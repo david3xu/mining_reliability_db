@@ -10,7 +10,8 @@ mining_reliability_db/
 ├── CHANGELOG.md                # Version history and changes
 ├── configs/                    # Configuration files
 │   ├── settings.py             # Configuration settings manager
-│   └── model_schema.json       # Neo4j schema definition
+│   ├── model_schema.json       # Neo4j schema definition
+│   └── field_mappings.json     # Field transformation mappings
 ├── data/                       # Data storage
 │   └── facility_data/          # Raw facility data files
 ├── mine_core/                  # Core package
@@ -18,6 +19,7 @@ mining_reliability_db/
 │   ├── database/               # Database operations
 │   │   ├── __init__.py
 │   │   ├── connection.py       # DB connection management
+│   │   ├── db.py               # Unified database interface
 │   │   └── queries.py          # Database query operations
 │   ├── entities/               # Data entities
 │   │   ├── __init__.py
