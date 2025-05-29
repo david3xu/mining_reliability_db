@@ -70,17 +70,17 @@ class Neo4jLoader:
         # Hierarchical chain relationships
         relationship_configs = [
             ("ActionRequest", "facility_id", "BELONGS_TO", "Facility", "facility_id"),
-            ("Problem", "action_request_id", "IDENTIFIED_IN", "ActionRequest", "action_request_id"),
+            ("Problem", "actionrequest_id", "IDENTIFIED_IN", "ActionRequest", "actionrequest_id"),
             ("RootCause", "problem_id", "ANALYZES", "Problem", "problem_id"),
-            ("ActionPlan", "root_cause_id", "RESOLVES", "RootCause", "cause_id"),
-            ("Verification", "action_plan_id", "VALIDATES", "ActionPlan", "plan_id"),
+            ("ActionPlan", "rootcause_id", "RESOLVES", "RootCause", "rootcause_id"),
+            ("Verification", "actionplan_id", "VALIDATES", "ActionPlan", "actionplan_id"),
             # Supporting relationships
             ("Asset", "problem_id", "INVOLVED_IN", "Problem", "problem_id"),
             ("AmountOfLoss", "problem_id", "QUANTIFIES", "Problem", "problem_id"),
             ("RecurringStatus", "problem_id", "CLASSIFIES", "Problem", "problem_id"),
-            ("Department", "action_request_id", "ASSIGNED_TO", "ActionRequest", "action_request_id"),
-            ("Review", "action_plan_id", "EVALUATES", "ActionPlan", "plan_id"),
-            ("EquipmentStrategy", "action_plan_id", "MODIFIES", "ActionPlan", "plan_id")
+            ("Department", "actionrequest_id", "ASSIGNED_TO", "ActionRequest", "actionrequest_id"),
+            ("Review", "actionplan_id", "EVALUATES", "ActionPlan", "actionplan_id"),
+            ("EquipmentStrategy", "actionplan_id", "MODIFIES", "ActionPlan", "actionplan_id")
         ]
 
         for from_type, from_field, rel_type, to_type, to_field in relationship_configs:

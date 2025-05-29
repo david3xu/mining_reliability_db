@@ -130,70 +130,70 @@
   ],
   "relationships": [
     {
-      "from": "Facility",
-      "to": "ActionRequest",
-      "type": "CONTAINS",
-      "cardinality": "one_to_many"
-    },
-    {
       "from": "ActionRequest",
-      "to": "Problem",
-      "type": "IDENTIFIES",
-      "cardinality": "one_to_many"
+      "to": "Facility",
+      "type": "BELONGS_TO",
+      "cardinality": "many_to_one"
     },
     {
       "from": "Problem",
-      "to": "RootCause",
-      "type": "ANALYZES",
-      "cardinality": "one_to_many"
+      "to": "ActionRequest",
+      "type": "IDENTIFIED_IN",
+      "cardinality": "many_to_one"
     },
     {
       "from": "RootCause",
-      "to": "ActionPlan",
+      "to": "Problem",
+      "type": "ANALYZES",
+      "cardinality": "many_to_one"
+    },
+    {
+      "from": "ActionPlan",
+      "to": "RootCause",
       "type": "RESOLVES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     },
     {
-      "from": "ActionPlan",
-      "to": "Verification",
+      "from": "Verification",
+      "to": "ActionPlan",
       "type": "VALIDATES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     },
     {
-      "from": "Problem",
-      "to": "Asset",
-      "type": "INVOLVES",
-      "cardinality": "one_to_many"
+      "from": "Asset",
+      "to": "Problem",
+      "type": "INVOLVED_IN",
+      "cardinality": "many_to_one"
     },
     {
-      "from": "Problem",
-      "to": "AmountOfLoss",
+      "from": "AmountOfLoss",
+      "to": "Problem",
       "type": "QUANTIFIES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     },
     {
-      "from": "Problem",
-      "to": "RecurringStatus",
+      "from": "RecurringStatus",
+      "to": "Problem",
       "type": "CLASSIFIES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     },
     {
-      "from": "ActionRequest",
-      "to": "Department",
-      "type": "ASSIGNS",
-      "cardinality": "one_to_many"
+      "from": "Department",
+      "to": "ActionRequest",
+      "type": "ASSIGNED_TO",
+      "cardinality": "many_to_one"
     },
     {
-      "from": "ActionPlan",
-      "to": "Review",
+      "from": "Review",
+      "to": "ActionPlan",
       "type": "EVALUATES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     },
     {
-      "from": "ActionPlan",
-      "to": "EquipmentStrategy",
+      "from": "EquipmentStrategy",
+      "to": "ActionPlan",
       "type": "MODIFIES",
-      "cardinality": "one_to_many"
+      "cardinality": "many_to_one"
     }
   ]
 }
