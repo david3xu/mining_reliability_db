@@ -1,0 +1,46 @@
+# Python bytecode and caching
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Development environments
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local Neo4j data
+.neo4j/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Data files (consider what should be versioned)
+data/facility_data/*.json
+!data/facility_data/sample.json
+*.xlsx
+*.csv
+*.db
+
+# Log files
+logs/
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
