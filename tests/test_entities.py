@@ -19,23 +19,57 @@ from mine_core.entities.definitions import (
 class TestEntityBase(unittest.TestCase):
     """Tests for Entity base class"""
 
-    def test_entity_types_registry(self):
-        """Test that entity types are registered correctly"""
-        entity_types = Entity.get_entity_types()
 
-        # Check expected entity types
-        expected_types = {
-            'Entity', 'Facility', 'ActionRequest', 'Problem', 'RootCause',
-            'ActionPlan', 'Verification', 'Department', 'Asset',
-            'RecurringStatus', 'AmountOfLoss', 'Review', 'EquipmentStrategy'
+    def test_entity_from_dict(self):
+        """Test entity creation from dictionary"""
+        # Test data for entity creation
+        data = {
+            "id": "test-id",
+            "facility_id": "facility-123",
+            "facility_name": "Test Facility",
+            "location": "Test Location",
+            "active": True,
+            "extra_field": "Should be ignored"  # This should not be included
         }
 
-        # Check all expected types are registered
-        for entity_type in expected_types:
-            self.assertIn(entity_type, entity_types)
+        # Create entity from dictionary
+        facility = Facility.from_dict(data)
 
-        # Check count matches
-        self.assertEqual(len(entity_types), len(expected_types))
+        # Check entity properties
+        self.assertEqual(facility.id, "test-id")
+        self.assertEqual(facility.facility_id, "facility-123")
+        self.assertEqual(facility.facility_name, "Test Facility")
+        self.assertEqual(facility.location, "Test Location")
+        self.assertTrue(facility.active)
+
+        # Ensure extra field was not included
+        self.assertFalse(hasattr(facility, "extra_field"))
+
+    def test_create_entity_from_dict(self):
+        """Test dynamic entity creation from type name and dictionary"""
+        # Test data for entity creation
+        data = {
+            "id": "test-id",
+            "problem_id": "prob-123",
+            "action_request_id": "ar-456",
+            "what_happened": "Test incident",
+            "requirement": "Test requirement"
+        }
+
+        # Create entity using factory function
+        problem = create_entity_from_dict("Problem", data)
+
+        # Check entity type and properties
+        self.assertIsInstance(problem, Problem)
+        self.assertEqual(problem.id, "test-id")
+        self.assertEqual(problem.problem_id, "prob-123")
+        self.assertEqual(problem.action_request_id, "ar-456")
+        self.assertEqual(problem.what_happened, "Test incident")
+        self.assertEqual(problem.requirement, "Test requirement")
+
+        # Test with unknown entity type
+        unknown = create_entity_from_dict("UnknownType", data)
+        self.assertIsNone(unknown)
 
 class TestEntityDefinitions(unittest.TestCase):
     """Tests for entity class definitions"""

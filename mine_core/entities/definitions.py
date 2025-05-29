@@ -7,15 +7,13 @@ Defines data structures and relationships for the entity model.
 import json
 import logging
 from pathlib import Path
-from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Set, ClassVar
+from dataclasses import dataclass, field, fields
+from typing import Dict, List, Any, Optional, Set, ClassVar, Type, TypeVar, get_type_hints
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
+
+# Type variable for entity types
+T = TypeVar('T', bound='Entity')
 
 @dataclass
 class Entity:
@@ -34,6 +32,18 @@ class Entity:
     def get_entity_types(cls) -> Set[str]:
         """Get all registered entity types"""
         return cls._entity_types
+
+    @classmethod
+    def from_dict(cls: Type[T], data: Dict[str, Any]) -> T:
+        """Create entity from dictionary"""
+        # Get field names and types for this class
+        entity_fields = {f.name: f.type for f in fields(cls)}
+
+        # Filter dictionary to only include fields in the class
+        filtered_data = {k: v for k, v in data.items() if k in entity_fields}
+
+        # Create entity from filtered data
+        return cls(**filtered_data)
 
 @dataclass
 class Facility(Entity):
@@ -149,6 +159,37 @@ class EquipmentStrategy(Entity):
     strategy_id: str
     action_plan_id: str
     apss_doc_number: Optional[str] = None
+
+def create_entity_from_dict(entity_type: str, data: Dict[str, Any]) -> Optional[Entity]:
+    """Create entity instance from dictionary and entity type name"""
+    # Map entity type names to classes
+    entity_classes = {
+        'Facility': Facility,
+        'ActionRequest': ActionRequest,
+        'Problem': Problem,
+        'RootCause': RootCause,
+        'ActionPlan': ActionPlan,
+        'Verification': Verification,
+        'Department': Department,
+        'Asset': Asset,
+        'RecurringStatus': RecurringStatus,
+        'AmountOfLoss': AmountOfLoss,
+        'Review': Review,
+        'EquipmentStrategy': EquipmentStrategy
+    }
+
+    # Get entity class
+    entity_class = entity_classes.get(entity_type)
+    if not entity_class:
+        logger.error(f"Unknown entity type: {entity_type}")
+        return None
+
+    # Create entity from data
+    try:
+        return entity_class.from_dict(data)
+    except Exception as e:
+        logger.error(f"Error creating {entity_type} entity: {e}")
+        return None
 
 def get_entity_definitions() -> Dict[str, Any]:
     """Get entity definitions from schema file"""

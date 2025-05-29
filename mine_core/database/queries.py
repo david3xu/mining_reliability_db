@@ -7,13 +7,8 @@ Core queries for mining reliability data.
 import logging
 from typing import Dict, List, Any, Optional
 
-from mine_core.database.connection import get_connection
+from mine_core.database.db import get_database
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 # Facility Queries
@@ -25,7 +20,7 @@ def get_facilities() -> List[Dict[str, Any]]:
     RETURN f.facility_id AS id, f.facility_name AS name, f.active AS active
     ORDER BY f.facility_name
     """
-    return get_connection().execute_query(query)
+    return get_database().execute_query(query)
 
 def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
     """Get facility by ID"""
@@ -33,7 +28,7 @@ def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
     MATCH (f:Facility {facility_id: $facility_id})
     RETURN f.facility_id AS id, f.facility_name AS name, f.active AS active
     """
-    results = get_connection().execute_query(query, facility_id=facility_id)
+    results = get_database().execute_query(query, facility_id=facility_id)
     return results[0] if results else None
 
 # ActionRequest Queries
@@ -70,7 +65,7 @@ def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[
         LIMIT $limit
         """
 
-    return get_connection().execute_query(query, **params)
+    return get_database().execute_query(query, **params)
 
 def get_action_request(action_request_id: str) -> Optional[Dict[str, Any]]:
     """Get action request by ID"""
@@ -91,7 +86,7 @@ def get_action_request(action_request_id: str) -> Optional[Dict[str, Any]]:
            f.facility_id AS facility_id,
            f.facility_name AS facility_name
     """
-    results = get_connection().execute_query(query, action_request_id=action_request_id)
+    results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else None
 
 # Incident Chain Queries
@@ -134,7 +129,7 @@ def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
            v.action_plan_eval_comment AS eval_comment,
            v.action_plan_verification_date AS verification_date
     """
-    results = get_connection().execute_query(query, action_request_id=action_request_id)
+    results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else {}
 
 # Supporting Entity Queries
@@ -147,7 +142,7 @@ def get_department(action_request_id: str) -> Optional[Dict[str, Any]]:
            d.init_dept AS init_dept,
            d.rec_dept AS rec_dept
     """
-    results = get_connection().execute_query(query, action_request_id=action_request_id)
+    results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else None
 
 def get_assets(problem_id: str) -> List[Dict[str, Any]]:
@@ -158,7 +153,7 @@ def get_assets(problem_id: str) -> List[Dict[str, Any]]:
            a.asset_numbers AS asset_numbers,
            a.asset_activity_numbers AS activity_numbers
     """
-    return get_connection().execute_query(query, problem_id=problem_id)
+    return get_database().execute_query(query, problem_id=problem_id)
 
 # Analysis Queries
 
@@ -170,7 +165,7 @@ def get_incident_counts_by_category() -> List[Dict[str, Any]]:
     RETURN ar.categories AS category, count(ar) AS count
     ORDER BY count DESC
     """
-    return get_connection().execute_query(query)
+    return get_database().execute_query(query)
 
 def get_root_cause_frequency() -> List[Dict[str, Any]]:
     """Get frequency of different root causes"""
@@ -181,7 +176,7 @@ def get_root_cause_frequency() -> List[Dict[str, Any]]:
     ORDER BY count DESC
     LIMIT 10
     """
-    return get_connection().execute_query(query)
+    return get_database().execute_query(query)
 
 def get_effectiveness_stats() -> Dict[str, Any]:
     """Get statistics on action plan effectiveness"""
@@ -195,7 +190,7 @@ def get_effectiveness_stats() -> Dict[str, Any]:
     RETURN total, effective, ineffective, unknown,
            toFloat(effective) / total * 100 AS effective_percent
     """
-    results = get_connection().execute_query(query)
+    results = get_database().execute_query(query)
     return results[0] if results else {
         "total": 0, "effective": 0, "ineffective": 0,
         "unknown": 0, "effective_percent": 0

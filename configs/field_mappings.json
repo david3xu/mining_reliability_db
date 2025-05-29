@@ -1,0 +1,78 @@
+{
+  "list_fields": [
+    "Obj. Evidence",
+    "Recom.Action",
+    "Immd. Contain. Action or Comments",
+    "Root Cause",
+    "Action Plan Eval Comment"
+  ],
+  "entity_mappings": {
+    "ActionRequest": {
+      "action_request_number": "Action Request Number:",
+      "title": "Title",
+      "initiation_date": "Initiation Date",
+      "action_types": "Action Types",
+      "categories": "Categories",
+      "requested_response_time": "Requested Response Time",
+      "past_due_status": "Past Due Status",
+      "days_past_due": "Days Past Due",
+      "operating_centre": "Operating Centre",
+      "stage": "Stage"
+    },
+    "Problem": {
+      "what_happened": "What happened?",
+      "requirement": "Requirement"
+    },
+    "RootCause": {
+      "root_cause": "Root Cause",
+      "objective_evidence": "Obj. Evidence"
+    },
+    "ActionPlan": {
+      "action_plan": "Action Plan",
+      "recommended_action": "Recom.Action",
+      "immediate_containment": "Immd. Contain. Action or Comments",
+      "due_date": "Due Date",
+      "complete": "Complete",
+      "completion_date": "Completion Date",
+      "comments": "Comments",
+      "response_date": "Response Date",
+      "response_revision_date": "Response Revision Date",
+      "did_plan_require_strategy_change": "Did this action plan require a change to the equipment management strategy ?",
+      "are_there_corrective_actions_to_update": "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?"
+    },
+    "Verification": {
+      "effectiveness_verification_due_date": "Effectiveness Verification Due Date",
+      "is_action_plan_effective": "IsActionPlanEffective",
+      "action_plan_eval_comment": "Action Plan Eval Comment",
+      "action_plan_verification_date": "Action Plan Verification Date:"
+    },
+    "Department": {
+      "init_dept": "Init. Dept.",
+      "rec_dept": "Rec. Dept."
+    },
+    "Asset": {
+      "asset_numbers": "Asset Number(s)",
+      "asset_activity_numbers": "Asset Activity numbers"
+    },
+    "RecurringStatus": {
+      "recurring_problems": "Recurring Problem(s)",
+      "recurring_comment": "Recurring Comment"
+    },
+    "AmountOfLoss": {
+      "amount_of_loss": "Amount of Loss"
+    },
+    "Review": {
+      "is_resp_satisfactory": "Is Resp Satisfactory?",
+      "reason_if_not_satisfactory": "Reason if not Satisfactory",
+      "reviewed_date": "Reviewed Date:",
+      "did_plan_require_change_review": "Did this action plan require a change to the equipment management strategy ? (review)"
+    },
+    "EquipmentStrategy": {
+      "apss_doc_number": "If yes, APSS Doc #"
+    }
+  },
+  "list_field_extraction": {
+    "Root Cause": "tail",
+    "default": "head"
+  }
+}

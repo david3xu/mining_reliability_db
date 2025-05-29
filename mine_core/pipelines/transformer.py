@@ -6,92 +6,28 @@ Transforms raw data to match entity model.
 
 import logging
 from typing import Dict, List, Any, Optional, Union
+from configs.settings import get_config
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 class DataTransformer:
     """Transforms raw facility data into entity model format"""
 
-    # List-type fields that need special handling
-    LIST_FIELDS = [
-        "Obj. Evidence",
-        "Recom.Action",
-        "Immd. Contain. Action or Comments",
-        "Root Cause",
-        "Action Plan Eval Comment"
-    ]
+    def __init__(self):
+        """Initialize with field mappings from configuration"""
+        # Get field mappings from configuration
+        mappings = get_config("mappings")
 
-    # Field mappings from raw to transformed
-    FIELD_MAPPINGS = {
-        "ActionRequest": {
-            "action_request_number": "Action Request Number:",
-            "title": "Title",
-            "initiation_date": "Initiation Date",
-            "action_types": "Action Types",
-            "categories": "Categories",
-            "requested_response_time": "Requested Response Time",
-            "past_due_status": "Past Due Status",
-            "days_past_due": "Days Past Due",
-            "operating_centre": "Operating Centre",
-            "stage": "Stage"
-        },
-        "Problem": {
-            "what_happened": "What happened?",
-            "requirement": "Requirement"
-        },
-        "RootCause": {
-            "root_cause": "Root Cause",
-            "objective_evidence": "Obj. Evidence"
-        },
-        "ActionPlan": {
-            "action_plan": "Action Plan",
-            "recommended_action": "Recom.Action",
-            "immediate_containment": "Immd. Contain. Action or Comments",
-            "due_date": "Due Date",
-            "complete": "Complete",
-            "completion_date": "Completion Date",
-            "comments": "Comments",
-            "response_date": "Response Date",
-            "response_revision_date": "Response Revision Date",
-            "did_plan_require_strategy_change": "Did this action plan require a change to the equipment management strategy ?",
-            "are_there_corrective_actions_to_update": "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?"
-        },
-        "Verification": {
-            "effectiveness_verification_due_date": "Effectiveness Verification Due Date",
-            "is_action_plan_effective": "IsActionPlanEffective",
-            "action_plan_eval_comment": "Action Plan Eval Comment",
-            "action_plan_verification_date": "Action Plan Verification Date:"
-        },
-        "Department": {
-            "init_dept": "Init. Dept.",
-            "rec_dept": "Rec. Dept."
-        },
-        "Asset": {
-            "asset_numbers": "Asset Number(s)",
-            "asset_activity_numbers": "Asset Activity numbers"
-        },
-        "RecurringStatus": {
-            "recurring_problems": "Recurring Problem(s)",
-            "recurring_comment": "Recurring Comment"
-        },
-        "AmountOfLoss": {
-            "amount_of_loss": "Amount of Loss"
-        },
-        "Review": {
-            "is_resp_satisfactory": "Is Resp Satisfactory?",
-            "reason_if_not_satisfactory": "Reason if not Satisfactory",
-            "reviewed_date": "Reviewed Date:",
-            "did_plan_require_change_review": "Did this action plan require a change to the equipment management strategy ? (review)"
-        },
-        "EquipmentStrategy": {
-            "apss_doc_number": "If yes, APSS Doc #"
-        }
-    }
+        if not mappings:
+            logger.warning("Field mappings not found in configuration, using empty defaults")
+            self.list_fields = []
+            self.field_mappings = {}
+            self.list_field_extraction = {"default": "head"}
+        else:
+            self.list_fields = mappings.get("list_fields", [])
+            self.field_mappings = mappings.get("entity_mappings", {})
+            self.list_field_extraction = mappings.get("list_field_extraction", {"default": "head"})
 
     def transform_facility_data(self, facility_data: Dict[str, Any]) -> Dict[str, Any]:
         """Transform facility data into entity model format"""
@@ -233,13 +169,16 @@ class DataTransformer:
         """Transform data for a specific entity type"""
         entity = {}
 
+        # Get field mappings for this entity type
+        field_mappings = self.field_mappings.get(entity_type, {})
+
         # Map fields according to the mapping definition
-        for target_field, source_field in self.FIELD_MAPPINGS[entity_type].items():
+        for target_field, source_field in field_mappings.items():
             if source_field in record:
                 value = record[source_field]
 
                 # Handle list fields with special extraction logic
-                if source_field in self.LIST_FIELDS:
+                if source_field in self.list_fields:
                     value = self._extract_list_field_value(source_field, value)
 
                 # Skip empty values
@@ -256,12 +195,15 @@ class DataTransformer:
         if not isinstance(value, list) or not value:
             return value
 
-        # Root Cause: use tail (second) item if available
-        if field_name == "Root Cause" and len(value) > 1:
-            return value[1]
+        # Get extraction method for this field
+        extraction_method = self.list_field_extraction.get(field_name,
+                                                          self.list_field_extraction.get("default", "head"))
 
-        # All other list fields: use head (first) item
-        return value[0]
+        # Apply extraction method
+        if extraction_method == "tail" and len(value) > 1:
+            return value[1]  # Return second item
+        else:
+            return value[0]  # Return first item (head)
 
     def _generate_entity_ids(self, action_request_number: str) -> Dict[str, str]:
         """Generate IDs for entities based on action request number"""

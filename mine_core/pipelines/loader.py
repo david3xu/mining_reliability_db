@@ -4,48 +4,24 @@ Data Loader for Mining Reliability Database
 Loads transformed data into Neo4j.
 """
 
-import os
 import logging
 from typing import Dict, List, Any
-from neo4j import GraphDatabase
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+from mine_core.database.db import get_database
+
 logger = logging.getLogger(__name__)
 
 class Neo4jLoader:
     """Loads transformed data into Neo4j database"""
 
     def __init__(self, uri=None, user=None, password=None):
-        """Initialize with Neo4j connection parameters"""
-        # Use environment variables if parameters not provided
-        self.uri = uri or os.environ.get("NEO4J_URI", "bolt://localhost:7687")
-        self.user = user or os.environ.get("NEO4J_USER", "neo4j")
-        self.password = password or os.environ.get("NEO4J_PASSWORD", "password")
-
-        # Create driver on demand (lazy loading)
-        self._driver = None
-
-    @property
-    def driver(self):
-        """Get Neo4j driver, creating it if necessary"""
-        if self._driver is None:
-            logger.info(f"Connecting to Neo4j at {self.uri}")
-            self._driver = GraphDatabase.driver(
-                self.uri,
-                auth=(self.user, self.password)
-            )
-        return self._driver
+        """Initialize loader with database connection"""
+        # Get database connection from unified interface
+        self.db = get_database(uri, user, password)
 
     def close(self):
-        """Close Neo4j connection"""
-        if self._driver is not None:
-            self._driver.close()
-            self._driver = None
-            logger.info("Neo4j connection closed")
+        """Close database connection"""
+        self.db.close()
 
     def load_data(self, transformed_data: Dict[str, Any]) -> bool:
         """Load transformed data into Neo4j"""
@@ -86,15 +62,8 @@ class Neo4jLoader:
             logger.warning("No facility data to load")
             return
 
-        with self.driver.session() as session:
-            query = """
-            MERGE (f:Facility {facility_id: $facility_id})
-            SET f.facility_name = $facility_name,
-                f.active = $active
-            """
-
-            session.run(query, **facility)
-            logger.info(f"Loaded facility: {facility.get('facility_id')}")
+        self.db.create_entity("Facility", facility)
+        logger.info(f"Loaded facility: {facility.get('facility_id')}")
 
     def _load_entities(self, entities: List[Dict[str, Any]], entity_type: str):
         """Load entities of a specific type"""
@@ -102,102 +71,62 @@ class Neo4jLoader:
             logger.info(f"No {entity_type} entities to load")
             return
 
-        with self.driver.session() as session:
-            # Prepare batch parameters for the query
-            batch_params = {"entities": entities}
-
-            # Create query to merge entities of this type
-            id_field = f"{entity_type.lower()}_id"
-
-            # Build SET clause dynamically based on first entity's properties
-            if entities:
-                # Get all properties excluding ID (already in MERGE)
-                sample_entity = entities[0]
-                properties = [k for k in sample_entity.keys() if k != id_field]
-
-                # Build the query
-                if properties:
-                    # Build SET clause
-                    set_clause = ", ".join([
-                        f"e.{prop} = entity.{prop}" for prop in properties
-                    ])
-
-                    query = f"""
-                    UNWIND $entities AS entity
-                    MERGE (e:{entity_type} {{{id_field}: entity.{id_field}}})
-                    SET {set_clause}
-                    """
-                else:
-                    # No properties to set
-                    query = f"""
-                    UNWIND $entities AS entity
-                    MERGE (e:{entity_type} {{{id_field}: entity.{id_field}}})
-                    """
-
-                # Execute the query
-                result = session.run(query, **batch_params)
-                logger.info(f"Loaded {len(entities)} {entity_type} entities")
+        # Use batch creation for efficiency
+        self.db.batch_create_entities(entity_type, entities)
+        logger.info(f"Loaded {len(entities)} {entity_type} entities")
 
     def _create_relationships(self, entities: Dict[str, List[Dict[str, Any]]]):
         """Create relationships between entities"""
-        with self.driver.session() as session:
-            # Create hierarchical chain relationships
-            self._create_relationship(session,
-                "ActionRequest", "BELONGS_TO", "Facility",
-                "action_request_id", "facility_id", "facility_id")
+        # Create hierarchical chain relationships
+        self._create_relationship_batch("ActionRequest", "facility_id", "BELONGS_TO", "Facility", "facility_id",
+                                       entities.get("ActionRequest", []))
 
-            self._create_relationship(session,
-                "Problem", "IDENTIFIED_IN", "ActionRequest",
-                "problem_id", "action_request_id", "action_request_id")
+        self._create_relationship_batch("Problem", "action_request_id", "IDENTIFIED_IN", "ActionRequest", "action_request_id",
+                                       entities.get("Problem", []))
 
-            self._create_relationship(session,
-                "RootCause", "ANALYZES", "Problem",
-                "cause_id", "problem_id", "problem_id")
+        self._create_relationship_batch("RootCause", "problem_id", "ANALYZES", "Problem", "problem_id",
+                                       entities.get("RootCause", []))
 
-            self._create_relationship(session,
-                "ActionPlan", "RESOLVES", "RootCause",
-                "plan_id", "root_cause_id", "cause_id")
+        self._create_relationship_batch("ActionPlan", "root_cause_id", "RESOLVES", "RootCause", "cause_id",
+                                       entities.get("ActionPlan", []))
 
-            self._create_relationship(session,
-                "Verification", "VALIDATES", "ActionPlan",
-                "verification_id", "action_plan_id", "plan_id")
+        self._create_relationship_batch("Verification", "action_plan_id", "VALIDATES", "ActionPlan", "plan_id",
+                                       entities.get("Verification", []))
 
-            # Create supporting entity relationships
-            self._create_relationship(session,
-                "Problem", "INVOLVES", "Asset",
-                "problem_id", "problem_id", "asset_id")
+        # Create supporting entity relationships
+        self._create_relationship_batch("Asset", "problem_id", "INVOLVED_IN", "Problem", "problem_id",
+                                       entities.get("Asset", []))
 
-            self._create_relationship(session,
-                "Problem", "QUANTIFIES", "AmountOfLoss",
-                "problem_id", "problem_id", "loss_id")
+        self._create_relationship_batch("AmountOfLoss", "problem_id", "QUANTIFIES", "Problem", "problem_id",
+                                       entities.get("AmountOfLoss", []))
 
-            self._create_relationship(session,
-                "Problem", "CLASSIFIES", "RecurringStatus",
-                "problem_id", "problem_id", "recurring_id")
+        self._create_relationship_batch("RecurringStatus", "problem_id", "CLASSIFIES", "Problem", "problem_id",
+                                       entities.get("RecurringStatus", []))
 
-            self._create_relationship(session,
-                "ActionRequest", "ASSIGNS", "Department",
-                "action_request_id", "action_request_id", "dept_id")
+        self._create_relationship_batch("Department", "action_request_id", "ASSIGNED_TO", "ActionRequest", "action_request_id",
+                                       entities.get("Department", []))
 
-            self._create_relationship(session,
-                "ActionPlan", "EVALUATES", "Review",
-                "plan_id", "plan_id", "review_id")
+        self._create_relationship_batch("Review", "action_plan_id", "EVALUATES", "ActionPlan", "plan_id",
+                                       entities.get("Review", []))
 
-            self._create_relationship(session,
-                "ActionPlan", "MODIFIES", "EquipmentStrategy",
-                "plan_id", "plan_id", "strategy_id")
+        self._create_relationship_batch("EquipmentStrategy", "action_plan_id", "MODIFIES", "ActionPlan", "plan_id",
+                                       entities.get("EquipmentStrategy", []))
 
-    def _create_relationship(self, session, from_entity, rel_type, to_entity,
-                            from_key, join_key, to_key):
-        """Create relationship between two entity types"""
-        query = f"""
-        MATCH (from:{from_entity}), (to:{to_entity})
-        WHERE from.{from_key} = to.{join_key}
-        MERGE (from)-[:{rel_type}]->(to)
-        """
-        try:
-            result = session.run(query)
-            summary = result.consume()
-            logger.info(f"Created {summary.counters.relationships_created} {from_entity}-[{rel_type}]->{to_entity} relationships")
-        except Exception as e:
-            logger.error(f"Error creating {from_entity}-[{rel_type}]->{to_entity} relationships: {e}")
+    def _create_relationship_batch(self, from_type, from_field, rel_type, to_type, to_field, entities):
+        """Create relationships in batch"""
+        if not entities:
+            return
+
+        relationship_count = 0
+
+        # Create individual relationships
+        for entity in entities:
+            from_id = entity.get(from_field)
+            to_id = entity.get(to_field, from_id)  # Default to from_id if to_field not in entity
+
+            if from_id and to_id:
+                if self.db.create_relationship(from_type, from_id, rel_type, to_type, to_id):
+                    relationship_count += 1
+
+        if relationship_count > 0:
+            logger.info(f"Created {relationship_count} {from_type}-[{rel_type}]->{to_type} relationships")
