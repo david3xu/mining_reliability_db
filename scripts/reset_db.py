@@ -4,8 +4,15 @@ Database Reset Script for Mining Reliability Database
 Cleans Neo4j database by removing all data and schema.
 """
 
+import sys
+import os
 import logging
 import argparse
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
 from mine_core.database.db import get_database
 
 logging.basicConfig(
