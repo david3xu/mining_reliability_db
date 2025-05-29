@@ -1,0 +1,199 @@
+{
+  "entities": [
+    {
+      "name": "Facility",
+      "properties": {
+        "facility_id": {"type": "string", "primary_key": true},
+        "facility_name": {"type": "string", "required": true},
+        "location": {"type": "string"},
+        "active": {"type": "boolean", "default": true}
+      }
+    },
+    {
+      "name": "ActionRequest",
+      "properties": {
+        "action_request_id": {"type": "string", "primary_key": true},
+        "facility_id": {"type": "string", "required": true},
+        "action_request_number": {"type": "string", "required": true},
+        "title": {"type": "string", "required": true},
+        "initiation_date": {"type": "date", "required": true},
+        "action_types": {"type": "string"},
+        "categories": {"type": "string"},
+        "requested_response_time": {"type": "string"},
+        "stage": {"type": "string"},
+        "operating_centre": {"type": "string"},
+        "past_due_status": {"type": "string"},
+        "days_past_due": {"type": "integer"}
+      }
+    },
+    {
+      "name": "Problem",
+      "properties": {
+        "problem_id": {"type": "string", "primary_key": true},
+        "action_request_id": {"type": "string", "required": true},
+        "what_happened": {"type": "text", "required": true},
+        "requirement": {"type": "text"}
+      }
+    },
+    {
+      "name": "RootCause",
+      "properties": {
+        "cause_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string", "required": true},
+        "root_cause": {"type": "text", "required": true},
+        "objective_evidence": {"type": "text"}
+      }
+    },
+    {
+      "name": "ActionPlan",
+      "properties": {
+        "plan_id": {"type": "string", "primary_key": true},
+        "root_cause_id": {"type": "string", "required": true},
+        "action_plan": {"type": "text", "required": true},
+        "recommended_action": {"type": "text"},
+        "immediate_containment": {"type": "text"},
+        "due_date": {"type": "date"},
+        "complete": {"type": "boolean", "default": false},
+        "completion_date": {"type": "date"},
+        "comments": {"type": "text"},
+        "response_date": {"type": "date"},
+        "response_revision_date": {"type": "date"},
+        "did_plan_require_strategy_change": {"type": "boolean", "default": false},
+        "are_there_corrective_actions_to_update": {"type": "boolean", "default": false}
+      }
+    },
+    {
+      "name": "Verification",
+      "properties": {
+        "verification_id": {"type": "string", "primary_key": true},
+        "action_plan_id": {"type": "string", "required": true},
+        "effectiveness_verification_due_date": {"type": "date"},
+        "is_action_plan_effective": {"type": "boolean"},
+        "action_plan_eval_comment": {"type": "text"},
+        "action_plan_verification_date": {"type": "date"}
+      }
+    },
+    {
+      "name": "Department",
+      "properties": {
+        "dept_id": {"type": "string", "primary_key": true},
+        "action_request_id": {"type": "string", "required": true},
+        "init_dept": {"type": "string"},
+        "rec_dept": {"type": "string"}
+      }
+    },
+    {
+      "name": "Asset",
+      "properties": {
+        "asset_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string", "required": true},
+        "asset_numbers": {"type": "string"},
+        "asset_activity_numbers": {"type": "string"}
+      }
+    },
+    {
+      "name": "RecurringStatus",
+      "properties": {
+        "recurring_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string", "required": true},
+        "recurring_problems": {"type": "boolean", "default": false},
+        "recurring_comment": {"type": "text"}
+      }
+    },
+    {
+      "name": "AmountOfLoss",
+      "properties": {
+        "loss_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string", "required": true},
+        "amount_of_loss": {"type": "string"}
+      }
+    },
+    {
+      "name": "Review",
+      "properties": {
+        "review_id": {"type": "string", "primary_key": true},
+        "action_plan_id": {"type": "string", "required": true},
+        "is_resp_satisfactory": {"type": "boolean"},
+        "reason_if_not_satisfactory": {"type": "text"},
+        "reviewed_date": {"type": "date"},
+        "did_plan_require_change_review": {"type": "boolean", "default": false}
+      }
+    },
+    {
+      "name": "EquipmentStrategy",
+      "properties": {
+        "strategy_id": {"type": "string", "primary_key": true},
+        "action_plan_id": {"type": "string", "required": true},
+        "apss_doc_number": {"type": "string"}
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": "Facility",
+      "to": "ActionRequest",
+      "type": "CONTAINS",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "ActionRequest",
+      "to": "Problem",
+      "type": "IDENTIFIES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "Problem",
+      "to": "RootCause",
+      "type": "ANALYZES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "RootCause",
+      "to": "ActionPlan",
+      "type": "RESOLVES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "ActionPlan",
+      "to": "Verification",
+      "type": "VALIDATES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "Problem",
+      "to": "Asset",
+      "type": "INVOLVES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "Problem",
+      "to": "AmountOfLoss",
+      "type": "QUANTIFIES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "Problem",
+      "to": "RecurringStatus",
+      "type": "CLASSIFIES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "ActionRequest",
+      "to": "Department",
+      "type": "ASSIGNS",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "ActionPlan",
+      "to": "Review",
+      "type": "EVALUATES",
+      "cardinality": "one_to_many"
+    },
+    {
+      "from": "ActionPlan",
+      "to": "EquipmentStrategy",
+      "type": "MODIFIES",
+      "cardinality": "one_to_many"
+    }
+  ]
+}

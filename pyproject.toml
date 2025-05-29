@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mining_reliability_db"
+version = "0.1.0"
+description = "Graph-based database system for mining incident analysis"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Mining Reliability Team"}
+]
+dependencies = [
+    "neo4j>=5.28.1",
+    "pandas>=2.1.4",
+    "numpy>=1.26.4",
+    "matplotlib>=3.10.1",
+    "seaborn>=0.13.2",
+]
+
+[project.optional-dependencies]
+web = [
+    "dash>=2.9.3",
+    "dash-bootstrap-components>=1.7.1",
+]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-mock>=3.12.0",
+    "black>=25.1.0",
+]
+
+[project.scripts]
+create-schema = "scripts.create_schema:main"
+import-data = "scripts.import_data:main"
+reset-db = "scripts.reset_db:main"
+
+[tool.setuptools]
+packages = ["mine_core"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+include = '\.pyi?$'
