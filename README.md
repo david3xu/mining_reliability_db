@@ -40,14 +40,14 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 make install        # Core dependencies only
 make install-dev    # Core + development tools
 make install-full   # All dependencies including ML/Azure tools
+
+# Setup environment configuration
+make setup          # Creates .env from template
 ```
 
 ### 3. Environment Setup
 
 ```bash
-# Copy environment template
-cp .env.example .env
-
 # Edit .env with your configuration
 # NEO4J_URI=bolt://localhost:7687
 # NEO4J_USER=neo4j

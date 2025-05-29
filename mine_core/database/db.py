@@ -16,28 +16,26 @@ class Database:
 
     def __init__(self, uri=None, user=None, password=None):
         """Initialize with Neo4j connection parameters"""
-        if uri or user or password:
-            # Use provided parameters
-            self.uri = uri
-            self.user = user
-            self.password = password
-        else:
-            # Use environment configuration
-            config = get_db_config()
-            self.uri = config["uri"]
-            self.user = config["user"]
-            self.password = config["password"]
-
+        self._uri = uri
+        self._user = user
+        self._password = password
         self._driver = None
 
     @property
     def driver(self):
         """Get Neo4j driver, creating it if necessary"""
         if self._driver is None:
-            logger.info(f"Connecting to Neo4j at {self.uri}")
+            if not (self._uri and self._user and self._password):
+                # Use environment configuration
+                config = get_db_config()
+                self._uri = config["uri"]
+                self._user = config["user"]
+                self._password = config["password"]
+
+            logger.info(f"Connecting to Neo4j at {self._uri}")
             self._driver = GraphDatabase.driver(
-                self.uri,
-                auth=(self.user, self.password)
+                self._uri,
+                auth=(self._user, self._password)
             )
 
             try:
@@ -159,3 +157,13 @@ def get_database(uri=None, user=None, password=None):
     if _db_instance is None:
         _db_instance = Database(uri, user, password)
     return _db_instance
+
+# Backward compatibility
+class DatabaseConnection:
+    """Legacy database connection wrapper"""
+    def __init__(self):
+        self.db = get_database()
+
+def get_connection():
+    """Legacy connection getter"""
+    return get_database()

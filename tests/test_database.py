@@ -5,12 +5,15 @@ Tests for unified database interface and queries
 
 import unittest
 from unittest.mock import patch, MagicMock
-from mine_core.database.db import Database, get_database
-from mine_core.database.connection import DatabaseConnection, get_connection
+from mine_core.database.db import Database, get_database, DatabaseConnection, get_connection, _db_instance
 from mine_core.database.queries import get_facilities, get_action_requests
 
 class TestUnifiedDatabase(unittest.TestCase):
     """Tests for unified Database interface"""
+
+    def setUp(self):
+        global _db_instance
+        _db_instance = None
 
     @patch('neo4j.GraphDatabase.driver')
     @patch('configs.environment.get_db_config')
@@ -99,6 +102,10 @@ class TestUnifiedDatabase(unittest.TestCase):
 class TestBackwardCompatibility(unittest.TestCase):
     """Tests for backward compatibility layer"""
 
+    def setUp(self):
+        global _db_instance
+        _db_instance = None
+
     @patch('mine_core.database.db.get_database')
     def test_connection_wrapper(self, mock_get_database):
         """Test DatabaseConnection wrapper works with unified interface"""
@@ -110,7 +117,7 @@ class TestBackwardCompatibility(unittest.TestCase):
         conn = DatabaseConnection()
 
         # Test wrapper delegates to unified interface
-        self.assertEqual(conn.db, mock_db)
+        self.assertIs(conn.db, mock_db)
         mock_get_database.assert_called_once()
 
     @patch('mine_core.database.db.get_database')
@@ -124,11 +131,15 @@ class TestBackwardCompatibility(unittest.TestCase):
         result = get_connection()
 
         # Verify it returns unified interface
-        self.assertEqual(result, mock_db)
+        self.assertIs(result, mock_db)
         mock_get_database.assert_called_once()
 
 class TestQueries(unittest.TestCase):
     """Tests for database queries with unified interface"""
+
+    def setUp(self):
+        global _db_instance
+        _db_instance = None
 
     @patch('mine_core.database.db.get_database')
     def test_get_facilities(self, mock_get_database):
