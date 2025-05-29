@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Unified Database Interface
-Provides a single entry point for all Neo4j operations.
+Single entry point for Neo4j operations.
 """
 
-import os
 import logging
 from contextlib import contextmanager
 from neo4j import GraphDatabase
+from configs.environment import get_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +16,18 @@ class Database:
 
     def __init__(self, uri=None, user=None, password=None):
         """Initialize with Neo4j connection parameters"""
-        # Use environment variables if parameters not provided
-        self.uri = uri or os.environ.get("NEO4J_URI", "bolt://localhost:7687")
-        self.user = user or os.environ.get("NEO4J_USER", "neo4j")
-        self.password = password or os.environ.get("NEO4J_PASSWORD", "password")
+        if uri or user or password:
+            # Use provided parameters
+            self.uri = uri
+            self.user = user
+            self.password = password
+        else:
+            # Use environment configuration
+            config = get_db_config()
+            self.uri = config["uri"]
+            self.user = config["user"]
+            self.password = config["password"]
+
         self._driver = None
 
     @property
@@ -32,7 +40,6 @@ class Database:
                 auth=(self.user, self.password)
             )
 
-            # Verify connectivity
             try:
                 self._driver.verify_connectivity()
                 logger.info("Neo4j connection verified")
@@ -67,7 +74,6 @@ class Database:
 
     def create_entity(self, entity_type, properties):
         """Create entity node with properties"""
-        # Find primary key
         id_field = f"{entity_type.lower()}_id"
         id_value = properties.get(id_field)
 
@@ -75,19 +81,13 @@ class Database:
             logger.error(f"Missing primary key {id_field} for {entity_type}")
             return False
 
-        # Filter out None values
         valid_props = {k: v for k, v in properties.items() if v is not None}
-
-        # Build dynamic SET clause
         props = [f"n.{k} = ${k}" for k in valid_props.keys()]
         set_clause = ", ".join(props) if props else ""
 
-        query = f"""
-        MERGE (n:{entity_type} {{{id_field}: ${id_field}}})
-        """
-
+        query = f"MERGE (n:{entity_type} {{{id_field}: ${id_field}}})"
         if set_clause:
-            query += f"SET {set_clause}"
+            query += f" SET {set_clause}"
 
         try:
             with self.session() as session:
@@ -121,21 +121,16 @@ class Database:
         if not entities_list:
             return True
 
-        # Find primary key field
         id_field = f"{entity_type.lower()}_id"
-
-        # Check if all entities have the primary key
         for entity in entities_list:
             if id_field not in entity:
                 logger.error(f"Missing primary key {id_field} in entity")
                 return False
 
-        # Get all property names from first entity
         sample_entity = entities_list[0]
         properties = list(sample_entity.keys())
-
-        # Build SET clause for non-primary key properties
         other_props = [p for p in properties if p != id_field]
+
         set_clause = ""
         if other_props:
             set_props = [f"n.{p} = entity.{p}" for p in other_props]

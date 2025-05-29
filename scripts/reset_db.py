@@ -4,35 +4,27 @@ Database Reset Script for Mining Reliability Database
 Cleans Neo4j database by removing all data and schema.
 """
 
-import argparse
 import logging
-from typing import Dict, List, Any
+import argparse
+from mine_core.database.db import get_database
 
-from mine_core.database.connection import get_connection
-from mine_core.helpers.log_manager import setup_logging, get_logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
-# Configure logging
-setup_logging()
-logger = get_logger(__name__)
-
-def get_database_stats() -> Dict[str, Any]:
+def get_database_stats(db):
     """Get current database statistics"""
-    connection = get_connection()
-
-    with connection.session() as session:
-        try:
-            # Count nodes by label
-            query = """
-            CALL db.labels() YIELD label
-            CALL apoc.cypher.run('MATCH (n:`' + $label + '`) RETURN count(n) as count', {}) YIELD value
-            RETURN $label AS label, value.count AS count
-            """
-
+    try:
+        with db.session() as session:
+            # Get node count by label
             label_results = []
             try:
-                label_results = session.run("CALL db.labels() YIELD label RETURN collect(label) AS labels").single()["labels"]
-            except Exception as e:
-                logger.warning(f"Could not get labels: {e}")
+                result = session.run("CALL db.labels() YIELD label RETURN collect(label) AS labels")
+                label_results = result.single()["labels"]
+            except Exception:
+                pass
 
             node_stats = {}
             total_nodes = 0
@@ -43,60 +35,33 @@ def get_database_stats() -> Dict[str, Any]:
                     count = result.single()["count"]
                     node_stats[label] = count
                     total_nodes += count
-                except Exception as e:
-                    logger.warning(f"Could not count nodes with label '{label}': {e}")
+                except Exception:
+                    pass
 
-            # If no specific labels found, get total node count
             if not node_stats:
                 result = session.run("MATCH (n) RETURN count(n) AS count")
                 total_nodes = result.single()["count"]
-                node_stats["(unlabeled)"] = total_nodes
 
             # Count relationships
             result = session.run("MATCH ()-[r]->() RETURN count(r) AS count")
             rel_count = result.single()["count"]
 
-            # Count constraints
-            constraints = []
-            try:
-                constraints = session.run("SHOW CONSTRAINTS").data()
-            except Exception as e:
-                logger.warning(f"Could not get constraints: {e}")
-
-            # Count indexes
-            indexes = []
-            try:
-                indexes = session.run("SHOW INDEXES").data()
-            except Exception as e:
-                logger.warning(f"Could not get indexes: {e}")
-
             return {
                 "nodes": node_stats,
                 "total_nodes": total_nodes,
-                "relationships": rel_count,
-                "constraints": len(constraints),
-                "indexes": len(indexes)
+                "relationships": rel_count
             }
 
-        except Exception as e:
-            logger.error(f"Error getting database stats: {e}")
-            return {
-                "nodes": {},
-                "total_nodes": 0,
-                "relationships": 0,
-                "constraints": 0,
-                "indexes": 0
-            }
+    except Exception as e:
+        logger.error(f"Error getting database stats: {e}")
+        return {"nodes": {}, "total_nodes": 0, "relationships": 0}
 
-def delete_all_data(batch_size: int = 5000) -> bool:
+def delete_all_data(db, batch_size=5000):
     """Delete all nodes and relationships"""
-    connection = get_connection()
-
     try:
         logger.info("Deleting all data...")
 
-        with connection.session() as session:
-            # First delete all relationships
+        with db.session() as session:
             deleted_rel_count = 0
             while True:
                 result = session.run(f"""
@@ -107,13 +72,10 @@ def delete_all_data(batch_size: int = 5000) -> bool:
                 """)
                 deleted = result.single()["deleted"]
                 deleted_rel_count += deleted
-
                 if deleted == 0:
                     break
-
                 logger.info(f"Deleted {deleted} relationships (Total: {deleted_rel_count})")
 
-            # Then delete all nodes
             deleted_node_count = 0
             while True:
                 result = session.run(f"""
@@ -124,10 +86,8 @@ def delete_all_data(batch_size: int = 5000) -> bool:
                 """)
                 deleted = result.single()["deleted"]
                 deleted_node_count += deleted
-
                 if deleted == 0:
                     break
-
                 logger.info(f"Deleted {deleted} nodes (Total: {deleted_node_count})")
 
         logger.info(f"Data deletion complete: {deleted_node_count} nodes, {deleted_rel_count} relationships")
@@ -137,139 +97,78 @@ def delete_all_data(batch_size: int = 5000) -> bool:
         logger.error(f"Error deleting data: {e}")
         return False
 
-def drop_constraints() -> bool:
+def drop_constraints(db):
     """Drop all constraints"""
-    connection = get_connection()
-
     try:
         logger.info("Dropping constraints...")
-
-        with connection.session() as session:
-            # Get all constraints
-            constraints = []
+        with db.session() as session:
             try:
                 constraints = session.run("SHOW CONSTRAINTS").data()
-            except Exception as e:
-                logger.warning(f"Could not get constraints: {e}")
-                return False
-
-            # Drop each constraint
-            for constraint in constraints:
-                if 'name' in constraint:
-                    try:
+                for constraint in constraints:
+                    if 'name' in constraint:
                         session.run(f"DROP CONSTRAINT {constraint['name']}")
                         logger.info(f"Dropped constraint: {constraint['name']}")
-                    except Exception as e:
-                        logger.warning(f"Could not drop constraint {constraint['name']}: {e}")
-
+            except Exception as e:
+                logger.warning(f"Could not drop constraints: {e}")
         return True
-
     except Exception as e:
         logger.error(f"Error dropping constraints: {e}")
         return False
 
-def drop_indexes() -> bool:
-    """Drop all indexes"""
-    connection = get_connection()
-
-    try:
-        logger.info("Dropping indexes...")
-
-        with connection.session() as session:
-            # Get all indexes
-            indexes = []
-            try:
-                indexes = session.run("SHOW INDEXES").data()
-            except Exception as e:
-                logger.warning(f"Could not get indexes: {e}")
-                return False
-
-            # Drop each index
-            for index in indexes:
-                if 'name' in index:
-                    try:
-                        session.run(f"DROP INDEX {index['name']}")
-                        logger.info(f"Dropped index: {index['name']}")
-                    except Exception as e:
-                        logger.warning(f"Could not drop index {index['name']}: {e}")
-
-        return True
-
-    except Exception as e:
-        logger.error(f"Error dropping indexes: {e}")
-        return False
-
-def reset_database(batch_size: int = 5000, drop_schema: bool = False) -> bool:
+def reset_database(db, batch_size=5000, drop_schema=False):
     """Reset Neo4j database"""
     logger.info("Resetting Neo4j database...")
 
     # Get initial stats
-    initial_stats = get_database_stats()
-    logger.info(f"Initial database stats: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships")
+    initial_stats = get_database_stats(db)
+    logger.info(f"Initial: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships")
 
     # Delete all data
-    if not delete_all_data(batch_size):
-        logger.error("Failed to delete data")
+    if not delete_all_data(db, batch_size):
         return False
 
     # Drop schema if requested
-    if drop_schema:
-        if not drop_constraints():
-            logger.error("Failed to drop constraints")
-            return False
-
-        if not drop_indexes():
-            logger.error("Failed to drop indexes")
-            return False
+    if drop_schema and not drop_constraints(db):
+        return False
 
     # Get final stats
-    final_stats = get_database_stats()
-    logger.info(f"Final database stats: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships")
+    final_stats = get_database_stats(db)
+    logger.info(f"Final: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships")
 
     return final_stats['total_nodes'] == 0 and final_stats['relationships'] == 0
 
 def main():
     """Main execution function"""
-    parser = argparse.ArgumentParser(
-        description="Reset Neo4j database for Mining Reliability DB"
-    )
-    parser.add_argument("--batch-size", type=int, default=5000,
-                        help="Batch size for deleting nodes and relationships")
-    parser.add_argument("--drop-schema", action="store_true",
-                        help="Drop schema (constraints and indexes) in addition to data")
-    parser.add_argument("--uri", type=str, default=None,
-                        help="Neo4j URI (default: environment variable or bolt://localhost:7687)")
-    parser.add_argument("--user", type=str, default=None,
-                        help="Neo4j username (default: environment variable or neo4j)")
-    parser.add_argument("--password", type=str, default=None,
-                        help="Neo4j password (default: environment variable or password)")
-    parser.add_argument("--force", action="store_true",
-                        help="Skip confirmation prompt")
+    parser = argparse.ArgumentParser(description="Reset Neo4j database")
+    parser.add_argument("--batch-size", type=int, default=5000, help="Batch size for deletion")
+    parser.add_argument("--drop-schema", action="store_true", help="Drop schema constraints")
+    parser.add_argument("--uri", type=str, help="Neo4j URI")
+    parser.add_argument("--user", type=str, help="Neo4j username")
+    parser.add_argument("--password", type=str, help="Neo4j password")
+    parser.add_argument("--force", action="store_true", help="Skip confirmation")
 
     args = parser.parse_args()
 
     try:
-        # Setup connection
-        connection = get_connection(args.uri, args.user, args.password)
+        # Setup database connection
+        db = get_database(args.uri, args.user, args.password)
 
-        # Get initial stats
-        initial_stats = get_database_stats()
+        # Show current stats
+        initial_stats = get_database_stats(db)
         print("Current database stats:")
         print(f"  Nodes: {initial_stats['total_nodes']}")
         print(f"  Relationships: {initial_stats['relationships']}")
-        print(f"  Constraints: {initial_stats['constraints']}")
-        print(f"  Indexes: {initial_stats['indexes']}")
         print()
 
         # Confirm reset
         if not args.force:
-            confirm = input("Are you sure you want to reset the database? This will delete all data. (y/n): ")
+            confirm = input("Reset database? This deletes all data. (y/n): ")
             if confirm.lower() != 'y':
                 print("Reset cancelled")
                 return 0
 
         # Reset database
-        success = reset_database(args.batch_size, args.drop_schema)
+        success = reset_database(db, args.batch_size, args.drop_schema)
 
         if success:
             print("Database reset successful!")
@@ -284,10 +183,9 @@ def main():
         return 1
 
     finally:
-        # Close connection
         try:
-            connection = get_connection()
-            connection.close()
+            db = get_database()
+            db.close()
         except:
             pass
 
