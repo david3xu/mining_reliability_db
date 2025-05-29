@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 class DataTransformer:
     """Transforms raw facility data into entity model format"""
 
-    def __init__(self):
-        """Initialize with field mappings from configuration"""
-        mappings = get_mappings()
+    def __init__(self, mappings=None, use_config=True):
+        """Initialize with field mappings from configuration or provided mappings"""
+        if mappings is None and use_config:
+            mappings = get_mappings()
 
         if not mappings:
             logger.warning("Field mappings not found in configuration")
@@ -63,7 +64,7 @@ class DataTransformer:
 
         # Transform ActionRequest
         action_request = self._transform_entity(record, "ActionRequest")
-        action_request["action_request_id"] = entity_ids["action_request_id"]
+        action_request["actionrequest_id"] = entity_ids["actionrequest_id"]
         action_request["facility_id"] = facility_id
         transformed["entities"]["ActionRequest"].append(action_request)
 
@@ -71,7 +72,7 @@ class DataTransformer:
         if record.get("What happened?"):
             problem = self._transform_entity(record, "Problem")
             problem["problem_id"] = entity_ids["problem_id"]
-            problem["action_request_id"] = entity_ids["action_request_id"]
+            problem["actionrequest_id"] = entity_ids["actionrequest_id"]
             transformed["entities"]["Problem"].append(problem)
 
             self._transform_problem_entities(record, entity_ids, transformed)
@@ -83,16 +84,16 @@ class DataTransformer:
         # Transform Department if data exists
         if record.get("Init. Dept.") or record.get("Rec. Dept."):
             department = self._transform_entity(record, "Department")
-            department["dept_id"] = entity_ids["dept_id"]
-            department["action_request_id"] = entity_ids["action_request_id"]
+            department["department_id"] = entity_ids["department_id"]
+            department["actionrequest_id"] = entity_ids["actionrequest_id"]
             transformed["entities"]["Department"].append(department)
 
     def _transform_problem_entities(self, record: Dict[str, Any], entity_ids: Dict[str, str], transformed: Dict[str, Any]) -> None:
         """Transform entities connected to Problem"""
         entity_configs = [
             ("Asset", ["Asset Number(s)", "Asset Activity numbers"], "asset_id"),
-            ("RecurringStatus", ["Recurring Problem(s)", "Recurring Comment"], "recurring_id"),
-            ("AmountOfLoss", ["Amount of Loss"], "loss_id")
+            ("RecurringStatus", ["Recurring Problem(s)", "Recurring Comment"], "recurringstatus_id"),
+            ("AmountOfLoss", ["Amount of Loss"], "amountofloss_id")
         ]
 
         for entity_type, required_fields, id_field in entity_configs:
@@ -106,29 +107,29 @@ class DataTransformer:
         """Transform RootCause and connected entities"""
         # Transform RootCause
         root_cause = self._transform_entity(record, "RootCause")
-        root_cause["cause_id"] = entity_ids["cause_id"]
+        root_cause["rootcause_id"] = entity_ids["rootcause_id"]
         root_cause["problem_id"] = entity_ids["problem_id"]
         transformed["entities"]["RootCause"].append(root_cause)
 
         # Transform ActionPlan if data exists
         if record.get("Action Plan"):
             action_plan = self._transform_entity(record, "ActionPlan")
-            action_plan["plan_id"] = entity_ids["plan_id"]
-            action_plan["root_cause_id"] = entity_ids["cause_id"]
+            action_plan["actionplan_id"] = entity_ids["actionplan_id"]
+            action_plan["rootcause_id"] = entity_ids["rootcause_id"]
             transformed["entities"]["ActionPlan"].append(action_plan)
 
             # Transform connected entities
             connected_configs = [
                 ("Verification", ["Effectiveness Verification Due Date", "IsActionPlanEffective"], "verification_id"),
                 ("Review", ["Is Resp Satisfactory?", "Reviewed Date:"], "review_id"),
-                ("EquipmentStrategy", ["If yes, APSS Doc #"], "strategy_id")
+                ("EquipmentStrategy", ["If yes, APSS Doc #"], "equipmentstrategy_id")
             ]
 
             for entity_type, required_fields, id_field in connected_configs:
                 if any(record.get(field) for field in required_fields):
                     entity = self._transform_entity(record, entity_type)
                     entity[id_field] = entity_ids[id_field]
-                    entity["action_plan_id"] = entity_ids["plan_id"]
+                    entity["actionplan_id"] = entity_ids["actionplan_id"]
                     transformed["entities"][entity_type].append(entity)
 
     def _transform_entity(self, record: Dict[str, Any], entity_type: str) -> Dict[str, Any]:
@@ -168,15 +169,15 @@ class DataTransformer:
         request_id = action_request_number.replace('-', '').lower()
 
         return {
-            "action_request_id": f"ar-{request_id}",
+            "actionrequest_id": f"ar-{request_id}",  # Database expects lowercase without underscores
             "problem_id": f"prob-{request_id}",
-            "cause_id": f"cause-{request_id}",
-            "plan_id": f"plan-{request_id}",
+            "rootcause_id": f"cause-{request_id}",   # Database expects 'rootcause_id' not 'cause_id'
+            "actionplan_id": f"plan-{request_id}",   # Database expects 'actionplan_id' not 'plan_id'
             "verification_id": f"ver-{request_id}",
-            "dept_id": f"dept-{request_id}",
+            "department_id": f"dept-{request_id}",   # Database expects 'department_id' not 'dept_id'
             "asset_id": f"asset-{request_id}",
-            "recurring_id": f"rec-{request_id}",
-            "loss_id": f"loss-{request_id}",
+            "recurringstatus_id": f"rec-{request_id}",  # Database expects 'recurringstatus_id' not 'recurring_id'
+            "amountofloss_id": f"loss-{request_id}",    # Database expects 'amountofloss_id' not 'loss_id'
             "review_id": f"rev-{request_id}",
-            "strategy_id": f"strat-{request_id}"
+            "equipmentstrategy_id": f"strat-{request_id}"  # Database expects 'equipmentstrategy_id' not 'strategy_id'
         }

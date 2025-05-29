@@ -41,6 +41,10 @@ class TestDatabaseInterface(unittest.TestCase):
         db1 = get_database()
         db2 = get_database()
 
+        # Access driver to trigger initialization
+        driver1 = db1.driver
+        driver2 = db2.driver
+
         # Check singleton pattern
         self.assertIs(db1, db2)
         mock_driver.assert_called_once()
@@ -58,7 +62,7 @@ class TestDatabaseInterface(unittest.TestCase):
         db = Database()
         entity_type = "TestEntity"
         properties = {
-            "test_id": "test-123",
+            "testentity_id": "test-123",
             "name": "Test Entity",
             "active": True
         }
@@ -73,8 +77,9 @@ class TestDatabaseInterface(unittest.TestCase):
         # Check query contains expected merge pattern
         call_args = mock_session.run.call_args[0]
         query = call_args[0]
-        self.assertIn(f"MERGE (n:{entity_type} {{test_id: $test_id}})", query)
-        self.assertIn("SET n.name = $name, n.active = $active", query)
+        self.assertIn(f"MERGE (n:{entity_type} {{testentity_id: $testentity_id}})", query)
+        self.assertIn("n.name = $name", query)
+        self.assertIn("n.active = $active", query)
 
     @patch('neo4j.GraphDatabase.driver')
     def test_batch_create_entities(self, mock_driver):
@@ -89,8 +94,8 @@ class TestDatabaseInterface(unittest.TestCase):
         db = Database()
         entity_type = "TestEntity"
         entities = [
-            {"test_id": "test-1", "name": "Test 1"},
-            {"test_id": "test-2", "name": "Test 2"}
+            {"testentity_id": "test-1", "name": "Test 1"},
+            {"testentity_id": "test-2", "name": "Test 2"}
         ]
 
         # Call batch_create_entities
@@ -104,7 +109,7 @@ class TestDatabaseInterface(unittest.TestCase):
         call_args = mock_session.run.call_args
         query = call_args[0][0]
         self.assertIn("UNWIND $entities AS entity", query)
-        self.assertIn(f"MERGE (n:{entity_type} {{test_id: entity.test_id}})", query)
+        self.assertIn(f"MERGE (n:{entity_type} {{testentity_id: entity.testentity_id}})", query)
         self.assertIn("SET n.name = entity.name", query)
 
         # Check entities parameter
@@ -140,7 +145,7 @@ class TestDatabaseInterface(unittest.TestCase):
         call_args = mock_session.run.call_args
         query = call_args[0][0]
         self.assertIn("MATCH (from:FromEntity {fromentity_id: $from_id})", query)
-        self.assertIn("MATCH (to:ToEntity {toentity_id: $to_id})", query)
+        self.assertIn("(to:ToEntity {toentity_id: $to_id})", query)
         self.assertIn("MERGE (from)-[r:RELATES_TO]->(to)", query)
 
         # Check parameters

@@ -43,7 +43,7 @@ packages = ["mine_core"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "-v --cov=mine_core"
+addopts = "-v --tb=short"
 
 [tool.black]
 line-length = 88

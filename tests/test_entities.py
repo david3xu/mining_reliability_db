@@ -13,7 +13,7 @@ from mine_core.entities.definitions import (
     Entity, Facility, ActionRequest, Problem, RootCause,
     ActionPlan, Verification, Department, Asset,
     RecurringStatus, AmountOfLoss, Review, EquipmentStrategy,
-    get_entity_definitions
+    get_entity_definitions, create_entity_from_dict
 )
 
 class TestEntityBase(unittest.TestCase):

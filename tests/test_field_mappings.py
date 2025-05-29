@@ -12,8 +12,7 @@ from mine_core.pipelines.transformer import DataTransformer
 class TestFieldMappings(unittest.TestCase):
     """Tests for field mapping configuration"""
 
-    @patch('configs.environment.get_mappings')
-    def test_config_based_initialization(self, mock_get_mappings):
+    def test_config_based_initialization(self):
         """Test transformer initialization with config-based mappings"""
         # Setup mock configuration
         mock_mappings = {
@@ -28,18 +27,16 @@ class TestFieldMappings(unittest.TestCase):
                 "default": "head"
             }
         }
-        mock_get_mappings.return_value = mock_mappings
 
         # Create transformer with mocked config
-        transformer = DataTransformer()
+        transformer = DataTransformer(mappings=mock_mappings)
 
         # Check mappings loaded from config
         self.assertEqual(transformer.list_fields, ["Field1", "Field2"])
         self.assertEqual(transformer.field_mappings, {"EntityType": {"target_field": "source_field"}})
         self.assertEqual(transformer.list_field_extraction, {"Field1": "tail", "default": "head"})
 
-    @patch('configs.environment.get_mappings')
-    def test_extract_list_field_value(self, mock_get_mappings):
+    def test_extract_list_field_value(self):
         """Test list field extraction logic based on configuration"""
         # Setup mock configuration
         mock_mappings = {
@@ -49,10 +46,9 @@ class TestFieldMappings(unittest.TestCase):
                 "default": "head"
             }
         }
-        mock_get_mappings.return_value = mock_mappings
 
         # Create transformer with mocked config
-        transformer = DataTransformer()
+        transformer = DataTransformer(mappings=mock_mappings)
 
         # Test tail extraction
         value1 = ["First", "Second", "Third"]
@@ -74,8 +70,7 @@ class TestFieldMappings(unittest.TestCase):
         result4 = transformer._extract_list_field_value("Field1", value4)
         self.assertEqual(result4, [])  # Return as is if empty list
 
-    @patch('configs.environment.get_mappings')
-    def test_transform_entity(self, mock_get_mappings):
+    def test_transform_entity(self):
         """Test entity transformation with field mappings"""
         # Setup mock configuration
         mock_mappings = {
@@ -91,10 +86,9 @@ class TestFieldMappings(unittest.TestCase):
                 "default": "head"
             }
         }
-        mock_get_mappings.return_value = mock_mappings
 
         # Create transformer with mocked config
-        transformer = DataTransformer()
+        transformer = DataTransformer(mappings=mock_mappings)
 
         # Create test record
         record = {
@@ -113,28 +107,20 @@ class TestFieldMappings(unittest.TestCase):
         self.assertEqual(entity["target_list_field"], "Item1")  # Head of list
         self.assertNotIn("UnmappedField", entity)  # Unmapped field not included
 
-    @patch('configs.environment.get_mappings')
-    def test_fallback_behavior(self, mock_get_mappings):
+    def test_fallback_behavior(self):
         """Test transformer behavior when mappings not available"""
-        # Setup mock to return empty mappings
-        mock_get_mappings.return_value = {}
-
         # Create transformer with empty config
-        transformer = DataTransformer()
+        transformer = DataTransformer(mappings={})
 
         # Check fallback behavior
         self.assertEqual(transformer.list_fields, [])
         self.assertEqual(transformer.field_mappings, {})
         self.assertEqual(transformer.list_field_extraction, {"default": "head"})
 
-    @patch('configs.environment.get_mappings')
-    def test_missing_mappings_handling(self, mock_get_mappings):
+    def test_missing_mappings_handling(self):
         """Test transformer behavior when get_mappings returns None"""
-        # Setup mock to return None
-        mock_get_mappings.return_value = None
-
-        # Create transformer with None config
-        transformer = DataTransformer()
+        # Create transformer with None config and disabled config loading
+        transformer = DataTransformer(mappings=None, use_config=False)
 
         # Check fallback behavior
         self.assertEqual(transformer.list_fields, [])

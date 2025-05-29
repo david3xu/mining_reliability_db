@@ -9,6 +9,14 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional
 
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not available, continue without it
+    pass
+
 def get_env(key: str, default: str = None) -> str:
     """Load environment variable with optional default"""
     return os.environ.get(key, default)

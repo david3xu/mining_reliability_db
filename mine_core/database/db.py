@@ -22,6 +22,21 @@ class Database:
         self._driver = None
 
     @property
+    def uri(self):
+        """Get URI for backward compatibility"""
+        return self._uri
+
+    @property
+    def user(self):
+        """Get user for backward compatibility"""
+        return self._user
+
+    @property
+    def password(self):
+        """Get password for backward compatibility"""
+        return self._password
+
+    @property
     def driver(self):
         """Get Neo4j driver, creating it if necessary"""
         if self._driver is None:

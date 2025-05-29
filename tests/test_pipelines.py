@@ -124,19 +124,17 @@ class TestTransformer(unittest.TestCase):
 class TestLoader(unittest.TestCase):
     """Tests for Neo4jLoader class"""
 
-    @patch('neo4j.GraphDatabase.driver')
-    def test_load_data(self, mock_driver):
+    def test_load_data(self):
         """Test load_data method"""
-        # Setup session mock
-        mock_session = MagicMock()
-        mock_result = MagicMock()
+        # Create loader
+        loader = Neo4jLoader()
 
-        mock_session.run.return_value = mock_result
-
-        # Setup driver mock
-        mock_driver_instance = MagicMock()
-        mock_driver_instance.session.return_value = mock_session
-        mock_driver.return_value = mock_driver_instance
+        # Mock the database instance directly
+        mock_db = MagicMock()
+        mock_db.create_entity.return_value = True
+        mock_db.batch_create_entities.return_value = True
+        mock_db.create_relationship.return_value = True
+        loader.db = mock_db
 
         # Sample transformed data
         transformed_data = {
@@ -148,7 +146,7 @@ class TestLoader(unittest.TestCase):
             'entities': {
                 'ActionRequest': [
                     {
-                        'action_request_id': 'ar-001',
+                        'actionrequest_id': 'ar-001',
                         'facility_id': 'test_facility',
                         'action_request_number': 'AR-001',
                         'title': 'Test Request'
@@ -167,33 +165,40 @@ class TestLoader(unittest.TestCase):
             }
         }
 
-        # Create loader and load data
-        loader = Neo4jLoader()
+        # Load data
         result = loader.load_data(transformed_data)
 
         # Check result
         self.assertTrue(result)
 
-        # Check session calls
-        self.assertEqual(mock_session.run.call_count, 1)  # Only facility loaded
+        # Check database method calls
+        # Should call create_entity for facility, batch_create_entities for ActionRequest,
+        # and create_relationship only for ActionRequest->Facility (1 time, since other entities are empty)
+        mock_db.create_entity.assert_called_once()
+        mock_db.batch_create_entities.assert_called_once()
+        self.assertEqual(mock_db.create_relationship.call_count, 1)
 
         # Test with entities
         transformed_data['entities']['Problem'] = [
             {
                 'problem_id': 'prob-001',
-                'action_request_id': 'ar-001',
+                'actionrequest_id': 'ar-001',
                 'what_happened': 'Test incident'
             }
         ]
 
-        mock_session.reset_mock()
+        mock_db.reset_mock()
         result = loader.load_data(transformed_data)
 
         # Check result
         self.assertTrue(result)
 
-        # Check session calls
-        self.assertEqual(mock_session.run.call_count, 2)  # Facility and Problem
+        # Check database method calls
+        # Should call create_entity for facility, batch_create_entities for ActionRequest and Problem,
+        # and create_relationship for ActionRequest->Facility and Problem->ActionRequest (2 times)
+        mock_db.create_entity.assert_called_once()
+        self.assertEqual(mock_db.batch_create_entities.call_count, 2)
+        self.assertEqual(mock_db.create_relationship.call_count, 2)
 
 class TestPipelineIntegration(unittest.TestCase):
     """Integration tests for full ETL pipeline"""
@@ -201,8 +206,7 @@ class TestPipelineIntegration(unittest.TestCase):
     @patch('pathlib.Path.exists')
     @patch('builtins.open', new_callable=mock_open)
     @patch('json.load')
-    @patch('neo4j.GraphDatabase.driver')
-    def test_extract_transform_load(self, mock_driver, mock_json_load, mock_file_open, mock_exists):
+    def test_extract_transform_load(self, mock_json_load, mock_file_open, mock_exists):
         """Test extract-transform-load pipeline"""
         # Setup mocks
         mock_exists.return_value = True
@@ -226,21 +230,17 @@ class TestPipelineIntegration(unittest.TestCase):
         }
         mock_json_load.return_value = mock_data
 
-        # Setup session mock
-        mock_session = MagicMock()
-        mock_result = MagicMock()
-
-        mock_session.run.return_value = mock_result
-
-        # Setup driver mock
-        mock_driver_instance = MagicMock()
-        mock_driver_instance.session.return_value = mock_session
-        mock_driver.return_value = mock_driver_instance
-
         # Create pipeline components
         extractor = FacilityDataExtractor('/fake/path')
         transformer = DataTransformer()
         loader = Neo4jLoader()
+
+        # Mock the loader's database
+        mock_db = MagicMock()
+        mock_db.create_entity.return_value = True
+        mock_db.batch_create_entities.return_value = True
+        mock_db.create_relationship.return_value = True
+        loader.db = mock_db
 
         # Run pipeline
         facility_data = extractor.extract_facility_data('test_facility')
@@ -258,8 +258,10 @@ class TestPipelineIntegration(unittest.TestCase):
         self.assertEqual(transformed_data['facility']['facility_id'], 'test_facility')
         self.assertEqual(len(transformed_data['entities']['ActionRequest']), 1)
 
-        # Check loading
-        self.assertTrue(mock_session.run.called)
+        # Check loading - should have database method calls
+        self.assertTrue(mock_db.create_entity.called)
+        self.assertTrue(mock_db.batch_create_entities.called)
+        self.assertTrue(mock_db.create_relationship.called)
 
 if __name__ == '__main__':
     unittest.main()

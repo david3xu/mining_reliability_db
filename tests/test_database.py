@@ -16,7 +16,7 @@ class TestUnifiedDatabase(unittest.TestCase):
         _db_instance = None
 
     @patch('neo4j.GraphDatabase.driver')
-    @patch('configs.environment.get_db_config')
+    @patch('mine_core.database.db.get_db_config')  # Patch where it's used, not where it's defined
     def test_database_initialization_with_config(self, mock_get_config, mock_driver):
         """Test database initialization using environment config"""
         # Setup mocks
@@ -28,7 +28,10 @@ class TestUnifiedDatabase(unittest.TestCase):
         mock_driver_instance = MagicMock()
         mock_driver.return_value = mock_driver_instance
 
-        # Create database instance
+        # Mock verify_connectivity to prevent actual connection
+        mock_driver_instance.verify_connectivity.return_value = True
+
+        # Create database instance without parameters to force config usage
         db = Database()
 
         # Access driver to trigger initialization
@@ -141,7 +144,7 @@ class TestQueries(unittest.TestCase):
         global _db_instance
         _db_instance = None
 
-    @patch('mine_core.database.db.get_database')
+    @patch('mine_core.database.queries.get_database')
     def test_get_facilities(self, mock_get_database):
         """Test get_facilities query"""
         # Setup mock
@@ -161,7 +164,7 @@ class TestQueries(unittest.TestCase):
         self.assertEqual(result[0]["id"], "facility1")
         self.assertEqual(result[1]["name"], "Facility 2")
 
-    @patch('mine_core.database.db.get_database')
+    @patch('mine_core.database.queries.get_database')
     def test_get_action_requests(self, mock_get_database):
         """Test get_action_requests query"""
         # Setup mock
