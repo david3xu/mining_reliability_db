@@ -1,88 +1,88 @@
-# Mining Reliability Database
-# Makefile for project automation
+# Mining Reliability Database - Makefile
 
-# Configuration
-PYTHON = python3
-PIP = pip3
-PYTEST = pytest
-BLACK = black
+.PHONY: help setup schema import reset test clean install install-dev install-full
 
-# Environment variables (can be overridden)
-NEO4J_URI ?= bolt://localhost:7687
-NEO4J_USER ?= neo4j
-NEO4J_PASSWORD ?= password
+help: ## Show available commands
+	@echo "Mining Reliability Database Commands:"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: help
-help:
-	@echo "Available commands:"
-	@echo "  setup      - Install dependencies"
-	@echo "  schema     - Create database schema"
-	@echo "  import     - Import all facility data"
-	@echo "  reset      - Reset database (remove all data)"
-	@echo "  clean      - Clean temporary files"
-	@echo "  test       - Run tests"
-	@echo "  format     - Format code with black"
-
-.PHONY: setup
-setup:
-	$(PIP) install -r requirements.txt
-
-.PHONY: dev-setup
-dev-setup:
-	$(PIP) install -e .
-
-.PHONY: schema
-schema:
-	NEO4J_URI=$(NEO4J_URI) NEO4J_USER=$(NEO4J_USER) NEO4J_PASSWORD=$(NEO4J_PASSWORD) \
-	$(PYTHON) scripts/create_schema.py
-
-.PHONY: import
-import:
-	NEO4J_URI=$(NEO4J_URI) NEO4J_USER=$(NEO4J_USER) NEO4J_PASSWORD=$(NEO4J_PASSWORD) \
-	$(PYTHON) scripts/import_data.py
-
-.PHONY: import-facility
-import-facility:
-	@if [ -z "$(FACILITY)" ]; then \
-		echo "Usage: make import-facility FACILITY=<facility_id>"; \
-		exit 1; \
+setup: ## Initial setup - copy environment template
+	@if [ ! -f .env ]; then \
+		cp .env.example .env; \
+		echo "Created .env file from template"; \
+		echo "Edit .env with your configuration"; \
+	else \
+		echo ".env file already exists"; \
 	fi
-	NEO4J_URI=$(NEO4J_URI) NEO4J_USER=$(NEO4J_USER) NEO4J_PASSWORD=$(NEO4J_PASSWORD) \
-	$(PYTHON) scripts/import_data.py --facility $(FACILITY)
 
-.PHONY: reset
-reset:
-	NEO4J_URI=$(NEO4J_URI) NEO4J_USER=$(NEO4J_USER) NEO4J_PASSWORD=$(NEO4J_PASSWORD) \
-	$(PYTHON) scripts/reset_db.py
+schema: ## Create database schema
+	python scripts/create_schema.py
 
-.PHONY: reset-force
-reset-force:
-	NEO4J_URI=$(NEO4J_URI) NEO4J_USER=$(NEO4J_USER) NEO4J_PASSWORD=$(NEO4J_PASSWORD) \
-	$(PYTHON) scripts/reset_db.py --force
+import: ## Import all facility data
+	python scripts/import_data.py
 
-.PHONY: clean
-clean:
-	find . -name "__pycache__" -type d -exec rm -rf {} +
-	find . -name "*.pyc" -delete
-	find . -name "*.pyo" -delete
-	find . -name "*.pyd" -delete
-	find . -name ".pytest_cache" -type d -exec rm -rf {} +
-	find . -name "*.egg-info" -type d -exec rm -rf {} +
-	find . -name "*.egg" -delete
-	rm -rf build/
-	rm -rf dist/
-	rm -rf .coverage
-	rm -rf htmlcov/
-	rm -rf .eggs/
+import-sample: ## Import sample data only
+	python scripts/import_data.py --facility sample
 
-.PHONY: test
-test:
-	$(PYTEST) tests/
+reset: ## Reset database (data only)
+	python scripts/reset_db.py --force
 
-.PHONY: format
-format:
-	$(BLACK) mine_core/ scripts/ tests/
+reset-all: ## Reset database including schema
+	python scripts/reset_db.py --drop-schema --force
 
-.PHONY: full-pipeline
-full-pipeline: reset schema import test
-	@echo "Full pipeline completed!"
+test: ## Run test suite
+	python -m pytest tests/ -v
+
+test-db: ## Run database tests only
+	python -m pytest tests/test_database.py -v
+
+test-pipelines: ## Run pipeline tests only
+	python -m pytest tests/test_pipelines.py -v
+
+clean: ## Clean Python cache files and test artifacts
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
+	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	find . -type f -name ".coverage" -delete
+	find . -type d -name "htmlcov" -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	find . -type d -name ".ruff_cache" -exec rm -rf {} +
+
+install: ## Install core dependencies
+	pip install -e .
+
+install-dev: ## Install development tools (pytest, black, etc.)
+	pip install -e ".[dev]"
+
+install-full: ## Install all development dependencies (including ML, Azure, etc.)
+	pip install -e ".[dev]"
+	pip install -r requirements-dev.txt
+
+docker-neo4j: ## Start Neo4j in Docker
+	docker run -d --name neo4j \
+		-p 7474:7474 -p 7687:7687 \
+		-e NEO4J_AUTH=neo4j/password \
+		neo4j:latest
+
+docker-stop: ## Stop Neo4j Docker container
+	docker stop neo4j
+
+docker-start: ## Start existing Neo4j Docker container
+	docker start neo4j
+
+docker-clean: ## Remove Neo4j Docker container
+	docker stop neo4j || true
+	docker rm neo4j || true
+
+# Development workflow shortcuts
+dev-setup: setup install-dev docker-neo4j ## Complete development setup
+	@echo "Development environment ready!"
+	@echo "1. Edit .env file with your settings"
+	@echo "2. Run 'make schema' to create database schema"
+	@echo "3. Run 'make import' to load data"
+
+quick-start: setup schema import-sample ## Quick start with sample data
+	@echo "Quick start complete!"
+	@echo "Neo4j browser: http://localhost:7474"

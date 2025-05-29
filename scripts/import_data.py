@@ -4,24 +4,21 @@ Data Import Script for Mining Reliability Database
 Extracts, transforms, and loads facility data into Neo4j.
 """
 
-import os
-import argparse
 import logging
-from typing import List, Optional
-
-from mine_core.database.connection import get_connection
+import argparse
 from mine_core.pipelines.extractor import FacilityDataExtractor
 from mine_core.pipelines.transformer import DataTransformer
 from mine_core.pipelines.loader import Neo4jLoader
+from mine_core.database.db import get_database
+from configs.environment import get_data_dir
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-def import_facility(facility_id: str, data_dir: Optional[str] = None) -> bool:
+def import_facility(facility_id, data_dir=None, db_config=None):
     """Import data for a specific facility"""
     try:
         # Extract data
@@ -37,7 +34,8 @@ def import_facility(facility_id: str, data_dir: Optional[str] = None) -> bool:
         transformed_data = transformer.transform_facility_data(facility_data)
 
         # Load data
-        loader = Neo4jLoader()
+        uri, user, password = db_config if db_config else (None, None, None)
+        loader = Neo4jLoader(uri, user, password)
         result = loader.load_data(transformed_data)
 
         if result:
@@ -51,7 +49,7 @@ def import_facility(facility_id: str, data_dir: Optional[str] = None) -> bool:
         logger.error(f"Error importing facility {facility_id}: {e}")
         return False
 
-def import_all_facilities(data_dir: Optional[str] = None) -> bool:
+def import_all_facilities(data_dir=None, db_config=None):
     """Import data for all available facilities"""
     extractor = FacilityDataExtractor(data_dir)
     facilities = extractor.get_available_facilities()
@@ -62,7 +60,7 @@ def import_all_facilities(data_dir: Optional[str] = None) -> bool:
 
     success = True
     for facility_id in facilities:
-        result = import_facility(facility_id, data_dir)
+        result = import_facility(facility_id, data_dir, db_config)
         if not result:
             success = False
 
@@ -73,28 +71,27 @@ def main():
     parser = argparse.ArgumentParser(
         description="Import facility data into Mining Reliability Database"
     )
-    parser.add_argument("--facility", type=str, default=None,
-                        help="Facility ID to import (default: all facilities)")
-    parser.add_argument("--data-dir", type=str, default=None,
-                        help="Data directory (default: data/facility_data)")
-    parser.add_argument("--uri", type=str, default=None,
-                        help="Neo4j URI (default: environment variable or bolt://localhost:7687)")
-    parser.add_argument("--user", type=str, default=None,
-                        help="Neo4j username (default: environment variable or neo4j)")
-    parser.add_argument("--password", type=str, default=None,
-                        help="Neo4j password (default: environment variable or password)")
+    parser.add_argument("--facility", type=str, help="Facility ID to import (default: all)")
+    parser.add_argument("--data-dir", type=str, help="Data directory path")
+    parser.add_argument("--uri", type=str, help="Neo4j URI")
+    parser.add_argument("--user", type=str, help="Neo4j username")
+    parser.add_argument("--password", type=str, help="Neo4j password")
 
     args = parser.parse_args()
 
     try:
-        # Setup connection (for queries.py)
-        get_connection(args.uri, args.user, args.password)
+        # Setup database connection for queries
+        get_database(args.uri, args.user, args.password)
+
+        # Prepare configuration
+        data_dir = args.data_dir or get_data_dir()
+        db_config = (args.uri, args.user, args.password) if any([args.uri, args.user, args.password]) else None
 
         # Import data
         if args.facility:
-            success = import_facility(args.facility, args.data_dir)
+            success = import_facility(args.facility, data_dir, db_config)
         else:
-            success = import_all_facilities(args.data_dir)
+            success = import_all_facilities(data_dir, db_config)
 
         if success:
             print("Data import successful!")
@@ -109,9 +106,11 @@ def main():
         return 1
 
     finally:
-        # Close connection
-        connection = get_connection()
-        connection.close()
+        try:
+            db = get_database()
+            db.close()
+        except:
+            pass
 
 if __name__ == "__main__":
     exit(main())
