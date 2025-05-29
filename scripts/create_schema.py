@@ -4,8 +4,15 @@ Schema Creation Script for Mining Reliability Database
 Creates Neo4j schema from configuration.
 """
 
+import sys
+import os
 import logging
 import argparse
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
 from mine_core.database.db import get_database
 from configs.environment import get_schema
 

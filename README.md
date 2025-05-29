@@ -82,9 +82,39 @@ docker run -d --name neo4j \
 
 # Check status
 docker ps | grep neo4j
+curl ifconfig.me
 
 # View logs
 docker logs neo4j
+
+
+
+docker stop neo4j
+docker rm neo4j
+docker run -d --name neo4j \
+  -p 0.0.0.0:7474:7474 -p 0.0.0.0:7687:7687 \
+  -e NEO4J_AUTH=neo4j/password \
+  neo4j:latest
+
+# From your local computer, create a tunnel
+ssh -L 7474:localhost:7474 azureuser@your-azure-machine-ip
+
+# Then visit: http://localhost:7474/browser/
+
+curl -I http://localhost:7474/browser/
+
+
+3. **Access Neo4j Browser**: http://localhost:7474
+   - Username: neo4j
+   - Password: password
+
+
+docker exec -it neo4j cypher-shell -u neo4j -p password
+
+# Access Neo4j Browser (optional)
+# Open: http://localhost:7474/browser/
+# Username: neo4j
+# Password: password
 ```
 
 ### Manage Neo4j Container

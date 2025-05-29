@@ -116,8 +116,8 @@ class Database:
         to_field = f"{to_type.lower()}_id"
 
         query = f"""
-        MATCH (from:{from_type} {{{from_field}: $from_id}}),
-              (to:{to_type} {{{to_field}: $to_id}})
+        MATCH (from:{from_type} {{{from_field}: $from_id}})
+        MATCH (to:{to_type} {{{to_field}: $to_id}})
         MERGE (from)-[r:{rel_type}]->(to)
         """
 

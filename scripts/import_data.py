@@ -4,8 +4,15 @@ Data Import Script for Mining Reliability Database
 Extracts, transforms, and loads facility data into Neo4j.
 """
 
+import sys
+import os
 import logging
 import argparse
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
 from mine_core.pipelines.extractor import FacilityDataExtractor
 from mine_core.pipelines.transformer import DataTransformer
 from mine_core.pipelines.loader import Neo4jLoader
