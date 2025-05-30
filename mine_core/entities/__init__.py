@@ -1,14 +1,9 @@
 """
-Entity definitions for Mining Reliability Database
-Defines data structures for the entity model.
+Schema-driven entity definitions using model_schema.json
 """
 
 from mine_core.entities.definitions import (
     get_entity_definitions,
-    Entity,
-    ActionRequest,
-    Problem,
-    RootCause,
-    ActionPlan,
-    Verification
+    create_entity_from_dict,
+    get_schema_manager
 )

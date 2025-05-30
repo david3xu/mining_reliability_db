@@ -1,66 +1,89 @@
 #!/usr/bin/env python3
 """
-Neo4j Database Queries
-Core queries for mining reliability data.
+Schema-driven database queries using model_schema.json
 """
 
 import logging
 from typing import Dict, List, Any, Optional
-
 from mine_core.database.db import get_database
+from configs.environment import get_schema
 
 logger = logging.getLogger(__name__)
 
-# Facility Queries
+class SchemaQueries:
+    """Schema-driven query builder"""
 
+    def __init__(self):
+        self.schema = get_schema()
+        self.entities = {e["name"]: e for e in self.schema.get("entities", [])}
+
+    def _get_primary_key(self, entity_name: str) -> Optional[str]:
+        """Get primary key from schema"""
+        entity = self.entities.get(entity_name, {})
+        properties = entity.get("properties", {})
+
+        for prop_name, prop_info in properties.items():
+            if prop_info.get("primary_key", False):
+                return prop_name
+        return None
+
+# Schema-driven query functions
 def get_facilities() -> List[Dict[str, Any]]:
-    """Get all facilities"""
-    query = """
+    """Get facilities using schema"""
+    queries = SchemaQueries()
+    facility_pk = queries._get_primary_key("Facility")
+
+    query = f"""
     MATCH (f:Facility)
-    RETURN f.facility_id AS id, f.facility_name AS name, f.active AS active
+    RETURN f.{facility_pk} AS id, f.facility_name AS name, f.active AS active
     ORDER BY f.facility_name
     """
     return get_database().execute_query(query)
 
 def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
-    """Get facility by ID"""
-    query = """
-    MATCH (f:Facility {facility_id: $facility_id})
-    RETURN f.facility_id AS id, f.facility_name AS name, f.active AS active
+    """Get facility by ID using schema"""
+    queries = SchemaQueries()
+    facility_pk = queries._get_primary_key("Facility")
+
+    query = f"""
+    MATCH (f:Facility {{{facility_pk}: $facility_id}})
+    RETURN f.{facility_pk} AS id, f.facility_name AS name, f.active AS active
     """
     results = get_database().execute_query(query, facility_id=facility_id)
     return results[0] if results else None
 
-# ActionRequest Queries
-
 def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[str, Any]]:
-    """Get action requests, optionally filtered by facility"""
+    """Get action requests using schema"""
+    queries = SchemaQueries()
+    ar_pk = queries._get_primary_key("ActionRequest")
+    facility_pk = queries._get_primary_key("Facility")
+
     params = {"limit": limit}
 
     if facility_id:
-        query = """
-        MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility {facility_id: $facility_id})
-        RETURN ar.action_request_id AS id,
+        query = f"""
+        MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility {{{facility_pk}: $facility_id}})
+        RETURN ar.{ar_pk} AS id,
                ar.action_request_number AS number,
                ar.title AS title,
                ar.initiation_date AS date,
                ar.stage AS stage,
                ar.categories AS categories,
-               f.facility_id AS facility_id
+               f.{facility_pk} AS facility_id
         ORDER BY ar.initiation_date DESC
         LIMIT $limit
         """
         params["facility_id"] = facility_id
     else:
-        query = """
+        query = f"""
         MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-        RETURN ar.action_request_id AS id,
+        RETURN ar.{ar_pk} AS id,
                ar.action_request_number AS number,
                ar.title AS title,
                ar.initiation_date AS date,
                ar.stage AS stage,
                ar.categories AS categories,
-               f.facility_id AS facility_id
+               f.{facility_pk} AS facility_id
         ORDER BY ar.initiation_date DESC
         LIMIT $limit
         """
@@ -68,11 +91,15 @@ def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[
     return get_database().execute_query(query, **params)
 
 def get_action_request(action_request_id: str) -> Optional[Dict[str, Any]]:
-    """Get action request by ID"""
-    query = """
-    MATCH (ar:ActionRequest {action_request_id: $action_request_id})
+    """Get action request by ID using schema"""
+    queries = SchemaQueries()
+    ar_pk = queries._get_primary_key("ActionRequest")
+    facility_pk = queries._get_primary_key("Facility")
+
+    query = f"""
+    MATCH (ar:ActionRequest {{{ar_pk}: $action_request_id}})
     OPTIONAL MATCH (ar)-[:BELONGS_TO]->(f:Facility)
-    RETURN ar.action_request_id AS id,
+    RETURN ar.{ar_pk} AS id,
            ar.action_request_number AS number,
            ar.title AS title,
            ar.initiation_date AS date,
@@ -83,40 +110,46 @@ def get_action_request(action_request_id: str) -> Optional[Dict[str, Any]]:
            ar.past_due_status AS past_due_status,
            ar.days_past_due AS days_past_due,
            ar.operating_centre AS operating_centre,
-           f.facility_id AS facility_id,
+           f.{facility_pk} AS facility_id,
            f.facility_name AS facility_name
     """
     results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else None
 
-# Incident Chain Queries
-
 def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
-    """Get complete incident chain for an action request with correct relationship traversal"""
-    query = """
-    MATCH (ar:ActionRequest {action_request_id: $action_request_id})
+    """Get complete incident chain using schema"""
+    queries = SchemaQueries()
+    ar_pk = queries._get_primary_key("ActionRequest")
+    facility_pk = queries._get_primary_key("Facility")
+    problem_pk = queries._get_primary_key("Problem")
+    rc_pk = queries._get_primary_key("RootCause")
+    ap_pk = queries._get_primary_key("ActionPlan")
+    v_pk = queries._get_primary_key("Verification")
+
+    query = f"""
+    MATCH (ar:ActionRequest {{{ar_pk}: $action_request_id}})
     OPTIONAL MATCH (ar)-[:BELONGS_TO]->(f:Facility)
     OPTIONAL MATCH (p:Problem)-[:IDENTIFIED_IN]->(ar)
     OPTIONAL MATCH (rc:RootCause)-[:ANALYZES]->(p)
     OPTIONAL MATCH (ap:ActionPlan)-[:RESOLVES]->(rc)
     OPTIONAL MATCH (v:Verification)-[:VALIDATES]->(ap)
 
-    RETURN ar.action_request_id AS request_id,
+    RETURN ar.{ar_pk} AS request_id,
            ar.action_request_number AS request_number,
            ar.title AS title,
            ar.initiation_date AS date,
            ar.stage AS stage,
-           f.facility_id AS facility_id,
+           f.{facility_pk} AS facility_id,
 
-           p.problem_id AS problem_id,
+           p.{problem_pk} AS problem_id,
            p.what_happened AS what_happened,
            p.requirement AS requirement,
 
-           rc.cause_id AS cause_id,
+           rc.{rc_pk} AS cause_id,
            rc.root_cause AS root_cause,
            rc.objective_evidence AS objective_evidence,
 
-           ap.plan_id AS plan_id,
+           ap.{ap_pk} AS plan_id,
            ap.action_plan AS action_plan,
            ap.recommended_action AS recommended_action,
            ap.immediate_containment AS immediate_containment,
@@ -124,7 +157,7 @@ def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
            ap.complete AS complete,
            ap.completion_date AS completion_date,
 
-           v.verification_id AS verification_id,
+           v.{v_pk} AS verification_id,
            v.is_action_plan_effective AS is_effective,
            v.action_plan_eval_comment AS eval_comment,
            v.action_plan_verification_date AS verification_date
@@ -132,13 +165,15 @@ def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
     results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else {}
 
-# Supporting Entity Queries
-
 def get_department(action_request_id: str) -> Optional[Dict[str, Any]]:
-    """Get department info for an action request"""
-    query = """
-    MATCH (d:Department)-[:ASSIGNED_TO]->(ar:ActionRequest {action_request_id: $action_request_id})
-    RETURN d.dept_id AS id,
+    """Get department info using schema"""
+    queries = SchemaQueries()
+    dept_pk = queries._get_primary_key("Department")
+    ar_pk = queries._get_primary_key("ActionRequest")
+
+    query = f"""
+    MATCH (d:Department)-[:ASSIGNED_TO]->(ar:ActionRequest {{{ar_pk}: $action_request_id}})
+    RETURN d.{dept_pk} AS id,
            d.init_dept AS init_dept,
            d.rec_dept AS rec_dept
     """
@@ -146,16 +181,18 @@ def get_department(action_request_id: str) -> Optional[Dict[str, Any]]:
     return results[0] if results else None
 
 def get_assets(problem_id: str) -> List[Dict[str, Any]]:
-    """Get assets for a problem"""
-    query = """
-    MATCH (a:Asset)-[:INVOLVED_IN]->(p:Problem {problem_id: $problem_id})
-    RETURN a.asset_id AS id,
+    """Get assets using schema"""
+    queries = SchemaQueries()
+    asset_pk = queries._get_primary_key("Asset")
+    problem_pk = queries._get_primary_key("Problem")
+
+    query = f"""
+    MATCH (a:Asset)-[:INVOLVED_IN]->(p:Problem {{{problem_pk}: $problem_id}})
+    RETURN a.{asset_pk} AS id,
            a.asset_numbers AS asset_numbers,
            a.asset_activity_numbers AS activity_numbers
     """
     return get_database().execute_query(query, problem_id=problem_id)
-
-# Analysis Queries
 
 def get_incident_counts_by_category() -> List[Dict[str, Any]]:
     """Get incident counts by category"""

@@ -1,49 +1,79 @@
 #!/usr/bin/env python3
 """
-Data Transformer for Mining Reliability Database
-Transforms raw data to match entity model.
+Schema-driven data transformer using model_schema.json
 """
 
 import logging
 from typing import Dict, List, Any, Optional, Union
-from configs.environment import get_mappings
+from configs.environment import get_mappings, get_schema
 
 logger = logging.getLogger(__name__)
 
 class DataTransformer:
-    """Transforms raw facility data into entity model format"""
+    """Schema-driven transformer"""
 
-    def __init__(self, mappings=None, use_config=True):
-        """Initialize with field mappings from configuration or provided mappings"""
-        if mappings is None and use_config:
-            mappings = get_mappings()
-
-        if not mappings:
-            logger.warning("Field mappings not found in configuration")
-            self.list_fields = []
-            self.field_mappings = {}
-            self.list_field_extraction = {"default": "head"}
+    def __init__(self, mappings=None, schema=None, use_config=True):
+        """Initialize from schema and mappings"""
+        if use_config:
+            self.mappings = mappings or get_mappings()
+            self.schema = schema or get_schema()
         else:
-            self.list_fields = mappings.get("list_fields", [])
-            self.field_mappings = mappings.get("entity_mappings", {})
-            self.list_field_extraction = mappings.get("list_field_extraction", {"default": "head"})
+            self.mappings = mappings or {}
+            self.schema = schema or {}
+
+        self.list_fields = self.mappings.get("list_fields", [])
+        self.field_mappings = self.mappings.get("entity_mappings", {})
+        self.list_field_extraction = self.mappings.get("list_field_extraction", {"default": "head"})
+
+        # Get entity info from schema
+        self.entities = {entity["name"]: entity for entity in self.schema.get("entities", [])}
+        self.entity_order = self._determine_entity_order()
+
+    def _determine_entity_order(self) -> List[str]:
+        """Determine entity processing order from schema relationships"""
+        if not self.schema.get("relationships"):
+            return list(self.entities.keys())
+
+        # Build dependency graph from relationships
+        dependencies = {entity_name: set() for entity_name in self.entities.keys()}
+
+        for rel in self.schema.get("relationships", []):
+            from_entity = rel["from"]
+            to_entity = rel["to"]
+            if from_entity in dependencies and to_entity in dependencies:
+                dependencies[from_entity].add(to_entity)
+
+        # Topological sort
+        ordered = []
+        remaining = set(dependencies.keys())
+
+        while remaining:
+            ready = [e for e in remaining if not (dependencies[e] & remaining)]
+            if not ready:
+                ready = list(remaining)
+
+            for entity in ready:
+                ordered.append(entity)
+                remaining.remove(entity)
+
+        logger.info(f"Entity processing order from schema: {ordered}")
+        return ordered
 
     def transform_facility_data(self, facility_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Transform facility data into entity model format"""
+        """Transform using schema-defined entities"""
         facility_id = facility_data.get("facility_id", "unknown")
         records = facility_data.get("records", [])
+
+        # Build entities dict from schema
+        entities_dict = {entity_name: [] for entity_name in self.entities.keys()}
 
         transformed = {
             "facility": {
                 "facility_id": facility_id,
-                "facility_name": facility_id,
+                "facility_name": facility_id.replace("_", " ").title(),
                 "active": True
             },
-            "entities": {
-                "ActionRequest": [], "Problem": [], "RootCause": [], "ActionPlan": [],
-                "Verification": [], "Department": [], "Asset": [], "RecurringStatus": [],
-                "AmountOfLoss": [], "Review": [], "EquipmentStrategy": []
-            }
+            "entities": entities_dict
         }
 
         for record in records:
@@ -55,85 +85,85 @@ class DataTransformer:
         return transformed
 
     def _transform_record(self, record: Dict[str, Any], facility_id: str, transformed: Dict[str, Any]) -> None:
-        """Transform a single record into entity model format"""
+        """Transform record using schema"""
         action_request_number = record.get("Action Request Number:")
         if not action_request_number:
             return
 
         entity_ids = self._generate_entity_ids(action_request_number)
 
-        # Transform ActionRequest
-        action_request = self._transform_entity(record, "ActionRequest")
-        action_request["action_request_id"] = entity_ids["action_request_id"]
-        action_request["facility_id"] = facility_id
-        transformed["entities"]["ActionRequest"].append(action_request)
+        # Process entities in schema order
+        for entity_name in self.entity_order:
+            if entity_name == "Facility":
+                continue
 
-        # Transform Problem if data exists
-        if record.get("What happened?"):
-            problem = self._transform_entity(record, "Problem")
-            problem["problem_id"] = entity_ids["problem_id"]
-            problem["action_request_id"] = entity_ids["action_request_id"]
-            transformed["entities"]["Problem"].append(problem)
+            entity_data = self._transform_entity(record, entity_name)
+            if not entity_data:
+                continue
 
-            self._transform_problem_entities(record, entity_ids, transformed)
+            # Add primary key
+            primary_key = self._get_primary_key(entity_name)
+            if primary_key and primary_key in entity_ids:
+                entity_data[primary_key] = entity_ids[primary_key]
 
-            # Transform RootCause if data exists
-            if record.get("Root Cause"):
-                self._transform_root_cause_chain(record, entity_ids, transformed)
+            # Add foreign keys based on relationships
+            self._add_foreign_keys(entity_name, entity_data, entity_ids, facility_id)
 
-        # Transform Department if data exists
-        if record.get("Init. Dept.") or record.get("Rec. Dept."):
-            department = self._transform_entity(record, "Department")
-            department["dept_id"] = entity_ids["dept_id"]
-            department["action_request_id"] = entity_ids["action_request_id"]
-            transformed["entities"]["Department"].append(department)
+            # Add if has required data
+            if self._has_required_data(entity_name, record):
+                transformed["entities"][entity_name].append(entity_data)
 
-    def _transform_problem_entities(self, record: Dict[str, Any], entity_ids: Dict[str, str], transformed: Dict[str, Any]) -> None:
-        """Transform entities connected to Problem"""
-        entity_configs = [
-            ("Asset", ["Asset Number(s)", "Asset Activity numbers"], "asset_id"),
-            ("RecurringStatus", ["Recurring Problem(s)", "Recurring Comment"], "recurring_id"),
-            ("AmountOfLoss", ["Amount of Loss"], "loss_id")
-        ]
+    def _get_primary_key(self, entity_name: str) -> Optional[str]:
+        """Get primary key field from schema"""
+        entity = self.entities.get(entity_name, {})
+        properties = entity.get("properties", {})
 
-        for entity_type, required_fields, id_field in entity_configs:
-            if any(record.get(field) for field in required_fields):
-                entity = self._transform_entity(record, entity_type)
-                entity[id_field] = entity_ids[id_field]
-                entity["problem_id"] = entity_ids["problem_id"]
-                transformed["entities"][entity_type].append(entity)
+        for prop_name, prop_info in properties.items():
+            if prop_info.get("primary_key", False):
+                return prop_name
+        return None
 
-    def _transform_root_cause_chain(self, record: Dict[str, Any], entity_ids: Dict[str, str], transformed: Dict[str, Any]) -> None:
-        """Transform RootCause and connected entities"""
-        # Transform RootCause
-        root_cause = self._transform_entity(record, "RootCause")
-        root_cause["cause_id"] = entity_ids["cause_id"]
-        root_cause["problem_id"] = entity_ids["problem_id"]
-        transformed["entities"]["RootCause"].append(root_cause)
+    def _add_foreign_keys(self, entity_name: str, entity_data: Dict, entity_ids: Dict, facility_id: str) -> None:
+        """Add foreign keys based on schema relationships"""
+        if entity_name == "ActionRequest":
+            entity_data["facility_id"] = facility_id
+            return
 
-        # Transform ActionPlan if data exists
-        if record.get("Action Plan"):
-            action_plan = self._transform_entity(record, "ActionPlan")
-            action_plan["plan_id"] = entity_ids["plan_id"]
-            action_plan["root_cause_id"] = entity_ids["cause_id"]
-            transformed["entities"]["ActionPlan"].append(action_plan)
+        # Find relationships where this entity is the 'from' entity
+        for rel in self.schema.get("relationships", []):
+            if rel["from"] == entity_name:
+                to_entity = rel["to"]
+                to_primary_key = self._get_primary_key(to_entity)
+                if to_primary_key and to_primary_key in entity_ids:
+                    entity_data[to_primary_key] = entity_ids[to_primary_key]
 
-            # Transform connected entities
-            connected_configs = [
-                ("Verification", ["Effectiveness Verification Due Date", "IsActionPlanEffective"], "verification_id"),
-                ("Review", ["Is Resp Satisfactory?", "Reviewed Date:"], "review_id"),
-                ("EquipmentStrategy", ["If yes, APSS Doc #"], "strategy_id")
-            ]
+    def _has_required_data(self, entity_name: str, record: Dict) -> bool:
+        """Check if record has data for this entity type"""
+        mappings = self.field_mappings.get(entity_name, {})
+        if not mappings:
+            return False
 
-            for entity_type, required_fields, id_field in connected_configs:
-                if any(record.get(field) for field in required_fields):
-                    entity = self._transform_entity(record, entity_type)
-                    entity[id_field] = entity_ids[id_field]
-                    entity["action_plan_id"] = entity_ids["plan_id"]
-                    transformed["entities"][entity_type].append(entity)
+        # Check if any mapped fields have data
+        for target_field, source_field in mappings.items():
+            if record.get(source_field):
+                return True
+        return False
+
+    def _generate_entity_ids(self, action_request_number: str) -> Dict[str, str]:
+        """Generate IDs for all entities from schema"""
+        request_id = action_request_number.replace('-', '').lower()
+
+        entity_ids = {}
+        for entity_name in self.entities.keys():
+            primary_key = self._get_primary_key(entity_name)
+            if primary_key:
+                prefix = entity_name.lower()[:4]
+                entity_ids[primary_key] = f"{prefix}-{request_id}"
+
+        return entity_ids
 
     def _transform_entity(self, record: Dict[str, Any], entity_type: str) -> Dict[str, Any]:
-        """Transform data for a specific entity type"""
+        """Transform entity using field mappings"""
         entity = {}
         field_mappings = self.field_mappings.get(entity_type, {})
 
@@ -144,15 +174,13 @@ class DataTransformer:
                 if source_field in self.list_fields:
                     value = self._extract_list_field_value(source_field, value)
 
-                if value is None or (isinstance(value, str) and not value.strip()):
-                    continue
-
-                entity[target_field] = value
+                if value is not None and (not isinstance(value, str) or value.strip()):
+                    entity[target_field] = value
 
         return entity
 
     def _extract_list_field_value(self, field_name: str, value: Union[str, List[str]]) -> Optional[str]:
-        """Apply field-specific extraction rules to list values"""
+        """Extract value from list fields using config"""
         if not isinstance(value, list) or not value:
             return value
 
@@ -163,21 +191,3 @@ class DataTransformer:
             return value[1]
         else:
             return value[0]
-
-    def _generate_entity_ids(self, action_request_number: str) -> Dict[str, str]:
-        """Generate IDs for entities based on action request number"""
-        request_id = action_request_number.replace('-', '').lower()
-
-        return {
-            "action_request_id": f"ar-{request_id}",
-            "problem_id": f"prob-{request_id}",
-            "cause_id": f"cause-{request_id}",
-            "plan_id": f"plan-{request_id}",
-            "verification_id": f"ver-{request_id}",
-            "dept_id": f"dept-{request_id}",
-            "asset_id": f"asset-{request_id}",
-            "recurring_id": f"rec-{request_id}",
-            "loss_id": f"loss-{request_id}",
-            "review_id": f"rev-{request_id}",
-            "strategy_id": f"strat-{request_id}"
-        }
