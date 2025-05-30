@@ -58,6 +58,7 @@ make setup          # Creates .env from template
 
 ```bash
 # Start Neo4j (see Docker section below)
+
 make schema
 # or: python scripts/create_schema.py
 ```
@@ -67,6 +68,9 @@ make schema
 ```bash
 make import
 # or: python scripts/import_data.py
+
+make reset
+make reset-all
 ```
 
 ## Docker Setup
@@ -75,6 +79,14 @@ make import
 
 ```bash
 # Start Neo4j container
+
+
+make docker-start
+make docker-neo4j
+make docker-stop
+make dokcer-clean
+
+
 docker run -d --name neo4j \
   -p 7474:7474 -p 7687:7687 \
   -e NEO4J_AUTH=neo4j/password \
@@ -126,6 +138,9 @@ docker start neo4j
 
 # Remove (deletes data)
 docker stop neo4j && docker rm neo4j
+
+
+
 ```
 
 ## Configuration
@@ -222,6 +237,16 @@ make test
 # Run specific test files
 make test-db
 make test-pipelines
+
+python scripts/reset_db.py --force --drop-schema
+python scripts/create_schema.py
+
+python scripts/import_data.py --facility sample
+
+pytest -xvs tests/relationship_test.py
+
+
+
 ```
 
 ## Project Structure

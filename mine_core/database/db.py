@@ -111,9 +111,21 @@ class Database:
             return False
 
     def create_relationship(self, from_type, from_id, rel_type, to_type, to_id):
-        """Create relationship between two nodes"""
-        from_field = f"{from_type.lower()}_id"
-        to_field = f"{to_type.lower()}_id"
+        """Create relationship between two nodes with fixed ID field handling"""
+        # Map entity types to their primary key field names
+        # This resolves the mismatch between entity definition field names and database field names
+        pk_mapping = {
+            "RootCause": "cause_id",
+            "ActionPlan": "plan_id",
+            "RecurringStatus": "recurring_id",
+            "AmountOfLoss": "loss_id",
+            "EquipmentStrategy": "strategy_id",
+            "Department": "dept_id"
+        }
+
+        # Get correct field names using the mapping
+        from_field = pk_mapping.get(from_type, f"{from_type.lower()}_id")
+        to_field = pk_mapping.get(to_type, f"{to_type.lower()}_id")
 
         query = f"""
         MATCH (from:{from_type} {{{from_field}: $from_id}})
@@ -172,13 +184,3 @@ def get_database(uri=None, user=None, password=None):
     if _db_instance is None:
         _db_instance = Database(uri, user, password)
     return _db_instance
-
-# Backward compatibility
-class DatabaseConnection:
-    """Legacy database connection wrapper"""
-    def __init__(self):
-        self.db = get_database()
-
-def get_connection():
-    """Legacy connection getter"""
-    return get_database()

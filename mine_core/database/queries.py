@@ -92,7 +92,7 @@ def get_action_request(action_request_id: str) -> Optional[Dict[str, Any]]:
 # Incident Chain Queries
 
 def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
-    """Get complete incident chain for an action request"""
+    """Get complete incident chain for an action request with correct relationship traversal"""
     query = """
     MATCH (ar:ActionRequest {action_request_id: $action_request_id})
     OPTIONAL MATCH (ar)-[:BELONGS_TO]->(f:Facility)

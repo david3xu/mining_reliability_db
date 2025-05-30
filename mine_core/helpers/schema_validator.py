@@ -39,6 +39,16 @@ def validate_entity(entity_type: str, data: Dict[str, Any], schema: Optional[Dic
     if not schema:
         return False, ["Schema not available"]
 
+    # Map entity types to their primary key field names
+    pk_mapping = {
+        "RootCause": "cause_id",
+        "ActionPlan": "plan_id",
+        "RecurringStatus": "recurring_id",
+        "AmountOfLoss": "loss_id",
+        "EquipmentStrategy": "strategy_id",
+        "Department": "dept_id"
+    }
+
     # Find entity schema
     entity_schema = None
     for entity in schema.get("entities", []):
@@ -53,17 +63,32 @@ def validate_entity(entity_type: str, data: Dict[str, Any], schema: Optional[Dic
     errors = []
     properties = entity_schema.get("properties", {})
 
+    # Get primary key field name
+    pk_field = pk_mapping.get(entity_type, f"{entity_type.lower()}_id")
+
     # Check required properties
     for prop_name, prop_info in properties.items():
-        if prop_info.get("required", False) and prop_name not in data:
-            errors.append(f"Missing required property: {prop_name}")
+        # Map property name if needed (for primary keys)
+        actual_prop = prop_name
+        if prop_name.endswith("_id") and prop_name == pk_field:
+            actual_prop = pk_field
+
+        if prop_info.get("required", False) and actual_prop not in data:
+            errors.append(f"Missing required property: {actual_prop}")
 
     # Check property types
     for prop_name, value in data.items():
-        if prop_name not in properties:
-            continue  # Skip properties not in schema
+        # Skip if property not in schema
+        schema_prop = prop_name
+        for schema_field in properties.keys():
+            if schema_field.endswith("_id") and schema_field == pk_field and prop_name == pk_field:
+                schema_prop = schema_field
+                break
 
-        prop_info = properties[prop_name]
+        if schema_prop not in properties:
+            continue
+
+        prop_info = properties[schema_prop]
         prop_type = prop_info.get("type", "string")
 
         # Validate type
@@ -122,6 +147,16 @@ def validate_entity_chain(entities: Dict[str, List[Dict[str, Any]]], schema: Opt
     if not schema:
         return False, {"schema": ["Schema not available"]}
 
+    # Primary key mapping
+    pk_mapping = {
+        "RootCause": "cause_id",
+        "ActionPlan": "plan_id",
+        "RecurringStatus": "recurring_id",
+        "AmountOfLoss": "loss_id",
+        "EquipmentStrategy": "strategy_id",
+        "Department": "dept_id"
+    }
+
     # Validate each entity
     errors = {}
     all_valid = True
@@ -130,6 +165,15 @@ def validate_entity_chain(entities: Dict[str, List[Dict[str, Any]]], schema: Opt
         entity_errors = []
 
         for entity in entity_list:
+            # Check for consistent ID field naming
+            pk_field = pk_mapping.get(entity_type, f"{entity_type.lower()}_id")
+            if pk_field not in entity:
+                non_standard_keys = [k for k in entity.keys() if k.endswith('_id')]
+                if non_standard_keys:
+                    entity_errors.append(f"Entity has non-standard ID field: expected {pk_field}, got {non_standard_keys}")
+                    all_valid = False
+                    continue
+
             valid, entity_error = validate_entity(entity_type, entity, schema)
             if not valid:
                 all_valid = False
