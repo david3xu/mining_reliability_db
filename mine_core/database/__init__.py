@@ -1,9 +1,9 @@
 """
-Database layer for Mining Reliability Database
-Handles Neo4j connections and queries.
+Schema-driven database layer using model_schema.json
 """
 
 from mine_core.database.connection import get_connection
+from mine_core.database.db import get_database
 from mine_core.database.queries import (
     get_facilities,
     get_facility,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Tests for entity definitions
-Verifies entity structure and inheritance.
+Tests for schema-driven entity definitions
+Verifies schema loading and entity creation from schema.
 """
 
 import unittest
@@ -10,10 +10,7 @@ from pathlib import Path
 from unittest.mock import patch, mock_open
 
 from mine_core.entities.definitions import (
-    Entity, Facility, ActionRequest, Problem, RootCause,
-    ActionPlan, Verification, Department, Asset,
-    RecurringStatus, AmountOfLoss, Review, EquipmentStrategy,
-    get_entity_definitions, create_entity_from_dict
+    get_entity_definitions, create_entity_from_dict, get_schema_manager
 )
 
 class TestEntityBase(unittest.TestCase):
