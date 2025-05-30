@@ -22,9 +22,6 @@ schema: ## Create database schema
 import: ## Import all facility data
 	python scripts/import_data.py
 
-import-sample: ## Import sample data only
-	python scripts/import_data.py --facility sample
-
 reset: ## Reset database (data only)
 	python scripts/reset_db.py --force
 
