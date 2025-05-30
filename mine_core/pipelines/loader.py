@@ -67,20 +67,22 @@ class Neo4jLoader:
 
     def _create_relationships(self, entities: Dict[str, List[Dict[str, Any]]]):
         """Create relationships between entities"""
-        # Hierarchical chain relationships
+        # Fixed relationship configurations with correct fields and directions
         relationship_configs = [
+            # Core hierarchical chain
             ("ActionRequest", "facility_id", "BELONGS_TO", "Facility", "facility_id"),
-            ("Problem", "actionrequest_id", "IDENTIFIED_IN", "ActionRequest", "actionrequest_id"),
+            ("Problem", "action_request_id", "IDENTIFIED_IN", "ActionRequest", "action_request_id"),
             ("RootCause", "problem_id", "ANALYZES", "Problem", "problem_id"),
-            ("ActionPlan", "rootcause_id", "RESOLVES", "RootCause", "rootcause_id"),
-            ("Verification", "actionplan_id", "VALIDATES", "ActionPlan", "actionplan_id"),
+            ("ActionPlan", "root_cause_id", "RESOLVES", "RootCause", "cause_id"),
+            ("Verification", "action_plan_id", "VALIDATES", "ActionPlan", "plan_id"),
+
             # Supporting relationships
             ("Asset", "problem_id", "INVOLVED_IN", "Problem", "problem_id"),
             ("AmountOfLoss", "problem_id", "QUANTIFIES", "Problem", "problem_id"),
             ("RecurringStatus", "problem_id", "CLASSIFIES", "Problem", "problem_id"),
-            ("Department", "actionrequest_id", "ASSIGNED_TO", "ActionRequest", "actionrequest_id"),
-            ("Review", "actionplan_id", "EVALUATES", "ActionPlan", "actionplan_id"),
-            ("EquipmentStrategy", "actionplan_id", "MODIFIES", "ActionPlan", "actionplan_id")
+            ("Department", "action_request_id", "ASSIGNED_TO", "ActionRequest", "action_request_id"),
+            ("Review", "action_plan_id", "EVALUATES", "ActionPlan", "plan_id"),
+            ("EquipmentStrategy", "action_plan_id", "MODIFIES", "ActionPlan", "plan_id")
         ]
 
         for from_type, from_field, rel_type, to_type, to_field in relationship_configs:
@@ -88,14 +90,21 @@ class Neo4jLoader:
                                           to_type, to_field, entities.get(from_type, []))
 
     def _create_relationship_batch(self, from_type, from_field, rel_type, to_type, to_field, entities):
-        """Create relationships in batch"""
+        """Create relationships in batch with proper ID resolution"""
         if not entities:
             return
 
+        # Get primary key field names for both entity types
+        from_pk_field = self._get_primary_key_field(from_type)
+        to_pk_field = self._get_primary_key_field(to_type)
+
         relationship_count = 0
         for entity in entities:
-            from_id = entity.get(from_field)
-            to_id = entity.get(to_field, from_id)
+            # Get the source entity's primary key
+            from_id = entity.get(from_pk_field)
+
+            # Get the target entity's ID that this entity references
+            to_id = entity.get(from_field)
 
             if from_id and to_id:
                 if self.db.create_relationship(from_type, from_id, rel_type, to_type, to_id):
@@ -103,3 +112,16 @@ class Neo4jLoader:
 
         if relationship_count > 0:
             logger.info(f"Created {relationship_count} {from_type}-[{rel_type}]->{to_type} relationships")
+
+    def _get_primary_key_field(self, entity_type):
+        """Get primary key field name for entity type"""
+        # Maps entity types to their actual primary key field names
+        pk_mapping = {
+            "RootCause": "cause_id",
+            "ActionPlan": "plan_id",
+            "RecurringStatus": "recurring_id",
+            "AmountOfLoss": "loss_id",
+            "EquipmentStrategy": "strategy_id",
+            "Department": "dept_id"
+        }
+        return pk_mapping.get(entity_type, f"{entity_type.lower()}_id")
