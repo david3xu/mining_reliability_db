@@ -12,11 +12,11 @@
     {
       "name": "ActionRequest",
       "properties": {
-        "action_request_id": {"type": "string", "primary_key": true},
-        "facility_id": {"type": "string", "required": true},
+        "actionrequest_id": {"type": "string", "primary_key": true},
+        "facility_id": {"type": "string"},
         "action_request_number": {"type": "string", "required": true},
-        "title": {"type": "string", "required": true},
-        "initiation_date": {"type": "date", "required": true},
+        "title": {"type": "string"},
+        "initiation_date": {"type": "date"},
         "action_types": {"type": "string"},
         "categories": {"type": "string"},
         "requested_response_time": {"type": "string"},
@@ -30,26 +30,26 @@
       "name": "Problem",
       "properties": {
         "problem_id": {"type": "string", "primary_key": true},
-        "action_request_id": {"type": "string", "required": true},
-        "what_happened": {"type": "text", "required": true},
+        "actionrequest_id": {"type": "string"},
+        "what_happened": {"type": "text"},
         "requirement": {"type": "text"}
       }
     },
     {
       "name": "RootCause",
       "properties": {
-        "cause_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string", "required": true},
-        "root_cause": {"type": "text", "required": true},
+        "rootcause_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string"},
+        "root_cause": {"type": "text"},
         "objective_evidence": {"type": "text"}
       }
     },
     {
       "name": "ActionPlan",
       "properties": {
-        "plan_id": {"type": "string", "primary_key": true},
-        "root_cause_id": {"type": "string", "required": true},
-        "action_plan": {"type": "text", "required": true},
+        "actionplan_id": {"type": "string", "primary_key": true},
+        "rootcause_id": {"type": "string"},
+        "action_plan": {"type": "text"},
         "recommended_action": {"type": "text"},
         "immediate_containment": {"type": "text"},
         "due_date": {"type": "date"},
@@ -66,7 +66,7 @@
       "name": "Verification",
       "properties": {
         "verification_id": {"type": "string", "primary_key": true},
-        "action_plan_id": {"type": "string", "required": true},
+        "actionplan_id": {"type": "string"},
         "effectiveness_verification_due_date": {"type": "date"},
         "is_action_plan_effective": {"type": "boolean"},
         "action_plan_eval_comment": {"type": "text"},
@@ -76,8 +76,8 @@
     {
       "name": "Department",
       "properties": {
-        "dept_id": {"type": "string", "primary_key": true},
-        "action_request_id": {"type": "string", "required": true},
+        "department_id": {"type": "string", "primary_key": true},
+        "actionrequest_id": {"type": "string"},
         "init_dept": {"type": "string"},
         "rec_dept": {"type": "string"}
       }
@@ -86,7 +86,7 @@
       "name": "Asset",
       "properties": {
         "asset_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string", "required": true},
+        "problem_id": {"type": "string"},
         "asset_numbers": {"type": "string"},
         "asset_activity_numbers": {"type": "string"}
       }
@@ -94,8 +94,8 @@
     {
       "name": "RecurringStatus",
       "properties": {
-        "recurring_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string", "required": true},
+        "recurringstatus_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string"},
         "recurring_problems": {"type": "boolean", "default": false},
         "recurring_comment": {"type": "text"}
       }
@@ -103,8 +103,8 @@
     {
       "name": "AmountOfLoss",
       "properties": {
-        "loss_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string", "required": true},
+        "amountofloss_id": {"type": "string", "primary_key": true},
+        "problem_id": {"type": "string"},
         "amount_of_loss": {"type": "string"}
       }
     },
@@ -112,7 +112,7 @@
       "name": "Review",
       "properties": {
         "review_id": {"type": "string", "primary_key": true},
-        "action_plan_id": {"type": "string", "required": true},
+        "actionplan_id": {"type": "string"},
         "is_resp_satisfactory": {"type": "boolean"},
         "reason_if_not_satisfactory": {"type": "text"},
         "reviewed_date": {"type": "date"},
@@ -122,8 +122,8 @@
     {
       "name": "EquipmentStrategy",
       "properties": {
-        "strategy_id": {"type": "string", "primary_key": true},
-        "action_plan_id": {"type": "string", "required": true},
+        "equipmentstrategy_id": {"type": "string", "primary_key": true},
+        "actionplan_id": {"type": "string"},
         "apss_doc_number": {"type": "string"}
       }
     }

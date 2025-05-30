@@ -37,6 +37,13 @@ data/facility_data/*.json
 *.csv
 *.db
 
+# Analysis outputs
+analysis_output/
+
+# Manager reports
+manager_reports/
+
+
 # Log files
 logs/
 *.log
