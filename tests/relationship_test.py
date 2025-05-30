@@ -99,11 +99,13 @@ def test_hierarchical_relationship_chain():
     result = db.execute_query(query)
     assert result[0]['relationship_exists'] is True
 
-    # Test 6: Verify full chain traversal
+    # Test 6: Verify full chain traversal (corrected direction)
     query = """
-    MATCH path = (f:Facility)<-[:BELONGS_TO]-(ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)
-                           <-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
-                           <-[:VALIDATES]-(v:Verification)
+    MATCH path = (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility),
+                 (p:Problem)-[:IDENTIFIED_IN]->(ar),
+                 (rc:RootCause)-[:ANALYZES]->(p),
+                 (ap:ActionPlan)-[:RESOLVES]->(rc),
+                 (v:Verification)-[:VALIDATES]->(ap)
     WHERE f.facility_id = 'test-facility'
     RETURN count(path) as path_count
     """

@@ -87,7 +87,19 @@ class Database:
 
     def create_entity(self, entity_type, properties):
         """Create entity node with properties"""
-        id_field = f"{entity_type.lower()}_id"
+        # Map entity types to their primary key field names
+        # This resolves the mismatch between entity type names and primary key field names
+        pk_mapping = {
+            "ActionRequest": "action_request_id",
+            "RootCause": "cause_id",
+            "ActionPlan": "plan_id",
+            "RecurringStatus": "recurring_id",
+            "AmountOfLoss": "loss_id",
+            "EquipmentStrategy": "strategy_id",
+            "Department": "dept_id"
+        }
+
+        id_field = pk_mapping.get(entity_type, f"{entity_type.lower()}_id")
         id_value = properties.get(id_field)
 
         if not id_value:
@@ -146,7 +158,18 @@ class Database:
         if not entities_list:
             return True
 
-        id_field = f"{entity_type.lower()}_id"
+        # Map entity types to their primary key field names
+        pk_mapping = {
+            "ActionRequest": "action_request_id",
+            "RootCause": "cause_id",
+            "ActionPlan": "plan_id",
+            "RecurringStatus": "recurring_id",
+            "AmountOfLoss": "loss_id",
+            "EquipmentStrategy": "strategy_id",
+            "Department": "dept_id"
+        }
+
+        id_field = pk_mapping.get(entity_type, f"{entity_type.lower()}_id")
         for entity in entities_list:
             if id_field not in entity:
                 logger.error(f"Missing primary key {id_field} in entity")
