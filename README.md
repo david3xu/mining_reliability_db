@@ -134,6 +134,9 @@ ROOT_CAUSE_DELIMITERS=";,|,\n, - , / , and , & "
 ### Schema Management
 
 ```bash
+# preparing data
+python scripts/preprocess_data.py
+
 # Create schema
 python scripts/create_schema.py
 
