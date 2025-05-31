@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simplified Constants for Mining Reliability Database
-Streamlined configuration supporting clean dataset processing.
+Core system constants only - field validation moved to field_utils.py
 """
 
 # Database operation constants
@@ -47,13 +47,6 @@ RELATIONSHIP_CONFIGS = [
     ("Review", "actionplan_id", "EVALUATES", "ActionPlan", "actionplan_id"),
     ("EquipmentStrategy", "actionplan_id", "MODIFIES", "ActionPlan", "actionplan_id")
 ]
-
-# Missing data indicator vocabulary
-MISSING_DATA_INDICATORS = {
-    "DATA_NOT_AVAILABLE": "Field exists but value missing - potential collection system issue",
-    "NOT_SPECIFIED": "Field intentionally left blank - business process gap",
-    "NOT_APPLICABLE": "Field doesn't apply to this case - correct operational variance"
-}
 
 # Field processing priorities by category
 FIELD_PRIORITY_CATEGORIES = {

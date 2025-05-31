@@ -1,307 +1,354 @@
 # Mining Reliability DB
 
-A graph-based database system for tracking and analyzing mining operation incidents, root causes, and corrective actions.
+A graph-based database system for tracking and analyzing mining operation incidents, root causes, and corrective actions with advanced causal intelligence capabilities.
 
 ## Overview
 
-This project implements a Neo4j graph database to model complex relationships in mining incident data. It transforms raw reliability records into a structured data model following natural workflow progression:
+This system implements a Neo4j graph database to model complex relationships in mining incident data. It transforms raw reliability records into a structured 12-entity model following natural workflow progression:
 
 ```
 Facility → ActionRequest → Problem → RootCause → ActionPlan → Verification
 ```
 
+**Key Innovation**: Automated causal intelligence extraction that identifies primary and secondary root causes, enabling predictive maintenance and operational optimization.
+
 ## Features
 
-- Converts 41-field raw data into structured 12-entity model
-- Tracks complete incident lifecycle from reporting to verification
-- Captures relationships between incidents, causes, and resolutions
-- Environment-driven configuration
+- **Schema-Driven Architecture**: JSON configuration files define all data transformations
+- **Causal Intelligence**: Automated extraction of root cause patterns for predictive insights
+- **Dynamic Entity Labeling**: Self-organizing data structures based on operational characteristics
+- **Unified Configuration Management**: Thread-safe, centralized configuration authority
+- **Production-Ready**: Thread-safe operations with comprehensive error handling
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 - Python 3.10+
 - Neo4j 4.4+
 - Git
 
-### 2. Installation
+### Installation
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone <repository-url>
 cd mining_reliability_db
 
-# Create and activate virtual environment
+# Create virtual environment
 python3.10 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Install dependencies (choose one):
-make install        # Core dependencies only
-make install-dev    # Core + development tools
-make install-full   # All dependencies including ML/Azure tools
-
-# Setup environment configuration
-make setup          # Creates .env from template
+# Install dependencies
+make install-dev          # Development tools included
+# or: pip install -e ".[dev]"
 ```
 
-### 3. Environment Setup
+### Environment Configuration
 
 ```bash
+# Create environment file
+make setup
+# or: cp .env.example .env
+
 # Edit .env with your configuration
-# NEO4J_URI=bolt://localhost:7687
-# NEO4J_USER=neo4j
-# NEO4J_PASSWORD=your_password
+# All settings now managed through single configuration gateway
 ```
 
-### 4. Database Setup
+### Database Setup
 
 ```bash
-# Start Neo4j (see Docker section below)
+# Start Neo4j (Docker method)
+make docker-neo4j
 
+# Create database schema
 make schema
 # or: python scripts/create_schema.py
-```
 
-### 5. Import Data
-
-```bash
+# Import facility data
 make import
 # or: python scripts/import_data.py
-
-make reset
-make reset-all
 ```
 
-## Docker Setup
+## Architecture
 
-### Start Neo4j
+### Configuration Authority
+
+All system configuration flows through the unified `configs/environment.py` gateway:
+
+```python
+from configs.environment import get_db_config, get_batch_size, get_log_level
+```
+
+**No direct environment access** - all configuration through centralized authority.
+
+### Validation Authority
+
+All field validation handled by centralized `mine_core/shared/field_utils.py`:
+
+```python
+from mine_core.shared.field_utils import has_real_value, clean_label
+```
+
+**No local validation functions** - import from central authority only.
+
+### Database Authority
+
+Unified database interface through `mine_core/database/db.py`:
+
+```python
+from mine_core.database.db import get_database
+```
+
+**Single database interface** - no fragmented connection patterns.
+
+## Environment Variables
+
+### Database Configuration
 
 ```bash
-# Start Neo4j container
-
-
-make docker-start
-make docker-neo4j
-make docker-stop
-make dokcer-clean
-
-
-docker run -d --name neo4j \
-  -p 7474:7474 -p 7687:7687 \
-  -e NEO4J_AUTH=neo4j/password \
-  neo4j:latest
-
-# Check status
-docker ps | grep neo4j
-curl ifconfig.me
-
-# View logs
-docker logs neo4j
-
-
-
-docker stop neo4j
-docker rm neo4j
-docker run -d --name neo4j \
-  -p 0.0.0.0:7474:7474 -p 0.0.0.0:7687:7687 \
-  -e NEO4J_AUTH=neo4j/password \
-  neo4j:latest
-
-# From your local computer, create a tunnel
-ssh -L 7474:localhost:7474 azureuser@your-azure-machine-ip
-
-# Then visit: http://localhost:7474/browser/
-
-curl -I http://localhost:7474/browser/
-
-
-3. **Access Neo4j Browser**: http://localhost:7474
-   - Username: neo4j
-   - Password: password
-
-
-docker exec -it neo4j cypher-shell -u neo4j -p password
-
-# Access Neo4j Browser (optional)
-# Open: http://localhost:7474/browser/
-# Username: neo4j
-# Password: password
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=password
 ```
 
-### Manage Neo4j Container
+### Processing Parameters
 
 ```bash
-# Stop/Start
-docker stop neo4j
-docker start neo4j
-
-# Remove (deletes data)
-docker stop neo4j && docker rm neo4j
-
-
-
+BATCH_SIZE=5000
+CONNECTION_TIMEOUT=30
+MAX_RETRIES=3
 ```
 
-## Configuration
+### System Configuration
 
-All configuration through environment variables:
-
-| Variable       | Default               | Description          |
-| -------------- | --------------------- | -------------------- |
-| NEO4J_URI      | bolt://localhost:7687 | Neo4j connection URI |
-| NEO4J_USER     | neo4j                 | Neo4j username       |
-| NEO4J_PASSWORD | password              | Neo4j password       |
-| DATA_DIR       | ./data/facility_data  | Raw data directory   |
-| LOG_LEVEL      | INFO                  | Logging level        |
+```bash
+LOG_LEVEL=INFO
+LOG_FILE=/path/to/logfile                    # Optional
+DATA_DIR=./data/facility_data
+ROOT_CAUSE_DELIMITERS=";,|,\n, - , / , and , & "
+```
 
 ## Usage
 
-### Create Database Schema
+### Schema Management
 
 ```bash
-make schema
-# or: python scripts/create_schema.py
+# Create schema
+python scripts/create_schema.py
+
+# Reset database (data only)
+python scripts/reset_db.py --force
+
+# Reset including schema
+python scripts/reset_db.py --drop-schema --force
 ```
 
-### Import Facility Data
+### Data Import
 
 ```bash
 # Import all facilities
-make import
-# or: python scripts/import_data.py
+python scripts/import_data.py
 
 # Import specific facility
-make import-sample
-# or: python scripts/import_data.py --facility sample
+python scripts/import_data.py --facility sample
+
+# Custom configuration
+python scripts/import_data.py \
+  --uri bolt://custom:7687 \
+  --user custom_user \
+  --batch-size 1000
 ```
 
-### Reset Database
+### Neo4j Browser Access
+
+1. **Local Access**: http://localhost:7474
+2. **Username**: neo4j
+3. **Password**: password (or your configured password)
+
+## Data Model
+
+### Core Workflow Entities
+
+- **Facility**: Mining operation sites
+- **ActionRequest**: Incident reports with operational context
+- **Problem**: Issue descriptions and requirements
+- **RootCause**: Primary and secondary cause analysis
+- **ActionPlan**: Resolution strategies and timelines
+- **Verification**: Effectiveness validation and feedback
+
+### Supporting Entities
+
+- **Department**: Organizational responsibility tracking
+- **Asset**: Equipment and resource involvement
+- **Review**: Management oversight and approval
+- **EquipmentStrategy**: Strategic maintenance implications
+
+### Causal Intelligence Features
+
+- **Primary Cause**: Direct root cause identification
+- **Secondary Cause**: Systemic underlying factors
+- **Evidence Correlation**: Supporting data relationships
+- **Pattern Recognition**: Recurring issue identification
+
+## Development
+
+### Make Commands
 
 ```bash
-# Reset data only
-make reset
-# or: python scripts/reset_db.py --force
-
-# Reset data and schema
-make reset-all
-# or: python scripts/reset_db.py --drop-schema --force
+make help              # Show all available commands
+make install           # Core dependencies only
+make install-dev       # Development tools included
+make schema            # Create database schema
+make import            # Import all facility data
+make reset             # Reset database data
+make reset-all         # Reset data and schema
+make test              # Run test suite
+make clean             # Remove cache files
 ```
 
-### View All Commands
+### Docker Operations
 
 ```bash
-make help
+make docker-neo4j      # Start Neo4j container
+make docker-start      # Start existing container
+make docker-stop       # Stop container
+make docker-clean      # Remove container
 ```
 
 ### Custom Configuration
 
+All configuration through environment variables - no hardcoded values:
+
 ```bash
-# Use custom Neo4j instance
-python scripts/import_data.py \
-  --uri bolt://custom:7687 \
-  --user custom_user \
-  --password custom_pass
+# Override any parameter
+BATCH_SIZE=10000 python scripts/import_data.py
+LOG_LEVEL=DEBUG python scripts/create_schema.py
 ```
 
-## Development
+## Operational Intelligence
 
-### Installation Options
+### Causal Analysis Queries
 
-The project provides three installation options:
+```cypher
+// Find most frequent root causes
+MATCH (rc:RootCause)
+WHERE rc.root_cause IS NOT NULL
+RETURN rc.root_cause, count(*) as frequency
+ORDER BY frequency DESC
+LIMIT 10
 
-1. **Core Installation** (`make install`)
+// Analyze causal patterns by facility
+MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
+RETURN f.facility_id, rc.root_cause, count(*) as incidents
+ORDER BY incidents DESC
+```
 
-   - Installs only the essential dependencies
-   - Suitable for basic usage
+### Performance Analytics
 
-2. **Development Tools** (`make install-dev`)
-
-   - Installs core dependencies + development tools
-   - Includes pytest, black, flake8, mypy
-   - Recommended for most developers
-
-3. **Full Development** (`make install-full`)
-   - Installs all possible dependencies
-   - Includes ML, Azure, and other tools
-   - Use only if you need specific tools
-
-### Testing
-
-Run the test suite:
-
-```bash
-# Run all tests
-make test
-
-# Run specific test files
-make test-db
-make test-pipelines
-
-python scripts/reset_db.py --force --drop-schema
-python scripts/create_schema.py
-
-python scripts/import_data.py --facility sample
-
-pytest -xvs tests/relationship_test.py
-
-
-
+```cypher
+// Action plan effectiveness by category
+MATCH (ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
+WHERE ar.categories IS NOT NULL AND v.is_action_plan_effective IS NOT NULL
+RETURN ar.categories,
+       count(*) as total_plans,
+       count(CASE WHEN v.is_action_plan_effective = true THEN 1 END) as effective_plans,
+       toFloat(count(CASE WHEN v.is_action_plan_effective = true THEN 1 END)) / count(*) * 100 as effectiveness_rate
+ORDER BY effectiveness_rate DESC
 ```
 
 ## Project Structure
 
 ```
 mining_reliability_db/
-├── configs/                # Configuration
-│   ├── environment.py      # Environment loader
-│   ├── model_schema.json   # Entity definitions
-│   └── field_mappings.json # Field transformations
-├── mine_core/              # Core business logic
-│   ├── database/           # Database operations
-│   ├── pipelines/          # ETL processes
-│   └── entities/           # Data models
-├── scripts/                # CLI tools
-├── data/                   # Raw data files
-└── tests/                  # Test suite
+├── configs/                   # Configuration authority
+│   ├── environment.py         # Exclusive configuration gateway
+│   ├── model_schema.json      # Entity definitions
+│   └── field_mappings.json    # Field transformations
+├── mine_core/                 # Business logic core
+│   ├── shared/                # Centralized utilities
+│   ├── database/              # Unified database interface
+│   ├── pipelines/             # ETL processes
+│   └── entities/              # Data models
+├── scripts/                   # Standardized entry points
+└── data/                      # Raw data storage
 ```
 
-## Data Model
+## Contributing
 
-The system transforms raw incident records through a 12-entity model:
+### Development Setup
 
-**Core Workflow**:
+```bash
+# Complete development environment
+make dev-setup
 
-- **Facility**: Site locations
-- **ActionRequest**: Incident reports
-- **Problem**: Issue descriptions
-- **RootCause**: Analysis results
-- **ActionPlan**: Resolution steps
-- **Verification**: Effectiveness validation
+# Run tests
+make test
 
-**Supporting Entities**:
+# Code formatting
+black mine_core/ scripts/
+isort mine_core/ scripts/
+```
 
-- Department, Asset, Review, EquipmentStrategy, etc.
+### Architecture Principles
 
-## Technologies
+1. **Single Source of Truth**: All configuration through `environment.py`
+2. **Centralized Validation**: All field validation through `field_utils.py`
+3. **Unified Database Access**: All operations through `db.py`
+4. **Schema-Driven Design**: Business logic externalized to JSON configuration
 
-- **Neo4j**: Graph database (4.4+)
-- **Python**: Core application (3.8+)
-- **Pandas**: Data processing
-- **JSON**: Configuration-driven transformations
+### Adding New Features
 
-## Development
+1. **Configuration**: Add to `environment.py` with environment variable support
+2. **Validation**: Use existing `field_utils.py` functions or extend centrally
+3. **Data Processing**: Follow ETL patterns in `pipelines/` directory
+4. **Database Operations**: Extend unified `db.py` interface
 
-### Adding New Data Sources
+## Troubleshooting
 
-1. Create extractor in `mine_core/pipelines/`
-2. Update field mappings in `configs/field_mappings.json`
-3. Add entity definitions to `configs/model_schema.json`
+### Common Issues
 
-### Environment Variables
+**Import Errors**: Ensure virtual environment activated and dependencies installed
 
-All configuration through environment variables - no hardcoded values in source code.
+```bash
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+**Database Connection**: Verify Neo4j running and environment variables set
+
+```bash
+# Check Neo4j status
+docker ps | grep neo4j
+
+# Test connection
+python -c "from configs.environment import get_db_config; print(get_db_config())"
+```
+
+**Schema Errors**: Reset and recreate schema
+
+```bash
+python scripts/reset_db.py --drop-schema --force
+python scripts/create_schema.py
+```
+
+### Performance Optimization
+
+```bash
+# Larger batch sizes for better performance
+BATCH_SIZE=10000 python scripts/import_data.py
+
+# Increase connection timeout for large datasets
+CONNECTION_TIMEOUT=60 python scripts/import_data.py
+```
 
 ## License
 
 MIT License
+
+## Support
+
+For configuration issues, verify environment variables are properly set.
+For data import problems, check log output with `LOG_LEVEL=DEBUG`.
+For database connectivity, ensure Neo4j is running and accessible.

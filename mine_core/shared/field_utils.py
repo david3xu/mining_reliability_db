@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simplified Field Processing Utilities for Mining Reliability Database
-Clean, efficient field validation and processing for single-value datasets.
+Consolidated Field Processing Utilities - Single Validation Authority
+Centralized field validation, processing, and missing data management.
 """
 
 import re
@@ -10,7 +10,7 @@ from typing import Any, Optional, List, Dict
 
 logger = logging.getLogger(__name__)
 
-# Missing data indicators
+# Unified missing data indicators - single source of truth
 MISSING_DATA_INDICATORS = {
     "DATA_NOT_AVAILABLE",
     "NOT_SPECIFIED",
@@ -25,8 +25,18 @@ MISSING_DATA_INDICATORS = {
     "unknown"
 }
 
+# Missing data context mappings
+MISSING_DATA_CONTEXT = {
+    "DATA_NOT_AVAILABLE": "Field exists but value missing - potential collection system issue",
+    "NOT_SPECIFIED": "Field intentionally left blank - business process gap",
+    "NOT_APPLICABLE": "Field doesn't apply to this case - correct operational variance"
+}
+
 def has_real_value(value: Any) -> bool:
-    """Check if field has meaningful data"""
+    """
+    Centralized validation for meaningful data presence.
+    Single source of truth for all field validation across system.
+    """
     if value in MISSING_DATA_INDICATORS:
         return False
 
@@ -36,8 +46,14 @@ def has_real_value(value: Any) -> bool:
 
     return value is not None
 
+def is_missing_data_indicator(value: Any) -> bool:
+    """Check if value is an explicit missing data indicator"""
+    if value is None:
+        return True
+    return str(value) in MISSING_DATA_INDICATORS
+
 def get_missing_indicator(field_name: str, context: str = "general") -> str:
-    """Get appropriate missing data indicator"""
+    """Get appropriate missing data indicator based on field type and context"""
     field_lower = field_name.lower()
 
     if "date" in field_lower or "time" in field_lower:
@@ -57,7 +73,7 @@ def clean_label(value: str) -> str:
     # Remove special characters, keep alphanumeric and underscores
     cleaned = re.sub(r'[^a-zA-Z0-9_]', '', value.replace(' ', '_').replace('-', '_'))
 
-    # Ensure it starts with letter
+    # Ensure starts with letter
     if cleaned and cleaned[0].isdigit():
         cleaned = f"_{cleaned}"
 
@@ -165,10 +181,6 @@ def validate_entity_completeness(entity_data: Dict[str, Any], required_fields: L
                           if has_real_value(entity_data.get(field)))
 
     return fields_with_data / len(required_fields)
-
-def is_missing_data_indicator(value: str) -> bool:
-    """Check if value is a missing data indicator"""
-    return value in MISSING_DATA_INDICATORS
 
 def get_field_category(field_name: str) -> str:
     """Categorize field for analytical purposes"""

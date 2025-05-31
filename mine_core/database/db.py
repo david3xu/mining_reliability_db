@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
 Simplified Database Interface for Mining Reliability Database
-Streamlined Neo4j operations with dynamic labeling for clean datasets.
+Clean implementation without backwards compatibility pollution.
 """
 
 import logging
 from contextlib import contextmanager
 from typing import Optional, Dict, Any, List
 from neo4j import GraphDatabase
-from configs.environment import get_db_config, get_entity_primary_key
-from mine_core.shared.constants import CONNECTION_TIMEOUT, MAX_RETRIES
+from configs.environment import get_db_config, get_entity_primary_key, get_connection_timeout, get_max_retries
 from mine_core.shared.common import handle_error
 from mine_core.shared.field_utils import clean_label, has_real_value
 
@@ -33,7 +32,7 @@ class SimplifiedDatabase:
         return self._driver
 
     def _connect(self):
-        """Establish Neo4j connection"""
+        """Establish Neo4j connection using unified configuration"""
         if not all([self._uri, self._user, self._password]):
             config = get_db_config()
             self._uri = config["uri"]
@@ -46,7 +45,7 @@ class SimplifiedDatabase:
             self._driver = GraphDatabase.driver(
                 self._uri,
                 auth=(self._user, self._password),
-                connection_timeout=CONNECTION_TIMEOUT
+                connection_timeout=get_connection_timeout()
             )
             self._driver.verify_connectivity()
             logger.info("Neo4j connection verified")
@@ -311,6 +310,3 @@ def close_database():
     if _db_instance is not None:
         _db_instance.close()
         _db_instance = None
-
-# Backward compatibility aliases
-Database = SimplifiedDatabase

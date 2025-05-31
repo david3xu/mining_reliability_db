@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """
 Database Reset Script for Mining Reliability Database
-Cleans Neo4j database with standardized setup and improved error handling.
+Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_path, setup_logging, handle_error
-from mine_core.shared.constants import DEFAULT_BATCH_SIZE
+from mine_core.shared.common import setup_project_environment, handle_error
 from mine_core.database.db import get_database, close_database
-
-# Setup project path and logging
-setup_project_path()
-logger = setup_logging(name=__name__)
+from configs.environment import get_batch_size
 
 def get_database_stats(db):
     """Get current database statistics"""
@@ -55,7 +51,7 @@ def get_database_stats(db):
         handle_error(logger, e, "getting database stats")
         return {"nodes": {}, "total_nodes": 0, "relationships": 0}
 
-def delete_all_data(db, batch_size=DEFAULT_BATCH_SIZE):
+def delete_all_data(db, batch_size):
     """Delete all nodes and relationships in batches"""
     try:
         logger.info("Starting data deletion")
@@ -124,7 +120,7 @@ def drop_constraints(db):
         handle_error(logger, e, "dropping constraints")
         return False
 
-def reset_database(db, batch_size=DEFAULT_BATCH_SIZE, drop_schema=False):
+def reset_database(db, batch_size, drop_schema=False):
     """Reset Neo4j database completely"""
     logger.info("Starting database reset")
 
@@ -159,24 +155,26 @@ def reset_database(db, batch_size=DEFAULT_BATCH_SIZE, drop_schema=False):
 def main():
     """Main execution function"""
     parser = argparse.ArgumentParser(description="Reset Neo4j database")
-    parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE,
-                       help=f"Batch size for deletion (default: {DEFAULT_BATCH_SIZE})")
+    parser.add_argument("--batch-size", type=int, help="Batch size for deletion")
     parser.add_argument("--drop-schema", action="store_true", help="Drop schema constraints")
     parser.add_argument("--uri", type=str, help="Neo4j URI")
     parser.add_argument("--user", type=str, help="Neo4j username")
     parser.add_argument("--password", type=str, help="Neo4j password")
     parser.add_argument("--force", action="store_true", help="Skip confirmation")
-    parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
+    parser.add_argument("--log-level", type=str, help="Logging level")
 
     args = parser.parse_args()
 
-    # Setup logging level
-    if args.log_level:
-        setup_logging(level=args.log_level, name=__name__)
+    # Standardized project initialization
+    global logger
+    logger = setup_project_environment("reset_db", args.log_level)
 
     try:
-        # Setup database connection
+        # Setup database connection using unified configuration
         db = get_database(args.uri, args.user, args.password)
+
+        # Use unified configuration for batch size
+        batch_size = args.batch_size or get_batch_size()
 
         # Show current stats
         initial_stats = get_database_stats(db)
@@ -202,7 +200,7 @@ def main():
                 return 0
 
         # Reset database
-        success = reset_database(db, args.batch_size, args.drop_schema)
+        success = reset_database(db, batch_size, args.drop_schema)
 
         if success:
             print("Database reset successful!")

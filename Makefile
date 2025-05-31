@@ -1,43 +1,44 @@
 # Mining Reliability Database - Makefile
+# Updated for unified configuration architecture
 
-.PHONY: help setup schema import reset test clean install install-dev install-full
+.PHONY: help setup schema import reset test clean install install-dev
 
 help: ## Show available commands
 	@echo "Mining Reliability Database Commands:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-setup: ## Initial setup - copy environment template
+setup: ## Create environment configuration from template
 	@if [ ! -f .env ]; then \
 		cp .env.example .env; \
 		echo "Created .env file from template"; \
-		echo "Edit .env with your configuration"; \
+		echo "Edit .env with your configuration through unified environment.py gateway"; \
 	else \
 		echo ".env file already exists"; \
 	fi
 
-schema: ## Create database schema
+schema: ## Create database schema using unified configuration
 	python scripts/create_schema.py
 
-import: ## Import all facility data
+import: ## Import all facility data using standardized patterns
 	python scripts/import_data.py
 
-reset: ## Reset database (data only)
+import-sample: ## Import sample facility data for testing
+	python scripts/import_data.py --facility sample
+
+reset: ## Reset database data only (preserve schema)
 	python scripts/reset_db.py --force
 
-reset-all: ## Reset database including schema
+reset-all: ## Reset database including schema constraints
 	python scripts/reset_db.py --drop-schema --force
 
-test: ## Run test suite
+test: ## Run complete test suite
 	python -m pytest tests/ -v
 
-test-db: ## Run database tests only
-	python -m pytest tests/test_database.py -v
+test-coverage: ## Run tests with coverage report
+	python -m pytest tests/ -v --cov=mine_core --cov-report=html
 
-test-pipelines: ## Run pipeline tests only
-	python -m pytest tests/test_pipelines.py -v
-
-clean: ## Clean Python cache files and test artifacts
+clean: ## Clean Python cache and build artifacts
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
@@ -47,39 +48,111 @@ clean: ## Clean Python cache files and test artifacts
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	find . -type d -name ".ruff_cache" -exec rm -rf {} +
 
-install: ## Install core dependencies
+install: ## Install core dependencies only
 	pip install -e .
 
-install-dev: ## Install development tools (pytest, black, etc.)
+install-dev: ## Install development dependencies
 	pip install -e ".[dev]"
 
-install-full: ## Install all development dependencies (including ML, Azure, etc.)
+install-full: ## Install all development and analysis dependencies
 	pip install -e ".[dev]"
 	pip install -r requirements-dev.txt
 
-docker-neo4j: ## Start Neo4j in Docker
+# Docker Neo4j Management - Updated patterns
+docker-neo4j: ## Start Neo4j container with standard configuration
 	docker run -d --name neo4j \
 		-p 7474:7474 -p 7687:7687 \
 		-e NEO4J_AUTH=neo4j/password \
 		neo4j:latest
+	@echo "Neo4j started. Browser: http://localhost:7474"
+	@echo "Configure connection in .env file"
 
-docker-stop: ## Stop Neo4j Docker container
-	docker stop neo4j
-
-docker-start: ## Start existing Neo4j Docker container
+docker-start: ## Start existing Neo4j container
 	docker start neo4j
 
-docker-clean: ## Remove Neo4j Docker container
+docker-stop: ## Stop Neo4j container
+	docker stop neo4j
+
+docker-clean: ## Remove Neo4j container (deletes data)
 	docker stop neo4j || true
 	docker rm neo4j || true
 
-# Development workflow shortcuts
-dev-setup: setup install-dev docker-neo4j ## Complete development setup
+docker-logs: ## View Neo4j container logs
+	docker logs neo4j
+
+# Development workflow shortcuts - Updated for unified architecture
+dev-setup: setup install-dev docker-neo4j ## Complete development environment setup
 	@echo "Development environment ready!"
-	@echo "1. Edit .env file with your settings"
+	@echo "1. Edit .env file through unified configuration gateway"
 	@echo "2. Run 'make schema' to create database schema"
-	@echo "3. Run 'make import' to load data"
+	@echo "3. Run 'make import-sample' to load sample data"
+	@echo "4. Access Neo4j browser: http://localhost:7474"
 
 quick-start: setup schema import-sample ## Quick start with sample data
 	@echo "Quick start complete!"
 	@echo "Neo4j browser: http://localhost:7474"
+	@echo "All configuration managed through environment.py gateway"
+
+# Configuration validation
+validate-config: ## Validate configuration setup
+	@echo "Validating unified configuration..."
+	python -c "from configs.environment import get_all_config; import json; print(json.dumps(get_all_config(), indent=2))"
+
+validate-db: ## Test database connection
+	@echo "Testing database connection..."
+	python -c "from mine_core.database.db import get_database; db = get_database(); print('Database connection successful')"
+
+# Data processing with environment overrides
+import-large: ## Import data with optimized settings for large datasets
+	BATCH_SIZE=10000 CONNECTION_TIMEOUT=60 python scripts/import_data.py
+
+import-debug: ## Import data with debug logging
+	LOG_LEVEL=DEBUG python scripts/import_data.py
+
+# Schema management
+schema-reset: reset-all schema ## Complete schema reset and recreation
+	@echo "Schema completely reset and recreated"
+
+# Performance operations
+optimize-db: ## Create performance indexes
+	python -c "from mine_core.database.db import get_database; get_database().optimize_performance()"
+
+# Validation and integrity checks
+validate-data: ## Run data integrity validation
+	python -c "from mine_core.database.db import get_database; import json; print(json.dumps(get_database().validate_data_integrity(), indent=2))"
+
+# Causal intelligence operations
+analyze-causes: ## Generate causal intelligence summary
+	python -c "from mine_core.database.db import get_database; import json; print(json.dumps(get_database().get_causal_intelligence_summary(), indent=2))"
+
+# Code quality checks
+lint: ## Run code quality checks
+	black --check mine_core/ scripts/
+	isort --check-only mine_core/ scripts/
+	flake8 mine_core/ scripts/
+
+format: ## Format code using black and isort
+	black mine_core/ scripts/
+	isort mine_core/ scripts/
+
+type-check: ## Run type checking
+	mypy mine_core/
+
+# Documentation
+docs: ## Generate documentation
+	@echo "Documentation available in README.md"
+	@echo "Architecture details in project_structure.md"
+
+# Environment information
+info: ## Show system information
+	@echo "Python version: $(shell python --version)"
+	@echo "Virtual environment: $(VIRTUAL_ENV)"
+	@echo "Project directory: $(PWD)"
+	@echo "Configuration status:"
+	@make validate-config
+
+# Security and cleanup
+secure-clean: clean ## Secure cleanup including sensitive data
+	find . -name "*.log" -delete
+	find . -name ".env.*" -not -name ".env.example" -delete
+	@echo "Secure cleanup completed"

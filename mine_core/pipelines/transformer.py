@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """
 Simplified Data Transformer for Mining Reliability Database
-Clean single-value field processing with enhanced root cause intelligence.
+Clean implementation without backwards compatibility pollution.
 """
 
 import logging
 from typing import Dict, List, Any, Optional
 from configs.environment import get_mappings, get_entity_names
 from mine_core.shared.common import handle_error
+from mine_core.shared.field_utils import (
+    has_real_value,
+    is_missing_data_indicator,
+    get_missing_indicator,
+    clean_label,
+    extract_root_cause_tail
+)
 
 logger = logging.getLogger(__name__)
 
@@ -105,31 +112,11 @@ class SimplifiedTransformer:
         """Create RootCause entity with enhanced causal intelligence"""
         root_cause = self._create_entity_with_labeling(record, "RootCause", base_id)
 
-        # Extract tail value for enhanced causal analysis
+        # Extract tail value for enhanced causal analysis using centralized utility
         original_cause = record.get("Root Cause", "")
-        root_cause["root_cause_tail"] = self._extract_tail_value(original_cause)
+        root_cause["root_cause_tail"] = extract_root_cause_tail(original_cause)
 
         return root_cause
-
-    def _extract_tail_value(self, value: str) -> str:
-        """Extract tail component from root cause for causal intelligence"""
-        if not value or isinstance(value, str) and not value.strip():
-            return "NOT_SPECIFIED"
-
-        str_value = str(value).strip()
-
-        # Split on common delimiters and extract tail (final) component
-        delimiters = [';', ',', '|', '\n', ' - ', ' / ', ' and ', ' & ']
-
-        for delimiter in delimiters:
-            if delimiter in str_value:
-                parts = [part.strip() for part in str_value.split(delimiter) if part.strip()]
-                if len(parts) > 1:
-                    return parts[-1]  # Return tail item
-                break
-
-        # No delimiters found - return original value
-        return str_value
 
     def _create_problem_entities(self, record: Dict[str, Any], base_id: str,
                                transformed: Dict[str, Any]) -> None:
@@ -184,13 +171,13 @@ class SimplifiedTransformer:
 
                 # Special handling for root_cause_tail
                 if target_field == "root_cause_tail":
-                    entity[target_field] = self._extract_tail_value(value)
-                elif self._has_real_value(value):
+                    entity[target_field] = extract_root_cause_tail(value)
+                elif has_real_value(value):
                     entity[target_field] = self._normalize_value(value)
                 else:
-                    entity[target_field] = self._get_missing_indicator(source_field)
+                    entity[target_field] = get_missing_indicator(source_field)
             else:
-                entity[target_field] = self._get_missing_indicator(source_field)
+                entity[target_field] = get_missing_indicator(source_field)
 
         # Apply cascade labeling
         dynamic_label = self._apply_cascade_labeling(entity, entity_type)
@@ -207,8 +194,8 @@ class SimplifiedTransformer:
         # Try priority fields in order
         for field_name in priority_fields:
             value = entity_data.get(field_name)
-            if self._has_real_value(value) and not self._is_missing_indicator(value):
-                return self._clean_label(str(value))
+            if has_real_value(value) and not is_missing_data_indicator(value):
+                return clean_label(str(value))
 
         # Fallback to entity type
         return entity_type
@@ -221,38 +208,13 @@ class SimplifiedTransformer:
         if not required_fields:
             return False
 
-        # Check if any required field has real value
+        # Check if any required field has real value using centralized validation
         for field_name in required_fields:
             value = record.get(field_name)
-            if self._has_real_value(value):
+            if has_real_value(value):
                 return True
 
         return False
-
-    def _has_real_value(self, value: Any) -> bool:
-        """Check if value contains meaningful data"""
-        if value is None:
-            return False
-        if isinstance(value, str):
-            cleaned = value.strip().lower()
-            return cleaned not in {"", "null", "n/a", "unknown", "data_not_available", "not_specified", "not_applicable"}
-        return True
-
-    def _is_missing_indicator(self, value: str) -> bool:
-        """Check if value is a missing data indicator"""
-        if not isinstance(value, str):
-            return False
-        return value in {"DATA_NOT_AVAILABLE", "NOT_SPECIFIED", "NOT_APPLICABLE"}
-
-    def _get_missing_indicator(self, field_name: str) -> str:
-        """Get appropriate missing data indicator for field"""
-        field_lower = field_name.lower()
-        if "date" in field_lower or "time" in field_lower:
-            return "DATA_NOT_AVAILABLE"
-        elif "comment" in field_lower or "description" in field_lower:
-            return "NOT_SPECIFIED"
-        else:
-            return "DATA_NOT_AVAILABLE"
 
     def _normalize_value(self, value: Any) -> Any:
         """Normalize field value for storage"""
@@ -260,30 +222,11 @@ class SimplifiedTransformer:
             return value.strip()
         return value
 
-    def _clean_label(self, value: str) -> str:
-        """Clean value for Neo4j label compatibility"""
-        import re
-        if not isinstance(value, str):
-            value = str(value)
-
-        # Remove special characters, keep alphanumeric and underscores
-        cleaned = re.sub(r'[^a-zA-Z0-9_]', '', value.replace(' ', '_').replace('-', '_'))
-
-        # Ensure starts with letter
-        if cleaned and cleaned[0].isdigit():
-            cleaned = f"_{cleaned}"
-
-        # Limit length
-        return cleaned[:50] if cleaned else "UnknownValue"
-
     def _generate_base_id(self, action_request_number: str, facility_id: str, record_index: int = 0) -> str:
         """Generate base ID for all related entities"""
-        clean_number = self._clean_label(action_request_number)
-        clean_facility = self._clean_label(facility_id)
+        clean_number = clean_label(action_request_number)
+        clean_facility = clean_label(facility_id)
 
         if record_index > 0:
             return f"{clean_facility}_{clean_number}_{record_index}"
         return f"{clean_facility}_{clean_number}"
-
-# Backward compatibility
-DataTransformer = SimplifiedTransformer

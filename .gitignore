@@ -1,3 +1,10 @@
+# Mining Reliability DB - Git Exclusion Patterns
+# Updated for unified configuration architecture
+
+# =============================================================================
+# PYTHON DEVELOPMENT ARTIFACTS
+# =============================================================================
+
 # Python bytecode and caching
 __pycache__/
 *.py[cod]
@@ -5,49 +12,275 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+.mypy_cache/
+.ruff_cache/
 
 # Distribution / packaging
 dist/
 build/
 *.egg-info/
+.eggs/
 
 # Virtual environments
 venv/
 env/
 ENV/
 .venv/
+.env-*/
 
-# Development environments
+# =============================================================================
+# DEVELOPMENT ENVIRONMENTS
+# =============================================================================
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+
+# Development configuration overrides
+.env.local
+.env.development
+.env.staging
+.env.production
+
+# =============================================================================
+# DATABASE AND DATA STORAGE
+# =============================================================================
 
 # Local Neo4j data
 .neo4j/
+neo4j-data/
+
+# Database dumps and backups
+*.dump
+*.backup
+neo4j-backup-*
+
+# =============================================================================
+# ENVIRONMENT AND SECRETS
+# =============================================================================
 
 # Environment variables and secrets
 .env
 .env.*
+!.env.example
 
-# Data files (consider what should be versioned)
+# Configuration overrides
+config.local.json
+settings.local.json
+
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+
+# =============================================================================
+# DATA FILES AND ANALYSIS
+# =============================================================================
+
+# Facility data (except sample)
 data/facility_data/*.json
 !data/facility_data/sample.json
+
+# Analysis and reporting outputs
+analysis_output/
+manager_reports/
+reports/
+exports/
+
+# Large data files
 *.xlsx
 *.csv
 *.db
+*.sqlite
+*.parquet
 
-# Analysis outputs
-analysis_output/
+# =============================================================================
+# LOGGING AND MONITORING
+# =============================================================================
 
-# Manager reports
-manager_reports/
-
-
-# Log files
+# Log files from unified logging system
 logs/
 *.log
+mining_reliability*.log
 
-# OS specific
+# Performance monitoring
+performance_reports/
+profiling_output/
+
+# =============================================================================
+# TESTING AND QUALITY ASSURANCE
+# =============================================================================
+
+# Test artifacts
+.coverage.*
+coverage.xml
+.pytest_cache/
+test-results/
+test_*.xml
+
+# Performance test data
+benchmark_results/
+load_test_data/
+
+# =============================================================================
+# DOCUMENTATION GENERATION
+# =============================================================================
+
+# Generated documentation
+docs/_build/
+docs/build/
+site/
+
+# Temporary documentation files
+*.tmp.md
+*.draft.md
+
+# =============================================================================
+# OPERATIONAL ARTIFACTS
+# =============================================================================
+
+# Docker volumes and data
+docker-data/
+.docker/
+
+# Temporary operational files
+tmp/
+temp/
+.tmp/
+
+# Process ID files
+*.pid
+
+# =============================================================================
+# SECURITY AND COMPLIANCE
+# =============================================================================
+
+# Security scan results
+security_reports/
+vulnerability_scan/
+
+# Compliance artifacts
+audit_logs/
+compliance_reports/
+
+# =============================================================================
+# SYSTEM AND OS ARTIFACTS
+# =============================================================================
+
+# OS specific files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# System backup files
+*.bak
+*.orig
+*.rej
+
+# =============================================================================
+# DEVELOPMENT UTILITIES
+# =============================================================================
+
+# Code formatting artifacts
+.black_cache/
+.isort.cfg.bak
+
+# Type checking artifacts
+.mypy_cache/
+.pytype/
+
+# Linting reports
+pylint_report.txt
+flake8_report.txt
+
+# =============================================================================
+# PRODUCTION DEPLOYMENT
+# =============================================================================
+
+# Deployment artifacts
+deployment/
+.deploy/
+k8s-manifests.local/
+
+# Configuration management
+.terraform/
+terraform.tfstate*
+.terraformrc
+
+# =============================================================================
+# JUPYTER AND ANALYSIS NOTEBOOKS
+# =============================================================================
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Jupyter lab workspace
+.jupyter/
+
+# Analysis notebooks (if containing sensitive data)
+*_analysis.ipynb
+*_exploration.ipynb
+
+# =============================================================================
+# CUSTOM PROJECT EXCLUSIONS
+# =============================================================================
+
+# Custom configuration overrides
+mine_core/local_config/
+configs/local/
+
+# Development data samples
+dev_data/
+sample_exports/
+
+# Performance benchmarks
+benchmarks/results/
+performance_data/
+
+# Integration test artifacts
+integration_test_data/
+test_databases/
+
+# =============================================================================
+# PACKAGE MANAGER ARTIFACTS
+# =============================================================================
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Poetry
+poetry.lock.backup
+
+# pipenv
+Pipfile.lock.backup
+
+# =============================================================================
+# CONTINUOUS INTEGRATION
+# =============================================================================
+
+# CI/CD artifacts
+.github/workflows/cache/
+.circleci/cache/
+.gitlab-ci-cache/
+
+# Build artifacts
+build_artifacts/
+ci_reports/
+
+# =============================================================================
+# ARCHITECTURE DOCUMENTATION
+# =============================================================================
+
+# Generated architecture diagrams
+architecture_diagrams/*.generated.*
+*.puml.png
+*.puml.svg
+
+# Temporary documentation work
+docs/draft/
+documentation_work/
