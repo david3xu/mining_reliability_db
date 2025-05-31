@@ -2,6 +2,21 @@
 # Updated for unified configuration architecture
 
 # =============================================================================
+# GIT SPECIFIC
+# =============================================================================
+
+# Git garbage collection and temporary files
+.git/gc.log
+.git/objects/*/tmp_*
+.git/objects/pack/tmp_*
+.git/objects/info/alternates
+.git/objects/info/http-alternates
+
+# Git hooks
+.git/hooks/*.sample
+.git/hooks/*.old
+
+# =============================================================================
 # PYTHON DEVELOPMENT ARTIFACTS
 # =============================================================================
 
@@ -80,6 +95,10 @@ settings.local.json
 # =============================================================================
 # DATA FILES AND ANALYSIS
 # =============================================================================
+
+# Raw data files
+data/raw_data/*.json
+!data/raw_data/sample_*.json
 
 # Facility data (except sample)
 data/facility_data/*.json
