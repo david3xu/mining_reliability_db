@@ -1,11 +1,61 @@
 {
-  "list_fields": [
-    "Obj. Evidence",
-    "Recom.Action",
-    "Immd. Contain. Action or Comments",
-    "Root Cause",
-    "Action Plan Eval Comment"
-  ],
+  "cascade_labeling": {
+    "ActionRequest": {
+      "label_priority": ["Title", "Action Request Number:", "Categories"],
+      "required_fields": ["Action Request Number:"],
+      "entity_type": "ActionRequest"
+    },
+    "Problem": {
+      "label_priority": ["What happened?", "Requirement"],
+      "required_fields": ["What happened?"],
+      "entity_type": "Problem"
+    },
+    "RootCause": {
+      "label_priority": ["Root Cause", "Obj. Evidence"],
+      "required_fields": ["Root Cause"],
+      "entity_type": "RootCause"
+    },
+    "ActionPlan": {
+      "label_priority": ["Action Plan", "Recom.Action"],
+      "required_fields": ["Action Plan"],
+      "entity_type": "ActionPlan"
+    },
+    "Verification": {
+      "label_priority": ["IsActionPlanEffective", "Action Plan Eval Comment"],
+      "required_fields": ["IsActionPlanEffective"],
+      "entity_type": "Verification"
+    },
+    "Department": {
+      "label_priority": ["Init. Dept.", "Rec. Dept."],
+      "required_fields": ["Init. Dept."],
+      "entity_type": "Department"
+    },
+    "Asset": {
+      "label_priority": ["Asset Number(s)", "Asset Activity numbers"],
+      "required_fields": ["Asset Number(s)"],
+      "entity_type": "Asset"
+    },
+    "RecurringStatus": {
+      "label_priority": ["Recurring Problem(s)", "Recurring Comment"],
+      "required_fields": ["Recurring Problem(s)"],
+      "entity_type": "RecurringStatus"
+    },
+    "AmountOfLoss": {
+      "label_priority": ["Amount of Loss"],
+      "required_fields": ["Amount of Loss"],
+      "entity_type": "AmountOfLoss"
+    },
+    "Review": {
+      "label_priority": ["Is Resp Satisfactory?", "Reason if not Satisfactory"],
+      "required_fields": ["Is Resp Satisfactory?"],
+      "entity_type": "Review"
+    },
+    "EquipmentStrategy": {
+      "label_priority": ["If yes, APSS Doc #"],
+      "required_fields": ["If yes, APSS Doc #"],
+      "entity_type": "EquipmentStrategy"
+    }
+  },
   "entity_mappings": {
     "ActionRequest": {
       "action_request_number": "Action Request Number:",
@@ -25,6 +75,7 @@
     },
     "RootCause": {
       "root_cause": "Root Cause",
+      "root_cause_tail": "Root Cause",
       "objective_evidence": "Obj. Evidence"
     },
     "ActionPlan": {
@@ -71,8 +122,64 @@
       "apss_doc_number": "If yes, APSS Doc #"
     }
   },
-  "list_field_extraction": {
-    "Root Cause": "tail",
-    "default": "head"
+  "field_categories": {
+    "identification_fields": [
+      "Action Request Number:",
+      "Title",
+      "Asset Number(s)"
+    ],
+    "temporal_fields": [
+      "Initiation Date",
+      "Due Date",
+      "Completion Date",
+      "Response Date",
+      "Response Revision Date",
+      "Effectiveness Verification Due Date",
+      "Action Plan Verification Date:",
+      "Reviewed Date:"
+    ],
+    "categorical_fields": [
+      "Categories",
+      "Action Types",
+      "Stage",
+      "Past Due Status",
+      "Operating Centre",
+      "Init. Dept.",
+      "Rec. Dept."
+    ],
+    "boolean_fields": [
+      "Complete",
+      "Recurring Problem(s)",
+      "Is Resp Satisfactory?",
+      "IsActionPlanEffective",
+      "Did this action plan require a change to the equipment management strategy ?",
+      "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?"
+    ],
+    "descriptive_fields": [
+      "What happened?",
+      "Requirement",
+      "Root Cause",
+      "Obj. Evidence",
+      "Action Plan",
+      "Recom.Action",
+      "Immd. Contain. Action or Comments",
+      "Comments",
+      "Action Plan Eval Comment",
+      "Reason if not Satisfactory",
+      "Recurring Comment",
+      "Amount of Loss"
+    ],
+    "quantitative_fields": [
+      "Days Past Due",
+      "Requested Response Time"
+    ]
+  },
+  "missing_data_handling": {
+    "temporal_fields": "DATA_NOT_AVAILABLE",
+    "boolean_fields": "NOT_SPECIFIED",
+    "descriptive_fields": "NOT_SPECIFIED",
+    "categorical_fields": "NOT_SPECIFIED",
+    "quantitative_fields": "DATA_NOT_AVAILABLE",
+    "identification_fields": "DATA_NOT_AVAILABLE"
   }
 }

@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
 """
 Schema Creation Script for Mining Reliability Database
-Creates Neo4j schema from configuration.
+Creates Neo4j schema from configuration with standardized setup.
 """
 
-import sys
-import os
-import logging
 import argparse
-
-# Add project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
-from mine_core.database.db import get_database
+from mine_core.shared.common import setup_project_path, setup_logging, handle_error
+from mine_core.database.db import get_database, close_database
 from configs.environment import get_schema
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+# Setup project path and logging
+setup_project_path()
+logger = setup_logging(name=__name__)
 
 def create_constraints(schema, db):
     """Create Neo4j constraints from schema"""
@@ -64,7 +55,7 @@ def create_constraints(schema, db):
                 constraints_created += 1
                 logger.info(f"Created constraint for {entity_name}.{pk_property}")
         except Exception as e:
-            logger.error(f"Error creating constraint for {entity_name}.{pk_property}: {e}")
+            handle_error(logger, e, f"creating constraint for {entity_name}.{pk_property}")
 
     return constraints_created
 
@@ -88,7 +79,7 @@ def create_schema_structure(schema, db):
                 relationships_created += 1
                 logger.info(f"Created relationship: {from_entity}-[{rel_type}]->{to_entity}")
         except Exception as e:
-            logger.error(f"Error creating relationship {from_entity}-[{rel_type}]->{to_entity}: {e}")
+            handle_error(logger, e, f"creating relationship {from_entity}-[{rel_type}]->{to_entity}")
 
     return relationships_created
 
@@ -100,8 +91,13 @@ def main():
     parser.add_argument("--uri", type=str, help="Neo4j URI")
     parser.add_argument("--user", type=str, help="Neo4j username")
     parser.add_argument("--password", type=str, help="Neo4j password")
+    parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
 
     args = parser.parse_args()
+
+    # Setup logging level
+    if args.log_level:
+        setup_logging(level=args.log_level, name=__name__)
 
     try:
         # Setup database connection
@@ -113,6 +109,8 @@ def main():
             logger.error("No schema configuration found")
             return 1
 
+        logger.info("Starting schema creation")
+
         # Create constraints
         constraints_count = create_constraints(schema, db)
         logger.info(f"Created {constraints_count} constraints")
@@ -122,19 +120,16 @@ def main():
         logger.info(f"Created {relationships_count} relationship types")
 
         print("Schema creation successful!")
+        logger.info("Schema creation completed successfully")
         return 0
 
     except Exception as e:
-        logger.error(f"Error creating schema: {e}")
+        handle_error(logger, e, "schema creation")
         print(f"Schema creation failed: {e}")
         return 1
 
     finally:
-        try:
-            db = get_database()
-            db.close()
-        except:
-            pass
+        close_database()
 
 if __name__ == "__main__":
     exit(main())

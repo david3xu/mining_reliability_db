@@ -3,17 +3,21 @@
     {
       "name": "Facility",
       "properties": {
-        "facility_id": {"type": "string", "primary_key": true},
+        "facility_id": {"type": "string", "primary_key": true, "required": true},
         "facility_name": {"type": "string", "required": true},
         "location": {"type": "string"},
         "active": {"type": "boolean", "default": true}
+      },
+      "dynamic_labeling": {
+        "enabled": false,
+        "label_field": null
       }
     },
     {
       "name": "ActionRequest",
       "properties": {
-        "actionrequest_id": {"type": "string", "primary_key": true},
-        "facility_id": {"type": "string"},
+        "actionrequest_id": {"type": "string", "primary_key": true, "required": true},
+        "facility_id": {"type": "string", "required": true},
         "action_request_number": {"type": "string", "required": true},
         "title": {"type": "string"},
         "initiation_date": {"type": "date"},
@@ -24,31 +28,49 @@
         "operating_centre": {"type": "string"},
         "past_due_status": {"type": "string"},
         "days_past_due": {"type": "integer"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["title", "action_request_number", "categories"]
       }
     },
     {
       "name": "Problem",
       "properties": {
-        "problem_id": {"type": "string", "primary_key": true},
-        "actionrequest_id": {"type": "string"},
+        "problem_id": {"type": "string", "primary_key": true, "required": true},
+        "actionrequest_id": {"type": "string", "required": true},
         "what_happened": {"type": "text"},
         "requirement": {"type": "text"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["what_happened", "requirement"]
       }
     },
     {
       "name": "RootCause",
       "properties": {
-        "rootcause_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string"},
-        "root_cause": {"type": "text"},
+        "rootcause_id": {"type": "string", "primary_key": true, "required": true},
+        "problem_id": {"type": "string", "required": true},
+        "root_cause": {"type": "text", "required": true},
+        "root_cause_tail": {"type": "text"},
         "objective_evidence": {"type": "text"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["root_cause", "objective_evidence"]
+      },
+      "causal_intelligence": {
+        "primary_cause_field": "root_cause",
+        "secondary_cause_field": "root_cause_tail",
+        "evidence_field": "objective_evidence"
       }
     },
     {
       "name": "ActionPlan",
       "properties": {
-        "actionplan_id": {"type": "string", "primary_key": true},
-        "rootcause_id": {"type": "string"},
+        "actionplan_id": {"type": "string", "primary_key": true, "required": true},
+        "rootcause_id": {"type": "string", "required": true},
         "action_plan": {"type": "text"},
         "recommended_action": {"type": "text"},
         "immediate_containment": {"type": "text"},
@@ -60,71 +82,103 @@
         "response_revision_date": {"type": "date"},
         "did_plan_require_strategy_change": {"type": "boolean", "default": false},
         "are_there_corrective_actions_to_update": {"type": "boolean", "default": false}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["action_plan", "recommended_action", "complete"]
       }
     },
     {
       "name": "Verification",
       "properties": {
-        "verification_id": {"type": "string", "primary_key": true},
-        "actionplan_id": {"type": "string"},
+        "verification_id": {"type": "string", "primary_key": true, "required": true},
+        "actionplan_id": {"type": "string", "required": true},
         "effectiveness_verification_due_date": {"type": "date"},
         "is_action_plan_effective": {"type": "boolean"},
         "action_plan_eval_comment": {"type": "text"},
         "action_plan_verification_date": {"type": "date"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["is_action_plan_effective", "action_plan_eval_comment"]
       }
     },
     {
       "name": "Department",
       "properties": {
-        "department_id": {"type": "string", "primary_key": true},
-        "actionrequest_id": {"type": "string"},
+        "department_id": {"type": "string", "primary_key": true, "required": true},
+        "actionrequest_id": {"type": "string", "required": true},
         "init_dept": {"type": "string"},
         "rec_dept": {"type": "string"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["init_dept", "rec_dept"]
       }
     },
     {
       "name": "Asset",
       "properties": {
-        "asset_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string"},
+        "asset_id": {"type": "string", "primary_key": true, "required": true},
+        "problem_id": {"type": "string", "required": true},
         "asset_numbers": {"type": "string"},
         "asset_activity_numbers": {"type": "string"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["asset_numbers", "asset_activity_numbers"]
       }
     },
     {
       "name": "RecurringStatus",
       "properties": {
-        "recurringstatus_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string"},
+        "recurringstatus_id": {"type": "string", "primary_key": true, "required": true},
+        "problem_id": {"type": "string", "required": true},
         "recurring_problems": {"type": "boolean", "default": false},
         "recurring_comment": {"type": "text"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["recurring_problems", "recurring_comment"]
       }
     },
     {
       "name": "AmountOfLoss",
       "properties": {
-        "amountofloss_id": {"type": "string", "primary_key": true},
-        "problem_id": {"type": "string"},
+        "amountofloss_id": {"type": "string", "primary_key": true, "required": true},
+        "problem_id": {"type": "string", "required": true},
         "amount_of_loss": {"type": "string"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["amount_of_loss"]
       }
     },
     {
       "name": "Review",
       "properties": {
-        "review_id": {"type": "string", "primary_key": true},
-        "actionplan_id": {"type": "string"},
+        "review_id": {"type": "string", "primary_key": true, "required": true},
+        "actionplan_id": {"type": "string", "required": true},
         "is_resp_satisfactory": {"type": "boolean"},
         "reason_if_not_satisfactory": {"type": "text"},
         "reviewed_date": {"type": "date"},
         "did_plan_require_change_review": {"type": "boolean", "default": false}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["is_resp_satisfactory", "reason_if_not_satisfactory"]
       }
     },
     {
       "name": "EquipmentStrategy",
       "properties": {
-        "equipmentstrategy_id": {"type": "string", "primary_key": true},
-        "actionplan_id": {"type": "string"},
+        "equipmentstrategy_id": {"type": "string", "primary_key": true, "required": true},
+        "actionplan_id": {"type": "string", "required": true},
         "apss_doc_number": {"type": "string"}
+      },
+      "dynamic_labeling": {
+        "enabled": true,
+        "cascade_priority": ["apss_doc_number"]
       }
     }
   ],
@@ -195,5 +249,64 @@
       "type": "MODIFIES",
       "cardinality": "many_to_one"
     }
-  ]
+  ],
+  "processing_rules": {
+    "missing_data_indicators": {
+      "use_explicit_indicators": true,
+      "track_missing_patterns": true,
+      "missing_data_analytics": true
+    },
+    "dynamic_labeling": {
+      "enable_cascade_strategy": true,
+      "clean_labels_for_neo4j": true,
+      "max_label_length": 50,
+      "fallback_to_entity_type": true
+    },
+    "root_cause_intelligence": {
+      "extract_tail_from_primary": true,
+      "preserve_original_text": true,
+      "enable_causal_analysis": true
+    },
+    "validation_rules": {
+      "enforce_required_fields": true,
+      "validate_field_dependencies": true,
+      "data_quality_scoring": true
+    }
+  },
+  "analytical_dimensions": {
+    "causal_analysis": {
+      "primary_dimension": "root_cause",
+      "secondary_dimension": "root_cause_tail",
+      "supporting_evidence": "objective_evidence"
+    },
+    "performance_metrics": {
+      "entities": ["ActionPlan", "Verification"],
+      "key_fields": ["complete", "is_action_plan_effective", "due_date"]
+    },
+    "categorical_analysis": {
+      "entities": ["ActionRequest", "Problem", "Department"],
+      "key_fields": ["categories", "stage", "init_dept", "recurring_problems"]
+    },
+    "temporal_analysis": {
+      "entities": ["ActionRequest", "ActionPlan", "Verification"],
+      "key_fields": ["initiation_date", "due_date", "completion_date", "action_plan_verification_date"]
+    }
+  },
+  "data_quality_framework": {
+    "completeness_metrics": {
+      "required_field_coverage": 0.8,
+      "optional_field_coverage": 0.5,
+      "missing_data_threshold": 0.2
+    },
+    "consistency_checks": {
+      "field_format_validation": true,
+      "cross_field_validation": true,
+      "temporal_sequence_validation": true
+    },
+    "causal_intelligence_validation": {
+      "root_cause_completeness": true,
+      "tail_extraction_accuracy": true,
+      "evidence_correlation": true
+    }
+  }
 }
