@@ -9,10 +9,11 @@ import sys
 import logging
 from pathlib import Path
 from typing import Optional
-from configs.environment import get_log_level, get_log_file, get_project_root
 
 def setup_project_path():
     """Add project root to Python path - standardized for all scripts"""
+    # Import here to avoid circular dependency
+    from configs.environment import get_project_root
     project_root = get_project_root()
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
@@ -20,6 +21,9 @@ def setup_project_path():
 
 def setup_logging(level: str = None, name: str = None) -> logging.Logger:
     """Unified logging setup using environment configuration"""
+    # Import here to avoid circular dependency
+    from configs.environment import get_log_level, get_log_file
+
     # Get configuration from environment gateway
     log_level = level or get_log_level()
     log_file = get_log_file()

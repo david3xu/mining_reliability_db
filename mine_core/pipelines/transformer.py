@@ -18,7 +18,7 @@ from mine_core.shared.field_utils import (
 
 logger = logging.getLogger(__name__)
 
-class SimplifiedTransformer:
+class DataTransformer:
     """Streamlined transformer for clean datasets with causal intelligence"""
 
     def __init__(self, mappings=None, use_config=True):
@@ -179,12 +179,42 @@ class SimplifiedTransformer:
             else:
                 entity[target_field] = get_missing_indicator(source_field)
 
+        # Add semantic display name for graph visualization
+        entity["name"] = self._get_display_name(entity, entity_type)
+
         # Apply cascade labeling
         dynamic_label = self._apply_cascade_labeling(entity, entity_type)
         if dynamic_label:
             entity["_dynamic_label"] = dynamic_label
 
         return entity
+
+    def _get_display_name(self, entity_data: Dict[str, Any], entity_type: str) -> str:
+        """Generate semantic display name for graph visualization"""
+        # Priority field mapping for meaningful node labels
+        display_priorities = {
+            "Problem": ["what_happened", "requirement"],
+            "RootCause": ["root_cause", "objective_evidence"],
+            "ActionRequest": ["title", "categories", "action_request_number"],
+            "ActionPlan": ["action_plan", "recommended_action"],
+            "Verification": ["is_action_plan_effective", "action_plan_eval_comment"],
+            "Department": ["init_dept", "rec_dept"],
+            "Asset": ["asset_numbers", "asset_activity_numbers"],
+            "Facility": ["facility_name", "facility_id"]
+        }
+
+        priority_fields = display_priorities.get(entity_type, [])
+
+        # Try priority fields in order
+        for field in priority_fields:
+            value = entity_data.get(field)
+            if has_real_value(value) and not is_missing_data_indicator(str(value)):
+                # Truncate long text for display
+                display_value = str(value).strip()
+                return display_value[:50] + "..." if len(display_value) > 50 else display_value
+
+        # Fallback to entity type
+        return entity_type
 
     def _apply_cascade_labeling(self, entity_data: Dict[str, Any], entity_type: str) -> Optional[str]:
         """Apply simplified cascade labeling strategy"""

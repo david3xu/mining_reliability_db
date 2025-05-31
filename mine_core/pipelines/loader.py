@@ -16,7 +16,7 @@ from mine_core.shared.field_utils import (
 
 logger = logging.getLogger(__name__)
 
-class SimplifiedLoader:
+class Neo4jLoader:
     """Streamlined loader for clean single-value datasets"""
 
     def __init__(self, uri=None, user=None, password=None):
@@ -146,16 +146,26 @@ class SimplifiedLoader:
 
     def _create_relationship_batch(self, from_type: str, from_field: str, rel_type: str,
                                  to_type: str, to_field: str, entities: List[Dict[str, Any]]) -> bool:
-        """Create relationships in batch for entity type"""
+        """Create relationships in batch for entity type using primary keys"""
         if not entities:
             return True
+
+        # Get primary key fields for proper entity matching
+        from configs.environment import get_entity_primary_key
+        from_pk = get_entity_primary_key(from_type)
+        to_pk = get_entity_primary_key(to_type)
+
+        if not from_pk or not to_pk:
+            logger.error(f"Missing primary keys for {from_type}-{to_type} relationship")
+            return False
 
         relationship_count = 0
         failed_count = 0
 
         for entity in entities:
-            from_id = entity.get(from_field)
-            to_id = entity.get(to_field, from_id)
+            # Use primary key values for relationship creation
+            from_id = entity.get(from_pk)  # Get actual primary key value
+            to_id = entity.get(to_field, from_id)  # Get foreign key reference value
 
             if from_id and to_id:
                 if self.db.create_relationship(from_type, from_id, rel_type, to_type, to_id):

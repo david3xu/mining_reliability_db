@@ -166,7 +166,7 @@ class SimplifiedDatabase:
 
         set_clause = ""
         if other_props:
-            set_props = [f"n.{p} = entity.{p}" for p in other_props]
+            set_props = [f"n.{p} = $entity.{p}" for p in other_props]
             set_clause = f"SET {', '.join(set_props)}"
 
         query = f"""
@@ -178,7 +178,7 @@ class SimplifiedDatabase:
 
     def create_relationship(self, from_type: str, from_id: str, rel_type: str,
                           to_type: str, to_id: str) -> bool:
-        """Create relationship using schema primary keys"""
+        """Create relationship using schema primary keys with validation"""
         from_pk = get_entity_primary_key(from_type)
         to_pk = get_entity_primary_key(to_type)
 
@@ -190,12 +190,20 @@ class SimplifiedDatabase:
         MATCH (from:{from_type} {{{from_pk}: $from_id}})
         MATCH (to:{to_type} {{{to_pk}: $to_id}})
         MERGE (from)-[r:{rel_type}]->(to)
+        RETURN count(r) AS relationships_created
         """
 
         try:
             with self.session() as session:
-                session.run(query, from_id=from_id, to_id=to_id)
-            return True
+                result = session.run(query, from_id=from_id, to_id=to_id)
+                record = result.single()
+
+                if record and record["relationships_created"] > 0:
+                    return True
+                else:
+                    logger.warning(f"No relationship created: {from_type}({from_id}) -[{rel_type}]-> {to_type}({to_id})")
+                    return False
+
         except Exception as e:
             handle_error(logger, e, f"Creating relationship {from_type}-[{rel_type}]->{to_type}")
             return False
