@@ -1,25 +1,17 @@
 #!/usr/bin/env python3
 """
 Database Reset Script for Mining Reliability Database
-Cleans Neo4j database by removing all data and schema.
+Cleans Neo4j database with standardized setup and improved error handling.
 """
 
-import sys
-import os
-import logging
 import argparse
+from mine_core.shared.common import setup_project_path, setup_logging, handle_error
+from mine_core.shared.constants import DEFAULT_BATCH_SIZE
+from mine_core.database.db import get_database, close_database
 
-# Add project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
-from mine_core.database.db import get_database
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+# Setup project path and logging
+setup_project_path()
+logger = setup_logging(name=__name__)
 
 def get_database_stats(db):
     """Get current database statistics"""
@@ -60,15 +52,16 @@ def get_database_stats(db):
             }
 
     except Exception as e:
-        logger.error(f"Error getting database stats: {e}")
+        handle_error(logger, e, "getting database stats")
         return {"nodes": {}, "total_nodes": 0, "relationships": 0}
 
-def delete_all_data(db, batch_size=5000):
-    """Delete all nodes and relationships"""
+def delete_all_data(db, batch_size=DEFAULT_BATCH_SIZE):
+    """Delete all nodes and relationships in batches"""
     try:
-        logger.info("Deleting all data...")
+        logger.info("Starting data deletion")
 
         with db.session() as session:
+            # Delete relationships first
             deleted_rel_count = 0
             while True:
                 result = session.run(f"""
@@ -83,6 +76,7 @@ def delete_all_data(db, batch_size=5000):
                     break
                 logger.info(f"Deleted {deleted} relationships (Total: {deleted_rel_count})")
 
+            # Delete nodes
             deleted_node_count = 0
             while True:
                 result = session.run(f"""
@@ -101,60 +95,84 @@ def delete_all_data(db, batch_size=5000):
         return True
 
     except Exception as e:
-        logger.error(f"Error deleting data: {e}")
+        handle_error(logger, e, "deleting data")
         return False
 
 def drop_constraints(db):
-    """Drop all constraints"""
+    """Drop all database constraints"""
     try:
-        logger.info("Dropping constraints...")
+        logger.info("Dropping constraints")
         with db.session() as session:
             try:
                 constraints = session.run("SHOW CONSTRAINTS").data()
+                constraint_count = 0
                 for constraint in constraints:
                     if 'name' in constraint:
                         session.run(f"DROP CONSTRAINT {constraint['name']}")
+                        constraint_count += 1
                         logger.info(f"Dropped constraint: {constraint['name']}")
+
+                if constraint_count == 0:
+                    logger.info("No constraints to drop")
+                else:
+                    logger.info(f"Dropped {constraint_count} constraints")
+
             except Exception as e:
                 logger.warning(f"Could not drop constraints: {e}")
         return True
     except Exception as e:
-        logger.error(f"Error dropping constraints: {e}")
+        handle_error(logger, e, "dropping constraints")
         return False
 
-def reset_database(db, batch_size=5000, drop_schema=False):
-    """Reset Neo4j database"""
-    logger.info("Resetting Neo4j database...")
+def reset_database(db, batch_size=DEFAULT_BATCH_SIZE, drop_schema=False):
+    """Reset Neo4j database completely"""
+    logger.info("Starting database reset")
 
     # Get initial stats
     initial_stats = get_database_stats(db)
-    logger.info(f"Initial: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships")
+    logger.info(f"Initial state: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships")
 
     # Delete all data
     if not delete_all_data(db, batch_size):
+        logger.error("Failed to delete data")
         return False
 
     # Drop schema if requested
-    if drop_schema and not drop_constraints(db):
-        return False
+    if drop_schema:
+        if not drop_constraints(db):
+            logger.error("Failed to drop constraints")
+            return False
+        logger.info("Schema constraints dropped")
 
-    # Get final stats
+    # Verify final state
     final_stats = get_database_stats(db)
-    logger.info(f"Final: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships")
+    logger.info(f"Final state: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships")
 
-    return final_stats['total_nodes'] == 0 and final_stats['relationships'] == 0
+    success = final_stats['total_nodes'] == 0 and final_stats['relationships'] == 0
+    if success:
+        logger.info("Database reset completed successfully")
+    else:
+        logger.error("Database reset incomplete")
+
+    return success
 
 def main():
     """Main execution function"""
     parser = argparse.ArgumentParser(description="Reset Neo4j database")
-    parser.add_argument("--batch-size", type=int, default=5000, help="Batch size for deletion")
+    parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE,
+                       help=f"Batch size for deletion (default: {DEFAULT_BATCH_SIZE})")
     parser.add_argument("--drop-schema", action="store_true", help="Drop schema constraints")
     parser.add_argument("--uri", type=str, help="Neo4j URI")
     parser.add_argument("--user", type=str, help="Neo4j username")
     parser.add_argument("--password", type=str, help="Neo4j password")
     parser.add_argument("--force", action="store_true", help="Skip confirmation")
+    parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
 
     args = parser.parse_args()
+
+    # Setup logging level
+    if args.log_level:
+        setup_logging(level=args.log_level, name=__name__)
 
     try:
         # Setup database connection
@@ -165,10 +183,19 @@ def main():
         print("Current database stats:")
         print(f"  Nodes: {initial_stats['total_nodes']}")
         print(f"  Relationships: {initial_stats['relationships']}")
+
+        if initial_stats['nodes']:
+            print("  Node breakdown:")
+            for label, count in initial_stats['nodes'].items():
+                print(f"    {label}: {count}")
         print()
 
-        # Confirm reset
+        # Confirm reset unless forced
         if not args.force:
+            if initial_stats['total_nodes'] == 0 and initial_stats['relationships'] == 0:
+                print("Database is already empty.")
+                return 0
+
             confirm = input("Reset database? This deletes all data. (y/n): ")
             if confirm.lower() != 'y':
                 print("Reset cancelled")
@@ -185,16 +212,12 @@ def main():
             return 1
 
     except Exception as e:
-        logger.error(f"Error resetting database: {e}")
+        handle_error(logger, e, "database reset")
         print(f"Database reset failed: {e}")
         return 1
 
     finally:
-        try:
-            db = get_database()
-            db.close()
-        except:
-            pass
+        close_database()
 
 if __name__ == "__main__":
     exit(main())

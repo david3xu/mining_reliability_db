@@ -1,117 +1,139 @@
 #!/usr/bin/env python3
 """
-Data Transformer for Mining Reliability Database
-Transforms raw data to match entity model - CORRECTED VERSION
+Simplified Data Transformer for Mining Reliability Database
+Clean single-value field processing with enhanced root cause intelligence.
 """
 
 import logging
-from typing import Dict, List, Any, Optional, Union
-from configs.environment import get_mappings, get_schema
+from typing import Dict, List, Any, Optional
+from configs.environment import get_mappings, get_entity_names
+from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-class DataTransformer:
-    """Transforms raw facility data into entity model format"""
+class SimplifiedTransformer:
+    """Streamlined transformer for clean datasets with causal intelligence"""
 
-    def __init__(self, mappings=None, schema=None, use_config=True):
-        """Initialize with field mappings from configuration or provided mappings"""
+    def __init__(self, mappings=None, use_config=True):
+        """Initialize with simplified configuration"""
         if use_config:
             self.mappings = mappings or get_mappings()
-            self.schema = schema or get_schema()
         else:
             self.mappings = mappings or {}
-            self.schema = schema or {}
 
-        if not self.mappings:
-            logger.warning("Field mappings not found in configuration")
-            self.list_fields = []
-            self.field_mappings = {}
-            self.list_field_extraction = {"default": "head"}
-        else:
-            self.list_fields = self.mappings.get("list_fields", [])
-            self.field_mappings = self.mappings.get("entity_mappings", {})
-            self.list_field_extraction = self.mappings.get("list_field_extraction", {"default": "head"})
+        # Simplified configuration
+        self.field_mappings = self.mappings.get("entity_mappings", {})
+        self.cascade_config = self.mappings.get("cascade_labeling", {})
 
-        # Get entity info from schema
-        self.entities = {entity["name"]: entity for entity in self.schema.get("entities", [])}
+        # Entity names from schema
+        self.entity_names = get_entity_names()
 
     def transform_facility_data(self, facility_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Transform facility data into entity model format"""
+        """Transform clean facility data with causal intelligence"""
         facility_id = facility_data.get("facility_id", "unknown")
         records = facility_data.get("records", [])
 
+        # Initialize simplified structure
         transformed = {
             "facility": {
                 "facility_id": facility_id,
                 "facility_name": facility_id,
                 "active": True
             },
-            "entities": {
-                "ActionRequest": [], "Problem": [], "RootCause": [], "ActionPlan": [],
-                "Verification": [], "Department": [], "Asset": [], "RecurringStatus": [],
-                "AmountOfLoss": [], "Review": [], "EquipmentStrategy": []
-            }
+            "entities": {entity_name: [] for entity_name in self.entity_names}
         }
 
-        # Track action request numbers to handle duplicates
-        action_request_counts = {}
-
+        # Process each record with simplified logic
         for record_index, record in enumerate(records):
-            action_request_number = record.get("Action Request Number:")
-            if not action_request_number:
-                continue
+            try:
+                self._transform_record(record, facility_id, transformed, record_index)
+            except Exception as e:
+                handle_error(logger, e, f"transforming record {record_index}")
 
-            # Handle duplicate action request numbers
-            if action_request_number in action_request_counts:
-                action_request_counts[action_request_number] += 1
-                sequence = action_request_counts[action_request_number]
-            else:
-                action_request_counts[action_request_number] = 0
-                sequence = 0
-
-            self._transform_record(record, facility_id, transformed, sequence)
-
-        for entity_type, entities in transformed["entities"].items():
-            logger.info(f"Transformed {len(entities)} {entity_type} entities")
-
+        # Log transformation results
+        total_entities = sum(len(entities) for entities in transformed["entities"].values())
+        logger.info(f"Transformed {total_entities} entities from {len(records)} records")
         return transformed
 
-    def _transform_record(self, record: Dict[str, Any], facility_id: str, transformed: Dict[str, Any], sequence: int = 0) -> None:
-        """Transform a single record into entity model format"""
+    def _transform_record(self, record: Dict[str, Any], facility_id: str,
+                         transformed: Dict[str, Any], record_index: int = 0) -> None:
+        """Transform single record with simplified processing"""
         action_request_number = record.get("Action Request Number:")
         if not action_request_number:
+            logger.warning(f"No action request number in record {record_index}")
             return
 
-        entity_ids = self._generate_entity_ids(action_request_number, facility_id, sequence)
+        base_id = self._generate_base_id(action_request_number, facility_id, record_index)
 
-        # Transform ActionRequest
-        action_request = self._transform_entity(record, "ActionRequest")
-        action_request["actionrequest_id"] = entity_ids["actionrequest_id"]
+        # Create entities in hierarchical order
+        self._create_hierarchical_entities(record, base_id, facility_id, transformed)
+
+    def _create_hierarchical_entities(self, record: Dict[str, Any], base_id: str,
+                                    facility_id: str, transformed: Dict[str, Any]) -> None:
+        """Create entities following hierarchical workflow pattern"""
+
+        # ActionRequest (always created)
+        action_request = self._create_entity_with_labeling(record, "ActionRequest", base_id)
         action_request["facility_id"] = facility_id
         transformed["entities"]["ActionRequest"].append(action_request)
 
-        # Transform Problem if data exists
+        # Problem (if data exists)
         if self._has_required_data("Problem", record):
-            problem = self._transform_entity(record, "Problem")
-            problem["problem_id"] = entity_ids["problem_id"]
-            problem["actionrequest_id"] = entity_ids["actionrequest_id"]
+            problem = self._create_entity_with_labeling(record, "Problem", base_id)
+            problem["actionrequest_id"] = action_request["actionrequest_id"]
             transformed["entities"]["Problem"].append(problem)
 
-            self._transform_problem_entities(record, entity_ids, transformed)
+            # Problem-connected entities
+            self._create_problem_entities(record, base_id, transformed)
 
-            # Transform RootCause if data exists
+            # RootCause (if data exists) - with intelligence enhancement
             if self._has_required_data("RootCause", record):
-                self._transform_root_cause_chain(record, entity_ids, transformed)
+                root_cause = self._create_root_cause_with_intelligence(record, base_id)
+                root_cause["problem_id"] = problem["problem_id"]
+                transformed["entities"]["RootCause"].append(root_cause)
 
-        # Transform Department if data exists
+                # ActionPlan and downstream entities
+                self._create_action_plan_chain(record, base_id, transformed)
+
+        # Department (if data exists)
         if self._has_required_data("Department", record):
-            department = self._transform_entity(record, "Department")
-            department["department_id"] = entity_ids["department_id"]
-            department["actionrequest_id"] = entity_ids["actionrequest_id"]
+            department = self._create_entity_with_labeling(record, "Department", base_id)
+            department["actionrequest_id"] = action_request["actionrequest_id"]
             transformed["entities"]["Department"].append(department)
 
-    def _transform_problem_entities(self, record: Dict[str, Any], entity_ids: Dict[str, str], transformed: Dict[str, Any]) -> None:
-        """Transform entities connected to Problem"""
+    def _create_root_cause_with_intelligence(self, record: Dict[str, Any], base_id: str) -> Dict[str, Any]:
+        """Create RootCause entity with enhanced causal intelligence"""
+        root_cause = self._create_entity_with_labeling(record, "RootCause", base_id)
+
+        # Extract tail value for enhanced causal analysis
+        original_cause = record.get("Root Cause", "")
+        root_cause["root_cause_tail"] = self._extract_tail_value(original_cause)
+
+        return root_cause
+
+    def _extract_tail_value(self, value: str) -> str:
+        """Extract tail component from root cause for causal intelligence"""
+        if not value or isinstance(value, str) and not value.strip():
+            return "NOT_SPECIFIED"
+
+        str_value = str(value).strip()
+
+        # Split on common delimiters and extract tail (final) component
+        delimiters = [';', ',', '|', '\n', ' - ', ' / ', ' and ', ' & ']
+
+        for delimiter in delimiters:
+            if delimiter in str_value:
+                parts = [part.strip() for part in str_value.split(delimiter) if part.strip()]
+                if len(parts) > 1:
+                    return parts[-1]  # Return tail item
+                break
+
+        # No delimiters found - return original value
+        return str_value
+
+    def _create_problem_entities(self, record: Dict[str, Any], base_id: str,
+                               transformed: Dict[str, Any]) -> None:
+        """Create entities connected to Problem"""
         entity_configs = [
             ("Asset", ["Asset Number(s)", "Asset Activity numbers"], "asset_id"),
             ("RecurringStatus", ["Recurring Problem(s)", "Recurring Comment"], "recurringstatus_id"),
@@ -120,27 +142,20 @@ class DataTransformer:
 
         for entity_type, required_fields, id_field in entity_configs:
             if any(record.get(field) for field in required_fields):
-                entity = self._transform_entity(record, entity_type)
-                entity[id_field] = entity_ids[id_field]
-                entity["problem_id"] = entity_ids["problem_id"]
+                entity = self._create_entity_with_labeling(record, entity_type, base_id)
+                entity["problem_id"] = f"problem-{base_id}"
                 transformed["entities"][entity_type].append(entity)
 
-    def _transform_root_cause_chain(self, record: Dict[str, Any], entity_ids: Dict[str, str], transformed: Dict[str, Any]) -> None:
-        """Transform RootCause and connected entities"""
-        # Transform RootCause
-        root_cause = self._transform_entity(record, "RootCause")
-        root_cause["rootcause_id"] = entity_ids["rootcause_id"]
-        root_cause["problem_id"] = entity_ids["problem_id"]
-        transformed["entities"]["RootCause"].append(root_cause)
-
-        # Transform ActionPlan if data exists
+    def _create_action_plan_chain(self, record: Dict[str, Any], base_id: str,
+                                transformed: Dict[str, Any]) -> None:
+        """Create ActionPlan and connected entities"""
+        # ActionPlan
         if self._has_required_data("ActionPlan", record):
-            action_plan = self._transform_entity(record, "ActionPlan")
-            action_plan["actionplan_id"] = entity_ids["actionplan_id"]
-            action_plan["rootcause_id"] = entity_ids["rootcause_id"]
+            action_plan = self._create_entity_with_labeling(record, "ActionPlan", base_id)
+            action_plan["rootcause_id"] = f"rootcause-{base_id}"
             transformed["entities"]["ActionPlan"].append(action_plan)
 
-            # Transform connected entities
+            # Connected entities
             connected_configs = [
                 ("Verification", ["Effectiveness Verification Due Date", "IsActionPlanEffective"], "verification_id"),
                 ("Review", ["Is Resp Satisfactory?", "Reviewed Date:"], "review_id"),
@@ -149,82 +164,126 @@ class DataTransformer:
 
             for entity_type, required_fields, id_field in connected_configs:
                 if any(record.get(field) for field in required_fields):
-                    entity = self._transform_entity(record, entity_type)
-                    entity[id_field] = entity_ids[id_field]
-                    entity["actionplan_id"] = entity_ids["actionplan_id"]
+                    entity = self._create_entity_with_labeling(record, entity_type, base_id)
+                    entity["actionplan_id"] = action_plan["actionplan_id"]
                     transformed["entities"][entity_type].append(entity)
 
-    def _has_required_data(self, entity_name: str, record: Dict) -> bool:
-        """Check if record has data for this entity type"""
-        mappings = self.field_mappings.get(entity_name, {})
-        if not mappings:
-            logger.debug(f"No field mappings found for entity: {entity_name}")
-            return False
-
-        # Check if any mapped fields have data
-        for target_field, source_field in mappings.items():
-            value = record.get(source_field)
-            if value is not None and (not isinstance(value, str) or value.strip()):
-                logger.debug(f"Entity {entity_name} has required data: {source_field} = {value}")
-                return True
-
-        logger.debug(f"Entity {entity_name} lacks required data")
-        return False
-
-    def _transform_entity(self, record: Dict[str, Any], entity_type: str) -> Dict[str, Any]:
-        """Transform data for a specific entity type"""
+    def _create_entity_with_labeling(self, record: Dict[str, Any], entity_type: str, base_id: str) -> Dict[str, Any]:
+        """Create entity with complete properties and dynamic labeling"""
         entity = {}
-        field_mappings = self.field_mappings.get(entity_type, {})
 
+        # Add primary ID
+        primary_id_field = f"{entity_type.lower()}_id"
+        entity[primary_id_field] = f"{entity_type.lower()}-{base_id}"
+
+        # Map all fields with missing data indicators
+        field_mappings = self.field_mappings.get(entity_type, {})
         for target_field, source_field in field_mappings.items():
             if source_field in record:
                 value = record[source_field]
 
-                if source_field in self.list_fields:
-                    value = self._extract_list_field_value(source_field, value)
+                # Special handling for root_cause_tail
+                if target_field == "root_cause_tail":
+                    entity[target_field] = self._extract_tail_value(value)
+                elif self._has_real_value(value):
+                    entity[target_field] = self._normalize_value(value)
+                else:
+                    entity[target_field] = self._get_missing_indicator(source_field)
+            else:
+                entity[target_field] = self._get_missing_indicator(source_field)
 
-                if value is None or (isinstance(value, str) and not value.strip()):
-                    continue
-
-                entity[target_field] = value
+        # Apply cascade labeling
+        dynamic_label = self._apply_cascade_labeling(entity, entity_type)
+        if dynamic_label:
+            entity["_dynamic_label"] = dynamic_label
 
         return entity
 
-    def _extract_list_field_value(self, field_name: str, value: Union[str, List[str]]) -> Optional[str]:
-        """Apply field-specific extraction rules to list values"""
-        if not isinstance(value, list) or not value:
-            return value
+    def _apply_cascade_labeling(self, entity_data: Dict[str, Any], entity_type: str) -> Optional[str]:
+        """Apply simplified cascade labeling strategy"""
+        cascade_config = self.cascade_config.get(entity_type, {})
+        priority_fields = cascade_config.get("label_priority", [])
 
-        extraction_method = self.list_field_extraction.get(field_name,
-                                                          self.list_field_extraction.get("default", "head"))
+        # Try priority fields in order
+        for field_name in priority_fields:
+            value = entity_data.get(field_name)
+            if self._has_real_value(value) and not self._is_missing_indicator(value):
+                return self._clean_label(str(value))
 
-        if extraction_method == "tail" and len(value) > 1:
-            return value[1]
+        # Fallback to entity type
+        return entity_type
+
+    def _has_required_data(self, entity_name: str, record: Dict) -> bool:
+        """Check if record has required data for entity creation"""
+        cascade_config = self.cascade_config.get(entity_name, {})
+        required_fields = cascade_config.get("required_fields", [])
+
+        if not required_fields:
+            return False
+
+        # Check if any required field has real value
+        for field_name in required_fields:
+            value = record.get(field_name)
+            if self._has_real_value(value):
+                return True
+
+        return False
+
+    def _has_real_value(self, value: Any) -> bool:
+        """Check if value contains meaningful data"""
+        if value is None:
+            return False
+        if isinstance(value, str):
+            cleaned = value.strip().lower()
+            return cleaned not in {"", "null", "n/a", "unknown", "data_not_available", "not_specified", "not_applicable"}
+        return True
+
+    def _is_missing_indicator(self, value: str) -> bool:
+        """Check if value is a missing data indicator"""
+        if not isinstance(value, str):
+            return False
+        return value in {"DATA_NOT_AVAILABLE", "NOT_SPECIFIED", "NOT_APPLICABLE"}
+
+    def _get_missing_indicator(self, field_name: str) -> str:
+        """Get appropriate missing data indicator for field"""
+        field_lower = field_name.lower()
+        if "date" in field_lower or "time" in field_lower:
+            return "DATA_NOT_AVAILABLE"
+        elif "comment" in field_lower or "description" in field_lower:
+            return "NOT_SPECIFIED"
         else:
-            return value[0]
+            return "DATA_NOT_AVAILABLE"
 
-    def _generate_entity_ids(self, action_request_number: str, facility_id: str, record_index: int = 0) -> Dict[str, str]:
-        """Generate unique IDs for entities based on action request number, facility, and record position"""
-        # Create unique base ID: facility + action_request + optional sequence
-        clean_number = action_request_number.replace('-', '').replace(' ', '').lower()
-        clean_facility = facility_id.replace('-', '').replace(' ', '').lower()
+    def _normalize_value(self, value: Any) -> Any:
+        """Normalize field value for storage"""
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
-        # Ensure uniqueness across facilities and duplicate action requests
+    def _clean_label(self, value: str) -> str:
+        """Clean value for Neo4j label compatibility"""
+        import re
+        if not isinstance(value, str):
+            value = str(value)
+
+        # Remove special characters, keep alphanumeric and underscores
+        cleaned = re.sub(r'[^a-zA-Z0-9_]', '', value.replace(' ', '_').replace('-', '_'))
+
+        # Ensure starts with letter
+        if cleaned and cleaned[0].isdigit():
+            cleaned = f"_{cleaned}"
+
+        # Limit length
+        return cleaned[:50] if cleaned else "UnknownValue"
+
+    def _generate_base_id(self, action_request_number: str, facility_id: str, record_index: int = 0) -> str:
+        """Generate base ID for all related entities"""
+        clean_number = self._clean_label(action_request_number)
+        clean_facility = self._clean_label(facility_id)
+
         if record_index > 0:
-            base_id = f"{clean_facility}_{clean_number}_{record_index}"
-        else:
-            base_id = f"{clean_facility}_{clean_number}"
+            return f"{clean_facility}_{clean_number}_{record_index}"
+        return f"{clean_facility}_{clean_number}"
 
-        return {
-            "actionrequest_id": f"ar-{base_id}",
-            "problem_id": f"prob-{base_id}",
-            "rootcause_id": f"cause-{base_id}",
-            "actionplan_id": f"plan-{base_id}",
-            "verification_id": f"ver-{base_id}",
-            "department_id": f"dept-{base_id}",
-            "asset_id": f"asset-{base_id}",
-            "recurringstatus_id": f"rec-{base_id}",
-            "amountofloss_id": f"loss-{base_id}",
-            "review_id": f"rev-{base_id}",
-            "equipmentstrategy_id": f"strat-{base_id}"
-        }
+# Backward compatibility
+DataTransformer = SimplifiedTransformer
