@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simplified Data Loader for Mining Reliability Database
-Streamlined loading for clean datasets with enhanced causal intelligence.
+Clean implementation without backwards compatibility pollution.
 """
 
 import logging
@@ -9,6 +9,10 @@ from typing import Dict, List, Any
 from mine_core.database.db import get_database
 from mine_core.shared.constants import ENTITY_LOAD_ORDER, RELATIONSHIP_CONFIGS
 from mine_core.shared.common import handle_error
+from mine_core.shared.field_utils import (
+    has_real_value,
+    is_missing_data_indicator
+)
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +101,7 @@ class SimplifiedLoader:
         # Extract dynamic label if present
         dynamic_label = entity_data.pop("_dynamic_label", None)
 
-        # Check if entity has enough meaningful data
+        # Check if entity has enough meaningful data using centralized validation
         if not self._has_sufficient_data(entity_data, entity_type):
             logger.debug(f"Skipping {entity_type} - insufficient data")
             return True  # Success, but no entity created
@@ -105,7 +109,7 @@ class SimplifiedLoader:
         return self.db.create_entity_with_dynamic_label(entity_type, entity_data, dynamic_label)
 
     def _has_sufficient_data(self, entity_data: Dict[str, Any], entity_type: str) -> bool:
-        """Check if entity has sufficient data for creation"""
+        """Check if entity has sufficient data for creation using centralized validation"""
         # Define critical fields per entity type
         critical_fields = {
             "ActionRequest": ["action_request_number"],
@@ -117,29 +121,19 @@ class SimplifiedLoader:
 
         required_fields = critical_fields.get(entity_type, [])
 
-        # Check if any critical field has real data
+        # Check if any critical field has real data using centralized validation
         for field in required_fields:
             value = entity_data.get(field)
-            if self._has_meaningful_value(value):
+            if has_real_value(value):
                 return True
 
         # For entities without specific critical fields, check overall data completeness
         if not required_fields:
             meaningful_fields = sum(1 for value in entity_data.values()
-                                  if self._has_meaningful_value(value))
+                                  if has_real_value(value))
             return meaningful_fields >= 1
 
         return False
-
-    def _has_meaningful_value(self, value: Any) -> bool:
-        """Check if value is meaningful (not missing indicator)"""
-        if value is None:
-            return False
-
-        if isinstance(value, str):
-            return value not in {"DATA_NOT_AVAILABLE", "NOT_SPECIFIED", "NOT_APPLICABLE", "", "null"}
-
-        return True
 
     def _create_all_relationships(self, entities: Dict[str, List[Dict[str, Any]]]) -> bool:
         """Create all entity relationships"""
@@ -255,6 +249,3 @@ class SimplifiedLoader:
             handle_error(logger, e, "validation")
 
         return validation_results
-
-# Backward compatibility
-Neo4jLoader = SimplifiedLoader

@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """
 Schema Creation Script for Mining Reliability Database
-Creates Neo4j schema from configuration with standardized setup.
+Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_path, setup_logging, handle_error
+from mine_core.shared.common import setup_project_environment, handle_error
 from mine_core.database.db import get_database, close_database
 from configs.environment import get_schema
-
-# Setup project path and logging
-setup_project_path()
-logger = setup_logging(name=__name__)
 
 def create_constraints(schema, db):
     """Create Neo4j constraints from schema"""
@@ -91,19 +87,19 @@ def main():
     parser.add_argument("--uri", type=str, help="Neo4j URI")
     parser.add_argument("--user", type=str, help="Neo4j username")
     parser.add_argument("--password", type=str, help="Neo4j password")
-    parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
+    parser.add_argument("--log-level", type=str, help="Logging level")
 
     args = parser.parse_args()
 
-    # Setup logging level
-    if args.log_level:
-        setup_logging(level=args.log_level, name=__name__)
+    # Standardized project initialization
+    global logger
+    logger = setup_project_environment("create_schema", args.log_level)
 
     try:
         # Setup database connection
         db = get_database(args.uri, args.user, args.password)
 
-        # Load schema
+        # Load schema using unified configuration access
         schema = get_schema()
         if not schema:
             logger.error("No schema configuration found")

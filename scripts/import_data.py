@@ -1,27 +1,23 @@
 #!/usr/bin/env python3
 """
 Data Import Script for Mining Reliability Database
-Extracts, transforms, and loads facility data with standardized setup.
+Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_path, setup_logging, handle_error
+from mine_core.shared.common import setup_project_environment, handle_error
 from mine_core.pipelines.extractor import FacilityDataExtractor
 from mine_core.pipelines.transformer import DataTransformer
 from mine_core.pipelines.loader import Neo4jLoader
 from mine_core.database.db import get_database, close_database
 from configs.environment import get_data_dir
 
-# Setup project path and logging
-setup_project_path()
-logger = setup_logging(name=__name__)
-
 def import_facility(facility_id, data_dir=None, db_config=None):
     """Import data for a specific facility"""
     try:
         logger.info(f"Starting import for facility: {facility_id}")
 
-        # Extract data
+        # Extract data using unified configuration
         extractor = FacilityDataExtractor(data_dir)
         facility_data = extractor.extract_facility_data(facility_id)
 
@@ -82,19 +78,19 @@ def main():
     parser.add_argument("--uri", type=str, help="Neo4j URI")
     parser.add_argument("--user", type=str, help="Neo4j username")
     parser.add_argument("--password", type=str, help="Neo4j password")
-    parser.add_argument("--log-level", type=str, default="INFO", help="Logging level")
+    parser.add_argument("--log-level", type=str, help="Logging level")
 
     args = parser.parse_args()
 
-    # Setup logging level
-    if args.log_level:
-        setup_logging(level=args.log_level, name=__name__)
+    # Standardized project initialization
+    global logger
+    logger = setup_project_environment("import_data", args.log_level)
 
     try:
-        # Setup database connection for validation
+        # Setup database connection for validation using unified configuration
         get_database(args.uri, args.user, args.password)
 
-        # Prepare configuration
+        # Use unified configuration gateway for data directory
         data_dir = args.data_dir or get_data_dir()
         db_config = (args.uri, args.user, args.password) if any([args.uri, args.user, args.password]) else None
 
