@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Optimized Configuration Gateway - Clean State Management
-Single source for all system configuration with optimized caching strategy.
+Single source for all system configuration with dashboard support.
 """
 
 import os
@@ -22,18 +22,19 @@ except ImportError:
     pass
 
 class ConfigurationManager:
-    """Thread-safe configuration manager with optimized caching"""
+    """Thread-safe configuration manager with dashboard support"""
 
     def __init__(self):
         self._schema_cache: Optional[Dict[str, Any]] = None
         self._mappings_cache: Optional[Dict[str, Any]] = None
+        self._dashboard_cache: Optional[Dict[str, Any]] = None
         self._lock = threading.Lock()
 
     def get_schema(self) -> Dict[str, Any]:
         """Load schema configuration with thread-safe caching"""
         if self._schema_cache is None:
             with self._lock:
-                if self._schema_cache is None:  # Double-check locking
+                if self._schema_cache is None:
                     self._schema_cache = self._load_json_config("model_schema.json")
         return self._schema_cache
 
@@ -41,15 +42,24 @@ class ConfigurationManager:
         """Load field mappings configuration with thread-safe caching"""
         if self._mappings_cache is None:
             with self._lock:
-                if self._mappings_cache is None:  # Double-check locking
+                if self._mappings_cache is None:
                     self._mappings_cache = self._load_json_config("field_mappings.json")
         return self._mappings_cache
+
+    def get_dashboard_config(self) -> Dict[str, Any]:
+        """Load dashboard configuration with thread-safe caching"""
+        if self._dashboard_cache is None:
+            with self._lock:
+                if self._dashboard_cache is None:
+                    self._dashboard_cache = self._load_json_config("dashboard_config.json")
+        return self._dashboard_cache
 
     def clear_cache(self):
         """Clear configuration cache (useful for testing)"""
         with self._lock:
             self._schema_cache = None
             self._mappings_cache = None
+            self._dashboard_cache = None
 
     def _load_json_config(self, filename: str) -> Dict[str, Any]:
         """Load JSON configuration file with error handling"""
@@ -57,6 +67,9 @@ class ConfigurationManager:
         config_path = config_dir / filename
 
         if not config_path.exists():
+            if filename == "dashboard_config.json":
+                # Return default dashboard config if file doesn't exist
+                return self._get_default_dashboard_config()
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
         try:
@@ -64,6 +77,14 @@ class ConfigurationManager:
                 return json.load(f)
         except Exception as e:
             raise ValueError(f"Error loading {filename}: {e}")
+
+    def _get_default_dashboard_config(self) -> Dict[str, Any]:
+        """Get default dashboard configuration"""
+        return {
+            "server": {"default_host": "127.0.0.1", "default_port": 8050},
+            "styling": {"primary_color": "#4A90E2", "chart_height": 400},
+            "performance": {"query_timeout_warning": 5.0, "cache_ttl_seconds": 300}
+        }
 
 # Singleton configuration manager
 _config_manager = ConfigurationManager()
@@ -140,6 +161,43 @@ def get_mappings() -> Dict[str, Any]:
     """Load field mappings configuration with optimized caching"""
     return _config_manager.get_mappings()
 
+def get_dashboard_config() -> Dict[str, Any]:
+    """Load dashboard configuration with optimized caching"""
+    return _config_manager.get_dashboard_config()
+
+# Dashboard-specific configuration functions
+def get_dashboard_server_config() -> Dict[str, Any]:
+    """Get dashboard server configuration"""
+    config = get_dashboard_config()
+    return config.get("server", {
+        "default_host": "127.0.0.1",
+        "default_port": 8050
+    })
+
+def get_dashboard_styling_config() -> Dict[str, Any]:
+    """Get dashboard styling configuration"""
+    config = get_dashboard_config()
+    return config.get("styling", {
+        "primary_color": "#4A90E2",
+        "chart_height": 400
+    })
+
+def get_dashboard_chart_config() -> Dict[str, Any]:
+    """Get dashboard chart configuration"""
+    config = get_dashboard_config()
+    return config.get("charts", {
+        "default_height": 400,
+        "font_family": "Arial, sans-serif"
+    })
+
+def get_dashboard_performance_config() -> Dict[str, Any]:
+    """Get dashboard performance configuration"""
+    config = get_dashboard_config()
+    return config.get("performance", {
+        "query_timeout_warning": 5.0,
+        "cache_ttl_seconds": 300
+    })
+
 def get_entities_from_schema() -> Dict[str, Dict[str, Any]]:
     """Get entities dictionary from schema"""
     schema = get_schema()
@@ -196,8 +254,10 @@ def get_all_config() -> Dict[str, Any]:
             "root_cause_delimiters": get_root_cause_delimiters(),
             "log_file": get_log_file()
         },
+        "dashboard": get_dashboard_config(),
         "cache_status": {
             "schema_loaded": _config_manager._schema_cache is not None,
-            "mappings_loaded": _config_manager._mappings_cache is not None
+            "mappings_loaded": _config_manager._mappings_cache is not None,
+            "dashboard_loaded": _config_manager._dashboard_cache is not None
         }
     }
