@@ -15,8 +15,8 @@ from unittest.mock import Mock, patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from mine_core.pipelines.extractor import FacilityDataExtractor
-from mine_core.pipelines.transformer import SimplifiedTransformer
-from mine_core.pipelines.loader import SimplifiedLoader
+from mine_core.pipelines.transformer import DataTransformer
+from mine_core.pipelines.loader import Neo4jLoader
 
 class TestSimplifiedETLPipeline:
     """Test streamlined ETL pipeline for clean datasets"""
@@ -120,7 +120,7 @@ class TestSimplifiedETLPipeline:
 
     def test_transformer_causal_intelligence(self):
         """Test transformer with causal intelligence enhancement"""
-        transformer = SimplifiedTransformer(self.test_config, use_config=False)
+        transformer = DataTransformer(self.test_config, use_config=False)
         transformed = transformer.transform_facility_data(self.sample_clean_data)
 
         # Verify structure
@@ -161,11 +161,11 @@ class TestSimplifiedETLPipeline:
         mock_db.create_relationship.return_value = True
 
         # Prepare test data
-        transformer = SimplifiedTransformer(self.test_config, use_config=False)
+        transformer = DataTransformer(self.test_config, use_config=False)
         transformed_data = transformer.transform_facility_data(self.sample_clean_data)
 
         # Test loading
-        loader = SimplifiedLoader()
+        loader = Neo4jLoader()
         result = loader.load_data(transformed_data)
 
         assert result == True
@@ -192,8 +192,8 @@ class TestSimplifiedETLPipeline:
 
                 # Execute pipeline
                 extractor = FacilityDataExtractor(temp_dir)
-                transformer = SimplifiedTransformer(self.test_config, use_config=False)
-                loader = SimplifiedLoader()
+                transformer = DataTransformer(self.test_config, use_config=False)
+                loader = Neo4jLoader()
 
                 # Extract
                 extracted_data = extractor.extract_facility_data("e2e_clean")
@@ -225,7 +225,7 @@ class TestSimplifiedETLPipeline:
             ]
         }
 
-        transformer = SimplifiedTransformer(self.test_config, use_config=False)
+        transformer = DataTransformer(self.test_config, use_config=False)
         transformed = transformer.transform_facility_data(causal_test_data)
 
         # Verify causal intelligence preservation
@@ -251,7 +251,7 @@ class TestSimplifiedETLPipeline:
             ]
         }
 
-        transformer = SimplifiedTransformer(self.test_config, use_config=False)
+        transformer = DataTransformer(self.test_config, use_config=False)
         transformed = transformer.transform_facility_data(missing_data_test)
 
         # Should create ActionRequest despite missing data
@@ -286,7 +286,7 @@ class TestSimplifiedETLPipeline:
             }
             moderate_dataset["records"].append(record)
 
-        transformer = SimplifiedTransformer(self.test_config, use_config=False)
+        transformer = DataTransformer(self.test_config, use_config=False)
 
         # Should complete transformation efficiently
         transformed = transformer.transform_facility_data(moderate_dataset)
@@ -332,7 +332,7 @@ class TestCausalIntelligenceIntegration:
             }
         }
 
-        transformer = SimplifiedTransformer(config, use_config=False)
+        transformer = DataTransformer(config, use_config=False)
 
         expected_tails = [
             "Single cause",      # No delimiter
@@ -398,7 +398,7 @@ class TestCausalIntelligenceIntegration:
             }
         }
 
-        transformer = SimplifiedTransformer(config, use_config=False)
+        transformer = DataTransformer(config, use_config=False)
         result = transformer.transform_facility_data(operational_data)
 
         # Verify complete workflow for operational intelligence

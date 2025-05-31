@@ -15,7 +15,7 @@ from mine_core.shared.field_utils import (
     has_real_value, get_missing_indicator, clean_label,
     extract_root_cause_tail, get_causal_intelligence_fields
 )
-from mine_core.pipelines.transformer import SimplifiedTransformer
+from mine_core.pipelines.transformer import DataTransformer
 
 class TestSimplifiedFieldUtils:
     """Test simplified field utility functions"""
@@ -80,7 +80,7 @@ class TestSimplifiedFieldUtils:
         assert causal_fields["secondary_cause"] == "Poor maintenance schedule"
         assert causal_fields["evidence"] == "Temperature logs show excessive heat"
 
-class TestSimplifiedTransformer:
+class TestDataTransformer:
     """Test simplified transformation logic with causal intelligence"""
 
     def setup_method(self):
@@ -116,7 +116,7 @@ class TestSimplifiedTransformer:
             }
         }
 
-        self.transformer = SimplifiedTransformer(self.sample_mappings, use_config=False)
+        self.transformer = DataTransformer(self.sample_mappings, use_config=False)
 
     def test_transform_facility_data(self):
         """Test complete facility data transformation"""
@@ -265,7 +265,7 @@ class TestCausalIntelligenceWorkflow:
 
     def test_complete_causal_workflow(self):
         """Test complete incident workflow with causal intelligence"""
-        transformer = SimplifiedTransformer(self.causal_config, use_config=False)
+        transformer = DataTransformer(self.causal_config, use_config=False)
 
         facility_data = {
             "facility_id": "CAUSAL_TEST",
@@ -304,7 +304,7 @@ class TestCausalIntelligenceWorkflow:
 
     def test_causal_intelligence_edge_cases(self):
         """Test causal intelligence with edge cases"""
-        transformer = SimplifiedTransformer(self.causal_config, use_config=False)
+        transformer = DataTransformer(self.causal_config, use_config=False)
 
         # Test various root cause formats
         test_cases = [
