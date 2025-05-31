@@ -1,0 +1,42 @@
+{
+  "server": {
+    "default_host": "127.0.0.1",
+    "default_port": 8050,
+    "debug_mode": false,
+    "auto_refresh_interval": 300000
+  },
+  "styling": {
+    "primary_color": "#4A90E2",
+    "light_blue": "#7BB3F0",
+    "dark_blue": "#2E5C8A",
+    "chart_colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
+    "background_light": "#FFFFFF",
+    "background_dark": "#1E1E1E",
+    "text_primary": "#333333",
+    "text_secondary": "#666666",
+    "text_light": "#FFFFFF"
+  },
+  "charts": {
+    "default_height": 400,
+    "default_width": null,
+    "metric_card_height": 120,
+    "metric_card_width": 220,
+    "table_height": 300,
+    "font_family": "Arial, sans-serif",
+    "title_font_size": 24,
+    "body_font_size": 14,
+    "caption_font_size": 12
+  },
+  "performance": {
+    "query_timeout_warning": 5.0,
+    "cache_ttl_seconds": 300,
+    "batch_size_limit": 10000,
+    "data_quality_threshold": 0.8
+  },
+  "features": {
+    "enable_caching": true,
+    "enable_auto_refresh": false,
+    "enable_debug_mode": false,
+    "show_metadata": false
+  }
+}
