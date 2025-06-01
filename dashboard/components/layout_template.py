@@ -7,6 +7,7 @@ Uniform grid layout for all dashboard tabs.
 from dash import html
 import dash_bootstrap_components as dbc
 from typing import List, Any, Optional
+from dashboard.utils.style_constants import PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, INFO_COLOR
 
 def create_metrics_row(metric_cards: List[Any]) -> dbc.Row:
     """Create standardized metrics row with 4 cards"""
@@ -79,9 +80,18 @@ def create_metric_card(
     value: Any,
     label: str,
     detail: str = "",
-    color: str = "#4A90E2"
+    color: str = None
 ) -> dbc.Card:
-    """Create standardized metric card"""
+    """Create standardized metric card with config-driven colors"""
+
+    # Get color from configuration if not provided
+    if color is None:
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            color = styling_config.get("primary_color", PRIMARY_COLOR)
+        except Exception:
+            color = PRIMARY_COLOR  # Fallback
 
     display_value = f"{value:,}" if isinstance(value, int) and value > 999 else str(value)
 
@@ -145,23 +155,47 @@ def create_loading_state(message: str = "Loading analysis...") -> html.Div:
     ], className="text-center p-5")
 
 def get_layout_config() -> dict:
-    """Get standardized layout configuration"""
+    """Get standardized layout configuration from centralized config"""
+    try:
+        from configs.environment import get_dashboard_styling_config, get_dashboard_chart_config
+        styling_config = get_dashboard_styling_config()
+        chart_config = get_dashboard_chart_config()
 
-    return {
-        "colors": {
-            "primary": "#4A90E2",
-            "secondary": "#F5A623",
-            "success": "#7ED321",
-            "info": "#B57EDC"
-        },
-        "spacing": {
-            "card_gap": "15px",
-            "section_margin": "30px",
-            "container_padding": "20px"
-        },
-        "dimensions": {
-            "metric_card_height": "120px",
-            "metric_card_width": "220px",
-            "chart_height": "400px"
+        return {
+            "colors": {
+                "primary": styling_config.get("primary_color", PRIMARY_COLOR),
+                "secondary": styling_config.get("chart_colors", [PRIMARY_COLOR, SECONDARY_COLOR])[1] if len(styling_config.get("chart_colors", [])) > 1 else SECONDARY_COLOR,
+                "success": styling_config.get("chart_colors", [PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR])[2] if len(styling_config.get("chart_colors", [])) > 2 else SUCCESS_COLOR,
+                "info": styling_config.get("chart_colors", [PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, INFO_COLOR])[3] if len(styling_config.get("chart_colors", [])) > 3 else INFO_COLOR
+            },
+            "spacing": {
+                "card_gap": "15px",
+                "section_margin": "30px",
+                "container_padding": "20px"
+            },
+            "dimensions": {
+                "metric_card_height": f"{chart_config.get('metric_card_height', 120)}px",
+                "metric_card_width": f"{chart_config.get('metric_card_width', 220)}px",
+                "chart_height": f"{chart_config.get('default_height', 400)}px"
+            }
         }
-    }
+    except Exception as e:
+        # Fallback to prevent breaking if config unavailable
+        return {
+            "colors": {
+                "primary": PRIMARY_COLOR,
+                "secondary": SECONDARY_COLOR,
+                "success": SUCCESS_COLOR,
+                "info": INFO_COLOR
+            },
+            "spacing": {
+                "card_gap": "15px",
+                "section_margin": "30px",
+                "container_padding": "20px"
+            },
+            "dimensions": {
+                "metric_card_height": "120px",
+                "metric_card_width": "220px",
+                "chart_height": "400px"
+            }
+        }

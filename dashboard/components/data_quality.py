@@ -9,25 +9,25 @@ from dash import dcc, html, dash_table
 import plotly.graph_objects as go
 from dashboard.components.layout_template import create_standard_layout, create_metric_card
 from mine_core.shared.common import handle_error
+from dashboard.utils.style_constants import (
+    SUCCESS_COLOR, DANGER_COLOR, PRIMARY_COLOR, LIGHT_BLUE,
+    HIGH_PRIORITY_BG, MEDIUM_PRIORITY_BG, LOW_PRIORITY_BG
+)
 from dashboard.adapters import get_data_adapter
 
-# Real data sources
-from mine_core.database.queries import (
-    get_missing_data_quality_intelligence,
-    get_facilities,
-    get_action_requests
-)
+# Configuration imports
 from configs.environment import get_mappings
 
 logger = logging.getLogger(__name__)
 
 def create_quality_metrics_cards() -> list:
-    """Generate quality metrics using real database data"""
-
+    """Generate quality metrics using real database data via adapter"""
     try:
-        # Real data from database
-        quality_data = get_missing_data_quality_intelligence()
-        facilities = get_facilities()
+        adapter = get_data_adapter()
+
+        # Real data from database via adapter
+        quality_data = adapter.get_missing_data_quality_intelligence()
+        facilities = adapter.get_facilities()
         mappings = get_mappings()
 
         # Real metrics from actual data
@@ -39,30 +39,39 @@ def create_quality_metrics_cards() -> list:
         problem_completeness = quality_data.get("problem_definition_completeness", 0)
         causal_completeness = quality_data.get("causal_analysis_completeness", 0)
 
+        # Get styling configuration for consistent colors
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            colors = styling_config.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"])
+        except Exception:
+            from dashboard.utils.style_constants import PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, INFO_COLOR
+            colors = [PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, INFO_COLOR]
+
         cards = [
             create_metric_card(
                 value=facilities_count,
                 label="Facilities Analyzed",
                 detail="Active operational sites",
-                color="#4A90E2"
+                color=colors[0]
             ),
             create_metric_card(
                 value=categorical_fields,
                 label="Categorical Fields",
                 detail="Classification dimensions",
-                color="#F5A623"
+                color=colors[1]
             ),
             create_metric_card(
                 value=f"{problem_completeness:.0f}%",
                 label="Problem Definition Rate",
                 detail="Workflow completeness",
-                color="#7ED321"
+                color=colors[2]
             ),
             create_metric_card(
                 value=f"{causal_completeness:.0f}%",
                 label="Causal Analysis Rate",
                 detail="Root cause completion",
-                color="#B57EDC"
+                color=colors[3]
             )
         ]
 
@@ -153,8 +162,9 @@ def create_facility_quality_comparison() -> dcc.Graph:
     """Facility quality comparison using real facility data"""
 
     try:
-        # Real facility data from database
-        facilities = get_facilities()
+        # Real facility data from database via adapter
+        adapter = get_data_adapter()
+        facilities = adapter.get_facilities()
 
         if not facilities:
             return dcc.Graph(figure={})
@@ -171,11 +181,23 @@ def create_facility_quality_comparison() -> dcc.Graph:
         # Create comparison visualization
         fig = go.Figure()
 
+        # Use configuration-driven styling
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            colors = styling_config.get("chart_colors", ["#7ED321", "#D0021B"])
+            success_color = colors[0] if len(colors) > 0 else SUCCESS_COLOR
+            danger_color = colors[1] if len(colors) > 1 else DANGER_COLOR
+        except Exception:
+            from dashboard.utils.style_constants import SUCCESS_COLOR, DANGER_COLOR
+            success_color = SUCCESS_COLOR
+            danger_color = DANGER_COLOR
+
         fig.add_trace(go.Bar(
             x=facility_names,
             y=incident_counts,
             name="Incident Count",
-            marker_color=['#7ED321' if status == 'Active' else '#D0021B'
+            marker_color=[success_color if status == 'Active' else danger_color
                          for status in active_status],
             text=incident_counts,
             textposition='outside',
@@ -204,9 +226,10 @@ def create_quality_summary_table() -> dash_table.DataTable:
     """Quality summary using real action request data"""
 
     try:
-        # Real data from database
-        facilities = get_facilities()
-        quality_data = get_missing_data_quality_intelligence()
+        # Real data from database via adapter
+        adapter = get_data_adapter()
+        facilities = adapter.get_facilities()
+        quality_data = adapter.get_missing_data_quality_intelligence()
 
         if not facilities:
             return dash_table.DataTable(data=[])
@@ -220,9 +243,9 @@ def create_quality_summary_table() -> dash_table.DataTable:
             incident_count = facility.get('incident_count', 0)
             total_incidents += incident_count
 
-            # Real action requests for each facility
+            # Real action requests for each facility via adapter
             try:
-                action_requests = get_action_requests(facility_id=facility_id, limit=10000)
+                action_requests = adapter.get_action_requests(facility_id=facility_id, limit=10000)
                 unique_actions = len(set(req.get('number', '') for req in action_requests))
                 avg_records_per_action = incident_count / unique_actions if unique_actions > 0 else 0
             except Exception as e:
@@ -250,6 +273,16 @@ def create_quality_summary_table() -> dash_table.DataTable:
             "Status": "System Total"
         })
 
+        # Use configuration-driven styling
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", PRIMARY_COLOR)
+            light_blue = styling_config.get("light_blue", LIGHT_BLUE)
+        except Exception:
+            primary_color = PRIMARY_COLOR
+            light_blue = LIGHT_BLUE
+
         return dash_table.DataTable(
             data=table_data,
             columns=[
@@ -260,18 +293,18 @@ def create_quality_summary_table() -> dash_table.DataTable:
                 {"name": "Status", "id": "Status"}
             ],
             style_cell={'textAlign': 'center', 'padding': '12px'},
-            style_header={'backgroundColor': '#4A90E2', 'color': 'white', 'fontWeight': 'bold'},
+            style_header={'backgroundColor': primary_color, 'color': 'white', 'fontWeight': 'bold'},
             style_data={'backgroundColor': 'white'},
             style_data_conditional=[
                 {
                     'if': {'row_index': len(table_data) - 1},
-                    'backgroundColor': '#7BB3F0',
+                    'backgroundColor': light_blue,
                     'color': 'white',
                     'fontWeight': 'bold'
                 },
                 {
                     'if': {'filter_query': '{Status} = Inactive'},
-                    'backgroundColor': '#FFE6E6',
+                    'backgroundColor': HIGH_PRIORITY_BG,
                     'color': 'black'
                 }
             ]

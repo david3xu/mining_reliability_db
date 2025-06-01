@@ -1,0 +1,113 @@
+{
+  "hardcoded_colors": [],
+  "direct_mine_core_imports": [],
+  "adapter_compliance": [
+    {
+      "file": "dashboard/components/portfolio_overview.py",
+      "has_adapter_import": false,
+      "uses_adapter_pattern": false,
+      "compliant": false
+    },
+    {
+      "file": "dashboard/components/interactive_elements.py",
+      "has_adapter_import": false,
+      "uses_adapter_pattern": false,
+      "compliant": false
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "has_adapter_import": true,
+      "uses_adapter_pattern": true,
+      "compliant": true
+    },
+    {
+      "file": "dashboard/components/workflow_analysis.py",
+      "has_adapter_import": true,
+      "uses_adapter_pattern": true,
+      "compliant": true
+    },
+    {
+      "file": "dashboard/components/tab_navigation.py",
+      "has_adapter_import": false,
+      "uses_adapter_pattern": false,
+      "compliant": false
+    },
+    {
+      "file": "dashboard/components/graph_visualizer.py",
+      "has_adapter_import": true,
+      "uses_adapter_pattern": true,
+      "compliant": true
+    },
+    {
+      "file": "dashboard/components/facility_detail.py",
+      "has_adapter_import": true,
+      "uses_adapter_pattern": true,
+      "compliant": true
+    },
+    {
+      "file": "dashboard/components/layout_template.py",
+      "has_adapter_import": false,
+      "uses_adapter_pattern": false,
+      "compliant": false
+    }
+  ],
+  "configuration_usage": [
+    {
+      "file": "dashboard/components/portfolio_overview.py",
+      "uses_styling_config": true,
+      "uses_chart_config": false,
+      "uses_env_config": true,
+      "config_driven": true
+    },
+    {
+      "file": "dashboard/components/interactive_elements.py",
+      "uses_styling_config": false,
+      "uses_chart_config": false,
+      "uses_env_config": false,
+      "config_driven": false
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "uses_styling_config": true,
+      "uses_chart_config": false,
+      "uses_env_config": true,
+      "config_driven": true
+    },
+    {
+      "file": "dashboard/components/workflow_analysis.py",
+      "uses_styling_config": true,
+      "uses_chart_config": false,
+      "uses_env_config": true,
+      "config_driven": true
+    },
+    {
+      "file": "dashboard/components/tab_navigation.py",
+      "uses_styling_config": false,
+      "uses_chart_config": false,
+      "uses_env_config": false,
+      "config_driven": false
+    },
+    {
+      "file": "dashboard/components/graph_visualizer.py",
+      "uses_styling_config": true,
+      "uses_chart_config": true,
+      "uses_env_config": true,
+      "config_driven": true
+    },
+    {
+      "file": "dashboard/components/facility_detail.py",
+      "uses_styling_config": true,
+      "uses_chart_config": false,
+      "uses_env_config": true,
+      "config_driven": true
+    },
+    {
+      "file": "dashboard/components/layout_template.py",
+      "uses_styling_config": true,
+      "uses_chart_config": true,
+      "uses_env_config": true,
+      "config_driven": true
+    }
+  ],
+  "data_accuracy_score": 72.5
+}
