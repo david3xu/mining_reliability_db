@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Dashboard Data Adapter - Strategic Data Access Layer
-Provides clean abstraction between dashboard components and mine_core business logic.
+Dashboard Data Adapter - Extended with Facility-Specific Methods
+Extends existing real data access with facility drill-down capability.
 """
 
 import logging
@@ -12,7 +12,7 @@ from dashboard.adapters.interfaces import (
     ComponentMetadata, ValidationResult
 )
 
-# Strategic import: Only one file imports mine_core directly
+# Real data sources - existing infrastructure
 from mine_core.database.queries import (
     get_facilities,
     get_operational_performance_dashboard,
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 class DashboardDataAdapter:
     """
-    Strategic data access layer for dashboard components.
-    Single point of coupling to mine_core business logic.
+    Extended data access layer with facility-specific methods.
+    Maintains single point of coupling to mine_core business logic.
     """
 
     def __init__(self):
@@ -36,23 +36,18 @@ class DashboardDataAdapter:
         self._cache_ttl = 300  # 5 minutes
         self._last_refresh = {}
 
+    # EXISTING METHODS (Keep unchanged - working real data)
     def get_portfolio_metrics(self) -> PortfolioData:
-        """
-        Get core portfolio metrics for dashboard header cards.
-        Returns structured data for 4 blue metric cards.
-        """
+        """Get core portfolio metrics for dashboard header cards"""
         try:
             logger.info("Adapter: Generating portfolio metrics")
 
-            # Get data from mine_core (only place with direct access)
             facilities = get_facilities()
             all_requests = get_action_requests(limit=10000)
             mappings = get_mappings()
 
-            # Transform to dashboard format
             total_records = len(all_requests)
 
-            # Calculate field count from mappings
             entity_mappings = mappings.get("entity_mappings", {})
             all_fields = set()
             for entity_type, field_mapping in entity_mappings.items():
@@ -61,7 +56,6 @@ class DashboardDataAdapter:
 
             total_facilities = len(facilities)
 
-            # Calculate year coverage
             years_found = set()
             for request in all_requests:
                 date_str = request.get('date', '')
@@ -76,7 +70,6 @@ class DashboardDataAdapter:
             min_year = min(years_found) if years_found else None
             max_year = max(years_found) if years_found else None
 
-            # Return structured portfolio data
             return PortfolioData(
                 total_records=total_records,
                 data_fields=total_fields,
@@ -95,16 +88,12 @@ class DashboardDataAdapter:
             return self._create_empty_portfolio_data()
 
     def get_facility_breakdown(self) -> FacilityData:
-        """
-        Get facility-wise record distribution for pie chart.
-        Returns data structured for Plotly pie visualization.
-        """
+        """Get facility-wise record distribution for pie chart"""
         try:
             logger.info("Adapter: Generating facility breakdown")
 
             facilities = get_facilities()
 
-            # Build facility distribution
             labels = []
             values = []
             total_records = 0
@@ -117,7 +106,6 @@ class DashboardDataAdapter:
                 values.append(incident_count)
                 total_records += incident_count
 
-            # Calculate percentages
             percentages = []
             for count in values:
                 percentage = round((count / total_records * 100), 1) if total_records > 0 else 0
@@ -140,17 +128,13 @@ class DashboardDataAdapter:
             return self._create_empty_facility_data()
 
     def get_field_distribution(self) -> FieldData:
-        """
-        Get field type distribution for bar chart visualization.
-        Returns data structured for Plotly bar chart.
-        """
+        """Get field type distribution for bar chart visualization"""
         try:
             logger.info("Adapter: Analyzing field distribution")
 
             mappings = get_mappings()
             field_categories = mappings.get("field_categories", {})
 
-            # Map to dashboard categories
             category_mapping = {
                 "descriptive_fields": "Text/String (Unstructured)",
                 "temporal_fields": "Date (Temporal)",
@@ -170,7 +154,6 @@ class DashboardDataAdapter:
                 values.append(field_count)
                 total_fields += field_count
 
-            # Calculate percentages
             percentages = []
             for count in values:
                 percentage = round((count / total_fields) * 100, 1) if total_fields > 0 else 0
@@ -193,28 +176,22 @@ class DashboardDataAdapter:
             return self._create_empty_field_data()
 
     def get_historical_timeline(self) -> TimelineData:
-        """
-        Get historical records timeline for table visualization.
-        Returns year-over-year breakdown by facility.
-        """
+        """Get historical records timeline for table visualization"""
         try:
             logger.info("Adapter: Generating historical timeline")
 
             all_requests = get_action_requests(limit=10000)
             facilities = get_facilities()
 
-            # Initialize data structures
             facility_names = [f.get('id', 'Unknown') for f in facilities]
             timeline_data = {}
             year_totals = {}
             facility_totals = {}
 
-            # Initialize nested dictionaries
             for facility_id in facility_names:
                 timeline_data[facility_id] = {}
                 facility_totals[facility_id] = 0
 
-            # Analyze temporal distribution
             for request in all_requests:
                 date_str = request.get('date', '')
                 facility_id = request.get('facility_id', 'Unknown')
@@ -234,7 +211,6 @@ class DashboardDataAdapter:
                     except:
                         continue
 
-            # Generate year range
             if year_totals:
                 min_year = min(year_totals.keys())
                 max_year = max(year_totals.keys())
@@ -242,7 +218,6 @@ class DashboardDataAdapter:
             else:
                 year_range = []
 
-            # Format for table display
             table_rows = []
             for facility_id in facility_names:
                 row = {
@@ -255,7 +230,6 @@ class DashboardDataAdapter:
 
                 table_rows.append(row)
 
-            # Add totals row
             totals_row = {"facility": "Total", "total": sum(facility_totals.values())}
             for year in year_range:
                 totals_row[str(year)] = year_totals.get(year, 0)
@@ -278,11 +252,98 @@ class DashboardDataAdapter:
             handle_error(logger, e, "historical timeline generation")
             return self._create_empty_timeline_data()
 
+    # NEW FACILITY-SPECIFIC METHODS
+    def get_facility_performance_analysis(self, facility_id: str) -> Dict[str, Any]:
+        """Get facility-specific performance analysis using real data"""
+        try:
+            logger.info(f"Adapter: Generating facility analysis for {facility_id}")
+
+            # Real performance data for specific facility
+            performance_data = get_operational_performance_dashboard(facility_id)
+
+            # Real action requests for facility
+            action_requests = get_action_requests(facility_id=facility_id, limit=10000)
+
+            # Real causal intelligence for facility
+            causal_data = get_root_cause_intelligence_summary(facility_id)
+
+            # Process category distribution from real data
+            category_distribution = {}
+            for request in action_requests:
+                category = request.get('categories', 'Unknown')
+                if category not in category_distribution:
+                    category_distribution[category] = 0
+                category_distribution[category] += 1
+
+            # Calculate percentages
+            total_records = len(action_requests)
+            category_percentages = {}
+            for category, count in category_distribution.items():
+                percentage = round((count / total_records * 100), 1) if total_records > 0 else 0
+                category_percentages[category] = percentage
+
+            return {
+                "facility_id": facility_id,
+                "total_records": total_records,
+                "category_distribution": category_distribution,
+                "category_percentages": category_percentages,
+                "performance_metrics": performance_data,
+                "causal_patterns": causal_data.get("causal_patterns", []),
+                "temporal_trends": performance_data.get("temporal_trends", []),
+                "workflow_efficiency": performance_data.get("workflow_efficiency", {}),
+                "metadata": ComponentMetadata(
+                    source="mine_core.database",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if total_records > 0 else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, f"facility performance analysis for {facility_id}")
+            return {}
+
+    def get_facility_comparison_metrics(self, facility_id: str) -> Dict[str, Any]:
+        """Compare facility performance against other facilities"""
+        try:
+            logger.info(f"Adapter: Generating facility comparison for {facility_id}")
+
+            # Get data for target facility
+            target_facility = self.get_facility_performance_analysis(facility_id)
+
+            # Get data for all facilities for comparison
+            all_facilities = get_facilities()
+            facility_metrics = []
+
+            for facility in all_facilities:
+                other_facility_id = facility.get('id', 'Unknown')
+                if other_facility_id != facility_id:
+                    other_data = self.get_facility_performance_analysis(other_facility_id)
+                    facility_metrics.append(other_data)
+
+            # Calculate comparison metrics
+            target_records = target_facility.get("total_records", 0)
+            other_records = [f.get("total_records", 0) for f in facility_metrics]
+            avg_other_records = sum(other_records) / len(other_records) if other_records else 0
+
+            performance_rank = sum(1 for r in other_records if r < target_records) + 1
+            total_facilities = len(other_records) + 1
+
+            return {
+                "facility_id": facility_id,
+                "target_records": target_records,
+                "average_other_records": avg_other_records,
+                "performance_rank": performance_rank,
+                "total_facilities": total_facilities,
+                "percentile": round((performance_rank / total_facilities) * 100, 1),
+                "vs_average": round(((target_records - avg_other_records) / avg_other_records * 100), 1) if avg_other_records > 0 else 0
+            }
+
+        except Exception as e:
+            handle_error(logger, e, f"facility comparison for {facility_id}")
+            return {}
+
     def validate_data_availability(self) -> ValidationResult:
-        """
-        Validate data availability for dashboard components.
-        Returns comprehensive validation status.
-        """
+        """Validate data availability for dashboard components"""
         try:
             validation_status = {
                 "portfolio_metrics": False,
@@ -291,7 +352,6 @@ class DashboardDataAdapter:
                 "historical_timeline": False
             }
 
-            # Test each data component
             portfolio_data = self.get_portfolio_metrics()
             validation_status["portfolio_metrics"] = portfolio_data.total_records > 0
 
@@ -322,7 +382,7 @@ class DashboardDataAdapter:
                 data_quality_score=0.0
             )
 
-    # Private helper methods
+    # HELPER METHODS (Keep existing)
     def _get_timestamp(self) -> str:
         """Get current timestamp for metadata."""
         from datetime import datetime
@@ -332,7 +392,7 @@ class DashboardDataAdapter:
         """Calculate data quality score based on completeness."""
         if not data:
             return 0.0
-        return min(1.0, len(data) / 1000)  # Normalize to expected data volume
+        return min(1.0, len(data) / 1000)
 
     def _create_empty_portfolio_data(self) -> PortfolioData:
         """Create empty portfolio data for error cases."""
