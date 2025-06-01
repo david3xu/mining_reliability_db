@@ -16,7 +16,7 @@ import dash_bootstrap_components as dbc
 
 # Import Phase 3 components
 from dashboard.components.portfolio_overview import create_complete_dashboard
-from dashboard.utils.data_transformers import get_facility_breakdown_data
+from dashboard.utils.data_transformers import get_facility_breakdown_data, get_system_config
 
 # Import styling system
 from dashboard.utils.styling import (
@@ -25,7 +25,6 @@ from dashboard.utils.styling import (
 )
 
 # Import configuration infrastructure
-from configs.environment import get_all_config
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
@@ -153,7 +152,7 @@ def create_footer() -> html.Footer:
     """
     try:
         # Get system configuration for footer info
-        config = get_all_config()
+        config = get_system_config()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         footer_content = [
@@ -438,7 +437,7 @@ def validate_layout_dependencies() -> Dict[str, bool]:
         validation_results["styling_system"] = True
 
         # Test configuration access
-        config = get_all_config()
+        config = get_system_config()
         validation_results["configuration_access"] = bool(config)
 
         logger.info("Layout dependencies validation completed")

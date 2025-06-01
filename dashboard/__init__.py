@@ -16,10 +16,10 @@ from dashboard.utils.data_transformers import (
 
 # Phase 3: Visual Components
 from dashboard.components.portfolio_overview import (
-    create_interactive_metrics_cards,
-    create_enhanced_field_distribution_chart,
-    create_enhanced_facility_pie_chart,
-    create_enhanced_historical_table,
+    create_metrics_cards,
+    create_field_distribution_chart,
+    create_facility_pie_chart,
+    create_historical_table,
     create_enhanced_dashboard_layout,
     create_complete_dashboard
 )
@@ -32,7 +32,6 @@ from dashboard.layouts.main_layout import (
 )
 
 from dashboard.app import (
-    InteractiveDashboardApplication,
     create_dashboard_app
 )
 
@@ -45,10 +44,10 @@ __all__ = [
     'validate_dashboard_data',
 
     # Visual Components (Phase 3)
-    'create_interactive_metrics_cards',
-    'create_enhanced_field_distribution_chart',
-    'create_enhanced_facility_pie_chart',
-    'create_enhanced_historical_table',
+    'create_metrics_cards',
+    'create_field_distribution_chart',
+    'create_facility_pie_chart',
+    'create_historical_table',
     'create_enhanced_dashboard_layout',
     'create_complete_dashboard',
 
@@ -56,6 +55,5 @@ __all__ = [
     'create_main_layout',
     'create_navigation_bar',
     'create_footer',
-    'InteractiveDashboardApplication',
     'create_dashboard_app'
 ]

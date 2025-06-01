@@ -55,7 +55,9 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
             # For now, use portfolio data as proxy
             portfolio_data = adapter.get_portfolio_metrics()
             has_data = portfolio_data.total_records > 0
-        except:
+        except Exception as e:
+            from mine_core.shared.common import handle_error
+            handle_error(logger, e, "portfolio data validation for network analysis")
             has_data = False
 
         if not has_data:
