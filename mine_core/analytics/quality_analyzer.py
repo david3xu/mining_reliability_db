@@ -150,6 +150,7 @@ class QualityAnalyzer:
 
         facilities_query = f"""
         MATCH (f:{facility_entity})
+        WHERE NOT '_SchemaTemplate' IN labels(f)
         RETURN f.{facility_pk} as id, f.facility_name as name
         ORDER BY f.facility_name
         """
