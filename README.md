@@ -165,7 +165,7 @@ python scripts/import_data.py \
 
 ### Neo4j Browser Access
 
-1. **Local Access**: http://localhost:7474
+1. **Local Access**: http://localhost:7474/
 2. **Username**: neo4j
 3. **Password**: password (or your configured password)
 
