@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-Portfolio Overview Component - Adapter Integration
-Clean component implementation using data adapter pattern.
+Portfolio Overview Component - Interactive Implementation
+Clean component implementation with enhanced user interaction.
 """
 
 import logging
 from typing import Dict, List, Any
 
 # Dash components
-import dash
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
 
-# Use adapter instead of direct mine_core access
+# Interactive components
+from dashboard.components.interactive_elements import (
+    create_interactive_metric_card,
+    create_interactive_pie_chart,
+    create_interactive_bar_chart,
+    create_interactive_timeline_table,
+    create_interaction_feedback_toast,
+    create_loading_overlay
+)
+
+# Data pipeline
 from dashboard.utils.data_transformers import (
     get_portfolio_metrics,
     get_field_distribution_data,
@@ -22,20 +30,16 @@ from dashboard.utils.data_transformers import (
     validate_dashboard_data
 )
 
-# Configuration-driven styling
+# Configuration
 from configs.environment import get_dashboard_styling_config, get_dashboard_chart_config
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-def create_metrics_cards() -> List[dbc.Card]:
-    """Create 4 metric cards using adapter data"""
+def create_interactive_metrics_cards() -> List[dbc.Card]:
+    """Create interactive metric cards with click functionality"""
     try:
-        logger.info("Creating portfolio metrics cards...")
-
-        # Get styling configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        logger.info("Creating interactive metrics cards...")
 
         # Get data via adapter
         metrics_data = get_portfolio_metrics()
@@ -45,86 +49,29 @@ def create_metrics_cards() -> List[dbc.Card]:
             return []
 
         cards = []
-        card_order = ["total_records", "data_fields", "facilities", "years_coverage"]
+        card_configs = [
+            ("total_records", "total-records-card"),
+            ("data_fields", "data-fields-card"),
+            ("facilities", "facilities-card"),
+            ("years_coverage", "years-card")
+        ]
 
-        for metric_key in card_order:
+        for metric_key, card_id in card_configs:
             metric_info = metrics_data.get(metric_key, {})
-            value = metric_info.get("value", 0)
-            label = metric_info.get("label", "Unknown")
-            detail = metric_info.get("detail", "")
-
-            # Format display value
-            display_value = f"{value:,}" if isinstance(value, int) and value > 999 else str(value)
-
-            # Create card content
-            card_content = [
-                html.H2(
-                    display_value,
-                    style={
-                        "fontSize": "32px",
-                        "fontWeight": "bold",
-                        "margin": "0",
-                        "color": styling_config.get("text_light", "#FFFFFF")
-                    }
-                ),
-                html.P(
-                    label,
-                    style={
-                        "fontSize": "14px",
-                        "margin": "5px 0 0 0",
-                        "color": styling_config.get("text_light", "#FFFFFF"),
-                        "opacity": "0.9"
-                    }
-                )
-            ]
-
-            # Add detail if available
-            if detail:
-                card_content.append(
-                    html.Small(
-                        detail,
-                        style={
-                            "fontSize": "12px",
-                            "color": styling_config.get("text_light", "#FFFFFF"),
-                            "opacity": "0.8"
-                        }
-                    )
-                )
-
-            # Create card with configuration-driven styling
-            card = dbc.Card(
-                dbc.CardBody(card_content),
-                style={
-                    "backgroundColor": styling_config.get("primary_color", "#4A90E2"),
-                    "color": styling_config.get("text_light", "#FFFFFF"),
-                    "padding": "20px",
-                    "borderRadius": "8px",
-                    "textAlign": "center",
-                    "height": chart_config.get("metric_card_height", 120),
-                    "width": chart_config.get("metric_card_width", 220),
-                    "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.1)",
-                    "margin": "15px"
-                },
-                className="text-center shadow-sm"
-            )
-
+            card = create_interactive_metric_card(metric_info, card_id)
             cards.append(card)
 
-        logger.info(f"Created {len(cards)} metric cards")
+        logger.info(f"Created {len(cards)} interactive metric cards")
         return cards
 
     except Exception as e:
-        handle_error(logger, e, "metrics cards creation")
+        handle_error(logger, e, "interactive metrics cards creation")
         return []
 
-def create_field_distribution_chart() -> dcc.Graph:
-    """Create field distribution bar chart using adapter data"""
+def create_enhanced_field_distribution_chart() -> dcc.Graph:
+    """Create interactive field distribution bar chart"""
     try:
-        logger.info("Creating field distribution chart...")
-
-        # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        logger.info("Creating enhanced field distribution chart...")
 
         # Get data via adapter
         field_data = get_field_distribution_data()
@@ -133,74 +80,20 @@ def create_field_distribution_chart() -> dcc.Graph:
             logger.warning("No field distribution data available")
             return dcc.Graph(figure={})
 
-        # Create bar chart
-        fig = go.Figure()
+        # Create interactive bar chart
+        chart = create_interactive_bar_chart(field_data)
 
-        fig.add_trace(go.Bar(
-            x=field_data.get("labels", []),
-            y=field_data.get("values", []),
-            text=[f"{v} ({p}%)" for v, p in zip(
-                field_data.get("values", []),
-                field_data.get("percentages", [])
-            )],
-            textposition="outside",
-            marker=dict(
-                color=styling_config.get("chart_colors", ["#4A90E2"])[0],
-                line=dict(color="#CCCCCC", width=1)
-            ),
-            hovertemplate="<b>%{x}</b><br>Count: %{y}<br>Percentage: %{text}<extra></extra>"
-        ))
-
-        # Apply configuration-driven layout
-        fig.update_layout(
-            title={
-                "text": "Data Types Distribution",
-                "font": {
-                    "family": chart_config.get("font_family", "Arial, sans-serif"),
-                    "size": chart_config.get("title_font_size", 18),
-                    "color": styling_config.get("text_primary", "#333333")
-                },
-                "x": 0.5,
-                "xanchor": "center"
-            },
-            paper_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            plot_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            font={
-                "family": chart_config.get("font_family", "Arial, sans-serif"),
-                "size": chart_config.get("body_font_size", 14),
-                "color": styling_config.get("text_primary", "#333333")
-            },
-            xaxis={
-                "title": "Field Type Category",
-                "tickangle": -45,
-                "tickfont": {"size": chart_config.get("caption_font_size", 12)}
-            },
-            yaxis={
-                "title": "Number of Fields",
-                "tickfont": {"size": chart_config.get("caption_font_size", 12)}
-            },
-            height=chart_config.get("default_height", 400),
-            showlegend=False
-        )
-
-        return dcc.Graph(
-            figure=fig,
-            config={"displayModeBar": False},
-            style={"height": f"{chart_config.get('default_height', 400)}px"}
-        )
+        logger.info("Enhanced field distribution chart created successfully")
+        return chart
 
     except Exception as e:
-        handle_error(logger, e, "field distribution chart creation")
+        handle_error(logger, e, "enhanced field distribution chart creation")
         return dcc.Graph(figure={})
 
-def create_facility_pie_chart() -> dcc.Graph:
-    """Create facility pie chart using adapter data"""
+def create_enhanced_facility_pie_chart() -> dcc.Graph:
+    """Create interactive facility pie chart"""
     try:
-        logger.info("Creating facility pie chart...")
-
-        # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        logger.info("Creating enhanced facility pie chart...")
 
         # Get data via adapter
         facility_data = get_facility_breakdown_data()
@@ -209,73 +102,20 @@ def create_facility_pie_chart() -> dcc.Graph:
             logger.warning("No facility breakdown data available")
             return dcc.Graph(figure={})
 
-        # Create pie chart
-        fig = go.Figure()
+        # Create interactive pie chart
+        chart = create_interactive_pie_chart(facility_data)
 
-        fig.add_trace(go.Pie(
-            labels=facility_data.get("labels", []),
-            values=facility_data.get("values", []),
-            marker=dict(
-                colors=styling_config.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
-                line=dict(color=styling_config.get("background_light", "#FFFFFF"), width=2)
-            ),
-            textfont=dict(
-                size=chart_config.get("body_font_size", 14),
-                color=styling_config.get("text_light", "#FFFFFF")
-            ),
-            textposition="inside",
-            textinfo="label+percent",
-            hovertemplate="<b>%{label}</b><br>Records: %{value}<br>Percentage: %{percent}<extra></extra>"
-        ))
-
-        # Apply configuration-driven layout
-        fig.update_layout(
-            title={
-                "text": "Records Distribution by Site",
-                "font": {
-                    "family": chart_config.get("font_family", "Arial, sans-serif"),
-                    "size": chart_config.get("title_font_size", 18),
-                    "color": styling_config.get("text_primary", "#333333")
-                },
-                "x": 0.5,
-                "xanchor": "center"
-            },
-            paper_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            plot_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            font={
-                "family": chart_config.get("font_family", "Arial, sans-serif"),
-                "size": chart_config.get("body_font_size", 14),
-                "color": styling_config.get("text_primary", "#333333")
-            },
-            height=chart_config.get("default_height", 400),
-            showlegend=True,
-            legend={
-                "orientation": "v",
-                "yanchor": "middle",
-                "y": 0.5,
-                "xanchor": "left",
-                "x": 1.05
-            }
-        )
-
-        return dcc.Graph(
-            figure=fig,
-            config={"displayModeBar": False},
-            style={"height": f"{chart_config.get('default_height', 400)}px"}
-        )
+        logger.info("Enhanced facility pie chart created successfully")
+        return chart
 
     except Exception as e:
-        handle_error(logger, e, "facility pie chart creation")
+        handle_error(logger, e, "enhanced facility pie chart creation")
         return dcc.Graph(figure={})
 
-def create_historical_table() -> dash_table.DataTable:
-    """Create historical timeline table using adapter data"""
+def create_enhanced_historical_table() -> dash_table.DataTable:
+    """Create interactive historical timeline table"""
     try:
-        logger.info("Creating historical timeline table...")
-
-        # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        logger.info("Creating enhanced historical timeline table...")
 
         # Get data via adapter
         timeline_data = get_historical_timeline_data()
@@ -284,84 +124,28 @@ def create_historical_table() -> dash_table.DataTable:
             logger.warning("No timeline data available")
             return dash_table.DataTable(data=[])
 
-        columns = timeline_data.get("columns", [])
-        rows = timeline_data.get("rows", [])
+        # Create interactive table
+        table = create_interactive_timeline_table(timeline_data)
 
-        # Create column definitions
-        table_columns = []
-        for col in columns:
-            column_def = {
-                "name": col.title(),
-                "id": col,
-                "type": "numeric" if col != "facility" else "text"
-            }
-
-            if col == "facility":
-                column_def.update({
-                    "presentation": "markdown",
-                    "type": "text"
-                })
-
-            table_columns.append(column_def)
-
-        # Create DataTable with configuration-driven styling
-        data_table = dash_table.DataTable(
-            id="historical-timeline-table",
-            columns=table_columns,
-            data=rows,
-            style_cell={
-                "textAlign": "center",
-                "padding": "12px",
-                "fontFamily": chart_config.get("font_family", "Arial, sans-serif"),
-                "fontSize": chart_config.get("body_font_size", 14),
-                "border": f"1px solid {styling_config.get('border_color', '#CCCCCC')}"
-            },
-            style_header={
-                "backgroundColor": styling_config.get("primary_color", "#4A90E2"),
-                "color": styling_config.get("text_light", "#FFFFFF"),
-                "fontWeight": "bold",
-                "border": f"1px solid {styling_config.get('primary_color', '#4A90E2')}"
-            },
-            style_data={
-                "backgroundColor": styling_config.get("background_light", "#FFFFFF"),
-                "color": styling_config.get("text_primary", "#333333")
-            },
-            style_data_conditional=[
-                {
-                    "if": {"row_index": len(rows) - 1},
-                    "backgroundColor": styling_config.get("light_blue", "#7BB3F0"),
-                    "color": styling_config.get("text_light", "#FFFFFF"),
-                    "fontWeight": "bold"
-                },
-                {
-                    "if": {"column_id": "facility"},
-                    "textAlign": "left",
-                    "fontWeight": "bold"
-                }
-            ],
-            sort_action="native",
-            filter_action="native",
-            page_action="none",
-            fixed_rows={"headers": True},
-            style_table={
-                "height": f"{chart_config.get('table_height', 300)}px",
-                "overflowY": "auto",
-                "border": f"1px solid {styling_config.get('border_color', '#CCCCCC')}",
-                "borderRadius": "8px"
-            }
-        )
-
-        logger.info("Historical table created successfully")
-        return data_table
+        logger.info("Enhanced historical table created successfully")
+        return table
 
     except Exception as e:
-        handle_error(logger, e, "historical table creation")
+        handle_error(logger, e, "enhanced historical table creation")
         return dash_table.DataTable(data=[])
 
-def create_complete_dashboard() -> html.Div:
-    """Create complete dashboard using adapter pattern"""
+def create_interaction_stores() -> List[dcc.Store]:
+    """Create data stores for interaction management"""
+    return [
+        dcc.Store(id="chart-interaction-store", data={}),
+        dcc.Store(id="table-interaction-store", data={}),
+        dcc.Store(id="card-interaction-store", data={})
+    ]
+
+def create_enhanced_dashboard_layout() -> html.Div:
+    """Create complete interactive dashboard layout"""
     try:
-        logger.info("Creating complete portfolio dashboard...")
+        logger.info("Creating enhanced dashboard layout...")
 
         # Get configuration
         styling_config = get_dashboard_styling_config()
@@ -375,20 +159,32 @@ def create_complete_dashboard() -> html.Div:
             return html.Div([
                 dbc.Alert([
                     html.H4("Data Validation Error", className="alert-heading"),
-                    html.P("Dashboard data pipeline validation failed. Please check system status."),
+                    html.P("Dashboard data pipeline validation failed. Interactive features may be limited."),
                     html.Hr(),
                     html.P("Run system diagnostics to resolve issues.", className="mb-0")
                 ], color="warning", dismissable=True)
             ], style={"padding": "50px"})
 
-        # Create components
-        metric_cards = create_metrics_cards()
-        field_chart = create_field_distribution_chart()
-        facility_chart = create_facility_pie_chart()
-        timeline_table = create_historical_table()
+        # Create interactive components
+        metric_cards = create_interactive_metrics_cards()
+        field_chart = create_enhanced_field_distribution_chart()
+        facility_chart = create_enhanced_facility_pie_chart()
+        timeline_table = create_enhanced_historical_table()
 
-        # Main layout with configuration-driven styling
-        dashboard = html.Div([
+        # Main layout with enhanced interactivity
+        layout = html.Div([
+            # Interaction stores (hidden)
+            html.Div(
+                create_interaction_stores(),
+                style={"display": "none"}
+            ),
+
+            # Loading overlay
+            create_loading_overlay(),
+
+            # Toast notifications
+            create_interaction_feedback_toast(),
+
             # Header section
             html.Div([
                 html.H1(
@@ -401,7 +197,7 @@ def create_complete_dashboard() -> html.Div:
                     }
                 ),
                 html.H4(
-                    "Comprehensive Analysis Across 4 Operational Facilities",
+                    "Comprehensive Analysis Across Operational Facilities - Click to Explore",
                     style={
                         "fontSize": chart_config.get("subtitle_font_size", 18),
                         "fontWeight": "normal",
@@ -419,7 +215,7 @@ def create_complete_dashboard() -> html.Div:
                 "borderRadius": "10px"
             }),
 
-            # Metrics cards
+            # Interactive metrics cards
             html.Div([
                 html.H3(
                     "Key Portfolio Metrics",
@@ -439,16 +235,33 @@ def create_complete_dashboard() -> html.Div:
                         "marginBottom": "30px",
                         "gap": "15px"
                     }
+                ),
+                html.P(
+                    "💡 Click metric cards for detailed analysis",
+                    style={
+                        "textAlign": "center",
+                        "fontSize": chart_config.get("caption_font_size", 12),
+                        "color": styling_config.get("text_secondary", "#666666"),
+                        "fontStyle": "italic",
+                        "marginTop": "10px"
+                    }
                 )
             ], style={"marginBottom": "40px"}),
 
-            # Charts section
+            # Interactive charts section
             html.Div([
-                html.Div([field_chart], style={"width": "48%", "display": "inline-block"}),
-                html.Div([facility_chart], style={"width": "48%", "display": "inline-block", "marginLeft": "4%"})
+                # Left: Interactive field distribution
+                html.Div([
+                    field_chart
+                ], style={"width": "48%", "display": "inline-block"}),
+
+                # Right: Interactive facility pie chart
+                html.Div([
+                    facility_chart
+                ], style={"width": "48%", "display": "inline-block", "marginLeft": "4%"})
             ], style={"marginBottom": "40px"}),
 
-            # Timeline table
+            # Interactive timeline table
             html.Div([
                 html.H3(
                     "Historical Records by Year",
@@ -460,7 +273,7 @@ def create_complete_dashboard() -> html.Div:
                 ),
                 timeline_table,
                 html.P(
-                    "Data spans multiple years with consistent field structure",
+                    "💡 Click facility rows to explore detailed analysis",
                     style={
                         "marginTop": "15px",
                         "fontSize": chart_config.get("caption_font_size", 12),
@@ -475,7 +288,27 @@ def create_complete_dashboard() -> html.Div:
                 "borderRadius": "8px",
                 "padding": "20px",
                 "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)"
-            })
+            }),
+
+            # Interaction help section
+            html.Div([
+                html.Hr(style={"margin": "40px 0 20px 0"}),
+                dbc.Card([
+                    dbc.CardBody([
+                        html.H5("Interactive Features", className="card-title"),
+                        html.Ul([
+                            html.Li("Click metric cards for detailed breakdowns"),
+                            html.Li("Click pie chart slices to explore individual facilities"),
+                            html.Li("Click bar chart segments to analyze field types"),
+                            html.Li("Click table rows to view facility-specific data")
+                        ], className="mb-0")
+                    ])
+                ], style={
+                    "backgroundColor": "#F8F9FA",
+                    "border": "1px solid #E9ECEF",
+                    "marginBottom": "20px"
+                })
+            ])
 
         ], style={
             "backgroundColor": styling_config.get("background_light", "#FFFFFF"),
@@ -483,19 +316,89 @@ def create_complete_dashboard() -> html.Div:
             "fontFamily": chart_config.get("font_family", "Arial, sans-serif")
         })
 
-        logger.info("Complete dashboard created successfully")
-        return dashboard
+        logger.info("Enhanced dashboard layout created successfully")
+        return layout
 
     except Exception as e:
-        handle_error(logger, e, "complete dashboard creation")
+        handle_error(logger, e, "enhanced dashboard layout creation")
         return html.Div([
             dbc.Alert([
                 html.H2("Dashboard Error", className="alert-heading"),
-                html.P(f"Failed to initialize dashboard: {str(e)}"),
+                html.P(f"Failed to initialize interactive dashboard: {str(e)}"),
                 html.P("Please contact system administrator.", className="mb-0")
             ], color="danger")
         ], style={"padding": "50px"})
 
+def create_complete_dashboard() -> html.Div:
+    """Create complete interactive dashboard with error handling"""
+    try:
+        logger.info("Initializing complete interactive dashboard...")
+
+        # Validate data availability before rendering
+        validation_results = validate_dashboard_data()
+
+        if not validation_results.get("phase2_complete", False):
+            logger.warning("Phase 2 data validation failed - showing limited dashboard")
+            return html.Div([
+                dbc.Alert([
+                    html.H4("System Status", className="alert-heading"),
+                    html.P("Dashboard running in limited mode due to data validation issues."),
+                    html.Ul([
+                        html.Li(f"{component}: {'✅ OK' if status else '❌ Limited'}")
+                        for component, status in validation_results.items()
+                        if component != "phase2_complete"
+                    ])
+                ], color="warning", dismissable=True),
+                create_enhanced_dashboard_layout()  # Still show dashboard
+            ])
+
+        # Create full interactive dashboard
+        dashboard = create_enhanced_dashboard_layout()
+
+        # Wrap in error boundary with metadata
+        complete_dashboard = html.Div([
+            # Meta information
+            html.Div([
+                html.Meta(name="viewport", content="width=device-width, initial-scale=1"),
+                html.Title("Mining Reliability - Interactive Portfolio Overview")
+            ], style={"display": "none"}),
+
+            # Main dashboard content
+            dashboard,
+
+            # Footer with interaction status
+            html.Footer([
+                html.Hr(style={"margin": "40px 0 20px 0"}),
+                html.P([
+                    "Mining Reliability Database v1.0.0 | ",
+                    "Interactive Dashboard | ",
+                    html.Span(id="timestamp"),
+                    " | Click elements to explore data"
+                ], style={
+                    "textAlign": "center",
+                    "fontSize": "12px",
+                    "color": "#666666",
+                    "margin": "20px 0"
+                })
+            ])
+        ])
+
+        logger.info("Complete interactive dashboard created successfully")
+        return complete_dashboard
+
+    except Exception as e:
+        handle_error(logger, e, "complete interactive dashboard creation")
+
+        # Fallback error display
+        return html.Div([
+            dbc.Alert([
+                html.H2("Critical Dashboard Error", className="alert-heading"),
+                html.P(f"Failed to initialize interactive dashboard: {str(e)}"),
+                html.P("Please contact system administrator.", className="mb-0")
+            ], color="danger")
+        ], style={"padding": "50px"})
+
+# Legacy compatibility function
 def create_portfolio_layout() -> html.Div:
-    """Legacy compatibility function that maps to create_complete_dashboard"""
+    """Legacy compatibility function"""
     return create_complete_dashboard()
