@@ -4,11 +4,11 @@ Visual components for Mining Reliability Database dashboard.
 """
 
 from dashboard.components.portfolio_overview import (
-    create_metrics_cards,
-    create_field_distribution_chart,
-    create_facility_pie_chart,
-    create_historical_table,
-    create_portfolio_layout,
+    create_interactive_metrics_cards,
+    create_enhanced_field_distribution_chart,
+    create_enhanced_facility_pie_chart,
+    create_enhanced_historical_table,
+    create_enhanced_dashboard_layout,
     create_complete_dashboard
 )
 
@@ -30,11 +30,11 @@ from dashboard.components.graph_visualizer import (
 
 __all__ = [
     # Phase 4: Portfolio Overview (Implemented)
-    'create_metrics_cards',
-    'create_field_distribution_chart',
-    'create_facility_pie_chart',
-    'create_historical_table',
-    'create_portfolio_layout',
+    'create_interactive_metrics_cards',
+    'create_enhanced_field_distribution_chart',
+    'create_enhanced_facility_pie_chart',
+    'create_enhanced_historical_table',
+    'create_enhanced_dashboard_layout',
     'create_complete_dashboard',
 
     # Phase 5: Facility Detail (Placeholder)

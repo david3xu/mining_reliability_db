@@ -6,7 +6,8 @@ Page structure, navigation, and responsive design management.
 
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
+from functools import lru_cache
 
 # Dash components
 import dash
@@ -15,6 +16,7 @@ import dash_bootstrap_components as dbc
 
 # Import Phase 3 components
 from dashboard.components.portfolio_overview import create_complete_dashboard
+from dashboard.utils.data_transformers import get_facility_breakdown_data
 
 # Import styling system
 from dashboard.utils.styling import (
@@ -28,9 +30,53 @@ from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-def create_navigation_bar() -> dbc.NavbarSimple:
-    """Enhanced navigation bar with component access"""
+@lru_cache(maxsize=1)
+def get_facility_navigation_items() -> List[Tuple[str, int]]:
+    """Cached facility navigation generation with record counts"""
     try:
+        facility_data = get_facility_breakdown_data()
+        if not facility_data:
+            return []
+
+        # Return list of (facility_id, record_count) tuples
+        return list(zip(
+            facility_data.get("labels", []),
+            facility_data.get("values", [])
+        ))
+    except Exception as e:
+        handle_error(logger, e, "facility navigation data retrieval")
+        return []
+
+def create_navigation_bar() -> dbc.NavbarSimple:
+    """Enhanced navigation bar with dynamic facility detection"""
+    try:
+        # Get facility data with caching
+        facility_items = []
+        facilities = get_facility_navigation_items()
+
+        if facilities:
+            # Create menu items for each facility
+            for facility_id, record_count in facilities:
+                facility_items.append(
+                    dbc.DropdownMenuItem(
+                        f"{facility_id} ({record_count:,} records)",
+                        href=f"/facility/{facility_id}"
+                    )
+                )
+
+            # Add separator and "All Facilities" option
+            facility_items.extend([
+                dbc.DropdownMenuItem(divider=True),
+                dbc.DropdownMenuItem("All Facilities", href="/")
+            ])
+        else:
+            # Fallback if no facility data available
+            facility_items = [
+                dbc.DropdownMenuItem("No Facilities Available", disabled=True),
+                dbc.DropdownMenuItem(divider=True),
+                dbc.DropdownMenuItem("All Facilities", href="/")
+            ]
+
         navbar = dbc.NavbarSimple(
             children=[
                 # Main dashboard
@@ -42,17 +88,9 @@ def create_navigation_bar() -> dbc.NavbarSimple:
                     )
                 ),
 
-                # Facility analysis dropdown
+                # Dynamic facility analysis dropdown
                 dbc.DropdownMenu(
-                    children=[
-                        dbc.DropdownMenuItem("Sample Facility", href="/facility/sample"),
-                        dbc.DropdownMenuItem("Pinjarra", href="/facility/Pinjarra"),
-                        dbc.DropdownMenuItem("WA Mining", href="/facility/WA_Mining"),
-                        dbc.DropdownMenuItem("WGP", href="/facility/WGP"),
-                        dbc.DropdownMenuItem("Kwinana", href="/facility/Kwinana"),
-                        dbc.DropdownMenuItem(divider=True),
-                        dbc.DropdownMenuItem("All Facilities", href="/"),
-                    ],
+                    children=facility_items,
                     nav=True,
                     in_navbar=True,
                     label="Facility Analysis",
