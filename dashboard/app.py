@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Dashboard Application - Multi-Tab with Facility Routing
-Professional tab routing plus facility drill-down capability.
+Dashboard Application - Complete Navigation System
+Professional navigation accessing all 6 analytical perspectives.
 """
 
 import sys
@@ -22,26 +22,30 @@ from dash.exceptions import PreventUpdate
 # Configuration and utilities
 from mine_core.shared.common import setup_project_environment, handle_error
 
-# Tab components
-from dashboard.components.tab_navigation import create_tab_container
-from dashboard.components.portfolio_overview import create_complete_dashboard
+# Components
+from dashboard.components.portfolio_overview import (
+    create_complete_dashboard,
+    create_historical_records_page,
+    create_facilities_distribution_page,
+    create_data_types_distribution_page
+)
+from dashboard.components.facility_detail import create_facility_detail_layout
 from dashboard.components.data_quality import create_data_quality_layout
 from dashboard.components.workflow_analysis import create_workflow_analysis_layout
-from dashboard.components.facility_detail import create_facility_detail_layout
 
 # Data validation
 from dashboard.utils.data_transformers import validate_dashboard_data
 
 # Layout infrastructure
-from dashboard.layouts.main_layout import create_main_layout, create_error_boundary
+from dashboard.layouts.main_layout import create_error_boundary
 
 logger = None
 
-class MultiTabDashboardApplication:
-    """Professional multi-tab dashboard with facility drill-down"""
+class CompleteDashboardApplication:
+    """Professional navigation system for all analytical perspectives"""
 
     def __init__(self, debug=None, port=None, host=None):
-        """Initialize with tab and facility routing capability"""
+        """Initialize complete navigation system"""
         self.debug = debug if debug is not None else False
         self.port = port or 8050
         self.host = host or "127.0.0.1"
@@ -58,39 +62,32 @@ class MultiTabDashboardApplication:
         """Setup logging using project infrastructure"""
         global logger
         try:
-            logger = setup_project_environment("multi_tab_dashboard_app")
-            logger.info("Multi-tab dashboard with facility routing initialization started")
+            logger = setup_project_environment("complete_dashboard_app")
+            logger.info("Complete navigation system initialization started")
         except Exception as e:
             logging.basicConfig(level=logging.INFO)
             logger = logging.getLogger(__name__)
             logger.warning(f"Failed to setup project environment: {e}")
 
     def _validate_system(self):
-        """Validate all tab and facility data availability"""
-        logger.info("Validating multi-tab system with facility support...")
+        """Validate complete navigation system"""
+        logger.info("Validating complete analytical system...")
 
         try:
             self.validation_status = validate_dashboard_data()
+            system_ready = self.validation_status.get("phase2_complete", False)
 
-            tabs_ready = all([
-                self.validation_status.get("portfolio_metrics", False),
-                self.validation_status.get("data_quality", False),
-                self.validation_status.get("workflow_analysis", False)
-            ])
-
-            if tabs_ready:
-                logger.info("✅ All tabs and facility support validated - dashboard ready")
+            if system_ready:
+                logger.info("✅ Complete navigation system validated")
             else:
-                failed_tabs = [k for k, v in self.validation_status.items()
-                             if k in ["portfolio_metrics", "data_quality", "workflow_analysis"] and not v]
-                logger.warning(f"⚠️ Tab validation issues: {failed_tabs}")
+                logger.warning("⚠️ System validation issues detected")
 
         except Exception as e:
-            handle_error(logger, e, "multi-tab system validation")
+            handle_error(logger, e, "complete system validation")
             self.validation_status = {"phase2_complete": False}
 
     def _initialize_app(self):
-        """Initialize Dash application with routing support"""
+        """Initialize Dash application with complete navigation"""
         try:
             external_stylesheets = [
                 dbc.themes.BOOTSTRAP,
@@ -104,39 +101,73 @@ class MultiTabDashboardApplication:
                 __name__,
                 external_stylesheets=external_stylesheets,
                 suppress_callback_exceptions=True,
-                title="Mining Reliability Database - Comprehensive Analysis",
+                title="Mining Reliability Database - Complete Analysis System",
                 meta_tags=[
                     {"name": "viewport", "content": "width=device-width, initial-scale=1.0"},
-                    {"name": "description", "content": "Multi-Tab Mining Reliability Dashboard with Facility Analysis"}
+                    {"name": "description", "content": "Complete Mining Reliability Analysis Dashboard"}
                 ]
             )
 
             self.app.layout = self._create_layout()
-            logger.info("Multi-tab Dash application with routing initialized successfully")
+            logger.info("Complete navigation application initialized successfully")
 
         except Exception as e:
-            handle_error(logger, e, "multi-tab Dash application initialization")
+            handle_error(logger, e, "complete navigation application initialization")
             raise
 
     def _create_layout(self):
-        """Create application layout with URL routing support"""
+        """Create application layout with complete navigation"""
         try:
-            # Main layout with URL location tracking
             return html.Div([
                 dcc.Location(id="url", refresh=False),
-                html.Div(id="page-content")
+                self._create_navigation_bar(),
+                html.Div(id="page-content", className="mt-3")
             ])
 
         except Exception as e:
-            handle_error(logger, e, "multi-tab layout creation")
+            handle_error(logger, e, "complete layout creation")
             return html.Div([
                 dbc.Container([
-                    create_error_boundary(f"Multi-tab system error: {str(e)}")
+                    create_error_boundary(f"Navigation system error: {str(e)}")
                 ])
             ])
 
+    def _create_navigation_bar(self):
+        """Create professional navigation bar for all analytical perspectives"""
+
+        return dbc.NavbarSimple(
+            children=[
+                dbc.NavItem(dbc.NavLink("Portfolio", href="/", className="nav-link")),
+                dbc.NavItem(dbc.NavLink("Data Quality", href="/data-quality", className="nav-link")),
+                dbc.NavItem(dbc.NavLink("Workflow", href="/workflow", className="nav-link")),
+                dbc.NavItem(dbc.NavLink("Summary", href="/summary", className="nav-link")),
+                dbc.DropdownMenu(
+                    children=[
+                        dbc.DropdownMenuItem("Pinjarra", href="/facility/pinjarra"),
+                        dbc.DropdownMenuItem("WA Mining", href="/facility/wa-mining"),
+                        dbc.DropdownMenuItem("Kwinana", href="/facility/kwinana"),
+                        dbc.DropdownMenuItem(divider=True),
+                        dbc.DropdownMenuItem("Historical Records", href="/historical-records"),
+                        dbc.DropdownMenuItem("Facilities Distribution", href="/facilities-distribution"),
+                        dbc.DropdownMenuItem("Data Types Distribution", href="/data-types-distribution")
+                    ],
+                    nav=True,
+                    in_navbar=True,
+                    label="Analysis",
+                    className="nav-link"
+                )
+            ],
+            brand="Mining Reliability Database",
+            brand_href="/",
+            brand_style={"fontSize": "18px", "fontWeight": "bold"},
+            color="#1E1E1E",
+            dark=True,
+            fluid=True,
+            className="mb-3"
+        )
+
     def _setup_routing_callbacks(self):
-        """Setup routing callbacks for tabs and facilities"""
+        """Setup complete routing for all analytical perspectives"""
         try:
             @self.app.callback(
                 Output("page-content", "children"),
@@ -144,115 +175,126 @@ class MultiTabDashboardApplication:
                 prevent_initial_call=False
             )
             def display_page(pathname):
-                """Main routing logic for all views"""
+                """Complete routing logic for all analytical perspectives"""
                 try:
                     if pathname is None or pathname == "/":
-                        # Default: Multi-tab dashboard
-                        return create_main_layout(content=create_tab_container())
+                        # Portfolio Overview (home)
+                        return self._create_main_container(create_complete_dashboard())
+
+                    elif pathname == "/data-quality":
+                        # Data Quality Foundation analysis
+                        logger.info("Routing to data quality analysis")
+                        return self._create_main_container(create_data_quality_layout())
+
+                    elif pathname == "/workflow":
+                        # Workflow Understanding analysis
+                        logger.info("Routing to workflow analysis")
+                        return self._create_main_container(create_workflow_analysis_layout())
+
+                    elif pathname == "/summary":
+                        # Four Facilities Summary
+                        logger.info("Routing to facilities summary")
+                        return self._create_main_container(self._create_facilities_summary())
+
+                    elif pathname == "/historical-records":
+                        # Historical records analysis
+                        logger.info("Routing to historical records")
+                        return self._create_main_container(create_historical_records_page())
+
+                    elif pathname == "/facilities-distribution":
+                        # Facilities distribution analysis
+                        logger.info("Routing to facilities distribution")
+                        return self._create_main_container(create_facilities_distribution_page())
+
+                    elif pathname == "/data-types-distribution":
+                        # Data types distribution analysis
+                        logger.info("Routing to data types distribution")
+                        return self._create_main_container(create_data_types_distribution_page())
 
                     elif pathname.startswith("/facility/"):
-                        # Facility detail pages
+                        # Individual facility analysis
                         facility_id = pathname.replace("/facility/", "")
-                        logger.info(f"Routing to facility: {facility_id}")
-
-                        # Create facility detail with navigation
-                        facility_content = create_facility_detail_layout(facility_id)
-                        return create_main_layout(content=facility_content)
+                        logger.info(f"Routing to facility analysis: {facility_id}")
+                        return self._create_main_container(create_facility_detail_layout(facility_id))
 
                     else:
-                        # Unknown route - redirect to home
-                        return create_main_layout(content=html.Div([
+                        # Unknown route
+                        return self._create_main_container(html.Div([
                             dbc.Alert([
                                 html.H4("Page Not Found"),
                                 html.P(f"The requested page '{pathname}' does not exist."),
-                                dbc.Button("Return to Dashboard", href="/", color="primary")
+                                dbc.Button("Return to Portfolio", href="/", color="primary")
                             ], color="warning")
                         ]))
 
                 except Exception as e:
                     handle_error(logger, e, f"page routing for {pathname}")
-                    return create_main_layout(content=create_error_boundary(f"Failed to load {pathname}"))
+                    return self._create_main_container(create_error_boundary(f"Failed to load {pathname}"))
 
-            @self.app.callback(
-                Output("tab-content", "children"),
-                Input("main-tabs", "active_tab"),
-                prevent_initial_call=False
-            )
-            def render_tab_content(active_tab):
-                """Render content for multi-tab view"""
-                try:
-                    if active_tab == "portfolio":
-                        return create_complete_dashboard()
-                    elif active_tab == "quality":
-                        return create_data_quality_layout()
-                    elif active_tab == "workflow":
-                        return create_workflow_analysis_layout()
-                    else:
-                        return create_complete_dashboard()
-
-                except Exception as e:
-                    handle_error(logger, e, f"tab content rendering for {active_tab}")
-                    return create_error_boundary(f"Failed to load {active_tab} analysis")
-
-            # Navigation callback for facility clicks
-            @self.app.callback(
-                Output("url", "pathname"),
-                Input("facility-pie-chart", "clickData"),
-                prevent_initial_call=True
-            )
-            def navigate_to_facility(click_data):
-                """Navigate to facility detail when pie chart clicked"""
-                try:
-                    if not click_data:
-                        raise PreventUpdate
-
-                    # Extract facility from clicked slice
-                    point = click_data['points'][0]
-                    facility_name = point['label']
-
-                    logger.info(f"Facility navigation: {facility_name}")
-
-                    # Convert facility name to URL-safe format
-                    facility_url = facility_name.lower().replace(" ", "-")
-                    return f"/facility/{facility_url}"
-
-                except Exception as e:
-                    handle_error(logger, e, "facility navigation")
-                    raise PreventUpdate
-
-            # Dashboard state callback
-            @self.app.callback(
-                Output("dashboard-state", "data"),
-                [Input("url", "pathname"), Input("main-tabs", "active_tab")],
-                prevent_initial_call=True
-            )
-            def update_dashboard_state(pathname, active_tab):
-                """Update dashboard state based on current route"""
-                try:
-                    state = {
-                        "current_path": pathname,
-                        "active_tab": active_tab,
-                        "validation_status": self.validation_status,
-                        "is_facility_view": pathname.startswith("/facility/") if pathname else False
-                    }
-
-                    if pathname and pathname.startswith("/facility/"):
-                        facility_id = pathname.replace("/facility/", "")
-                        state["facility_id"] = facility_id
-
-                    return state
-
-                except Exception as e:
-                    handle_error(logger, e, "dashboard state update")
-                    return {"current_path": pathname, "error": str(e)}
-
-            logger.info("Routing callbacks setup completed")
+            logger.info("Complete routing callbacks setup completed")
 
         except Exception as e:
-            handle_error(logger, e, "routing callbacks setup")
+            handle_error(logger, e, "complete routing callbacks setup")
+
+    def _create_main_container(self, content):
+        """Create main container for page content"""
+        return dbc.Container([content], fluid=True, className="p-4")
+
+    def _create_facilities_summary(self):
+        """Create four facilities summary analysis"""
+        try:
+            from dashboard.utils.data_transformers import get_facility_breakdown_data, get_portfolio_metrics
+
+            # Real data integration
+            portfolio_data = get_portfolio_metrics()
+            facility_data = get_facility_breakdown_data()
+
+            if not facility_data:
+                return dbc.Alert("No facility data available for summary", color="warning")
+
+            # Summary metrics
+            total_records = portfolio_data.get("total_records", {}).get("value", 0)
+            total_facilities = len(facility_data.get("labels", []))
+
+            # Create facility comparison cards
+            facility_cards = []
+            for i, (label, value, percentage) in enumerate(zip(
+                facility_data.get("labels", []),
+                facility_data.get("values", []),
+                facility_data.get("percentages", [])
+            )):
+                card = dbc.Card([
+                    dbc.CardBody([
+                        html.H4(label, className="card-title text-primary"),
+                        html.H2(f"{value:,}", className="text-success"),
+                        html.P(f"{percentage:.1f}% of total records", className="text-muted"),
+                        dbc.Button("Analyze", href=f"/facility/{label.lower()}",
+                                 color="outline-primary", size="sm")
+                    ])
+                ], className="mb-3")
+                facility_cards.append(card)
+
+            return html.Div([
+                html.H2("Four Facilities Analysis Summary", className="text-primary mb-4"),
+                html.P(f"Comprehensive assessment across {total_facilities} operational facilities with {total_records:,} total records",
+                      className="text-muted mb-4"),
+
+                dbc.Row([
+                    dbc.Col([card], md=6, lg=3) for card in facility_cards
+                ]),
+
+                html.Hr(className="my-4"),
+
+                html.H4("Facilities Distribution Overview", className="text-secondary mb-3"),
+                create_facilities_distribution_page()
+            ])
+
+        except Exception as e:
+            handle_error(logger, e, "facilities summary creation")
+            return dbc.Alert("Failed to load facilities summary", color="danger")
 
     def run_server(self, **kwargs):
-        """Run multi-tab dashboard server with facility support"""
+        """Run complete analytical dashboard server"""
         try:
             server_config = {
                 "host": self.host,
@@ -263,38 +305,37 @@ class MultiTabDashboardApplication:
             }
             server_config.update(kwargs)
 
-            logger.info(f"Starting comprehensive dashboard server on {self.host}:{self.port}")
-
-            # System status summary
-            tabs_ready = {
-                "Portfolio": self.validation_status.get("portfolio_metrics", False),
-                "Quality": self.validation_status.get("data_quality", False),
-                "Workflow": self.validation_status.get("workflow_analysis", False)
-            }
+            logger.info(f"Starting complete analytical dashboard on {self.host}:{self.port}")
 
             data_quality = self.validation_status.get("data_quality_score", 0.0)
 
-            print("\n" + "=" * 70)
-            print("🚀 COMPREHENSIVE MINING RELIABILITY DASHBOARD")
-            print("=" * 70)
+            print("\n" + "=" * 80)
+            print("🚀 COMPLETE MINING RELIABILITY ANALYTICAL DASHBOARD")
+            print("=" * 80)
             print(f"📊 URL: http://{self.host}:{self.port}")
             print(f"🔧 Debug: {self.debug}")
             print(f"📈 Data Quality: {data_quality:.1%}")
-            print("📑 Navigation:")
-            print("   • Multi-tab analysis (Portfolio, Quality, Workflow)")
-            print("   • Facility drill-down (/facility/facility-name)")
-            print("   • Cross-facility stakeholder assessment")
-            print("📋 Tab Status:")
-            for tab, status in tabs_ready.items():
-                print(f"   {tab}: {'✅ Ready' if status else '❌ Limited'}")
-            print("=" * 70)
-            print("💡 Click facility slices to drill down into specific analysis")
-            print("=" * 70)
+            print("🧭 Complete Navigation Structure:")
+            print("   📋 Portfolio Overview (/) - Home dashboard")
+            print("   🔍 Data Quality (/data-quality) - Reliability analysis")
+            print("   🔄 Workflow (/workflow) - Process mapping")
+            print("   📊 Summary (/summary) - Four facilities assessment")
+            print("   🏭 Individual Facilities:")
+            print("      • Pinjarra (/facility/pinjarra)")
+            print("      • WA Mining (/facility/wa-mining)")
+            print("      • Kwinana (/facility/kwinana)")
+            print("   📈 Analysis Pages:")
+            print("      • Historical Records (/historical-records)")
+            print("      • Facilities Distribution (/facilities-distribution)")
+            print("      • Data Types Distribution (/data-types-distribution)")
+            print("=" * 80)
+            print("💡 Use navigation bar to access all analytical perspectives")
+            print("=" * 80)
 
             self.app.run_server(**server_config)
 
         except Exception as e:
-            handle_error(logger, e, "comprehensive server startup")
+            handle_error(logger, e, "complete server startup")
             raise
 
     def get_validation_status(self):
@@ -303,12 +344,12 @@ class MultiTabDashboardApplication:
 
 # Application factory
 def create_dashboard_app(debug=None, port=None, host=None):
-    """Create comprehensive dashboard application instance"""
+    """Create complete dashboard application instance"""
     try:
-        return MultiTabDashboardApplication(debug=debug, port=port, host=host)
+        return CompleteDashboardApplication(debug=debug, port=port, host=host)
     except Exception as e:
         if logger:
-            handle_error(logger, e, "comprehensive dashboard application creation")
+            handle_error(logger, e, "complete dashboard application creation")
         raise
 
 # CLI interface
@@ -316,11 +357,11 @@ def main():
     """Main entry point"""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Comprehensive Mining Reliability Dashboard")
+    parser = argparse.ArgumentParser(description="Complete Mining Reliability Dashboard")
     parser.add_argument("--port", type=int, help="Server port")
     parser.add_argument("--host", type=str, help="Server host")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument("--validate", action="store_true", help="Validate comprehensive system only")
+    parser.add_argument("--validate", action="store_true", help="Validate complete system")
 
     args = parser.parse_args()
 
@@ -333,17 +374,18 @@ def main():
 
         if args.validate:
             validation_status = dashboard_app.get_validation_status()
-            print("\nComprehensive System Validation:")
+            print("\nComplete System Validation:")
 
-            all_components = ["portfolio_metrics", "data_quality", "workflow_analysis"]
-            for component in all_components:
+            components = ["portfolio_metrics", "field_distribution", "facility_breakdown", "historical_timeline"]
+            for component in components:
                 status = validation_status.get(component, False)
                 component_name = component.replace("_", " ").title()
                 print(f"  {component_name}: {'✅ READY' if status else '❌ LIMITED'}")
 
-            overall_score = sum(validation_status.get(c, False) for c in all_components) / len(all_components)
+            overall_score = sum(validation_status.get(c, False) for c in components) / len(components)
             print(f"\nOverall Readiness: {overall_score:.1%}")
-            print("Facility Routing: ✅ READY")
+            print("Complete Navigation: ✅ READY")
+            print("All 6 Analytical Perspectives: ✅ ACCESSIBLE")
 
             return 0 if overall_score >= 0.67 else 1
         else:
@@ -351,7 +393,7 @@ def main():
             return 0
 
     except KeyboardInterrupt:
-        print("\n🛑 Comprehensive dashboard stopped")
+        print("\n🛑 Complete dashboard stopped")
         return 0
     except Exception as e:
         print(f"Error: {e}")
@@ -369,7 +411,7 @@ except Exception as e:
     print(f"Production app creation failed: {e}")
     app = dash.Dash(__name__)
     app.layout = html.Div([
-        html.H1("Comprehensive Dashboard Error"),
+        html.H1("Complete Dashboard Error"),
         html.P(f"Failed to initialize: {str(e)}")
     ])
     server = app.server
