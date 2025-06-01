@@ -176,6 +176,28 @@ def get_workflow_analysis_data() -> Dict[str, Any]:
         handle_error(logger, e, "real workflow analysis data generation")
         return {}
 
+def _process_action_request_categories(action_requests: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Helper function to process action request categories and analysis"""
+    category_distribution = {}
+    recurring_analysis = {}
+
+    for request in action_requests:
+        # Category analysis
+        category = request.get('categories', 'Unknown')
+        if category not in category_distribution:
+            category_distribution[category] = 0
+        category_distribution[category] += 1
+
+        # Extract additional analysis data
+        stage = request.get('stage', 'Unknown')
+        has_root_cause = request.get('has_root_cause_analysis', False)
+
+    return {
+        "category_distribution": category_distribution,
+        "total_records": len(action_requests),
+        "categories_count": len(category_distribution)
+    }
+
 def get_facility_analysis_data(facility_id: str) -> Dict[str, Any]:
     """Real facility-specific analysis using database queries"""
     try:
@@ -189,32 +211,16 @@ def get_facility_analysis_data(facility_id: str) -> Dict[str, Any]:
         causal_data = get_root_cause_intelligence_summary(facility_id)
 
         # Process real action request data for categories
-        category_distribution = {}
-        recurring_analysis = {}
-
-        for request in action_requests:
-            # Category analysis
-            category = request.get('categories', 'Unknown')
-            if category not in category_distribution:
-                category_distribution[category] = 0
-            category_distribution[category] += 1
-
-            # Extract additional analysis data
-            stage = request.get('stage', 'Unknown')
-            has_root_cause = request.get('has_root_cause_analysis', False)
-
-        # Calculate real facility metrics
-        total_records = len(action_requests)
-        categories_count = len(category_distribution)
+        processed_data = _process_action_request_categories(action_requests)
 
         # Real facility comparison
         all_facilities_data = get_operational_performance_dashboard()
 
         return {
             "facility_id": facility_id,
-            "total_records": total_records,
-            "categories_count": categories_count,
-            "category_distribution": category_distribution,
+            "total_records": processed_data["total_records"],
+            "categories_count": processed_data["categories_count"],
+            "category_distribution": processed_data["category_distribution"],
             "performance_data": performance_data,
             "causal_patterns": causal_data.get("causal_patterns", []),
             "temporal_trends": performance_data.get("temporal_trends", []),
@@ -341,3 +347,39 @@ def format_for_plotly_pie(facility_breakdown: Dict[str, Any]) -> Dict[str, Any]:
             "title": "Records Distribution by Site"
         }
     }
+
+def format_for_plotly_table(timeline_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Format timeline data for Plotly table visualization"""
+    return {
+        "data": timeline_data.get("rows", []),
+        "columns": [{"name": col, "id": col} for col in timeline_data.get("columns", [])],
+        "style_cell": {"textAlign": "left"},
+        "style_header": {"backgroundColor": "#f8f9fa", "fontWeight": "bold"}
+    }
+
+def get_styling_config() -> Dict[str, Any]:
+    """Get styling configuration through data layer"""
+    try:
+        from configs.environment import get_dashboard_styling_config
+        return get_dashboard_styling_config()
+    except Exception as e:
+        handle_error(logger, e, "styling configuration access")
+        return {}
+
+def get_chart_config() -> Dict[str, Any]:
+    """Get chart configuration through data layer"""
+    try:
+        from configs.environment import get_dashboard_chart_config
+        return get_dashboard_chart_config()
+    except Exception as e:
+        handle_error(logger, e, "chart configuration access")
+        return {}
+
+def get_system_config() -> Dict[str, Any]:
+    """Get system configuration through data layer"""
+    try:
+        from configs.environment import get_all_config
+        return get_all_config()
+    except Exception as e:
+        handle_error(logger, e, "system configuration access")
+        return {}

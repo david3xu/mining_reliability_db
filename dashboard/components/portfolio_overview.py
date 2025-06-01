@@ -27,16 +27,17 @@ from dashboard.utils.data_transformers import (
     get_field_distribution_data,
     get_facility_breakdown_data,
     get_historical_timeline_data,
-    validate_dashboard_data
+    validate_dashboard_data,
+    get_styling_config,
+    get_chart_config
 )
 
 # Configuration
-from configs.environment import get_dashboard_styling_config, get_dashboard_chart_config
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-def create_interactive_metrics_cards() -> List[dbc.Card]:
+def create_metrics_cards() -> List[dbc.Card]:
     """Create interactive metric cards with click functionality"""
     try:
         logger.info("Creating interactive metrics cards...")
@@ -68,7 +69,7 @@ def create_interactive_metrics_cards() -> List[dbc.Card]:
         handle_error(logger, e, "interactive metrics cards creation")
         return []
 
-def create_enhanced_field_distribution_chart() -> dcc.Graph:
+def create_field_distribution_chart() -> dcc.Graph:
     """Create interactive field distribution bar chart"""
     try:
         logger.info("Creating enhanced field distribution chart...")
@@ -83,14 +84,14 @@ def create_enhanced_field_distribution_chart() -> dcc.Graph:
         # Create interactive bar chart
         chart = create_interactive_bar_chart(field_data)
 
-        logger.info("Enhanced field distribution chart created successfully")
+        logger.info("Field distribution chart created successfully")
         return chart
 
     except Exception as e:
-        handle_error(logger, e, "enhanced field distribution chart creation")
+        handle_error(logger, e, "field distribution chart creation")
         return dcc.Graph(figure={})
 
-def create_enhanced_facility_pie_chart() -> dcc.Graph:
+def create_facility_pie_chart() -> dcc.Graph:
     """Create interactive facility pie chart"""
     try:
         logger.info("Creating enhanced facility pie chart...")
@@ -105,14 +106,14 @@ def create_enhanced_facility_pie_chart() -> dcc.Graph:
         # Create interactive pie chart
         chart = create_interactive_pie_chart(facility_data)
 
-        logger.info("Enhanced facility pie chart created successfully")
+        logger.info("Facility pie chart created successfully")
         return chart
 
     except Exception as e:
-        handle_error(logger, e, "enhanced facility pie chart creation")
+        handle_error(logger, e, "facility pie chart creation")
         return dcc.Graph(figure={})
 
-def create_enhanced_historical_table() -> dash_table.DataTable:
+def create_historical_table() -> dash_table.DataTable:
     """Create interactive historical timeline table"""
     try:
         logger.info("Creating enhanced historical timeline table...")
@@ -127,7 +128,7 @@ def create_enhanced_historical_table() -> dash_table.DataTable:
         # Create interactive table
         table = create_interactive_timeline_table(timeline_data)
 
-        logger.info("Enhanced historical table created successfully")
+        logger.info("Historical table created successfully")
         return table
 
     except Exception as e:
@@ -148,8 +149,8 @@ def create_enhanced_dashboard_layout() -> html.Div:
         logger.info("Creating enhanced dashboard layout...")
 
         # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        styling_config = get_styling_config()
+        chart_config = get_chart_config()
 
         # Validate data before rendering
         validation_results = validate_dashboard_data()
@@ -166,10 +167,10 @@ def create_enhanced_dashboard_layout() -> html.Div:
             ], style={"padding": "50px"})
 
         # Create interactive components
-        metric_cards = create_interactive_metrics_cards()
-        field_chart = create_enhanced_field_distribution_chart()
-        facility_chart = create_enhanced_facility_pie_chart()
-        timeline_table = create_enhanced_historical_table()
+        metric_cards = create_metrics_cards()
+        field_chart = create_field_distribution_chart()
+        facility_chart = create_facility_pie_chart()
+        timeline_table = create_historical_table()
 
         # Main layout with enhanced interactivity
         layout = html.Div([

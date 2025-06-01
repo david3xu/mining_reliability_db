@@ -210,7 +210,8 @@ def create_quality_summary_table() -> dash_table.DataTable:
                 action_requests = get_action_requests(facility_id=facility_id, limit=10000)
                 unique_actions = len(set(req.get('number', '') for req in action_requests))
                 avg_records_per_action = incident_count / unique_actions if unique_actions > 0 else 0
-            except:
+            except Exception as e:
+                handle_error(logger, e, f"action request analysis for {facility_id}")
                 unique_actions = 0
                 avg_records_per_action = 0
 

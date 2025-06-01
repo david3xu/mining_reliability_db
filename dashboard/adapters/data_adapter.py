@@ -63,7 +63,8 @@ class DashboardDataAdapter:
                     try:
                         year = int(date_str[:4])
                         years_found.add(year)
-                    except:
+                    except Exception as e:
+                        handle_error(logger, e, "Failed to parse year from date string", {"date_str": date_str})
                         continue
 
             year_coverage = len(years_found) if years_found else 0
@@ -208,7 +209,8 @@ class DashboardDataAdapter:
                         timeline_data[facility_id][year] += 1
                         year_totals[year] += 1
                         facility_totals[facility_id] += 1
-                    except:
+                    except Exception as e:
+                        handle_error(logger, e, "Failed to parse year from action request date", {"date_str": date_str})
                         continue
 
             if year_totals:

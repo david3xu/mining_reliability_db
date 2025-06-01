@@ -10,7 +10,7 @@ from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 
-from configs.environment import get_dashboard_styling_config, get_dashboard_chart_config
+from dashboard.utils.data_transformers import get_styling_config, get_chart_config
 from dashboard.utils.url_builders import build_facility_url, build_detail_url
 from mine_core.shared.common import handle_error
 
@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 def create_interactive_metric_card(metric_data: Dict[str, Any], card_id: str) -> dbc.Card:
     """Create clickable metric card with hover effects"""
     try:
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        styling_config = get_styling_config()
+        chart_config = get_chart_config()
 
         value = metric_data.get("value", 0)
         label = metric_data.get("label", "Unknown")
@@ -92,8 +92,8 @@ def create_interactive_metric_card(metric_data: Dict[str, Any], card_id: str) ->
 def create_interactive_pie_chart(facility_data: Dict[str, Any]) -> dcc.Graph:
     """Create clickable pie chart with enhanced interactivity"""
     try:
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        styling_config = get_styling_config()
+        chart_config = get_chart_config()
 
         if not facility_data:
             return dcc.Graph(figure={})
@@ -183,8 +183,8 @@ def create_interactive_pie_chart(facility_data: Dict[str, Any]) -> dcc.Graph:
 def create_interactive_bar_chart(field_data: Dict[str, Any]) -> dcc.Graph:
     """Create clickable bar chart with enhanced interactivity"""
     try:
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        styling_config = get_styling_config()
+        chart_config = get_chart_config()
 
         if not field_data:
             return dcc.Graph(figure={})
@@ -272,8 +272,8 @@ def create_interactive_bar_chart(field_data: Dict[str, Any]) -> dcc.Graph:
 def create_interactive_timeline_table(timeline_data: Dict[str, Any]) -> dash_table.DataTable:
     """Create clickable timeline table with enhanced interactivity"""
     try:
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        styling_config = get_styling_config()
+        chart_config = get_chart_config()
 
         if not timeline_data:
             return dash_table.DataTable(data=[])
