@@ -64,20 +64,6 @@ def create_interactive_metric_card(metric_data: Dict[str, Any], card_id: str) ->
                 )
             )
 
-        # Add click indicator
-        card_content.append(
-            html.Small(
-                "Click for details",
-                style={
-                    "fontSize": "10px",
-                    "color": styling_config.get("text_light", "#FFFFFF"),
-                    "opacity": "0.7",
-                    "fontStyle": "italic",
-                    "marginTop": "5px"
-                }
-            )
-        )
-
         # Interactive card with hover effects
         return dbc.Card(
             dbc.CardBody(card_content),
@@ -119,8 +105,7 @@ def create_interactive_pie_chart(facility_data: Dict[str, Any]) -> dcc.Graph:
         hover_template = (
             "<b>%{label}</b><br>"
             "Records: %{value}<br>"
-            "Percentage: %{percent}<br>"
-            "<i>Click to explore facility</i>"
+            "Percentage: %{percent}"
             "<extra></extra>"
         )
 
@@ -149,7 +134,7 @@ def create_interactive_pie_chart(facility_data: Dict[str, Any]) -> dcc.Graph:
         # Enhanced layout with interaction hints
         fig.update_layout(
             title={
-                "text": "Records Distribution by Site<br><sub>Click slices to explore facilities</sub>",
+                "text": "Records Distribution by Site",
                 "font": {
                     "family": chart_config.get("font_family", "Arial, sans-serif"),
                     "size": chart_config.get("title_font_size", 18),
@@ -237,7 +222,7 @@ def create_interactive_bar_chart(field_data: Dict[str, Any]) -> dcc.Graph:
         # Enhanced layout
         fig.update_layout(
             title={
-                "text": "Data Types Distribution<br><sub>Click bars to analyze field types</sub>",
+                "text": "Data Types Distribution",
                 "font": {
                     "family": chart_config.get("font_family", "Arial, sans-serif"),
                     "size": chart_config.get("title_font_size", 18),
@@ -370,10 +355,6 @@ def create_interactive_timeline_table(timeline_data: Dict[str, Any]) -> dash_tab
                 "overflowY": "auto",
                 "border": f"1px solid {styling_config.get('border_color', '#CCCCCC')}",
                 "borderRadius": "8px"
-            },
-            tooltip_header={
-                col: f"Click {col} column to sort. Click facility rows to explore details."
-                for col in columns
             }
         )
 
