@@ -197,7 +197,7 @@ def create_enhanced_dashboard_layout() -> html.Div:
                     }
                 ),
                 html.H4(
-                    "Comprehensive Analysis Across Operational Facilities - Click to Explore",
+                    "Comprehensive Analysis Across Operational Facilities",
                     style={
                         "fontSize": chart_config.get("subtitle_font_size", 18),
                         "fontWeight": "normal",
@@ -235,16 +235,6 @@ def create_enhanced_dashboard_layout() -> html.Div:
                         "marginBottom": "30px",
                         "gap": "15px"
                     }
-                ),
-                html.P(
-                    "💡 Click metric cards for detailed analysis",
-                    style={
-                        "textAlign": "center",
-                        "fontSize": chart_config.get("caption_font_size", 12),
-                        "color": styling_config.get("text_secondary", "#666666"),
-                        "fontStyle": "italic",
-                        "marginTop": "10px"
-                    }
                 )
             ], style={"marginBottom": "40px"}),
 
@@ -271,44 +261,14 @@ def create_enhanced_dashboard_layout() -> html.Div:
                         "fontSize": chart_config.get("subtitle_font_size", 18)
                     }
                 ),
-                timeline_table,
-                html.P(
-                    "💡 Click facility rows to explore detailed analysis",
-                    style={
-                        "marginTop": "15px",
-                        "fontSize": chart_config.get("caption_font_size", 12),
-                        "color": styling_config.get("text_secondary", "#666666"),
-                        "fontStyle": "italic",
-                        "textAlign": "center"
-                    }
-                )
+                timeline_table
             ], style={
                 "marginTop": "30px",
                 "backgroundColor": styling_config.get("background_light", "#FFFFFF"),
                 "borderRadius": "8px",
                 "padding": "20px",
                 "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)"
-            }),
-
-            # Interaction help section
-            html.Div([
-                html.Hr(style={"margin": "40px 0 20px 0"}),
-                dbc.Card([
-                    dbc.CardBody([
-                        html.H5("Interactive Features", className="card-title"),
-                        html.Ul([
-                            html.Li("Click metric cards for detailed breakdowns"),
-                            html.Li("Click pie chart slices to explore individual facilities"),
-                            html.Li("Click bar chart segments to analyze field types"),
-                            html.Li("Click table rows to view facility-specific data")
-                        ], className="mb-0")
-                    ])
-                ], style={
-                    "backgroundColor": "#F8F9FA",
-                    "border": "1px solid #E9ECEF",
-                    "marginBottom": "20px"
-                })
-            ])
+            })
 
         ], style={
             "backgroundColor": styling_config.get("background_light", "#FFFFFF"),
@@ -372,8 +332,7 @@ def create_complete_dashboard() -> html.Div:
                 html.P([
                     "Mining Reliability Database v1.0.0 | ",
                     "Interactive Dashboard | ",
-                    html.Span(id="timestamp"),
-                    " | Click elements to explore data"
+                    html.Span(id="timestamp")
                 ], style={
                     "textAlign": "center",
                     "fontSize": "12px",
