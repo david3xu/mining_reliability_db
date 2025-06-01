@@ -16,6 +16,7 @@ def get_facilities() -> List[Dict[str, Any]]:
     """Get all facilities with operational metrics"""
     query = """
     MATCH (f:Facility)
+    WHERE NOT '_SchemaTemplate' IN labels(f)
     OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
     WITH f, count(ar) AS incident_count
     RETURN f.facility_id AS id,
@@ -30,6 +31,7 @@ def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
     """Get facility details with operational summary"""
     query = """
     MATCH (f:Facility {facility_id: $facility_id})
+    WHERE NOT '_SchemaTemplate' IN labels(f)
     OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
     OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
     WITH f, count(DISTINCT ar) AS total_incidents,
@@ -444,28 +446,42 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
         # Single facility analysis
         query = """
         MATCH (f:Facility {facility_id: $facility_id})
+        WHERE NOT '_SchemaTemplate' IN labels(f)
         OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
         OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
         OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
 
+        WITH f, ar, p, rc, ap, v
+        // Calculate workflow completion based on progression through stages
+        WITH f,
+             count(DISTINCT ar) AS total_action_requests,
+             count(DISTINCT p) AS total_problems,
+             count(DISTINCT rc) AS total_root_causes,
+             count(DISTINCT ap) AS total_action_plans,
+             count(DISTINCT v) AS total_verifications,
+             // Completion rate: ActionRequests that reached ActionPlan stage
+             count(DISTINCT CASE WHEN ap IS NOT NULL THEN ar END) AS completed_to_plan,
+             // Effectiveness rate: ActionPlans that reached Verification stage
+             count(DISTINCT CASE WHEN v IS NOT NULL THEN ap END) AS completed_to_verification
+
         RETURN {
-            facility_id: f.facility_id,
-            facility_name: f.facility_name,
-            total_action_requests: count(DISTINCT ar),
-            total_problems: count(DISTINCT p),
-            total_root_causes: count(DISTINCT rc),
-            total_action_plans: count(DISTINCT ap),
-            total_verifications: count(DISTINCT v),
-            completed_action_plans: count(DISTINCT CASE WHEN ap.complete = true THEN ap END),
-            effective_verifications: count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END),
+            facility_id: COALESCE(f.facility_id, f.name, 'unknown'),
+            facility_name: COALESCE(f.facility_name, f.name, 'Unknown Facility'),
+            total_action_requests: total_action_requests,
+            total_problems: total_problems,
+            total_root_causes: total_root_causes,
+            total_action_plans: total_action_plans,
+            total_verifications: total_verifications,
+            completed_action_plans: completed_to_plan,
+            effective_verifications: completed_to_verification,
             completion_rate: CASE
-                WHEN count(DISTINCT ap) > 0
-                THEN round(count(DISTINCT CASE WHEN ap.complete = true THEN ap END) * 100.0 / count(DISTINCT ap), 1)
+                WHEN total_action_requests > 0
+                THEN round(completed_to_plan * 100.0 / total_action_requests, 1)
                 ELSE 0.0
             END,
             effectiveness_rate: CASE
-                WHEN count(DISTINCT v) > 0
-                THEN round(count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END) * 100.0 / count(DISTINCT v), 1)
+                WHEN total_action_plans > 0
+                THEN round(completed_to_verification * 100.0 / total_action_plans, 1)
                 ELSE 0.0
             END
         } AS facility_stats
@@ -475,6 +491,7 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
         # All facilities analysis
         query = """
         MATCH (f:Facility)
+        WHERE NOT '_SchemaTemplate' IN labels(f)
         OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
         OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
         OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
@@ -485,13 +502,15 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
              count(DISTINCT rc) AS facility_root_causes,
              count(DISTINCT ap) AS facility_action_plans,
              count(DISTINCT v) AS facility_verifications,
-             count(DISTINCT CASE WHEN ap.complete = true THEN ap END) AS facility_completed_plans,
-             count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END) AS facility_effective_verifications
+             // Completion rate: ActionRequests that reached ActionPlan stage
+             count(DISTINCT CASE WHEN ap IS NOT NULL THEN ar END) AS facility_completed_plans,
+             // Effectiveness rate: ActionPlans that reached Verification stage
+             count(DISTINCT CASE WHEN v IS NOT NULL THEN ap END) AS facility_effective_verifications
 
         RETURN {
             facilities: collect({
-                facility_id: f.facility_id,
-                facility_name: f.facility_name,
+                facility_id: COALESCE(f.facility_id, f.name, 'unknown'),
+                facility_name: COALESCE(f.facility_name, f.name, 'Unknown Facility'),
                 total_action_requests: facility_action_requests,
                 total_problems: facility_problems,
                 total_root_causes: facility_root_causes,
@@ -500,13 +519,13 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
                 completed_action_plans: facility_completed_plans,
                 effective_verifications: facility_effective_verifications,
                 completion_rate: CASE
-                    WHEN facility_action_plans > 0
-                    THEN round(facility_completed_plans * 100.0 / facility_action_plans, 1)
+                    WHEN facility_action_requests > 0
+                    THEN round(facility_completed_plans * 100.0 / facility_action_requests, 1)
                     ELSE 0.0
                 END,
                 effectiveness_rate: CASE
-                    WHEN facility_verifications > 0
-                    THEN round(facility_effective_verifications * 100.0 / facility_verifications, 1)
+                    WHEN facility_action_plans > 0
+                    THEN round(facility_effective_verifications * 100.0 / facility_action_plans, 1)
                     ELSE 0.0
                 END
             }),
@@ -520,13 +539,13 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
                 total_completed_plans: sum(facility_completed_plans),
                 total_effective_verifications: sum(facility_effective_verifications),
                 average_completion_rate: CASE
-                    WHEN sum(facility_action_plans) > 0
-                    THEN round(sum(facility_completed_plans) * 100.0 / sum(facility_action_plans), 1)
+                    WHEN sum(facility_action_requests) > 0
+                    THEN round(sum(facility_completed_plans) * 100.0 / sum(facility_action_requests), 1)
                     ELSE 0.0
                 END,
                 average_effectiveness_rate: CASE
-                    WHEN sum(facility_verifications) > 0
-                    THEN round(sum(facility_effective_verifications) * 100.0 / sum(facility_verifications), 1)
+                    WHEN sum(facility_action_plans) > 0
+                    THEN round(sum(facility_effective_verifications) * 100.0 / sum(facility_action_plans), 1)
                     ELSE 0.0
                 END
             }

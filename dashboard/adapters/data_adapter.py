@@ -680,7 +680,8 @@ class DashboardDataAdapter:
 
             # Get entity classification config for ordering and display
             entity_config = get_entity_classification()
-            entity_order = entity_config.get("entity_order", [])
+            # Extract entity order from the correct nested path
+            entity_order = entity_config.get("entity_types", {}).get("workflow_entities", {}).get("order", [])
 
             # Structure the response with configuration
             structured_entities = []
@@ -722,39 +723,40 @@ class DashboardDataAdapter:
 
             # Get entity classification for display configuration
             entity_classification = get_entity_classification()
-            entity_order = entity_classification.get("entity_order", [])
+            # Extract entity order from the correct nested path
+            entity_order = entity_classification.get("entity_types", {}).get("workflow_entities", {}).get("order", [])
 
             # Structure workflow stages with Neo4j completion rates
             workflow_stages = []
-            stage_number = 1
 
-            for entity_name in entity_order:
-                if entity_name in workflow_config.get("stages", {}):
-                    stage_config = workflow_config["stages"][entity_name]
+            # Get workflow stages config as array
+            stage_configs = workflow_config.get("workflow_stages", [])
 
-                    # Get Neo4j completion rate for this entity
-                    completion_rate = 0.0
-                    entity_count = 0
-                    if entity_name in entity_completion_data:
-                        entity_info = entity_completion_data[entity_name]
-                        completion_rate = entity_info.get("completion_rate", 0.0)
-                        entity_count = entity_info.get("total_count", 0)
+            for stage_config in stage_configs:
+                entity_name = stage_config.get("entity_name", "")
 
-                    workflow_stages.append({
-                        "stage_number": stage_number,
-                        "entity_name": entity_name,
-                        "title": stage_config.get("title", entity_name),
-                        "description": stage_config.get("description", ""),
-                        "completion_rate": completion_rate,
-                        "entity_count": entity_count,
-                        "source_fields": stage_config.get("source_fields", []),
-                        "display_title": stage_config.get("display_title", entity_name),
-                        "color": stage_config.get("color", "#4A90E2"),
-                        "card_min_height": stage_config.get("card_min_height", "300px"),
-                        "header_bg_opacity": stage_config.get("header_bg_opacity", 0.3),
-                        "show_description": stage_config.get("show_description", False)
-                    })
-                    stage_number += 1
+                # Get Neo4j completion rate for this entity
+                completion_rate = 0.0
+                entity_count = 0
+                if entity_name in entity_completion_data:
+                    entity_info = entity_completion_data[entity_name]
+                    completion_rate = entity_info.get("completion_rate", 0.0)
+                    entity_count = entity_info.get("total_count", 0)
+
+                workflow_stages.append({
+                    "stage_number": stage_config.get("stage_number", 1),
+                    "entity_name": entity_name,
+                    "title": stage_config.get("title", entity_name),
+                    "description": stage_config.get("description", ""),
+                    "completion_rate": completion_rate,
+                    "entity_count": entity_count,
+                    "source_fields": stage_config.get("business_fields", []),
+                    "display_title": stage_config.get("title", entity_name),
+                    "color": stage_config.get("color", "#4A90E2"),
+                    "card_min_height": stage_config.get("card_min_height", "300px"),
+                    "header_bg_opacity": stage_config.get("header_bg_opacity", 0.3),
+                    "show_description": stage_config.get("show_description", False)
+                })
 
             # Get display configuration
             display_config = workflow_config.get("display_config", {})
@@ -869,3 +871,23 @@ class DashboardDataAdapter:
         except Exception as e:
             handle_error(logger, e, "entity completion rate calculation")
             return 0.0
+
+# Adapter Factory Pattern - Singleton instance management
+_adapter_instance = None
+
+def get_data_adapter() -> DashboardDataAdapter:
+    """Get singleton adapter instance with efficient memory management"""
+    global _adapter_instance
+
+    if _adapter_instance is None:
+        logger.info("Creating new DashboardDataAdapter instance")
+        _adapter_instance = DashboardDataAdapter()
+
+    return _adapter_instance
+
+def reset_adapter():
+    """Reset adapter instance (useful for testing or config changes)"""
+    global _adapter_instance
+    if _adapter_instance:
+        logger.info("Resetting DashboardDataAdapter instance")
+        _adapter_instance = None
