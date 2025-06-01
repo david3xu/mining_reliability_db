@@ -9,10 +9,6 @@ import json
 import threading
 from pathlib import Path
 from typing import Dict, Any, Optional, List
-from mine_core.shared.constants import (
-    DEFAULT_NEO4J_URI, DEFAULT_NEO4J_USER, DEFAULT_NEO4J_PASSWORD,
-    DEFAULT_LOG_LEVEL, DEFAULT_DATA_DIR, DEFAULT_BATCH_SIZE, CONNECTION_TIMEOUT, MAX_RETRIES
-)
 
 # Load .env file if available
 try:
@@ -28,7 +24,20 @@ class ConfigurationManager:
         self._schema_cache: Optional[Dict[str, Any]] = None
         self._mappings_cache: Optional[Dict[str, Any]] = None
         self._dashboard_cache: Optional[Dict[str, Any]] = None
+        self._system_constants_cache: Optional[Dict[str, Any]] = None
+        self._workflow_stages_cache: Optional[Dict[str, Any]] = None
+        self._entity_classification_cache: Optional[Dict[str, Any]] = None
+        self._entity_connections_cache: Optional[Dict[str, Any]] = None
+        self._field_analysis_cache: Optional[Dict[str, Any]] = None
         self._lock = threading.Lock()
+
+    def get_system_constants(self) -> Dict[str, Any]:
+        """Load system constants configuration with thread-safe caching"""
+        if self._system_constants_cache is None:
+            with self._lock:
+                if self._system_constants_cache is None:
+                    self._system_constants_cache = self._load_json_config("system_constants.json")
+        return self._system_constants_cache
 
     def get_schema(self) -> Dict[str, Any]:
         """Load schema configuration with thread-safe caching"""
@@ -54,12 +63,49 @@ class ConfigurationManager:
                     self._dashboard_cache = self._load_json_config("dashboard_config.json")
         return self._dashboard_cache
 
+    def get_workflow_stages_config(self) -> Dict[str, Any]:
+        """Load workflow stages configuration with thread-safe caching"""
+        if self._workflow_stages_cache is None:
+            with self._lock:
+                if self._workflow_stages_cache is None:
+                    self._workflow_stages_cache = self._load_json_config("workflow_stages.json")
+        return self._workflow_stages_cache
+
+    def get_entity_classification(self) -> Dict[str, Any]:
+        """Load entity classification with thread-safe caching"""
+        if self._entity_classification_cache is None:
+            with self._lock:
+                if self._entity_classification_cache is None:
+                    self._entity_classification_cache = self._load_json_config("entity_classification.json")
+        return self._entity_classification_cache
+
+    def get_entity_connections(self) -> Dict[str, Any]:
+        """Load entity connections with thread-safe caching"""
+        if self._entity_connections_cache is None:
+            with self._lock:
+                if self._entity_connections_cache is None:
+                    self._entity_connections_cache = self._load_json_config("entity_connections.json")
+        return self._entity_connections_cache
+
+    def get_field_analysis_config(self) -> Dict[str, Any]:
+        """Load field analysis configuration with thread-safe caching"""
+        if self._field_analysis_cache is None:
+            with self._lock:
+                if self._field_analysis_cache is None:
+                    self._field_analysis_cache = self._load_json_config("field_analysis.json")
+        return self._field_analysis_cache
+
     def clear_cache(self):
         """Clear configuration cache (useful for testing)"""
         with self._lock:
             self._schema_cache = None
             self._mappings_cache = None
             self._dashboard_cache = None
+            self._system_constants_cache = None
+            self._workflow_stages_cache = None
+            self._entity_classification_cache = None
+            self._entity_connections_cache = None
+            self._field_analysis_cache = None
 
     def _load_json_config(self, filename: str) -> Dict[str, Any]:
         """Load JSON configuration file with error handling"""
@@ -89,6 +135,23 @@ class ConfigurationManager:
 # Singleton configuration manager
 _config_manager = ConfigurationManager()
 
+def get_system_constants() -> Dict[str, Any]:
+    """Load system constants configuration with optimized caching"""
+    return _config_manager.get_system_constants()
+
+def _get_constant(path: str, default: Any = None) -> Any:
+    """Get a value from system constants using dot notation (e.g., 'database.default_uri')"""
+    constants = get_system_constants()
+    keys = path.split('.')
+    value = constants
+
+    try:
+        for key in keys:
+            value = value[key]
+        return value
+    except (KeyError, TypeError):
+        return default
+
 def get_env(key: str, default: str = None) -> str:
     """Load environment variable with default - primary access method"""
     return os.environ.get(key, default)
@@ -110,39 +173,39 @@ def validate_required_env(required_vars: List[str]) -> bool:
 def get_db_config() -> Dict[str, str]:
     """Get database configuration from environment"""
     return {
-        "uri": get_env("NEO4J_URI", DEFAULT_NEO4J_URI),
-        "user": get_env("NEO4J_USER", DEFAULT_NEO4J_USER),
-        "password": get_env("NEO4J_PASSWORD", DEFAULT_NEO4J_PASSWORD)
+        "uri": get_env("NEO4J_URI", _get_constant("database.default_uri", "bolt://localhost:7687")),
+        "user": get_env("NEO4J_USER", _get_constant("database.default_user", "neo4j")),
+        "password": get_env("NEO4J_PASSWORD", _get_constant("database.default_password", "password"))
     }
 
 def get_data_dir() -> str:
     """Get data directory path"""
-    return get_env("DATA_DIR", DEFAULT_DATA_DIR)
+    return get_env("DATA_DIR", _get_constant("database.default_data_dir", "data"))
 
 def get_log_level() -> str:
     """Get logging level"""
-    return get_env("LOG_LEVEL", DEFAULT_LOG_LEVEL)
+    return get_env("LOG_LEVEL", _get_constant("database.default_log_level", "INFO"))
 
 def get_batch_size() -> int:
     """Get processing batch size"""
     try:
-        return int(get_env("BATCH_SIZE", str(DEFAULT_BATCH_SIZE)))
+        return int(get_env("BATCH_SIZE", str(_get_constant("processing.batch_size", 1000))))
     except ValueError:
-        return DEFAULT_BATCH_SIZE
+        return _get_constant("processing.batch_size", 1000)
 
 def get_connection_timeout() -> int:
     """Get database connection timeout"""
     try:
-        return int(get_env("CONNECTION_TIMEOUT", str(CONNECTION_TIMEOUT)))
+        return int(get_env("CONNECTION_TIMEOUT", str(_get_constant("processing.connection_timeout", 30))))
     except ValueError:
-        return CONNECTION_TIMEOUT
+        return _get_constant("processing.connection_timeout", 30)
 
 def get_max_retries() -> int:
     """Get maximum retry attempts"""
     try:
-        return int(get_env("MAX_RETRIES", str(MAX_RETRIES)))
+        return int(get_env("MAX_RETRIES", str(_get_constant("processing.max_retries", 3))))
     except ValueError:
-        return MAX_RETRIES
+        return _get_constant("processing.max_retries", 3)
 
 def get_root_cause_delimiters() -> List[str]:
     """Get configurable root cause extraction delimiters"""
@@ -161,9 +224,29 @@ def get_mappings() -> Dict[str, Any]:
     """Load field mappings configuration with optimized caching"""
     return _config_manager.get_mappings()
 
+def get_field_mappings() -> Dict[str, Any]:
+    """Load field mappings configuration (alias for get_mappings)"""
+    return get_mappings()
+
 def get_dashboard_config() -> Dict[str, Any]:
     """Load dashboard configuration with optimized caching"""
     return _config_manager.get_dashboard_config()
+
+def get_workflow_stages_config() -> Dict[str, Any]:
+    """Load workflow stages configuration with optimized caching"""
+    return _config_manager.get_workflow_stages_config()
+
+def get_entity_classification() -> Dict[str, Any]:
+    """Load entity classification configuration with optimized caching"""
+    return _config_manager.get_entity_classification()
+
+def get_entity_connections() -> Dict[str, Any]:
+    """Load entity connections configuration with optimized caching"""
+    return _config_manager.get_entity_connections()
+
+def get_field_analysis_config() -> Dict[str, Any]:
+    """Public function to access field analysis configuration"""
+    return _config_manager.get_field_analysis_config()
 
 # Dashboard-specific configuration functions
 def get_dashboard_server_config() -> Dict[str, Any]:
@@ -258,6 +341,7 @@ def get_all_config() -> Dict[str, Any]:
         "cache_status": {
             "schema_loaded": _config_manager._schema_cache is not None,
             "mappings_loaded": _config_manager._mappings_cache is not None,
-            "dashboard_loaded": _config_manager._dashboard_cache is not None
+            "dashboard_loaded": _config_manager._dashboard_cache is not None,
+            "workflow_stages_loaded": _config_manager._workflow_stages_cache is not None
         }
     }

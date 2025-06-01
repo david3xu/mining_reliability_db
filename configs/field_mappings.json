@@ -1,5 +1,10 @@
 {
   "cascade_labeling": {
+    "Facility": {
+      "label_priority": ["Facility Name", "Location"],
+      "required_fields": ["Facility Name"],
+      "entity_type": "Facility"
+    },
     "ActionRequest": {
       "label_priority": ["Title", "Action Request Number:", "Categories"],
       "required_fields": ["Action Request Number:"],
@@ -21,8 +26,8 @@
       "entity_type": "ActionPlan"
     },
     "Verification": {
-      "label_priority": ["IsActionPlanEffective", "Action Plan Eval Comment"],
-      "required_fields": ["IsActionPlanEffective"],
+      "label_priority": ["Action Plan Eval Comment", "IsActionPlanEffective"],
+      "required_fields": ["Action Plan Eval Comment"],
       "entity_type": "Verification"
     },
     "Department": {
@@ -57,6 +62,11 @@
     }
   },
   "entity_mappings": {
+    "Facility": {
+      "facility_name": "Facility Name",
+      "location": "Location",
+      "active": "Active"
+    },
     "ActionRequest": {
       "action_request_number": "Action Request Number:",
       "title": "Title",
@@ -126,7 +136,8 @@
     "identification_fields": [
       "Action Request Number:",
       "Title",
-      "Asset Number(s)"
+      "Asset Number(s)",
+      "Asset Activity numbers"
     ],
     "temporal_fields": [
       "Initiation Date",
@@ -153,6 +164,7 @@
       "Is Resp Satisfactory?",
       "IsActionPlanEffective",
       "Did this action plan require a change to the equipment management strategy ?",
+      "Did this action plan require a change to the equipment management strategy ? (review)",
       "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?"
     ],
     "descriptive_fields": [
@@ -167,12 +179,10 @@
       "Action Plan Eval Comment",
       "Reason if not Satisfactory",
       "Recurring Comment",
-      "Amount of Loss"
+      "Amount of Loss",
+      "If yes, APSS Doc #"
     ],
-    "quantitative_fields": [
-      "Days Past Due",
-      "Requested Response Time"
-    ]
+    "quantitative_fields": ["Days Past Due", "Requested Response Time"]
   },
   "missing_data_handling": {
     "temporal_fields": "DATA_NOT_AVAILABLE",

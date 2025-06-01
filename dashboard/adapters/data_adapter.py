@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Dashboard Data Adapter - Extended with Facility-Specific Methods
-Extends existing real data access with facility drill-down capability.
+Dashboard Data Adapter - Extended with Workflow Methods
+Clean adapter pattern implementation for all dashboard data needs.
 """
 
 import logging
@@ -17,17 +17,23 @@ from mine_core.database.queries import (
     get_facilities,
     get_operational_performance_dashboard,
     get_action_requests,
-    get_root_cause_intelligence_summary
+    get_root_cause_intelligence_summary,
+    get_field_completion_statistics,
+    get_entity_completion_rates,
+    get_facility_action_statistics
 )
 from mine_core.shared.common import handle_error
-from configs.environment import get_mappings
+from configs.environment import (
+    get_mappings, get_schema, get_entity_names, get_workflow_stages_config,
+    get_entity_classification, get_entity_connections, get_field_analysis_config
+)
 
 logger = logging.getLogger(__name__)
 
 class DashboardDataAdapter:
     """
-    Extended data access layer with facility-specific methods.
-    Maintains single point of coupling to mine_core business logic.
+    Complete data access layer with workflow-specific methods.
+    Single point of coupling to mine_core business logic.
     """
 
     def __init__(self):
@@ -254,7 +260,7 @@ class DashboardDataAdapter:
             handle_error(logger, e, "historical timeline generation")
             return self._create_empty_timeline_data()
 
-    # NEW FACILITY-SPECIFIC METHODS
+    # EXISTING FACILITY-SPECIFIC METHODS
     def get_facility_performance_analysis(self, facility_id: str) -> Dict[str, Any]:
         """Get facility-specific performance analysis using real data"""
         try:
@@ -289,6 +295,7 @@ class DashboardDataAdapter:
                 "total_records": total_records,
                 "category_distribution": category_distribution,
                 "category_percentages": category_percentages,
+                "categories_count": len(category_distribution),
                 "performance_metrics": performance_data,
                 "causal_patterns": causal_data.get("causal_patterns", []),
                 "temporal_trends": performance_data.get("temporal_trends", []),
@@ -344,6 +351,222 @@ class DashboardDataAdapter:
             handle_error(logger, e, f"facility comparison for {facility_id}")
             return {}
 
+    # NEW WORKFLOW METHODS - CLEAN ADAPTER PATTERN
+    def get_workflow_schema_analysis(self) -> Dict[str, Any]:
+        """Get workflow schema analysis for process flow visualization"""
+        try:
+            logger.info("Adapter: Generating workflow schema analysis")
+
+            # Access configuration through adapter
+            schema = get_schema()
+            mappings = get_mappings()
+            entity_names = get_entity_names()
+
+            # Real schema data
+            entity_mappings = mappings.get("entity_mappings", {})
+
+            # Count unique field names across all entities (not field mappings per entity)
+            unique_fields = set()
+            for field_mapping in entity_mappings.values():
+                unique_fields.update(field_mapping.values())
+            total_fields = len(unique_fields)
+
+            # Real entity count from schema
+            entities_count = len(entity_names)
+
+            # Real analytical dimensions
+            analytical_dimensions = schema.get("analytical_dimensions", {})
+
+            # Core workflow entities in business order
+            workflow_entities = [
+                {"name": "ActionRequest", "title": "Incident Reporting", "stage": 1},
+                {"name": "Problem", "title": "Problem Definition", "stage": 2},
+                {"name": "RootCause", "title": "Causal Analysis", "stage": 3},
+                {"name": "ActionPlan", "title": "Resolution Planning", "stage": 4},
+                {"name": "Verification", "title": "Effectiveness Check", "stage": 5}
+            ]
+
+            # Get real entity definitions from schema
+            entities = schema.get("entities", [])
+            entity_dict = {e["name"]: e for e in entities}
+
+            # Enrich workflow entities with real data
+            enriched_workflow = []
+            for workflow_entity in workflow_entities:
+                entity_name = workflow_entity["name"]
+                entity_def = entity_dict.get(entity_name, {})
+
+                # Real field count from schema
+                properties = entity_def.get("properties", {})
+                field_count = len(properties)
+
+                # Business required fields (exclude primary keys and foreign keys)
+                required_fields = 0
+                for prop_name, prop_info in properties.items():
+                    if prop_info.get("required", False):
+                        # Skip primary keys and foreign keys - these are technical requirements
+                        is_primary_key = prop_info.get("primary_key", False)
+                        is_foreign_key = prop_name.endswith("_id") and not is_primary_key
+
+                        # Only count business fields as required
+                        if not is_primary_key and not is_foreign_key:
+                            required_fields += 1
+
+                # Enhanced entity data
+                enriched_entity = {
+                    **workflow_entity,
+                    "field_count": field_count,
+                    "required_fields": required_fields,
+                    "properties": properties,
+                    "complexity_level": "complex" if field_count >= 8 else "moderate" if field_count >= 5 else "simple"
+                }
+
+                enriched_workflow.append(enriched_entity)
+
+            return {
+                "workflow_entities": enriched_workflow,
+                "total_entities": entities_count,
+                "total_fields": total_fields,
+                "analytical_dimensions": len(analytical_dimensions),
+                "field_categories": len(mappings.get('field_categories', {})),
+                "metadata": ComponentMetadata(
+                    source="configs.schema",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if entities_count > 0 else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "workflow schema analysis")
+            return {}
+
+    def get_entity_field_distribution(self) -> Dict[str, Any]:
+        """Get entity field distribution for bar chart visualization"""
+        try:
+            logger.info("Adapter: Generating entity field distribution")
+
+            # Real schema data through adapter
+            schema = get_schema()
+            entities = schema.get("entities", [])
+
+            if not entities:
+                return {}
+
+            entity_names = []
+            field_counts = []
+
+            for entity in entities:
+                entity_name = entity["name"]
+                properties = entity.get("properties", {})
+
+                field_count = len(properties)
+
+                entity_names.append(entity_name)
+                field_counts.append(field_count)
+
+            return {
+                "entity_names": entity_names,
+                "field_counts": field_counts,
+                "total_entities": len(entities),
+                "metadata": ComponentMetadata(
+                    source="configs.schema",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if entities else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "entity field distribution")
+            return {}
+
+    def get_field_mapping_analysis(self) -> Dict[str, Any]:
+        """Get field mapping analysis for detailed table"""
+        try:
+            logger.info("Adapter: Generating field mapping analysis")
+
+            # Real field mappings through adapter
+            mappings = get_mappings()
+            entity_mappings = mappings.get("entity_mappings", {})
+            field_categories = mappings.get("field_categories", {})
+
+            if not entity_mappings:
+                return {}
+
+            # Build field category lookup
+            category_lookup = {}
+            for category, fields in field_categories.items():
+                for field in fields:
+                    category_lookup[field] = category.replace("_fields", "").title()
+
+            # Analyze mappings
+            mapping_analysis = []
+            for entity_name, field_mapping in entity_mappings.items():
+                for target_field, source_field in field_mapping.items():
+
+                    # Determine field category
+                    field_category = category_lookup.get(source_field, "General")
+
+                    # Determine if critical based on field name patterns
+                    critical_patterns = ["number", "id", "cause", "plan", "date"]
+                    is_critical = any(pattern in target_field.lower()
+                                    for pattern in critical_patterns)
+
+                    mapping_analysis.append({
+                        "entity": entity_name,
+                        "target_field": target_field,
+                        "source_field": source_field,
+                        "category": field_category,
+                        "critical": is_critical
+                    })
+
+            return {
+                "mappings": mapping_analysis,
+                "total_mappings": len(mapping_analysis),
+                "entities_covered": len(entity_mappings),
+                "categories_found": len(set(m["category"] for m in mapping_analysis)),
+                "critical_fields": sum(1 for m in mapping_analysis if m["critical"]),
+                "metadata": ComponentMetadata(
+                    source="configs.mappings",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if mapping_analysis else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "field mapping analysis")
+            return {}
+
+    def get_field_mapping_counts(self) -> Dict[str, Any]:
+        """Get field mapping counts for workflow metrics - encapsulates mapping access"""
+        try:
+            logger.info("Adapter: Analyzing field mapping counts")
+
+            # Access configuration through adapter (not directly in component)
+            mappings = get_mappings()
+            entity_mappings = mappings.get("entity_mappings", {})
+
+            # Count source fields
+            raw_source_fields = []
+            for entity_name, mapping in entity_mappings.items():
+                raw_source_fields.extend(mapping.values())
+
+            # Return total unique source fields
+            total_fields = len(set(raw_source_fields))
+
+            return {
+                "total_fields": total_fields,
+                "entity_mappings": entity_mappings,
+                "source_fields": list(set(raw_source_fields))
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "field mapping counts analysis")
+            return {
+                "total_fields": 0,
+                "entity_mappings": {},
+                "source_fields": []
+            }
+
     def validate_data_availability(self) -> ValidationResult:
         """Validate data availability for dashboard components"""
         try:
@@ -351,7 +574,10 @@ class DashboardDataAdapter:
                 "portfolio_metrics": False,
                 "facility_breakdown": False,
                 "field_distribution": False,
-                "historical_timeline": False
+                "historical_timeline": False,
+                "workflow_schema": False,
+                "entity_distribution": False,
+                "field_mapping": False
             }
 
             portfolio_data = self.get_portfolio_metrics()
@@ -365,6 +591,16 @@ class DashboardDataAdapter:
 
             timeline_data = self.get_historical_timeline()
             validation_status["historical_timeline"] = timeline_data.total_records > 0
+
+            # New workflow validations
+            workflow_data = self.get_workflow_schema_analysis()
+            validation_status["workflow_schema"] = bool(workflow_data.get("total_entities", 0) > 0)
+
+            entity_data = self.get_entity_field_distribution()
+            validation_status["entity_distribution"] = bool(entity_data.get("total_entities", 0) > 0)
+
+            mapping_data = self.get_field_mapping_analysis()
+            validation_status["field_mapping"] = bool(mapping_data.get("total_mappings", 0) > 0)
 
             all_valid = all(validation_status.values())
 
@@ -432,12 +668,204 @@ class DashboardDataAdapter:
             )
         )
 
-# Singleton instance for application use
-_adapter_instance = None
+    # NEO4J-DRIVEN ANALYTICS METHODS
 
-def get_data_adapter() -> DashboardDataAdapter:
-    """Get singleton data adapter instance."""
-    global _adapter_instance
-    if _adapter_instance is None:
-        _adapter_instance = DashboardDataAdapter()
-    return _adapter_instance
+    def get_entity_completion_analysis(self) -> Dict[str, Any]:
+        """Get entity completion analysis using Neo4j data and configuration"""
+        try:
+            logger.info("Adapter: Getting Neo4j entity completion analysis")
+
+            # Get Neo4j entity completion rates
+            entity_data = get_entity_completion_rates()
+
+            # Get entity classification config for ordering and display
+            entity_config = get_entity_classification()
+            entity_order = entity_config.get("entity_order", [])
+
+            # Structure the response with configuration
+            structured_entities = []
+            for entity_name in entity_order:
+                if entity_name in entity_data:
+                    entity_info = entity_data[entity_name]
+                    structured_entities.append({
+                        "entity_name": entity_name,
+                        "total_count": entity_info.get("total_count", 0),
+                        "completion_rate": entity_info.get("completion_rate", 0.0),
+                        "completed_fields": entity_info.get("completed_fields", 0),
+                        "total_fields": entity_info.get("total_fields", 0)
+                    })
+
+            return {
+                "entities": structured_entities,
+                "entity_config": entity_config,
+                "metadata": ComponentMetadata(
+                    source="neo4j.entity_completion_rates",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if entity_data else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "Neo4j entity completion analysis")
+            return {}
+
+    def get_workflow_business_analysis_neo4j(self) -> Dict[str, Any]:
+        """Get workflow business analysis using Neo4j entity completion rates"""
+        try:
+            logger.info("Adapter: Getting Neo4j workflow business analysis")
+
+            # Get workflow stages configuration
+            workflow_config = get_workflow_stages_config()
+
+            # Get Neo4j entity completion rates
+            entity_completion_data = get_entity_completion_rates()
+
+            # Get entity classification for display configuration
+            entity_classification = get_entity_classification()
+            entity_order = entity_classification.get("entity_order", [])
+
+            # Structure workflow stages with Neo4j completion rates
+            workflow_stages = []
+            stage_number = 1
+
+            for entity_name in entity_order:
+                if entity_name in workflow_config.get("stages", {}):
+                    stage_config = workflow_config["stages"][entity_name]
+
+                    # Get Neo4j completion rate for this entity
+                    completion_rate = 0.0
+                    entity_count = 0
+                    if entity_name in entity_completion_data:
+                        entity_info = entity_completion_data[entity_name]
+                        completion_rate = entity_info.get("completion_rate", 0.0)
+                        entity_count = entity_info.get("total_count", 0)
+
+                    workflow_stages.append({
+                        "stage_number": stage_number,
+                        "entity_name": entity_name,
+                        "title": stage_config.get("title", entity_name),
+                        "description": stage_config.get("description", ""),
+                        "completion_rate": completion_rate,
+                        "entity_count": entity_count,
+                        "source_fields": stage_config.get("source_fields", []),
+                        "display_title": stage_config.get("display_title", entity_name),
+                        "color": stage_config.get("color", "#4A90E2"),
+                        "card_min_height": stage_config.get("card_min_height", "300px"),
+                        "header_bg_opacity": stage_config.get("header_bg_opacity", 0.3),
+                        "show_description": stage_config.get("show_description", False)
+                    })
+                    stage_number += 1
+
+            # Get display configuration
+            display_config = workflow_config.get("display_config", {})
+
+            return {
+                "workflow_stages": workflow_stages,
+                "display_config": display_config,
+                "entity_completion_summary": entity_completion_data,
+                "metadata": ComponentMetadata(
+                    source="neo4j.workflow_business_analysis",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if workflow_stages else 0.0
+                )
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "Neo4j workflow business analysis")
+            return {}
+
+    def get_facility_statistics_analysis(self, facility_id: str = None) -> Dict[str, Any]:
+        """Get facility statistics analysis using Neo4j aggregation"""
+        try:
+            logger.info(f"Adapter: Getting Neo4j facility statistics for {facility_id or 'all facilities'}")
+
+            # Get Neo4j facility statistics
+            facilities_data = get_facility_action_statistics(facility_id)
+
+            if not facilities_data:
+                return {}
+
+            if facility_id:
+                # Single facility analysis
+                return {
+                    "facility": facilities_data,
+                    "analysis_type": "single_facility",
+                    "metadata": ComponentMetadata(
+                        source="neo4j.facility_action_statistics",
+                        generated_at=self._get_timestamp(),
+                        data_quality=1.0
+                    )
+                }
+            else:
+                # All facilities analysis
+                facilities_list = facilities_data.get("facilities", [])
+                aggregate_data = facilities_data.get("aggregate", {})
+
+                # Calculate performance distributions
+                completion_rates = [f.get("completion_rate", 0) for f in facilities_list]
+                effectiveness_rates = [f.get("effectiveness_rate", 0) for f in facilities_list]
+
+                avg_completion = sum(completion_rates) / len(completion_rates) if completion_rates else 0
+                avg_effectiveness = sum(effectiveness_rates) / len(effectiveness_rates) if effectiveness_rates else 0
+
+                total_facilities = len(facilities_list)
+                total_incidents = aggregate_data.get("total_action_requests", 0)
+
+                return {
+                    "facilities": facilities_list,
+                    "performance_summary": {
+                        "average_completion_rate": round(avg_completion, 1),
+                        "average_effectiveness_rate": round(avg_effectiveness, 1),
+                        "completion_rate_distribution": completion_rates,
+                        "effectiveness_rate_distribution": effectiveness_rates
+                    },
+                    "aggregate_metrics": {
+                        "total_facilities": total_facilities,
+                        "total_incidents": total_incidents,
+                        "average_completion_rate": avg_completion,
+                        "average_effectiveness_rate": avg_effectiveness
+                    },
+                    "metadata": ComponentMetadata(
+                        source="neo4j.facility_action_statistics",
+                        generated_at=self._get_timestamp(),
+                        data_quality=1.0 if facilities_data else 0.0
+                    )
+                }
+
+        except Exception as e:
+            handle_error(logger, e, "Neo4j facility statistics analysis")
+            return {}
+
+    # DEPRECATED METHODS - TO BE REMOVED AFTER MIGRATION
+    def get_workflow_business_analysis(self) -> Dict[str, Any]:
+        """DEPRECATED: Use get_workflow_business_analysis_neo4j() instead"""
+        logger.warning("Using deprecated Python-based workflow analysis. Migrating to Neo4j...")
+        return self.get_workflow_business_analysis_neo4j()
+
+    def _calculate_entity_completion_rate(self, entity_name: str, source_fields: List[str]) -> float:
+        """DEPRECATED: Neo4j entity completion rates used instead"""
+        logger.warning("Using deprecated Python completion rate calculation. Use Neo4j entity completion rates instead.")
+        try:
+            # Get action requests for completion rate calculation (reused calculation logic)
+            action_requests = get_action_requests(limit=10000)
+
+            if not source_fields or not action_requests:
+                return 0.0
+
+            # Count records with at least one value in fields
+            records_with_data = 0
+            for request in action_requests:
+                has_data = False
+                for field in source_fields:
+                    if field in request and request[field]:
+                        has_data = True
+                        break
+                if has_data:
+                    records_with_data += 1
+
+            # Calculate completion rate
+            return round((records_with_data / len(action_requests) * 100), 1) if action_requests else 0
+
+        except Exception as e:
+            handle_error(logger, e, "entity completion rate calculation")
+            return 0.0

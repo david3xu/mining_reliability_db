@@ -108,6 +108,41 @@ class CompleteDashboardApplication:
                 ]
             )
 
+            # Add custom CSS for hover effects
+            self.app.index_string = '''
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    {%metas%}
+                    <title>{%title%}</title>
+                    {%favicon%}
+                    {%css%}
+                    <style>
+                        .metric-card-hover:hover {
+                            transform: translateY(-2px) !important;
+                            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2) !important;
+                        }
+                        .metric-card-hover {
+                            transition: all 0.3s ease !important;
+                        }
+                        .metric-card-interactive:hover {
+                            transform: translateY(-3px);
+                            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+                            border-color: #ffffff40 !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    {%app_entry%}
+                    <footer>
+                        {%config%}
+                        {%scripts%}
+                        {%renderer%}
+                    </footer>
+                </body>
+            </html>
+            '''
+
             self.app.layout = self._create_layout()
             logger.info("Complete navigation application initialized successfully")
 
@@ -190,6 +225,12 @@ class CompleteDashboardApplication:
                         # Workflow Understanding analysis
                         logger.info("Routing to workflow analysis")
                         return self._create_main_container(create_workflow_analysis_layout())
+
+                    elif pathname == "/workflow-process":
+                        # Dedicated workflow process analysis
+                        logger.info("Routing to workflow process analysis")
+                        from dashboard.components.workflow_analysis import create_workflow_process_page
+                        return self._create_main_container(create_workflow_process_page())
 
                     elif pathname == "/summary":
                         # Four Facilities Summary

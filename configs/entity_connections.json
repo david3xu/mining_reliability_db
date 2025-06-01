@@ -1,0 +1,16 @@
+{
+  "supporting_connections": {
+    "Facility": "ActionRequest",
+    "Department": "ActionRequest",
+    "Asset": "Problem",
+    "RecurringStatus": "Problem",
+    "AmountOfLoss": "Problem",
+    "Review": "ActionPlan",
+    "EquipmentStrategy": "ActionPlan"
+  },
+  "connection_display": {
+    "show_arrows": true,
+    "connection_symbol": "→",
+    "connection_style": "text-white-50"
+  }
+}

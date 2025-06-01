@@ -70,6 +70,13 @@ make import
 # or: python scripts/import_data.py
 ```
 
+## Dashboard
+
+```bash
+python dashboard/app.py --debug
+
+```
+
 ## Architecture
 
 ### Configuration Authority

@@ -1,0 +1,35 @@
+{
+  "entity_types": {
+    "workflow_entities": {
+      "order": [
+        "ActionRequest",
+        "Problem",
+        "RootCause",
+        "ActionPlan",
+        "Verification"
+      ],
+      "display_type": "main_process",
+      "card_height": 300,
+      "show_arrows": true
+    },
+    "supporting_entities": {
+      "entities": [
+        "Facility",
+        "Department",
+        "Asset",
+        "RecurringStatus",
+        "AmountOfLoss",
+        "Review",
+        "EquipmentStrategy"
+      ],
+      "display_type": "secondary_data",
+      "card_height": 120,
+      "show_connections": true
+    }
+  },
+  "layout_config": {
+    "workflow_row_title": "Core Workflow Process",
+    "supporting_row_title": "Supporting Data Entities",
+    "main_title": "Complete Entity Architecture"
+  }
+}

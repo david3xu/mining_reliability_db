@@ -9,6 +9,7 @@ from dash import dcc, html, dash_table
 import plotly.graph_objects as go
 from dashboard.components.layout_template import create_standard_layout, create_metric_card
 from mine_core.shared.common import handle_error
+from dashboard.adapters import get_data_adapter
 
 # Real data sources
 from mine_core.database.queries import (
@@ -72,57 +73,58 @@ def create_quality_metrics_cards() -> list:
         return []
 
 def create_field_completeness_chart() -> dcc.Graph:
-    """Field completeness analysis using real data quality intelligence"""
-
+    """Neo4j-driven field completion chart with configuration-based styling"""
     try:
-        # Real quality data from database
-        quality_data = get_missing_data_quality_intelligence()
+        # Get completion data through adapter (Neo4j-driven)
+        adapter = get_data_adapter()
+        completion_data = adapter.get_field_completion_analysis()
 
-        if not quality_data:
+        if not completion_data or not completion_data.get("field_names"):
             return dcc.Graph(figure={})
 
-        # Real completion rates from database
-        completeness_metrics = {
-            "Problem Definition": quality_data.get("problem_definition_completeness", 0),
-            "Causal Analysis": quality_data.get("causal_analysis_completeness", 0),
-            "Action Planning": quality_data.get("action_planning_completeness", 0),
-            "Verification": quality_data.get("verification_completeness", 0),
-            "Title Fields": 100 - quality_data.get("title_missing_rate", 0),
-            "Category Fields": 100 - quality_data.get("category_missing_rate", 0),
-            "Root Cause Fields": 100 - quality_data.get("root_cause_missing_rate", 0)
-        }
+        field_names = completion_data["field_names"]
+        completion_rates = completion_data["completion_rates"]
+        chart_config = completion_data["chart_config"]
+        color_config = completion_data["color_config"]
+        threshold_config = completion_data["threshold_config"]
 
-        fields = list(completeness_metrics.keys())
-        completion_rates = list(completeness_metrics.values())
-
-        # Color mapping based on completion rate
+        # Generate colors using configuration thresholds
         colors = []
         for rate in completion_rates:
-            if rate >= 80:
-                colors.append('#7ED321')  # Green for good
-            elif rate >= 60:
-                colors.append('#F5A623')  # Orange for moderate
-            else:
-                colors.append('#D0021B')  # Red for poor
+            colors.append(_get_completion_color(rate, threshold_config, color_config))
 
         fig = go.Figure()
 
         fig.add_trace(go.Bar(
+            y=field_names,
             x=completion_rates,
-            y=fields,
             orientation='h',
             marker=dict(color=colors),
-            text=[f"{rate:.1f}%" for rate in completion_rates],
+            text=[f"{rate}%" for rate in completion_rates],
             textposition='inside',
-            hovertemplate="<b>%{y}</b><br>Completion: %{x:.1f}%<extra></extra>"
+            hovertemplate="<b>%{y}</b><br>Completion: %{x}%<extra></extra>"
         ))
 
         fig.update_layout(
-            title="Field Completion Rates - Real Database Analysis",
-            xaxis_title="Completion Rate (%)",
-            yaxis_title="",
-            height=400,
-            margin=dict(l=200, r=50, t=50, b=50),
+            title="Field Completion Rates (Neo4j Analysis - Excluding 100% Complete)",
+            xaxis=dict(
+                title="Completion Rate (%)",
+                range=[0, chart_config["max_completion"]],
+                tickmode='linear',
+                tick0=0,
+                dtick=chart_config["tick_interval"]
+            ),
+            yaxis=dict(
+                title="",
+                automargin=True
+            ),
+            height=max(chart_config["min_height"], len(field_names) * chart_config["row_height"]),
+            margin=dict(
+                l=chart_config["margin_left"],
+                r=chart_config["margin_right"],
+                t=chart_config["margin_top"],
+                b=chart_config["margin_bottom"]
+            ),
             showlegend=False,
             paper_bgcolor='white',
             plot_bgcolor='white'
@@ -131,8 +133,21 @@ def create_field_completeness_chart() -> dcc.Graph:
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        handle_error(logger, e, "field completeness chart creation")
+        handle_error(logger, e, "Neo4j field completeness chart creation")
         return dcc.Graph(figure={})
+
+def _get_completion_color(rate: float, thresholds: dict, colors: dict) -> str:
+    """Get color based on configuration thresholds"""
+    if rate <= thresholds["very_low"]:
+        return colors["very_low"]
+    elif rate <= thresholds["low"]:
+        return colors["low"]
+    elif rate <= thresholds["medium"]:
+        return colors["medium"]
+    elif rate <= thresholds["good"]:
+        return colors["good"]
+    else:
+        return colors["high"]
 
 def create_facility_quality_comparison() -> dcc.Graph:
     """Facility quality comparison using real facility data"""
