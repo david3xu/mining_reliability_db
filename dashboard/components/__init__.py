@@ -1,16 +1,25 @@
 """
 Dashboard Components Package
-Visual components for Mining Reliability Database multi-tab dashboard.
+Visual components for Mining Reliability Database - Interactive Navigation Hub.
 """
 
-# FIXED: Updated imports to match actual function names in portfolio_overview.py
+# Portfolio Overview (Updated with navigation pages)
 from dashboard.components.portfolio_overview import (
+    create_complete_dashboard,
+    create_clean_metrics_section,
+    create_enhanced_field_distribution_chart,
+    create_enhanced_facility_pie_chart,
+    create_enhanced_historical_table,
+    create_historical_trends_chart,
+    create_historical_records_page,
+    create_facilities_distribution_page,
+    create_data_types_distribution_page,
+    # Legacy compatibility
     create_metrics_cards,
     create_field_distribution_chart,
     create_facility_pie_chart,
     create_historical_table,
-    create_enhanced_dashboard_layout,
-    create_complete_dashboard
+    create_portfolio_layout
 )
 
 # Multi-tab components
@@ -26,8 +35,8 @@ from dashboard.components.workflow_analysis import (
     create_workflow_analysis_layout,
     create_workflow_metrics_cards,
     create_process_flow_diagram,
-    create_entity_field_distribution,
-    create_field_mapping_table
+    create_stage_field_distribution,
+    create_workflow_mapping_table
 )
 
 from dashboard.components.tab_navigation import (
@@ -50,7 +59,8 @@ from dashboard.components.facility_detail import (
     create_facility_detail_layout,
     create_facility_metrics_cards,
     create_facility_category_chart,
-    create_recurring_issues_analysis
+    create_recurring_issues_analysis,
+    create_operating_centre_table
 )
 
 # Graph visualization (placeholder)
@@ -61,14 +71,33 @@ from dashboard.components.graph_visualizer import (
     create_network_analysis_dashboard
 )
 
+# Interactive elements
+from dashboard.components.interactive_elements import (
+    create_interactive_metric_card,
+    create_interactive_pie_chart,
+    create_interactive_bar_chart,
+    create_interactive_timeline_table
+)
+
 __all__ = [
-    # Portfolio Overview (Fixed function names)
-    'create_interactive_metrics_cards',
+    # Portfolio Overview (Navigation Hub)
+    'create_complete_dashboard',
+    'create_clean_metrics_section',
     'create_enhanced_field_distribution_chart',
     'create_enhanced_facility_pie_chart',
     'create_enhanced_historical_table',
-    'create_enhanced_dashboard_layout',
-    'create_complete_dashboard',
+
+    # Dedicated Analysis Pages
+    'create_historical_records_page',
+    'create_facilities_distribution_page',
+    'create_data_types_distribution_page',
+
+    # Legacy Compatibility
+    'create_metrics_cards',
+    'create_field_distribution_chart',
+    'create_facility_pie_chart',
+    'create_historical_table',
+    'create_portfolio_layout',
 
     # Data Quality Foundation
     'create_data_quality_layout',
@@ -99,13 +128,20 @@ __all__ = [
 
     # Facility Detail
     'create_facility_detail_layout',
-    'create_facility_overview_card',
-    'create_incident_timeline_chart',
-    'create_workflow_analysis_table',
+    'create_facility_metrics_cards',
+    'create_facility_category_chart',
+    'create_recurring_issues_analysis',
+    'create_operating_centre_table',
 
     # Graph Visualization (Placeholder)
     'create_causal_network_graph',
     'create_correlation_heatmap',
     'create_root_cause_flow_diagram',
-    'create_network_analysis_dashboard'
+    'create_network_analysis_dashboard',
+
+    # Interactive Elements
+    'create_interactive_metric_card',
+    'create_interactive_pie_chart',
+    'create_interactive_bar_chart',
+    'create_interactive_timeline_table'
 ]

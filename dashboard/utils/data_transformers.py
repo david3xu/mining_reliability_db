@@ -1,26 +1,18 @@
 #!/usr/bin/env python3
 """
-Data Transformers - Extended with Real Database Queries
-Extends existing real data methods for multi-tab dashboard.
+Data Transformers - Clean Data Access Layer
+Data transformation using adapter pattern for interactive navigation dashboard.
 """
 
 import logging
 from typing import Dict, List, Any
 from mine_core.shared.common import handle_error
 
-# Real data sources - existing infrastructure
+# Strategic import: Use adapter instead of direct mine_core access
 from dashboard.adapters import get_data_adapter
-from mine_core.database.queries import (
-    get_missing_data_quality_intelligence,
-    get_operational_performance_dashboard,
-    get_action_requests,
-    get_root_cause_intelligence_summary
-)
-from configs.environment import get_mappings, get_schema, get_entity_names
 
 logger = logging.getLogger(__name__)
 
-# EXISTING FUNCTIONS (Keep unchanged - already use real data)
 def get_portfolio_metrics() -> Dict[str, Any]:
     """Generate portfolio metrics for dashboard header cards"""
     try:
@@ -80,7 +72,19 @@ def get_facility_breakdown_data() -> Dict[str, Any]:
             "labels": facility_data.labels,
             "values": facility_data.values,
             "percentages": facility_data.percentages,
-            "total_records": facility_data.total_records
+            "total_records": facility_data.total_records,
+            "facility_details": [
+                {
+                    "facility": label,
+                    "records": value,
+                    "percentage": percentage
+                }
+                for label, value, percentage in zip(
+                    facility_data.labels,
+                    facility_data.values,
+                    facility_data.percentages
+                )
+            ]
         }
     except Exception as e:
         handle_error(logger, e, "facility breakdown transformation")
@@ -99,195 +103,35 @@ def get_historical_timeline_data() -> Dict[str, Any]:
             "summary": {
                 "total_records": timeline_data.total_records,
                 "year_span": len(timeline_data.year_range),
-                "facilities": timeline_data.facilities_count
+                "facilities": timeline_data.facilities_count,
+                "min_year": min(timeline_data.year_range) if timeline_data.year_range else None,
+                "max_year": max(timeline_data.year_range) if timeline_data.year_range else None
             }
         }
     except Exception as e:
         handle_error(logger, e, "historical timeline transformation")
         return {}
 
-# NEW REAL DATA METHODS
-def get_data_quality_metrics() -> Dict[str, Any]:
-    """Real data quality assessment using database queries"""
-    try:
-        # Real quality intelligence from database
-        quality_data = get_missing_data_quality_intelligence()
-
-        # Real facility data
-        adapter = get_data_adapter()
-        facility_data = adapter.get_facility_breakdown()
-
-        # Real field categories from configuration
-        mappings = get_mappings()
-        field_categories = mappings.get("field_categories", {})
-
-        return {
-            "facilities_analyzed": len(facility_data.labels) if facility_data.labels else 0,
-            "categorical_fields": len(field_categories.get("categorical_fields", [])),
-            "problem_definition_completeness": quality_data.get("problem_definition_completeness", 0),
-            "causal_analysis_completeness": quality_data.get("causal_analysis_completeness", 0),
-            "action_planning_completeness": quality_data.get("action_planning_completeness", 0),
-            "verification_completeness": quality_data.get("verification_completeness", 0),
-            "title_missing_rate": quality_data.get("title_missing_rate", 0),
-            "category_missing_rate": quality_data.get("category_missing_rate", 0),
-            "root_cause_missing_rate": quality_data.get("root_cause_missing_rate", 0),
-            "field_categories": field_categories
-        }
-
-    except Exception as e:
-        handle_error(logger, e, "real data quality metrics generation")
-        return {}
-
-def get_workflow_analysis_data() -> Dict[str, Any]:
-    """Real workflow analysis using schema and configuration"""
-    try:
-        # Real schema data
-        schema = get_schema()
-        mappings = get_mappings()
-        entity_names = get_entity_names()
-
-        # Real entity definitions
-        entities = schema.get("entities", [])
-        entity_mappings = mappings.get("entity_mappings", {})
-
-        # Calculate real field counts
-        total_fields = sum(len(fields) for fields in entity_mappings.values())
-
-        # Real analytical dimensions
-        analytical_dimensions = schema.get("analytical_dimensions", {})
-
-        return {
-            "total_fields": total_fields,
-            "entity_count": len(entity_names),
-            "analytical_dimensions": len(analytical_dimensions),
-            "field_categories": len(mappings.get("field_categories", {})),
-            "entities": entities,
-            "entity_mappings": entity_mappings,
-            "workflow_entities": [
-                {"name": "ActionRequest", "stage": 1, "description": "Incident Reporting"},
-                {"name": "Problem", "stage": 2, "description": "Problem Definition"},
-                {"name": "RootCause", "stage": 3, "description": "Causal Analysis"},
-                {"name": "ActionPlan", "stage": 4, "description": "Resolution Planning"},
-                {"name": "Verification", "stage": 5, "description": "Effectiveness Check"}
-            ]
-        }
-
-    except Exception as e:
-        handle_error(logger, e, "real workflow analysis data generation")
-        return {}
-
-def _process_action_request_categories(action_requests: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Helper function to process action request categories and analysis"""
-    category_distribution = {}
-    recurring_analysis = {}
-
-    for request in action_requests:
-        # Category analysis
-        category = request.get('categories', 'Unknown')
-        if category not in category_distribution:
-            category_distribution[category] = 0
-        category_distribution[category] += 1
-
-        # Extract additional analysis data
-        stage = request.get('stage', 'Unknown')
-        has_root_cause = request.get('has_root_cause_analysis', False)
-
-    return {
-        "category_distribution": category_distribution,
-        "total_records": len(action_requests),
-        "categories_count": len(category_distribution)
-    }
-
 def get_facility_analysis_data(facility_id: str) -> Dict[str, Any]:
-    """Real facility-specific analysis using database queries"""
+    """Get facility-specific analysis data using adapter"""
     try:
-        # Real facility performance data
-        performance_data = get_operational_performance_dashboard(facility_id)
-
-        # Real action requests for facility
-        action_requests = get_action_requests(facility_id=facility_id, limit=10000)
-
-        # Real causal intelligence for facility
-        causal_data = get_root_cause_intelligence_summary(facility_id)
-
-        # Process real action request data for categories
-        processed_data = _process_action_request_categories(action_requests)
-
-        # Real facility comparison
-        all_facilities_data = get_operational_performance_dashboard()
-
-        return {
-            "facility_id": facility_id,
-            "total_records": processed_data["total_records"],
-            "categories_count": processed_data["categories_count"],
-            "category_distribution": processed_data["category_distribution"],
-            "performance_data": performance_data,
-            "causal_patterns": causal_data.get("causal_patterns", []),
-            "temporal_trends": performance_data.get("temporal_trends", []),
-            "category_performance": performance_data.get("category_performance", []),
-            "workflow_efficiency": performance_data.get("workflow_efficiency", {}),
-            "comparison_data": all_facilities_data
-        }
-
-    except Exception as e:
-        handle_error(logger, e, f"real facility analysis data for {facility_id}")
-        return {}
-
-def get_stakeholder_assessment_data() -> Dict[str, Any]:
-    """Cross-facility stakeholder assessment using real data"""
-    try:
-        # Real data from all facilities
         adapter = get_data_adapter()
-        portfolio_data = adapter.get_portfolio_metrics()
-        facility_data = adapter.get_facility_breakdown()
-        quality_data = get_missing_data_quality_intelligence()
-
-        # Real causal intelligence summary
-        causal_summary = get_root_cause_intelligence_summary()
-
-        # Real cross-facility comparison
-        facility_comparisons = []
-        for facility_id in facility_data.labels:
-            facility_analysis = get_facility_analysis_data(facility_id)
-            facility_comparisons.append(facility_analysis)
-
-        return {
-            "total_facilities": len(facility_data.labels),
-            "total_incidents": portfolio_data.total_records,
-            "data_quality_score": quality_data.get("data_quality_score", 0),
-            "causal_patterns": causal_summary.get("causal_patterns", []),
-            "facility_comparisons": facility_comparisons,
-            "stakeholder_insights": {
-                "equipment_focus": sum(1 for comp in facility_comparisons
-                                     if "Equipment" in str(comp.get("category_distribution", {}))),
-                "production_issues": sum(1 for comp in facility_comparisons
-                                       if "Production" in str(comp.get("category_distribution", {}))),
-                "quality_concerns": len([f for f in facility_comparisons
-                                       if f.get("total_records", 0) > portfolio_data.total_records / len(facility_data.labels)])
-            }
-        }
-
+        return adapter.get_facility_performance_analysis(facility_id)
     except Exception as e:
-        handle_error(logger, e, "stakeholder assessment data generation")
+        handle_error(logger, e, f"facility analysis data for {facility_id}")
         return {}
 
 def validate_dashboard_data() -> Dict[str, bool]:
-    """Validate dashboard data pipeline for all tabs"""
+    """Validate dashboard data pipeline"""
     try:
         adapter = get_data_adapter()
         validation_result = adapter.validate_data_availability()
-
-        # Test real data methods
-        quality_data = get_data_quality_metrics()
-        workflow_data = get_workflow_analysis_data()
 
         return {
             "portfolio_metrics": validation_result.component_status.get("portfolio_metrics", False),
             "field_distribution": validation_result.component_status.get("field_distribution", False),
             "facility_breakdown": validation_result.component_status.get("facility_breakdown", False),
             "historical_timeline": validation_result.component_status.get("historical_timeline", False),
-            "data_quality": bool(quality_data and quality_data.get("facilities_analyzed", 0) > 0),
-            "workflow_analysis": bool(workflow_data and workflow_data.get("total_fields", 0) > 0),
             "phase2_complete": validation_result.is_valid,
             "data_quality_score": validation_result.data_quality_score
         }
@@ -299,13 +143,59 @@ def validate_dashboard_data() -> Dict[str, bool]:
             "field_distribution": False,
             "facility_breakdown": False,
             "historical_timeline": False,
-            "data_quality": False,
-            "workflow_analysis": False,
             "phase2_complete": False,
             "data_quality_score": 0.0
         }
 
-# PLOTLY FORMATTING FUNCTIONS (Keep existing - already work)
+# Configuration access functions (for circular import prevention)
+def get_styling_config() -> Dict[str, Any]:
+    """Get styling configuration through data layer"""
+    try:
+        from configs.environment import get_dashboard_styling_config
+        return get_dashboard_styling_config()
+    except Exception as e:
+        handle_error(logger, e, "styling configuration access")
+        return {
+            "primary_color": "#4A90E2",
+            "chart_colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
+            "background_light": "#FFFFFF",
+            "background_dark": "#1E1E1E",
+            "text_primary": "#333333",
+            "text_secondary": "#666666",
+            "text_light": "#FFFFFF",
+            "border_color": "#CCCCCC",
+            "light_blue": "#7BB3F0"
+        }
+
+def get_chart_config() -> Dict[str, Any]:
+    """Get chart configuration through data layer"""
+    try:
+        from configs.environment import get_dashboard_chart_config
+        return get_dashboard_chart_config()
+    except Exception as e:
+        handle_error(logger, e, "chart configuration access")
+        return {
+            "font_family": "Arial, sans-serif",
+            "title_font_size": 18,
+            "subtitle_font_size": 16,
+            "body_font_size": 14,
+            "caption_font_size": 12,
+            "default_height": 400,
+            "metric_card_height": 120,
+            "metric_card_width": 220,
+            "table_height": 300
+        }
+
+def get_system_config() -> Dict[str, Any]:
+    """Get system configuration through data layer"""
+    try:
+        from configs.environment import get_all_config
+        return get_all_config()
+    except Exception as e:
+        handle_error(logger, e, "system configuration access")
+        return {}
+
+# Plotly formatting functions
 def format_for_plotly_bar(field_distribution: Dict[str, Any]) -> Dict[str, Any]:
     """Transform field distribution to Plotly bar chart format"""
     if not field_distribution:
@@ -349,37 +239,99 @@ def format_for_plotly_pie(facility_breakdown: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 def format_for_plotly_table(timeline_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Format timeline data for Plotly table visualization"""
+    """Transform timeline data to Plotly table format"""
+    if not timeline_data:
+        return {}
+
+    rows = timeline_data.get("rows", [])
+    columns = timeline_data.get("columns", [])
+
+    # Transpose data for Plotly table
+    table_values = []
+    for col in columns:
+        column_values = [row.get(col, 0) for row in rows]
+        table_values.append(column_values)
+
     return {
-        "data": timeline_data.get("rows", []),
-        "columns": [{"name": col, "id": col} for col in timeline_data.get("columns", [])],
-        "style_cell": {"textAlign": "left"},
-        "style_header": {"backgroundColor": "#f8f9fa", "fontWeight": "bold"}
+        "data": [{
+            "type": "table",
+            "header": {
+                "values": [col.title() for col in columns],
+                "fill_color": "lightblue",
+                "align": "center"
+            },
+            "cells": {
+                "values": table_values,
+                "fill_color": "white",
+                "align": "center"
+            }
+        }],
+        "layout": {
+            "title": "Historical Records by Year"
+        }
     }
 
-def get_styling_config() -> Dict[str, Any]:
-    """Get styling configuration through data layer"""
+# Data quality analysis functions
+def analyze_data_quality() -> Dict[str, Any]:
+    """Analyze overall data quality using adapter"""
     try:
-        from configs.environment import get_dashboard_styling_config
-        return get_dashboard_styling_config()
-    except Exception as e:
-        handle_error(logger, e, "styling configuration access")
-        return {}
+        validation_results = validate_dashboard_data()
 
-def get_chart_config() -> Dict[str, Any]:
-    """Get chart configuration through data layer"""
-    try:
-        from configs.environment import get_dashboard_chart_config
-        return get_dashboard_chart_config()
-    except Exception as e:
-        handle_error(logger, e, "chart configuration access")
-        return {}
+        quality_metrics = {
+            "overall_score": validation_results.get("data_quality_score", 0.0),
+            "component_health": {
+                "portfolio": "healthy" if validation_results.get("portfolio_metrics") else "degraded",
+                "facilities": "healthy" if validation_results.get("facility_breakdown") else "degraded",
+                "fields": "healthy" if validation_results.get("field_distribution") else "degraded",
+                "timeline": "healthy" if validation_results.get("historical_timeline") else "degraded"
+            },
+            "system_status": "operational" if validation_results.get("phase2_complete") else "degraded"
+        }
 
-def get_system_config() -> Dict[str, Any]:
-    """Get system configuration through data layer"""
-    try:
-        from configs.environment import get_all_config
-        return get_all_config()
+        return quality_metrics
+
     except Exception as e:
-        handle_error(logger, e, "system configuration access")
-        return {}
+        handle_error(logger, e, "data quality analysis")
+        return {
+            "overall_score": 0.0,
+            "component_health": {},
+            "system_status": "error"
+        }
+
+def get_performance_metrics() -> Dict[str, Any]:
+    """Get dashboard performance metrics"""
+    try:
+        adapter = get_data_adapter()
+
+        # Test response times for each component
+        import time
+
+        performance_data = {}
+
+        start_time = time.time()
+        adapter.get_portfolio_metrics()
+        performance_data["portfolio_time"] = time.time() - start_time
+
+        start_time = time.time()
+        adapter.get_facility_breakdown()
+        performance_data["facility_time"] = time.time() - start_time
+
+        start_time = time.time()
+        adapter.get_field_distribution()
+        performance_data["field_time"] = time.time() - start_time
+
+        start_time = time.time()
+        adapter.get_historical_timeline()
+        performance_data["timeline_time"] = time.time() - start_time
+
+        total_time = sum(performance_data.values())
+
+        return {
+            "component_times": performance_data,
+            "total_load_time": total_time,
+            "performance_grade": "excellent" if total_time < 1.0 else "good" if total_time < 3.0 else "poor"
+        }
+
+    except Exception as e:
+        handle_error(logger, e, "performance metrics collection")
+        return {"performance_grade": "error", "total_load_time": 0.0}

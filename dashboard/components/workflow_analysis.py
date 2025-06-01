@@ -310,3 +310,12 @@ def create_workflow_analysis_layout() -> html.Div:
             html.H3("Workflow Analysis Error"),
             html.P("Failed to load real workflow schema data")
         ])
+
+# ALIAS FUNCTIONS (for compatibility with different naming conventions)
+def create_stage_field_distribution() -> dcc.Graph:
+    """Alias for create_entity_field_distribution"""
+    return create_entity_field_distribution()
+
+def create_workflow_mapping_table() -> dash_table.DataTable:
+    """Alias for create_field_mapping_table"""
+    return create_field_mapping_table()
