@@ -13,6 +13,10 @@ from mine_core.shared.common import handle_error
 
 # Clean adapter pattern - single point data access
 from dashboard.adapters import get_data_adapter
+from dashboard.utils.style_constants import (
+    PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, WARNING_COLOR, DANGER_COLOR,
+    HIGH_PRIORITY_BG, MEDIUM_PRIORITY_BG, LOW_PRIORITY_BG, LIGHT_BLUE
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,31 +80,39 @@ def create_workflow_metrics_cards() -> list:
             else:
                 return html.Div(card_content, style=card_style)
 
+        # Get styling configuration for consistent colors
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            colors = styling_config.get("chart_colors", [PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, DANGER_COLOR])
+        except Exception:
+            colors = [PRIMARY_COLOR, SECONDARY_COLOR, SUCCESS_COLOR, DANGER_COLOR]
+
         cards = [
             create_metric_card(
                 value=entities_count,
                 label="Entity Types",
                 detail="Schema-defined entities",
-                color="#4A90E2"
+                color=colors[0]
             ),
             create_clean_clickable_metric_card(
                 value=total_fields,
                 label="Mapped Fields",
                 detail="Click to explore process",
-                color="#F5A623",
+                color=colors[1],
                 href="/workflow-process"
             ),
             create_metric_card(
                 value=analytical_dimensions,
                 label="Analysis Dimensions",
                 detail="Schema-driven analytics",
-                color="#7ED321"
+                color=colors[2]
             ),
             create_metric_card(
                 value=field_categories,
                 label="Field Categories",
                 detail="Classification types",
-                color="#B57EDC"
+                color=colors[3]
             )
         ]
 
@@ -189,12 +201,20 @@ def create_entity_field_distribution() -> dcc.Graph:
 
         fig = go.Figure()
 
+        # Use configuration-driven styling
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", PRIMARY_COLOR)
+        except Exception:
+            primary_color = PRIMARY_COLOR
+
         # Total fields bar
         fig.add_trace(go.Bar(
             x=entity_names,
             y=field_counts,
             name="Total Fields",
-            marker_color="#4A90E2",
+            marker_color=primary_color,
             text=field_counts,
             textposition="outside"
         ))
@@ -246,6 +266,14 @@ def create_field_mapping_table() -> dash_table.DataTable:
                 "Critical": "Yes" if mapping["critical"] else "No"
             })
 
+        # Use configuration-driven styling
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", PRIMARY_COLOR)
+        except Exception:
+            primary_color = PRIMARY_COLOR
+
         return dash_table.DataTable(
             data=table_data,
             columns=[
@@ -256,12 +284,12 @@ def create_field_mapping_table() -> dash_table.DataTable:
                 {"name": "Critical", "id": "Critical"}
             ],
             style_cell={'textAlign': 'left', 'padding': '10px'},
-            style_header={'backgroundColor': '#4A90E2', 'color': 'white', 'fontWeight': 'bold'},
+            style_header={'backgroundColor': primary_color, 'color': 'white', 'fontWeight': 'bold'},
             style_data={'backgroundColor': 'white'},
             style_data_conditional=[
                 {
                     'if': {'filter_query': '{Critical} = Yes'},
-                    'backgroundColor': '#FFF3CD',
+                    'backgroundColor': MEDIUM_PRIORITY_BG,
                     'color': 'black'
                 }
             ],
@@ -431,7 +459,7 @@ def create_two_part_stage_card(stage_data: Dict[str, Any]) -> html.Div:
     field_count = len(unique_source_fields)
 
     # Use color from configuration with fallback
-    color = stage_data.get("color", "#7ED321")
+    color = stage_data.get("color", SUCCESS_COLOR)
 
     # Get display field limit from config with fallback
     max_fields_to_display = stage_data.get("max_fields_to_display", 6)
@@ -532,7 +560,7 @@ def create_supporting_entity_card(entity_data: Dict[str, Any], connection_config
     field_count = entity_data["field_count"]
     completion_rate = entity_data["completion_rate"]
     connects_to = entity_data["connects_to"]
-    color = entity_data.get("color", "#6C757D")
+    color = entity_data.get("color", LIGHT_BLUE)
 
     # Get height from config with fallback
     card_height = f"{entity_data.get('card_height', 120)}px"

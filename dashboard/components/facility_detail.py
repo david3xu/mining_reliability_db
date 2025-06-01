@@ -14,7 +14,10 @@ from mine_core.shared.common import handle_error
 # Real data sources
 from dashboard.adapters import get_data_adapter
 from dashboard.utils.data_transformers import get_facility_analysis_data
-from mine_core.database.queries import get_action_requests
+from dashboard.utils.style_constants import (
+    DANGER_COLOR, WARNING_COLOR, SUCCESS_COLOR, PRIMARY_COLOR, SECONDARY_COLOR, INFO_COLOR,
+    HIGH_PRIORITY_BG, MEDIUM_PRIORITY_BG, LOW_PRIORITY_BG, WHITE_COLOR
+)
 
 logger = logging.getLogger(__name__)
 
@@ -38,24 +41,49 @@ def create_facility_metrics_cards(facility_id: str) -> list:
         # Calculate risk level based on real data
         avg_other_records = comparison_data.get("average_other_records", 0)
         risk_level = "High" if total_records > avg_other_records * 1.5 else "Medium" if total_records > avg_other_records else "Low"
-        risk_color = "#D0021B" if risk_level == "High" else "#F5A623" if risk_level == "Medium" else "#7ED321"
+
+        # Get risk colors from configuration
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            high_risk_color = styling_config.get("danger_color", DANGER_COLOR)
+            medium_risk_color = styling_config.get("warning_color", WARNING_COLOR)
+            low_risk_color = styling_config.get("success_color", SUCCESS_COLOR)
+        except Exception:
+            high_risk_color = DANGER_COLOR
+            medium_risk_color = WARNING_COLOR
+            low_risk_color = SUCCESS_COLOR
+
+        risk_color = high_risk_color if risk_level == "High" else medium_risk_color if risk_level == "Medium" else low_risk_color
 
         # Performance vs others
         vs_average = comparison_data.get("vs_average", 0)
         performance_text = f"{vs_average:+.1f}% vs Others"
+
+        # Get standard colors from configuration
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", PRIMARY_COLOR)
+            secondary_color = styling_config.get("secondary_color", SECONDARY_COLOR)
+            info_color = styling_config.get("info_color", INFO_COLOR)
+        except Exception:
+            primary_color = PRIMARY_COLOR
+            secondary_color = SECONDARY_COLOR
+            info_color = INFO_COLOR
 
         cards = [
             create_metric_card(
                 value=total_records,
                 label="Total Records",
                 detail=f"Facility incidents",
-                color="#4A90E2"
+                color=primary_color
             ),
             create_metric_card(
                 value=categories_count,
                 label="Categories",
                 detail="Issue types identified",
-                color="#F5A623"
+                color=secondary_color
             ),
             create_metric_card(
                 value=risk_level,
@@ -67,7 +95,7 @@ def create_facility_metrics_cards(facility_id: str) -> list:
                 value=performance_text,
                 label="Performance Rank",
                 detail=f"Rank {comparison_data.get('performance_rank', 0)}/{comparison_data.get('total_facilities', 0)}",
-                color="#B57EDC"
+                color=info_color
             )
         ]
 
@@ -100,15 +128,28 @@ def create_facility_category_chart(facility_id: str) -> dcc.Graph:
         values = [count for cat, count in sorted_categories]
         percentages = [category_percentages.get(cat, 0) for cat, count in sorted_categories]
 
-        # Color mapping based on category risk
+        # Color mapping based on category risk using configuration
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            high_risk_color = styling_config.get("danger_color", DANGER_COLOR)
+            medium_risk_color = styling_config.get("warning_color", WARNING_COLOR)
+            low_risk_color = styling_config.get("success_color", SUCCESS_COLOR)
+            border_color = styling_config.get("border_color", WHITE_COLOR)
+        except Exception:
+            high_risk_color = DANGER_COLOR
+            medium_risk_color = WARNING_COLOR
+            low_risk_color = SUCCESS_COLOR
+            border_color = WHITE_COLOR
+
         colors = []
         for label in labels:
             if "Equipment" in label or "Production" in label:
-                colors.append("#D0021B")  # High risk
+                colors.append(high_risk_color)  # High risk
             elif "Safety" in label or "Plant Level" in label:
-                colors.append("#F5A623")  # Medium risk
+                colors.append(medium_risk_color)  # Medium risk
             else:
-                colors.append("#7ED321")  # Low risk
+                colors.append(low_risk_color)  # Low risk
 
         fig = go.Figure()
 
@@ -118,7 +159,7 @@ def create_facility_category_chart(facility_id: str) -> dcc.Graph:
             text=[f"{p:.1f}%" for p in percentages],
             textinfo="label+text",
             textposition="auto",
-            marker=dict(colors=colors, line=dict(color="#FFFFFF", width=2)),
+            marker=dict(colors=colors, line=dict(color=border_color, width=2)),
             hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{text}<extra></extra>"
         ))
 
@@ -141,8 +182,9 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
     """Recurring issues analysis for specific facility"""
 
     try:
-        # Real action requests for facility
-        action_requests = get_action_requests(facility_id=facility_id, limit=10000)
+        # Real action requests for facility via adapter
+        adapter = get_data_adapter()
+        action_requests = adapter.get_action_requests(facility_id=facility_id, limit=10000)
 
         if not action_requests:
             return dcc.Graph(figure={})
@@ -180,15 +222,26 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
         # Create horizontal bar chart
         fig = go.Figure()
 
-        # Color based on recurring rate
+        # Color based on recurring rate using configuration
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            high_risk_color = styling_config.get("danger_color", DANGER_COLOR)
+            medium_risk_color = styling_config.get("warning_color", WARNING_COLOR)
+            low_risk_color = styling_config.get("success_color", SUCCESS_COLOR)
+        except Exception:
+            high_risk_color = DANGER_COLOR
+            medium_risk_color = WARNING_COLOR
+            low_risk_color = SUCCESS_COLOR
+
         colors = []
         for rate in recurring_rates:
             if rate > 30:
-                colors.append("#D0021B")  # High recurring
+                colors.append(high_risk_color)  # High recurring
             elif rate > 15:
-                colors.append("#F5A623")  # Medium recurring
+                colors.append(medium_risk_color)  # Medium recurring
             else:
-                colors.append("#7ED321")  # Low recurring
+                colors.append(low_risk_color)  # Low recurring
 
         fig.add_trace(go.Bar(
             x=recurring_rates,
@@ -221,8 +274,9 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
     """Operating centre breakdown table for facility"""
 
     try:
-        # Real action requests data
-        action_requests = get_action_requests(facility_id=facility_id, limit=10000)
+        # Real action requests data via adapter
+        adapter = get_data_adapter()
+        action_requests = adapter.get_action_requests(facility_id=facility_id, limit=10000)
 
         if not action_requests:
             return dash_table.DataTable(data=[])
@@ -273,6 +327,20 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
         # Sort by total records descending
         table_data.sort(key=lambda x: x["Total Records"], reverse=True)
 
+        # Get table styling from configuration
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", PRIMARY_COLOR)
+            high_bg = styling_config.get("high_priority_bg", HIGH_PRIORITY_BG)
+            medium_bg = styling_config.get("medium_priority_bg", MEDIUM_PRIORITY_BG)
+            low_bg = styling_config.get("low_priority_bg", LOW_PRIORITY_BG)
+        except Exception:
+            primary_color = PRIMARY_COLOR
+            high_bg = HIGH_PRIORITY_BG
+            medium_bg = MEDIUM_PRIORITY_BG
+            low_bg = LOW_PRIORITY_BG
+
         return dash_table.DataTable(
             data=table_data,
             columns=[
@@ -283,22 +351,22 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
                 {"name": "Priority", "id": "Priority"}
             ],
             style_cell={'textAlign': 'center', 'padding': '12px'},
-            style_header={'backgroundColor': '#4A90E2', 'color': 'white', 'fontWeight': 'bold'},
+            style_header={'backgroundColor': primary_color, 'color': 'white', 'fontWeight': 'bold'},
             style_data={'backgroundColor': 'white'},
             style_data_conditional=[
                 {
                     'if': {'filter_query': '{Priority} = High'},
-                    'backgroundColor': '#FFE6E6',
+                    'backgroundColor': high_bg,
                     'color': 'black'
                 },
                 {
                     'if': {'filter_query': '{Priority} = Medium'},
-                    'backgroundColor': '#FFF3CD',
+                    'backgroundColor': medium_bg,
                     'color': 'black'
                 },
                 {
                     'if': {'filter_query': '{Priority} = Low'},
-                    'backgroundColor': '#E6F7E6',
+                    'backgroundColor': low_bg,
                     'color': 'black'
                 }
             ],
@@ -384,14 +452,14 @@ def create_facility_detail_layout(facility_id: str) -> html.Div:
             # Stakeholder questions
             html.Div([
                 html.Hr(style={"margin": "40px 0 20px 0"}),
-                html.H4("Stakeholder Questions", style={"color": "#F5A623", "marginBottom": "20px"}),
+                html.H4("Stakeholder Questions", style={"color": SECONDARY_COLOR, "marginBottom": "20px"}),
                 html.Ul([
                     html.Li(f"Equipment-Centric Operations at {facility_id.title()}",
-                           style={"color": "#4A90E2", "fontSize": "16px", "marginBottom": "10px"}),
+                           style={"color": PRIMARY_COLOR, "fontSize": "16px", "marginBottom": "10px"}),
                     html.Li("Plant-Level Investigation Priorities",
-                           style={"color": "#4A90E2", "fontSize": "16px", "marginBottom": "10px"}),
+                           style={"color": PRIMARY_COLOR, "fontSize": "16px", "marginBottom": "10px"}),
                     html.Li("Category-Specific Risk Assessment",
-                           style={"color": "#4A90E2", "fontSize": "16px"})
+                           style={"color": PRIMARY_COLOR, "fontSize": "16px"})
                 ])
             ])
         ], className="container-fluid")

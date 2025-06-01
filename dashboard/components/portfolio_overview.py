@@ -80,33 +80,41 @@ def create_clean_metrics_section() -> html.Div:
                 dbc.Alert("No metrics data available", color="warning")
             ])
 
+        # Get styling configuration for consistent colors
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            primary_color = styling_config.get("primary_color", "#4A90E2")
+        except Exception:
+            primary_color = "#4A90E2"  # Fallback
+
         # Interactive metric cards with real values
         cards = [
             create_clean_metric_card(
                 value=metrics_data["total_records"]["value"],
                 label="Total Records",
-                color="#4A90E2",
+                color=primary_color,
                 clickable=True,
                 href="/historical-records"
             ),
             create_clean_metric_card(
                 value=metrics_data["data_fields"]["value"],
                 label="Data Fields",
-                color="#4A90E2",
+                color=primary_color,
                 clickable=True,
                 href="/data-types-distribution"
             ),
             create_clean_metric_card(
                 value=metrics_data["facilities"]["value"],
                 label="Facilities",
-                color="#4A90E2",
+                color=primary_color,
                 clickable=True,
                 href="/facilities-distribution"
             ),
             create_clean_metric_card(
                 value=metrics_data["years_coverage"]["value"],
                 label="Years Coverage",
-                color="#4A90E2"
+                color=primary_color
             )
         ]
 
@@ -480,8 +488,13 @@ def create_facility_trends_line_chart() -> dcc.Graph:
         columns = timeline_data.get("columns", [])
         years = [col for col in columns if col.isdigit()]
 
-        # Color palette for facilities
-        colors = ['#4A90E2', '#F5A623', '#7ED321', '#B57EDC', '#FF6B6B', '#4ECDC4']
+        # Get configuration-driven colors
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            colors = styling_config.get("chart_colors", ['#4A90E2', '#F5A623', '#7ED321', '#B57EDC', '#FF6B6B', '#4ECDC4'])
+        except Exception:
+            colors = ['#4A90E2', '#F5A623', '#7ED321', '#B57EDC', '#FF6B6B', '#4ECDC4']  # Fallback
 
         fig = go.Figure()
 
@@ -565,8 +578,13 @@ def create_historical_trends_chart() -> dcc.Graph:
         columns = timeline_data.get("columns", [])
         years = [col for col in columns if col.isdigit()]
 
-        # Professional color palette
-        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#1B998B', '#7209B7']
+        # Get configuration-driven colors for timeline chart
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            colors = styling_config.get("timeline_colors", ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#1B998B', '#7209B7'])
+        except Exception:
+            colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#1B998B', '#7209B7']  # Fallback
 
         fig = go.Figure()
 
@@ -596,28 +614,41 @@ def create_historical_trends_chart() -> dcc.Graph:
                              "Records: %{y:,}<extra></extra>"
             ))
 
+        # Get styling configuration for chart layout
+        try:
+            from configs.environment import get_dashboard_styling_config
+            styling_config = get_dashboard_styling_config()
+            text_color = styling_config.get("text_color", TEXT_COLOR)
+            grid_color = styling_config.get("grid_color", GRID_COLOR)
+            line_color = styling_config.get("line_color", LINE_COLOR)
+        except Exception:
+            from dashboard.utils.style_constants import TEXT_COLOR, GRID_COLOR, LINE_COLOR
+            text_color = TEXT_COLOR
+            grid_color = GRID_COLOR
+            line_color = LINE_COLOR
+
         # Professional layout
         fig.update_layout(
             title={
                 'text': "Historical Data Collection Trends by Facility",
                 'x': 0.5,
                 'xanchor': 'center',
-                'font': {'size': 18, 'color': '#2C3E50'}
+                'font': {'size': 18, 'color': text_color}
             },
             xaxis=dict(
                 title="Year",
                 showgrid=True,
                 gridwidth=1,
-                gridcolor='#E5E5E5',
-                linecolor='#CCCCCC',
+                gridcolor=grid_color,
+                linecolor=line_color,
                 linewidth=1
             ),
             yaxis=dict(
                 title="Number of Records",
                 showgrid=True,
                 gridwidth=1,
-                gridcolor='#E5E5E5',
-                linecolor='#CCCCCC',
+                gridcolor=grid_color,
+                linecolor=line_color,
                 linewidth=1
             ),
             height=400,
