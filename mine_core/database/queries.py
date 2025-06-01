@@ -69,6 +69,7 @@ def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[
     else:
         query = """
         MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+        WHERE NOT '_SchemaTemplate' IN labels(f)
         OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
         RETURN ar.actionrequest_id AS id,
                ar.action_request_number AS number,
@@ -95,7 +96,7 @@ def get_root_cause_intelligence_summary(facility_id: str = None) -> Dict[str, An
     # Primary vs secondary cause analysis
     causal_analysis_query = f"""
     MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-    {facility_filter}
+    WHERE NOT '_SchemaTemplate' IN labels(f) {' AND f.facility_id = $facility_id' if facility_filter else ''}
     MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
     WHERE rc.root_cause IS NOT NULL AND rc.root_cause <> 'DATA_NOT_AVAILABLE'
     WITH rc.root_cause AS primary_cause,
@@ -110,7 +111,7 @@ def get_root_cause_intelligence_summary(facility_id: str = None) -> Dict[str, An
     # Causal pattern effectiveness
     effectiveness_query = f"""
     MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-    {facility_filter}
+    WHERE NOT '_SchemaTemplate' IN labels(f) {' AND f.facility_id = $facility_id' if facility_filter else ''}
     MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
     WHERE rc.root_cause IS NOT NULL AND v.is_action_plan_effective IS NOT NULL
     WITH rc.root_cause AS cause_type,
@@ -140,7 +141,7 @@ def get_operational_performance_dashboard(facility_id: str = None) -> Dict[str, 
     # Incident volume and resolution trends
     performance_query = f"""
     MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-    {facility_filter}
+    WHERE NOT '_SchemaTemplate' IN labels(f) {' AND f.facility_id = $facility_id' if facility_filter else ''}
     OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
     OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
     WITH substring(ar.initiation_date, 0, 7) AS year_month,
@@ -159,8 +160,8 @@ def get_operational_performance_dashboard(facility_id: str = None) -> Dict[str, 
     # Category distribution with resolution success rates
     category_query = f"""
     MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-    {facility_filter}
-    WHERE ar.categories IS NOT NULL AND ar.categories <> 'DATA_NOT_AVAILABLE'
+    WHERE NOT '_SchemaTemplate' IN labels(f) {' AND f.facility_id = $facility_id' if facility_filter else ''}
+          AND ar.categories IS NOT NULL AND ar.categories <> 'DATA_NOT_AVAILABLE'
     OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
     WITH ar.categories AS category,
          count(DISTINCT ar) AS incident_count,
