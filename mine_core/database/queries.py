@@ -278,6 +278,271 @@ def get_causal_correlation_matrix() -> List[Dict[str, Any]]:
     """
     return get_database().execute_query(query)
 
+def get_field_completion_statistics() -> Dict[str, Any]:
+    """Get field completion statistics directly from Neo4j graph data"""
+    query = """
+    MATCH (ar:ActionRequest)
+    WITH ar, keys(ar) as field_names, count(ar) as total_records
+    UNWIND field_names as field_name
+    WITH field_name, total_records,
+         count(ar) as total_for_field,
+         sum(case
+             when ar[field_name] is not null
+             and toString(ar[field_name]) <> ''
+             and toString(ar[field_name]) <> 'DATA_NOT_AVAILABLE'
+             and toString(ar[field_name]) <> 'NOT_SPECIFIED'
+             and toString(ar[field_name]) <> 'null'
+             and toString(ar[field_name]) <> 'none'
+             and toString(ar[field_name]) <> 'n/a'
+             then 1 else 0
+         end) as completed_records
+    WITH field_name, total_for_field, completed_records,
+         round(toFloat(completed_records) / total_for_field * 100, 1) as completion_rate
+    WHERE field_name IS NOT NULL
+    RETURN field_name,
+           total_for_field as total_records,
+           completed_records,
+           completion_rate
+    ORDER BY completion_rate ASC, field_name ASC
+    """
+
+    results = get_database().execute_query(query)
+
+    field_completion = {}
+    total_fields = 0
+
+    for record in results:
+        field_completion[record["field_name"]] = record["completion_rate"]
+        total_fields += 1
+
+    return {
+        "field_completion_rates": field_completion,
+        "total_fields": total_fields,
+        "source": "neo4j_direct_query"
+    }
+
+# Neo4j-driven analytics queries for completion rates system
+
+def get_entity_completion_rates() -> Dict[str, Any]:
+    """Get completion rates for all workflow entities using separate simple queries"""
+
+    try:
+        db = get_database()
+        entity_rates = {}
+
+        # ActionRequest completion rates
+        ar_query = """
+        MATCH (ar:ActionRequest)
+        RETURN count(ar) AS total_count,
+               count(CASE WHEN ar.title IS NOT NULL AND ar.title <> '' THEN 1 END) AS title_complete,
+               count(CASE WHEN ar.initiation_date IS NOT NULL THEN 1 END) AS date_complete,
+               count(CASE WHEN ar.stage IS NOT NULL AND ar.stage <> '' THEN 1 END) AS stage_complete
+        """
+        ar_results = db.execute_query(ar_query)
+        if ar_results:
+            ar_data = ar_results[0]
+            total = ar_data['total_count']
+            completed = ar_data['title_complete'] + ar_data['date_complete'] + ar_data['stage_complete']
+            total_fields = total * 3
+            entity_rates['ActionRequest'] = {
+                'total_count': total,
+                'completed_fields': completed,
+                'total_fields': total_fields,
+                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            }
+
+        # Problem completion rates
+        p_query = """
+        MATCH (p:Problem)
+        RETURN count(p) AS total_count,
+               count(CASE WHEN p.what_happened IS NOT NULL AND p.what_happened <> '' THEN 1 END) AS what_complete,
+               count(CASE WHEN p.requirement IS NOT NULL AND p.requirement <> '' THEN 1 END) AS req_complete
+        """
+        p_results = db.execute_query(p_query)
+        if p_results:
+            p_data = p_results[0]
+            total = p_data['total_count']
+            completed = p_data['what_complete'] + p_data['req_complete']
+            total_fields = total * 2
+            entity_rates['Problem'] = {
+                'total_count': total,
+                'completed_fields': completed,
+                'total_fields': total_fields,
+                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            }
+
+        # RootCause completion rates
+        rc_query = """
+        MATCH (rc:RootCause)
+        RETURN count(rc) AS total_count,
+               count(CASE WHEN rc.root_cause IS NOT NULL AND rc.root_cause <> '' THEN 1 END) AS cause_complete,
+               count(CASE WHEN rc.objective_evidence IS NOT NULL AND rc.objective_evidence <> '' THEN 1 END) AS evidence_complete
+        """
+        rc_results = db.execute_query(rc_query)
+        if rc_results:
+            rc_data = rc_results[0]
+            total = rc_data['total_count']
+            completed = rc_data['cause_complete'] + rc_data['evidence_complete']
+            total_fields = total * 2
+            entity_rates['RootCause'] = {
+                'total_count': total,
+                'completed_fields': completed,
+                'total_fields': total_fields,
+                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            }
+
+        # ActionPlan completion rates
+        ap_query = """
+        MATCH (ap:ActionPlan)
+        RETURN count(ap) AS total_count,
+               count(CASE WHEN ap.action_plan IS NOT NULL AND ap.action_plan <> '' THEN 1 END) AS plan_complete,
+               count(CASE WHEN ap.due_date IS NOT NULL THEN 1 END) AS date_complete
+        """
+        ap_results = db.execute_query(ap_query)
+        if ap_results:
+            ap_data = ap_results[0]
+            total = ap_data['total_count']
+            completed = ap_data['plan_complete'] + ap_data['date_complete']
+            total_fields = total * 2
+            entity_rates['ActionPlan'] = {
+                'total_count': total,
+                'completed_fields': completed,
+                'total_fields': total_fields,
+                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            }
+
+        # Verification completion rates
+        v_query = """
+        MATCH (v:Verification)
+        RETURN count(v) AS total_count,
+               count(CASE WHEN v.is_action_plan_effective IS NOT NULL THEN 1 END) AS effective_complete,
+               count(CASE WHEN v.action_plan_verification_date IS NOT NULL THEN 1 END) AS date_complete
+        """
+        v_results = db.execute_query(v_query)
+        if v_results:
+            v_data = v_results[0]
+            total = v_data['total_count']
+            completed = v_data['effective_complete'] + v_data['date_complete']
+            total_fields = total * 2
+            entity_rates['Verification'] = {
+                'total_count': total,
+                'completed_fields': completed,
+                'total_fields': total_fields,
+                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            }
+
+        return entity_rates
+
+    except Exception as e:
+        logger.error(f"Error getting entity completion rates: {e}")
+        return {}
+
+def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
+    """Get facility action statistics using direct Neo4j aggregation"""
+
+    if facility_id:
+        # Single facility analysis
+        query = """
+        MATCH (f:Facility {facility_id: $facility_id})
+        OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
+        OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
+        OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
+
+        RETURN {
+            facility_id: f.facility_id,
+            facility_name: f.facility_name,
+            total_action_requests: count(DISTINCT ar),
+            total_problems: count(DISTINCT p),
+            total_root_causes: count(DISTINCT rc),
+            total_action_plans: count(DISTINCT ap),
+            total_verifications: count(DISTINCT v),
+            completed_action_plans: count(DISTINCT CASE WHEN ap.complete = true THEN ap END),
+            effective_verifications: count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END),
+            completion_rate: CASE
+                WHEN count(DISTINCT ap) > 0
+                THEN round(count(DISTINCT CASE WHEN ap.complete = true THEN ap END) * 100.0 / count(DISTINCT ap), 1)
+                ELSE 0.0
+            END,
+            effectiveness_rate: CASE
+                WHEN count(DISTINCT v) > 0
+                THEN round(count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END) * 100.0 / count(DISTINCT v), 1)
+                ELSE 0.0
+            END
+        } AS facility_stats
+        """
+        params = {"facility_id": facility_id}
+    else:
+        # All facilities analysis
+        query = """
+        MATCH (f:Facility)
+        OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
+        OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
+        OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
+
+        WITH f,
+             count(DISTINCT ar) AS facility_action_requests,
+             count(DISTINCT p) AS facility_problems,
+             count(DISTINCT rc) AS facility_root_causes,
+             count(DISTINCT ap) AS facility_action_plans,
+             count(DISTINCT v) AS facility_verifications,
+             count(DISTINCT CASE WHEN ap.complete = true THEN ap END) AS facility_completed_plans,
+             count(DISTINCT CASE WHEN v.is_action_plan_effective = true THEN v END) AS facility_effective_verifications
+
+        RETURN {
+            facilities: collect({
+                facility_id: f.facility_id,
+                facility_name: f.facility_name,
+                total_action_requests: facility_action_requests,
+                total_problems: facility_problems,
+                total_root_causes: facility_root_causes,
+                total_action_plans: facility_action_plans,
+                total_verifications: facility_verifications,
+                completed_action_plans: facility_completed_plans,
+                effective_verifications: facility_effective_verifications,
+                completion_rate: CASE
+                    WHEN facility_action_plans > 0
+                    THEN round(facility_completed_plans * 100.0 / facility_action_plans, 1)
+                    ELSE 0.0
+                END,
+                effectiveness_rate: CASE
+                    WHEN facility_verifications > 0
+                    THEN round(facility_effective_verifications * 100.0 / facility_verifications, 1)
+                    ELSE 0.0
+                END
+            }),
+            aggregate: {
+                total_facilities: count(f),
+                total_action_requests: sum(facility_action_requests),
+                total_problems: sum(facility_problems),
+                total_root_causes: sum(facility_root_causes),
+                total_action_plans: sum(facility_action_plans),
+                total_verifications: sum(facility_verifications),
+                total_completed_plans: sum(facility_completed_plans),
+                total_effective_verifications: sum(facility_effective_verifications),
+                average_completion_rate: CASE
+                    WHEN sum(facility_action_plans) > 0
+                    THEN round(sum(facility_completed_plans) * 100.0 / sum(facility_action_plans), 1)
+                    ELSE 0.0
+                END,
+                average_effectiveness_rate: CASE
+                    WHEN sum(facility_verifications) > 0
+                    THEN round(sum(facility_effective_verifications) * 100.0 / sum(facility_verifications), 1)
+                    ELSE 0.0
+                END
+            }
+        } AS facility_statistics
+        """
+        params = {}
+
+    try:
+        results = get_database().execute_query(query, **params)
+        if results and len(results) > 0:
+            return results[0].get('facility_statistics', {}) if not facility_id else results[0].get('facility_stats', {})
+        return {}
+    except Exception as e:
+        logger.error(f"Error getting facility action statistics: {e}")
+        return {}
+
 # Backward compatibility functions
 def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
     """Get complete incident workflow chain with causal intelligence"""

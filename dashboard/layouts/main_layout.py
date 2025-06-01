@@ -378,25 +378,6 @@ def create_responsive_layout(content: html.Div = None, mobile_optimized: bool = 
 
         # Responsive layout with breakpoint handling
         responsive_layout = html.Div([
-            # CSS media queries for responsive behavior
-            html.Style(f"""
-                @media (max-width: {responsive_config['md']}px) {{
-                    .dashboard-charts-section {{
-                        grid-template-columns: 1fr !important;
-                    }}
-                    .dashboard-metrics-row {{
-                        flex-direction: column !important;
-                        align-items: center !important;
-                    }}
-                }}
-                @media (max-width: {responsive_config['sm']}px) {{
-                    .metric-card {{
-                        width: 90% !important;
-                        margin: 10px auto !important;
-                    }}
-                }}
-            """),
-
             # Main responsive content
             create_main_layout(content_wrapper)
         ])

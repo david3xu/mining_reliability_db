@@ -1,0 +1,110 @@
+{
+  "display_config": {
+    "default_max_fields": 6,
+    "default_card_height": "300px",
+    "default_header_bg_opacity": 0.3,
+    "default_show_description": false,
+    "font_sizes": {
+      "stage_number": "14px",
+      "title": "18px",
+      "field_count": "14px",
+      "field_list": "11px",
+      "description": "12px"
+    },
+    "card_style": {
+      "field_line_height": "1.3",
+      "completion_rate_padding": "5px 10px",
+      "completion_rate_border_radius": "10px"
+    }
+  },
+  "workflow_stages": [
+    {
+      "stage_number": 1,
+      "entity_name": "ActionRequest",
+      "title": "Action Request",
+      "description": "Initial incident or problem report",
+      "color": "#4A90E2",
+      "max_fields_to_display": 6,
+      "card_min_height": "300px",
+      "header_bg_opacity": 0.3,
+      "show_description": true,
+      "business_fields": [
+        "action_request_number",
+        "title",
+        "initiation_date",
+        "categories",
+        "action_types"
+      ],
+      "process_fields": [
+        "requested_response_time",
+        "past_due_status",
+        "stage",
+        "operating_centre"
+      ]
+    },
+    {
+      "stage_number": 2,
+      "entity_name": "Problem",
+      "title": "Problem Identification",
+      "description": "Detailed problem statement",
+      "color": "#7ED321",
+      "max_fields_to_display": 6,
+      "card_min_height": "300px",
+      "header_bg_opacity": 0.25,
+      "show_description": true,
+      "business_fields": ["what_happened"],
+      "process_fields": ["requirement"]
+    },
+    {
+      "stage_number": 3,
+      "entity_name": "RootCause",
+      "title": "Root Cause Analysis",
+      "description": "Investigation and causal factors",
+      "color": "#F5A623",
+      "max_fields_to_display": 6,
+      "card_min_height": "300px",
+      "header_bg_opacity": 0.35,
+      "show_description": true,
+      "business_fields": ["root_cause", "root_cause_tail"],
+      "process_fields": ["objective_evidence"]
+    },
+    {
+      "stage_number": 4,
+      "entity_name": "ActionPlan",
+      "title": "Action Planning",
+      "description": "Corrective actions and implementation plan",
+      "color": "#B57EDC",
+      "max_fields_to_display": 8,
+      "card_min_height": "320px",
+      "header_bg_opacity": 0.4,
+      "show_description": true,
+      "business_fields": [
+        "action_plan",
+        "recommended_action",
+        "immediate_containment",
+        "due_date"
+      ],
+      "process_fields": [
+        "complete",
+        "completion_date",
+        "comments",
+        "response_date",
+        "response_revision_date",
+        "did_plan_require_strategy_change"
+      ]
+    },
+    {
+      "stage_number": 5,
+      "entity_name": "Verification",
+      "title": "Verification & Closure",
+      "description": "Effectiveness review and closure decision",
+      "color": "#D0021B",
+      "max_fields_to_display": 4,
+      "card_min_height": "280px",
+      "header_bg_opacity": 0.45,
+      "show_description": true,
+      "business_fields": ["is_action_plan_effective"],
+      "process_fields": ["action_plan_eval_comment"]
+    }
+  ]
+}

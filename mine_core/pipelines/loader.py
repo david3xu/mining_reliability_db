@@ -7,7 +7,7 @@ Clean implementation without backwards compatibility pollution.
 import logging
 from typing import Dict, List, Any
 from mine_core.database.db import get_database
-from mine_core.shared.constants import ENTITY_LOAD_ORDER, RELATIONSHIP_CONFIGS
+from configs.environment import get_system_constants
 from mine_core.shared.common import handle_error
 from mine_core.shared.field_utils import (
     has_real_value,
@@ -22,6 +22,9 @@ class Neo4jLoader:
     def __init__(self, uri=None, user=None, password=None):
         """Initialize loader with database connection"""
         self.db = get_database(uri, user, password)
+        self.system_constants = get_system_constants()
+        self.entity_load_order = self.system_constants.get("processing", {}).get("entity_load_order", [])
+        self.relationship_configs = self.system_constants.get("relationships", {}).get("configs", [])
 
     def close(self):
         """Close database connection"""
@@ -65,7 +68,7 @@ class Neo4jLoader:
 
     def _load_all_entities(self, entities: Dict[str, List[Dict[str, Any]]]) -> bool:
         """Load all entities in hierarchical order"""
-        for entity_type in ENTITY_LOAD_ORDER:
+        for entity_type in self.entity_load_order:
             entity_list = entities.get(entity_type, [])
             if not self._load_entities_with_labeling(entity_list, entity_type):
                 return False
@@ -137,7 +140,7 @@ class Neo4jLoader:
 
     def _create_all_relationships(self, entities: Dict[str, List[Dict[str, Any]]]) -> bool:
         """Create all entity relationships"""
-        for config in RELATIONSHIP_CONFIGS:
+        for config in self.relationship_configs:
             from_type, from_field, rel_type, to_type, to_field = config
             if not self._create_relationship_batch(from_type, from_field, rel_type,
                                                  to_type, to_field, entities.get(from_type, [])):

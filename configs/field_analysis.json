@@ -1,0 +1,45 @@
+{
+  "completion_thresholds": {
+    "very_low": 20,
+    "low": 40,
+    "medium": 60,
+    "good": 80,
+    "high": 100
+  },
+  "completion_colors": {
+    "very_low": "#D32F2F",
+    "low": "#F57C00",
+    "medium": "#FFA000",
+    "good": "#7CB342",
+    "high": "#388E3C"
+  },
+  "missing_indicators": [
+    "null",
+    "none",
+    "",
+    "n/a",
+    "data_not_available",
+    "NOT_SPECIFIED",
+    "DATA_NOT_AVAILABLE"
+  ],
+  "chart_config": {
+    "row_height": 25,
+    "min_height": 400,
+    "max_completion": 100,
+    "tick_interval": 20,
+    "margin_left": 200,
+    "margin_right": 50,
+    "margin_top": 60,
+    "margin_bottom": 50
+  },
+  "exclusions": {
+    "exclude_complete_fields": true,
+    "minimum_completion_threshold": 0,
+    "exclude_system_fields": ["id", "created_at", "updated_at", "node_type"]
+  },
+  "analysis_config": {
+    "max_records_to_analyze": 10000,
+    "include_null_values": false,
+    "case_sensitive_matching": false
+  }
+}

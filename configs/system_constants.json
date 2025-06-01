@@ -1,0 +1,186 @@
+{
+  "database": {
+    "default_uri": "bolt://localhost:7687",
+    "default_user": "neo4j",
+    "default_password": "password",
+    "batch_size": 5000,
+    "connection_timeout": 30,
+    "max_retries": 3
+  },
+  "processing": {
+    "default_log_level": "INFO",
+    "default_data_dir": "./data/facility_data",
+    "entity_load_order": [
+      "ActionRequest",
+      "Problem",
+      "RootCause",
+      "ActionPlan",
+      "Verification",
+      "Department",
+      "Asset",
+      "RecurringStatus",
+      "AmountOfLoss",
+      "Review",
+      "EquipmentStrategy"
+    ]
+  },
+  "field_processing": {
+    "priority_categories": {
+      "critical": [
+        "Action Request Number:",
+        "Title",
+        "What happened?",
+        "Root Cause",
+        "Action Plan"
+      ],
+      "high": [
+        "Categories",
+        "Stage",
+        "Complete",
+        "IsActionPlanEffective",
+        "Initiation Date"
+      ],
+      "medium": [
+        "Asset Number(s)",
+        "Init. Dept.",
+        "Due Date",
+        "Recurring Problem(s)"
+      ],
+      "low": ["Comments", "Reason if not Satisfactory", "Days Past Due"]
+    }
+  },
+  "relationships": {
+    "configs": [
+      ["ActionRequest", "facility_id", "BELONGS_TO", "Facility", "facility_id"],
+      [
+        "Problem",
+        "actionrequest_id",
+        "IDENTIFIED_IN",
+        "ActionRequest",
+        "actionrequest_id"
+      ],
+      ["RootCause", "problem_id", "ANALYZES", "Problem", "problem_id"],
+      ["ActionPlan", "rootcause_id", "RESOLVES", "RootCause", "rootcause_id"],
+      [
+        "Verification",
+        "actionplan_id",
+        "VALIDATES",
+        "ActionPlan",
+        "actionplan_id"
+      ],
+      ["Asset", "problem_id", "INVOLVED_IN", "Problem", "problem_id"],
+      ["AmountOfLoss", "problem_id", "QUANTIFIES", "Problem", "problem_id"],
+      ["RecurringStatus", "problem_id", "CLASSIFIES", "Problem", "problem_id"],
+      [
+        "Department",
+        "actionrequest_id",
+        "ASSIGNED_TO",
+        "ActionRequest",
+        "actionrequest_id"
+      ],
+      ["Review", "actionplan_id", "EVALUATES", "ActionPlan", "actionplan_id"],
+      [
+        "EquipmentStrategy",
+        "actionplan_id",
+        "MODIFIES",
+        "ActionPlan",
+        "actionplan_id"
+      ]
+    ]
+  },
+  "validation": {
+    "entity_creation_thresholds": {
+      "min_field_length": 3,
+      "max_label_length": 50,
+      "required_field_ratio": 0.3,
+      "skip_common_values": [
+        "unknown",
+        "n/a",
+        "none",
+        "null",
+        "empty",
+        "tbd",
+        "pending"
+      ]
+    },
+    "boolean_normalization": {
+      "true_values": [
+        "true",
+        "yes",
+        "1",
+        "completed",
+        "effective",
+        "satisfactory",
+        "applicable",
+        "required",
+        "success",
+        "positive"
+      ],
+      "false_values": [
+        "false",
+        "no",
+        "0",
+        "pending",
+        "ineffective",
+        "unsatisfactory",
+        "not applicable",
+        "not required",
+        "failure",
+        "negative"
+      ]
+    }
+  },
+  "analytics": {
+    "categories": {
+      "causal_intelligence": [
+        "Root Cause",
+        "Obj. Evidence",
+        "Recurring Problem(s)"
+      ],
+      "performance_indicators": [
+        "Days Past Due",
+        "Complete",
+        "IsActionPlanEffective",
+        "Is Resp Satisfactory?"
+      ],
+      "classification_dimensions": [
+        "Categories",
+        "Action Types",
+        "Stage",
+        "Operating Centre",
+        "Init. Dept.",
+        "Rec. Dept."
+      ],
+      "resolution_tracking": [
+        "Action Plan",
+        "Recom.Action",
+        "Due Date",
+        "Completion Date",
+        "Effectiveness Verification Due Date"
+      ]
+    }
+  },
+  "root_cause_processing": {
+    "tail_extraction_delimiters": [
+      ";",
+      ",",
+      "|",
+      "\n",
+      " - ",
+      " / ",
+      " and ",
+      " & "
+    ],
+    "preserve_original": true,
+    "enable_causal_correlation": true,
+    "primary_field": "root_cause",
+    "secondary_field": "root_cause_tail"
+  },
+  "query_optimization": {
+    "batch_relationship_creation": true,
+    "use_periodic_commit": true,
+    "periodic_commit_size": 1000,
+    "create_indexes_for_labels": true,
+    "enable_query_caching": true
+  }
+}

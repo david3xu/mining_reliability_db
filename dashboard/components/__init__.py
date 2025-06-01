@@ -86,6 +86,7 @@ __all__ = [
     'create_enhanced_field_distribution_chart',
     'create_enhanced_facility_pie_chart',
     'create_enhanced_historical_table',
+    'create_workflow_analysis_layout'
 
     # Dedicated Analysis Pages
     'create_historical_records_page',

@@ -3,31 +3,39 @@
     {
       "name": "Facility",
       "properties": {
-        "facility_id": {"type": "string", "primary_key": true, "required": true},
-        "facility_name": {"type": "string", "required": true},
-        "location": {"type": "string"},
-        "active": {"type": "boolean", "default": true}
+        "facility_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "facility_name": { "type": "string", "required": true },
+        "location": { "type": "string" },
+        "active": { "type": "boolean", "default": true }
       },
       "dynamic_labeling": {
-        "enabled": false,
-        "label_field": null
+        "enabled": true,
+        "cascade_priority": ["facility_name", "location"]
       }
     },
     {
       "name": "ActionRequest",
       "properties": {
-        "actionrequest_id": {"type": "string", "primary_key": true, "required": true},
-        "facility_id": {"type": "string", "required": true},
-        "action_request_number": {"type": "string", "required": true},
-        "title": {"type": "string"},
-        "initiation_date": {"type": "date"},
-        "action_types": {"type": "string"},
-        "categories": {"type": "string"},
-        "requested_response_time": {"type": "string"},
-        "stage": {"type": "string"},
-        "operating_centre": {"type": "string"},
-        "past_due_status": {"type": "string"},
-        "days_past_due": {"type": "integer"}
+        "actionrequest_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "facility_id": { "type": "string", "required": true },
+        "action_request_number": { "type": "string", "required": true },
+        "title": { "type": "string" },
+        "initiation_date": { "type": "date" },
+        "action_types": { "type": "string" },
+        "categories": { "type": "string" },
+        "requested_response_time": { "type": "string" },
+        "stage": { "type": "string" },
+        "operating_centre": { "type": "string" },
+        "past_due_status": { "type": "string" },
+        "days_past_due": { "type": "integer" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -37,10 +45,14 @@
     {
       "name": "Problem",
       "properties": {
-        "problem_id": {"type": "string", "primary_key": true, "required": true},
-        "actionrequest_id": {"type": "string", "required": true},
-        "what_happened": {"type": "text"},
-        "requirement": {"type": "text"}
+        "problem_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "actionrequest_id": { "type": "string", "required": true },
+        "what_happened": { "type": "text" },
+        "requirement": { "type": "text" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -50,11 +62,15 @@
     {
       "name": "RootCause",
       "properties": {
-        "rootcause_id": {"type": "string", "primary_key": true, "required": true},
-        "problem_id": {"type": "string", "required": true},
-        "root_cause": {"type": "text", "required": true},
-        "root_cause_tail": {"type": "text"},
-        "objective_evidence": {"type": "text"}
+        "rootcause_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "problem_id": { "type": "string", "required": true },
+        "root_cause": { "type": "text" },
+        "root_cause_tail": { "type": "text" },
+        "objective_evidence": { "type": "text" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -69,47 +85,66 @@
     {
       "name": "ActionPlan",
       "properties": {
-        "actionplan_id": {"type": "string", "primary_key": true, "required": true},
-        "rootcause_id": {"type": "string", "required": true},
-        "action_plan": {"type": "text"},
-        "recommended_action": {"type": "text"},
-        "immediate_containment": {"type": "text"},
-        "due_date": {"type": "date"},
-        "complete": {"type": "boolean", "default": false},
-        "completion_date": {"type": "date"},
-        "comments": {"type": "text"},
-        "response_date": {"type": "date"},
-        "response_revision_date": {"type": "date"},
-        "did_plan_require_strategy_change": {"type": "boolean", "default": false},
-        "are_there_corrective_actions_to_update": {"type": "boolean", "default": false}
+        "actionplan_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "rootcause_id": { "type": "string", "required": true },
+        "action_plan": { "type": "text" },
+        "recommended_action": { "type": "text" },
+        "immediate_containment": { "type": "text" },
+        "due_date": { "type": "date" },
+        "complete": { "type": "boolean" },
+        "completion_date": { "type": "date" },
+        "comments": { "type": "text" },
+        "response_date": { "type": "date" },
+        "response_revision_date": { "type": "date" },
+        "did_plan_require_strategy_change": { "type": "boolean" },
+        "are_there_corrective_actions_to_update": { "type": "boolean" }
       },
       "dynamic_labeling": {
         "enabled": true,
-        "cascade_priority": ["action_plan", "recommended_action", "complete"]
+        "cascade_priority": [
+          "action_plan",
+          "recommended_action",
+          "immediate_containment"
+        ]
       }
     },
     {
       "name": "Verification",
       "properties": {
-        "verification_id": {"type": "string", "primary_key": true, "required": true},
-        "actionplan_id": {"type": "string", "required": true},
-        "effectiveness_verification_due_date": {"type": "date"},
-        "is_action_plan_effective": {"type": "boolean"},
-        "action_plan_eval_comment": {"type": "text"},
-        "action_plan_verification_date": {"type": "date"}
+        "verification_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "actionplan_id": { "type": "string", "required": true },
+        "effectiveness_verification_due_date": { "type": "date" },
+        "is_action_plan_effective": { "type": "boolean" },
+        "action_plan_eval_comment": { "type": "text" },
+        "action_plan_verification_date": { "type": "date" }
       },
       "dynamic_labeling": {
         "enabled": true,
-        "cascade_priority": ["is_action_plan_effective", "action_plan_eval_comment"]
+        "cascade_priority": [
+          "action_plan_eval_comment",
+          "is_action_plan_effective"
+        ]
       }
     },
     {
       "name": "Department",
       "properties": {
-        "department_id": {"type": "string", "primary_key": true, "required": true},
-        "actionrequest_id": {"type": "string", "required": true},
-        "init_dept": {"type": "string"},
-        "rec_dept": {"type": "string"}
+        "department_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "actionrequest_id": { "type": "string", "required": true },
+        "init_dept": { "type": "string" },
+        "rec_dept": { "type": "string" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -119,10 +154,10 @@
     {
       "name": "Asset",
       "properties": {
-        "asset_id": {"type": "string", "primary_key": true, "required": true},
-        "problem_id": {"type": "string", "required": true},
-        "asset_numbers": {"type": "string"},
-        "asset_activity_numbers": {"type": "string"}
+        "asset_id": { "type": "string", "primary_key": true, "required": true },
+        "problem_id": { "type": "string", "required": true },
+        "asset_numbers": { "type": "string" },
+        "asset_activity_numbers": { "type": "string" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -132,22 +167,30 @@
     {
       "name": "RecurringStatus",
       "properties": {
-        "recurringstatus_id": {"type": "string", "primary_key": true, "required": true},
-        "problem_id": {"type": "string", "required": true},
-        "recurring_problems": {"type": "boolean", "default": false},
-        "recurring_comment": {"type": "text"}
+        "recurringstatus_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "problem_id": { "type": "string", "required": true },
+        "recurring_problems": { "type": "boolean", "default": false },
+        "recurring_comment": { "type": "text" }
       },
       "dynamic_labeling": {
         "enabled": true,
-        "cascade_priority": ["recurring_problems", "recurring_comment"]
+        "cascade_priority": ["recurring_comment", "recurring_problems"]
       }
     },
     {
       "name": "AmountOfLoss",
       "properties": {
-        "amountofloss_id": {"type": "string", "primary_key": true, "required": true},
-        "problem_id": {"type": "string", "required": true},
-        "amount_of_loss": {"type": "string"}
+        "amountofloss_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "problem_id": { "type": "string", "required": true },
+        "amount_of_loss": { "type": "string" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -157,24 +200,38 @@
     {
       "name": "Review",
       "properties": {
-        "review_id": {"type": "string", "primary_key": true, "required": true},
-        "actionplan_id": {"type": "string", "required": true},
-        "is_resp_satisfactory": {"type": "boolean"},
-        "reason_if_not_satisfactory": {"type": "text"},
-        "reviewed_date": {"type": "date"},
-        "did_plan_require_change_review": {"type": "boolean", "default": false}
+        "review_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "actionplan_id": { "type": "string", "required": true },
+        "is_resp_satisfactory": { "type": "boolean" },
+        "reason_if_not_satisfactory": { "type": "text" },
+        "reviewed_date": { "type": "date" },
+        "did_plan_require_change_review": {
+          "type": "boolean",
+          "default": false
+        }
       },
       "dynamic_labeling": {
         "enabled": true,
-        "cascade_priority": ["is_resp_satisfactory", "reason_if_not_satisfactory"]
+        "cascade_priority": [
+          "reason_if_not_satisfactory",
+          "is_resp_satisfactory"
+        ]
       }
     },
     {
       "name": "EquipmentStrategy",
       "properties": {
-        "equipmentstrategy_id": {"type": "string", "primary_key": true, "required": true},
-        "actionplan_id": {"type": "string", "required": true},
-        "apss_doc_number": {"type": "string"}
+        "equipmentstrategy_id": {
+          "type": "string",
+          "primary_key": true,
+          "required": true
+        },
+        "actionplan_id": { "type": "string", "required": true },
+        "apss_doc_number": { "type": "string" }
       },
       "dynamic_labeling": {
         "enabled": true,
@@ -289,7 +346,12 @@
     },
     "temporal_analysis": {
       "entities": ["ActionRequest", "ActionPlan", "Verification"],
-      "key_fields": ["initiation_date", "due_date", "completion_date", "action_plan_verification_date"]
+      "key_fields": [
+        "initiation_date",
+        "due_date",
+        "completion_date",
+        "action_plan_verification_date"
+      ]
     }
   },
   "data_quality_framework": {

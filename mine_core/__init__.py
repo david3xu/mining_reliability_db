@@ -23,7 +23,7 @@ from mine_core.database import (
     get_causal_correlation_matrix
 )
 from mine_core.pipelines import FacilityDataExtractor, DataTransformer, Neo4jLoader
-from mine_core.shared import constants, field_utils, common
+from mine_core.shared import field_utils, common
 from mine_core.entities import get_entity_definitions, create_entity_from_dict, get_schema_manager
 from mine_core.helpers import setup_logging, get_logger
 from mine_core.analytics import WorkflowAnalyzer, PatternDiscovery, QualityAnalyzer
