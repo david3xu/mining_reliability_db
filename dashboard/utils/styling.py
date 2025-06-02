@@ -30,35 +30,33 @@ def get_colors() -> Dict[str, str]:
 
 
 def get_fonts() -> Dict[str, Any]:
-    """Direct typography configuration access"""
+    """Get fonts configuration"""
     config_adapter = get_config_adapter()
-    chart = config_adapter.get_chart_config()
-
+    chart = config_adapter.get_dashboard_chart_config()
     return {
-        "primary_font": chart.get("font_family", "Arial, sans-serif"),
-        "title_size": chart.get("title_font_size", 24),
-        "subtitle_size": chart.get("subtitle_font_size", 18),
-        "body_size": chart.get("body_font_size", 14),
-        "caption_size": chart.get("caption_font_size", 12),
-        "metric_size": 32,
-        "metric_label_size": 14,
+        "family": chart.get("font_family", "Arial, sans-serif"),
+        "size": chart.get("title_font_size", 12),
+        "color": get_colors().get("text_primary"),
     }
 
 
 def get_layout_dimensions() -> Dict[str, Any]:
-    """Direct layout dimension configuration"""
+    """Get layout dimensions configuration"""
     config_adapter = get_config_adapter()
-    chart = config_adapter.get_chart_config()
-
+    chart = config_adapter.get_dashboard_chart_config()
     return {
-        "container_padding": "20px",
-        "component_margin": "15px",
-        "card_padding": "20px",
+        "container_padding": chart.get("container_padding", "20px"),
         "metric_card_height": chart.get("metric_card_height", 120),
         "metric_card_width": chart.get("metric_card_width", 220),
         "chart_height": chart.get("default_height", 400),
         "table_height": chart.get("table_height", 300),
-        "mobile_breakpoint": "768px",
+        "card_padding": chart.get("micro_component_configs", {})
+        .get("metric_card", {})
+        .get("dimensions", {})
+        .get("padding", 20),
+        "component_margin": chart.get("micro_component_configs", {}).get(
+            "component_margin", "15px"
+        ),
     }
 
 
@@ -78,7 +76,7 @@ def get_metric_card_style(color: str = None) -> Dict[str, Any]:
         "height": f"{layout['metric_card_height']}px",
         "width": f"{layout['metric_card_width']}px",
         "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.1)",
-        "margin": layout["component_margin"],
+        "margin": layout.get("component_margin", "15px"),
         "display": "flex",
         "flexDirection": "column",
         "justifyContent": "center",
@@ -96,9 +94,9 @@ def get_chart_layout_template(title: str = "") -> Dict[str, Any]:
         "title": {
             "text": title,
             "font": {
-                "family": fonts["primary_font"],
-                "size": fonts["title_size"],
-                "color": colors["text_primary"],
+                "family": fonts["family"],
+                "size": fonts["size"],
+                "color": fonts["color"],
             },
             "x": 0.5,
             "xanchor": "center",
@@ -106,9 +104,9 @@ def get_chart_layout_template(title: str = "") -> Dict[str, Any]:
         "paper_bgcolor": colors["background_light"],
         "plot_bgcolor": colors["background_light"],
         "font": {
-            "family": fonts["primary_font"],
-            "size": fonts["body_size"],
-            "color": colors["text_primary"],
+            "family": fonts["family"],
+            "size": fonts["size"],
+            "color": fonts["color"],
         },
         "margin": {"l": 60, "r": 30, "t": 60, "b": 60},
         "height": layout["chart_height"],
@@ -125,7 +123,7 @@ def get_bar_chart_style() -> Dict[str, Any]:
             "color": colors["chart_colors"],
             "line": {"color": colors["border_color"], "width": 1},
         },
-        "textfont": {"size": fonts["caption_size"]},
+        "textfont": {"size": fonts["size"]},
         "textposition": "outside",
     }
 
@@ -140,7 +138,7 @@ def get_pie_chart_style() -> Dict[str, Any]:
             "colors": colors["chart_colors"],
             "line": {"color": colors["background_light"], "width": 2},
         },
-        "textfont": {"size": fonts["body_size"], "color": colors["text_light"]},
+        "textfont": {"size": fonts["size"], "color": colors["text_light"]},
         "textposition": "inside",
         "textinfo": "label+percent",
         "hovertemplate": "<b>%{label}</b><br>Records: %{value}<br>Percentage: %{percent}<extra></extra>",
@@ -157,8 +155,8 @@ def get_table_style() -> Dict[str, Any]:
         "style_cell": {
             "textAlign": "center",
             "padding": "12px",
-            "fontFamily": fonts["primary_font"],
-            "fontSize": fonts["body_size"],
+            "fontFamily": fonts["family"],
+            "fontSize": fonts["size"],
             "border": f"1px solid {colors['border_color']}",
         },
         "style_header": {
@@ -190,7 +188,7 @@ def get_dashboard_styles() -> Dict[str, Any]:
         "main_container": {
             "backgroundColor": colors["background_light"],
             "padding": layout["container_padding"],
-            "fontFamily": fonts["primary_font"],
+            "fontFamily": fonts["family"],
         },
         "header_section": {
             "textAlign": "center",

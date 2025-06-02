@@ -24,6 +24,7 @@ from dashboard.routing.navigation_builder import get_navigation_builder
 
 # Pure routing and navigation
 from dashboard.routing.url_manager import get_url_manager
+from dashboard.utils.styling import get_dashboard_styles
 from mine_core.shared.common import handle_error, setup_project_environment
 
 logger = None
@@ -59,8 +60,8 @@ class PurifiedDashboardApp:
             data_adapter = get_data_adapter()
             config_adapter = get_config_adapter()
 
-            validation = data_adapter.validate_data_availability()
-            if validation.is_valid:
+            validation = data_adapter.get_data_quality_validation()
+            if validation.overall_status:
                 logger.info("✅ Adapter layer validated")
             else:
                 logger.warning("⚠️ Adapter validation issues detected")
@@ -71,8 +72,8 @@ class PurifiedDashboardApp:
     def _initialize_app(self):
         """Initialize Dash application with clean architecture"""
         try:
-            config_adapter = get_config_adapter()
-            styling = config_adapter.get_styling_config()
+            # Use centralized styling utility
+            styling = get_dashboard_styles()
 
             self.app = dash.Dash(
                 __name__,
@@ -82,6 +83,7 @@ class PurifiedDashboardApp:
                         "href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
                         "rel": "stylesheet",
                     },
+                    "./assets/custom_styles.css",
                 ],
                 suppress_callback_exceptions=True,
                 title="Mining Reliability Database",
@@ -101,12 +103,18 @@ class PurifiedDashboardApp:
     def _create_layout(self):
         """Create application layout with navigation delegation"""
         navigation_builder = get_navigation_builder()
+        # Use centralized styling utility for main layout background
+        styling = get_dashboard_styles()
 
         return html.Div(
             [
                 dcc.Location(id="url", refresh=False),
                 navigation_builder.build_main_navigation(),
-                html.Div(id="page-content", className="container-fluid p-4"),
+                html.Div(
+                    id="page-content",
+                    className="container-fluid p-4",
+                    style=styling["main_container"],
+                ),
             ]
         )
 

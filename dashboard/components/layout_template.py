@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 from dashboard.adapters import get_config_adapter
+from dashboard.utils.styling import get_colors, get_dashboard_styles
 
 __all__ = [
     "create_metrics_row",
@@ -58,22 +59,30 @@ def create_summary_section(summary_component: Any, title: str = "Analysis Summar
 
 
 def create_standard_layout(
-    tab_id: str,
-    metric_cards: List[Any],
-    left_component: Any,
-    right_component: Any,
-    summary_component: Any,
-    summary_title: str = "Analysis Summary",
+    title: str,
+    content_cards: List[Any],
 ) -> html.Div:
-    """Complete standardized layout template"""
+    """Complete standardized layout template with dynamic content cards"""
+    colors = get_colors()
+    dashboard_styles = get_dashboard_styles()
+
     return html.Div(
         [
-            create_tab_header(tab_id),
-            create_metrics_row(metric_cards),
-            create_main_grid(left_component, right_component),
-            create_summary_section(summary_component, summary_title),
+            html.H2(
+                title,
+                className="text-center mb-4",
+                style={
+                    "color": colors.get("text_light"),
+                    "fontSize": dashboard_styles.get("title_font_size", "2.5rem"),
+                },
+            ),
+            html.Div(content_cards, className="d-flex flex-column gap-4"),
         ],
-        className="container-fluid",
+        className="container-fluid p-4",
+        style={
+            "backgroundColor": colors.get("background_main"),
+            "minHeight": "100vh",
+        },
     )
 
 

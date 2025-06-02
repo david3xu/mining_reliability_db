@@ -10,9 +10,16 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 from dash import dash_table, dcc, html
 
-from dashboard.adapters import get_config_adapter, get_facility_adapter
+from dashboard.adapters import get_config_adapter, get_facility_adapter, handle_error_utility
+from dashboard.components.layout_template import create_standard_layout
 from dashboard.components.micro.chart_base import create_pie_chart
 from dashboard.components.micro.metric_card import create_metric_card
+from dashboard.utils.styling import (
+    get_chart_layout_template,
+    get_colors,
+    get_fonts,
+    get_table_style,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +62,7 @@ def create_facility_metrics_cards(facility_id: str) -> list:
         return cards
 
     except Exception as e:
-        config_adapter.handle_error_utility(
+        handle_error_utility(
             logger, e, f"facility metrics cards creation for {facility_id}"
         )
         return []
@@ -79,7 +86,7 @@ def create_facility_category_chart(facility_id: str) -> dcc.Graph:
         return create_pie_chart(labels, values, f"{facility_id} Issue Categories")
 
     except Exception as e:
-        config_adapter.handle_error_utility(
+        handle_error_utility(
             logger, e, f"facility category chart creation for {facility_id}"
         )
         return dcc.Graph(figure={})
@@ -124,7 +131,7 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        config_adapter.handle_error_utility(
+        handle_error_utility(
             logger, e, f"recurring issues analysis for {facility_id}"
         )
         return dcc.Graph(figure={})
@@ -186,112 +193,146 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
         )
 
     except Exception as e:
-        config_adapter.handle_error_utility(
+        handle_error_utility(
             logger, e, f"operating centre table creation for {facility_id}"
         )
         return dash_table.DataTable(data=[])
 
 
-def create_facility_detail_layout(facility_id: str) -> html.Div:
-    """Complete facility detail layout"""
+def create_facility_detail_layout(facility_name: str) -> html.Div:
+    """Layout for a single facility detail page"""
     try:
         facility_adapter = get_facility_adapter()
         config_adapter = get_config_adapter()
+        colors = get_colors()
 
-        # Validate facility exists
-        validation = facility_adapter.validate_facility_data(facility_id)
-        if not validation.get("facility_exists", False):
-            return dbc.Container(
-                [
-                    dbc.Alert(
-                        [
-                            html.H4("Facility Not Found"),
-                            html.P(f"Facility '{facility_id}' does not exist or has no data"),
-                            dbc.Button("Return to Portfolio", href="/", color="primary"),
-                        ],
-                        color="warning",
-                    )
-                ]
+        # Fetch facility data
+        facility_data = facility_adapter.get_facility_statistics_analysis(facility_name)
+        if not facility_data or facility_data.get("error"):
+            return html.Div(
+                html.P(
+                    f"Could not load data for facility: {facility_name}. {facility_data.get("error", "")}"
+                ),
+                className="alert alert-warning",
             )
 
-        # Get facility info
-        facility_analysis = facility_adapter.get_facility_performance_analysis(facility_id)
-        facility_name = facility_analysis.get("facility_name", facility_id)
+        # Data quality metrics for the facility
+        quality_metrics = facility_data.get("completeness_metrics", {})
+        entity_completeness = quality_metrics.get("entity_completeness", {})
+        incident_summary = facility_data.get("total_action_requests", 0) # This is a placeholder as incident_summary is not directly available
+        action_summary = {} # This is a placeholder as action_summary is not directly available
 
-        return html.Div(
-            [
-                # Header with back navigation
-                dbc.Container(
-                    [
-                        dbc.Button(
-                            "← Back to Portfolio",
-                            href="/",
-                            color="secondary",
-                            size="sm",
-                            className="mb-3",
-                        ),
-                        html.H2(
-                            f"{facility_name} - Detailed Analysis", className="text-primary mb-4"
-                        ),
-                    ],
-                    fluid=True,
+        # Extract relevant metrics for cards
+        overall_score = quality_metrics.get("overall_score", 0.0)
+        total_incidents = incident_summary
+        open_actions = 0 # This is a placeholder
+
+        metrics = [
+            create_metric_card(f"{overall_score:.1f}%", "Overall Quality Score"),
+            create_metric_card(total_incidents, "Total Incidents"),
+            create_metric_card(open_actions, "Open Actions"),
+        ]
+
+        # Chart for entity completeness
+        # The entity_completeness structure from _analyze_entity_completeness is different.
+        # Need to adapt it or query it separately if a detailed chart is required.
+        # For now, I'll use a dummy data if entity_completeness is not directly available in expected format.
+        if not entity_completeness:
+            entity_names = []
+            completeness_scores = []
+        else:
+            entity_names = list(entity_completeness.keys())
+            completeness_scores = [
+                entity_completeness[e].get("completeness_percentage", 0.0) for e in entity_names
+            ]
+
+        entity_completeness_chart = go.Figure(
+            data=[
+                go.Bar(
+                    x=entity_names,
+                    y=completeness_scores,
+                    marker_color=[colors.get("primary_color")] * len(entity_names),
+                )
+            ]
+        )
+        entity_completeness_chart.update_layout(
+            **get_chart_layout_template(),
+            title_text="Entity Completeness",
+            xaxis_title="Entity",
+            yaxis_title="Completeness (%)",
+            font=get_fonts()
+        )
+
+        # Incident status table - adapting to available data
+        incident_table_data = [
+            {"Category": "Total Incidents", "Count": total_incidents, "Color": colors.get("table_header_bg")}
+        ]
+        incident_table = dash_table.DataTable(
+            id="incident-status-table",
+            columns=[{"name": i, "id": i} for i in incident_table_data[0].keys()],
+            data=incident_table_data,
+            style_header=get_table_style().get("header", {}),
+            style_data=get_table_style().get("data", {}),
+            style_table=get_table_style().get("table", {}),
+        )
+
+        # Action status table - currently no direct equivalent in facility_statistics_analysis
+        action_table = dash_table.DataTable(
+            id="action-status-table",
+            columns=[{"name": "Category", "id": "Category"}, {"name": "Count", "id": "Count"}],
+            data=[{"Category": "Open Actions", "Count": open_actions}],
+            style_header=get_table_style().get("header", {}),
+            style_data=get_table_style().get("data", {}),
+            style_table=get_table_style().get("table", {}),
+        )
+
+        return create_standard_layout(
+            title=f"{facility_name} Detail Analysis",
+            content_cards=[
+                html.Div(
+                    metrics,
+                    className="d-flex justify-content-around mb-4",
+                    style={
+                        "backgroundColor": colors.get("background_dark"),
+                        "padding": "20px",
+                        "borderRadius": "8px",
+                        "color": colors.get("text_light"),
+                    },
                 ),
-                # Metrics cards
                 html.Div(
                     [
-                        html.H4("Performance Metrics", className="mb-3"),
+                        dcc.Graph(
+                            id="entity-completeness-chart", figure=entity_completeness_chart
+                        ),
                         html.Div(
-                            create_facility_metrics_cards(facility_id),
-                            className="d-flex justify-content-around flex-wrap gap-3 mb-4",
-                        ),
-                    ],
-                    className="mb-5",
-                ),
-                # Analysis charts
-                dbc.Row(
-                    [
-                        dbc.Col(
                             [
-                                html.H5("Category Distribution", className="mb-3"),
-                                create_facility_category_chart(facility_id),
+                                html.H4("Incident Status", className="text-center"),
+                                incident_table,
+                                html.H4("Action Status", className="text-center mt-4"),
+                                action_table,
                             ],
-                            md=6,
-                        ),
-                        dbc.Col(
-                            [
-                                html.H5("Recurring Issues", className="mb-3"),
-                                create_recurring_issues_analysis(facility_id),
-                            ],
-                            md=6,
+                            className="p-4",
+                            style={
+                                "backgroundColor": colors.get("background_dark"),
+                                "padding": "20px",
+                                "borderRadius": "8px",
+                                "color": colors.get("text_light"),
+                            },
                         ),
                     ],
-                    className="mb-5",
-                ),
-                # Detailed analysis table
-                html.Div(
-                    [
-                        html.H5("Root Cause Analysis", className="mb-3"),
-                        create_operating_centre_table(facility_id),
-                    ],
-                    className="mb-4",
+                    className="row", # This is hardcoded to be row
+                    style={
+                        "backgroundColor": colors.get("background_dark"),
+                        "color": colors.get("text_light"),
+                    }
                 ),
             ],
-            className="container-fluid p-4",
         )
 
     except Exception as e:
-        config_adapter.handle_error_utility(
-            logger, e, f"facility detail layout creation for {facility_id}"
-        )
-        return dbc.Container(
-            [
-                dbc.Alert(
-                    [
-                        html.H4("Analysis Error"),
-                        html.P(f"Failed to load analysis for facility: {facility_id}"),
-                        dbc.Button("Return to Portfolio", href="/", color="secondary"),
-                    ],
-                    color="danger",
-                )
-            ]
+        logging.error(f"Error creating facility detail layout for {facility_name}: {e}")
+        handle_error_utility(logger, e, f"facility detail layout creation for {facility_name}")
+        return html.Div(
+            html.P(f"Error loading facility detail for {facility_name}: {e}"),
+            className="alert alert-danger",
         )

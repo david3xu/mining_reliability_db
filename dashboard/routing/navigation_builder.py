@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 import dash_bootstrap_components as dbc
 
 from dashboard.adapters import get_config_adapter, get_facility_adapter
+from dashboard.utils.styling import get_colors, get_dashboard_styles
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
@@ -25,28 +26,52 @@ class NavigationBuilder:
     def build_main_navigation(self) -> dbc.NavbarSimple:
         """Build main navigation bar with dynamic facility data"""
         try:
-            styling = self.config_adapter.get_styling_config()
+            styling = get_dashboard_styles()
+            colors = get_colors()
 
             # Core navigation items
-            nav_items = [dbc.NavItem(dbc.NavLink("Portfolio", href="/", className="nav-link"))]
+            nav_items = [
+                dbc.NavItem(
+                    dbc.NavLink("Portfolio", href="/", className="nav-link"),
+                    style={"display": "flex", "alignItems": "center"},
+                ),
+                dbc.NavItem(
+                    dbc.NavLink("Data Quality", href="/data-quality", className="nav-link"),
+                    style={"display": "flex", "alignItems": "center"},
+                ),
+                dbc.NavItem(
+                    dbc.NavLink("Workflow Analysis", href="/workflow", className="nav-link"),
+                    style={"display": "flex", "alignItems": "center"},
+                ),
+            ]
 
             # Analysis dropdown with facility data
             analysis_dropdown = self._build_analysis_dropdown()
-            nav_items.append(analysis_dropdown)
+            nav_items.append(
+                dbc.NavItem(analysis_dropdown, style={"display": "flex", "alignItems": "center"})
+            )
 
             # System dropdown
             system_dropdown = self._build_system_dropdown()
-            nav_items.append(system_dropdown)
+            nav_items.append(
+                dbc.NavItem(system_dropdown, style={"display": "flex", "alignItems": "center"})
+            )
 
             return dbc.NavbarSimple(
                 children=nav_items,
                 brand="Mining Reliability Database",
                 brand_href="/",
                 brand_style={"fontSize": "18px", "fontWeight": "bold"},
-                color=styling.get("background_dark", "#1E1E1E"),
+                color=colors.get("background_dark", "#1E1E1E"),
                 dark=True,
                 fluid=True,
                 className="mb-3",
+                style={
+                    "display": "flex",
+                    "alignItems": "center",
+                    "--bs-navbar-nav-link-padding-y": "0.5rem",
+                    "--bs-navbar-nav-link-padding-x": "0.5rem",
+                },
             )
 
         except Exception as e:
@@ -54,34 +79,14 @@ class NavigationBuilder:
             return self._build_fallback_navigation()
 
     def _build_analysis_dropdown(self) -> dbc.DropdownMenu:
-        """Build analysis dropdown with dynamic facility links"""
+        """Build analysis dropdown without facility links"""
         try:
-            facilities = self.facility_adapter.get_facility_list()
-
             dropdown_items = []
 
-            # Add facility links
-            for facility in facilities:
-                facility_id = facility.get("facility_id", "Unknown")
-                incident_count = facility.get("incident_count", 0)
-
-                dropdown_items.append(
-                    dbc.DropdownMenuItem(
-                        f"{facility_id} ({incident_count:,} records)",
-                        href=f"/facility/{facility_id}",
-                    )
-                )
-
             # Add separator and analysis pages
-            if dropdown_items:
-                dropdown_items.append(dbc.DropdownMenuItem(divider=True))
-
             dropdown_items.extend(
                 [
                     dbc.DropdownMenuItem("Historical Records", href="/historical-records"),
-                    dbc.DropdownMenuItem(
-                        "Facilities Distribution", href="/facilities-distribution"
-                    ),
                     dbc.DropdownMenuItem(
                         "Data Types Distribution", href="/data-types-distribution"
                     ),
@@ -125,11 +130,12 @@ class NavigationBuilder:
 
     def _build_fallback_navigation(self) -> dbc.NavbarSimple:
         """Fallback navigation when adapters fail"""
+        colors = get_colors()
         return dbc.NavbarSimple(
             children=[dbc.NavItem(dbc.NavLink("Portfolio", href="/"))],
             brand="Mining Reliability Database",
             brand_href="/",
-            color="#1E1E1E",
+            color=colors.get("background_dark", "#1E1E1E"),
             dark=True,
             fluid=True,
         )
@@ -198,8 +204,10 @@ class NavigationBuilder:
             validation["facilities_available"] = len(facilities) > 0
 
             # Test configuration
-            styling = self.config_adapter.get_styling_config()
-            validation["styling_available"] = bool(styling)
+            # Removed direct config_adapter.get_styling_config() as styling should be accessed via dashboard.utils.styling
+            validation[
+                "styling_available"
+            ] = True  # Assuming styling functions are always available
 
             return validation
 

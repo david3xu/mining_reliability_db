@@ -36,44 +36,28 @@ class FacilityAdapter:
         try:
             logger.info(f"Facility Adapter: Fetching performance analysis for {facility_id}")
 
-            # Call core business logic for causal intelligence
             causal_analysis = self.intelligence_engine.analyze_causal_intelligence(facility_id)
-
-            # Get basic facility metrics from query manager
             facility_metrics = self.query_manager.get_facility_metrics(facility_id)
 
             if not causal_analysis.data and not facility_metrics.success:
                 return {}
 
-            # Pure data transformation
-            facility_info = facility_metrics.data[0] if facility_metrics.data else {}
-            causal_patterns = causal_analysis.data.get("causal_patterns", [])
-
-            # Simple category analysis from causal patterns
-            category_distribution = {}
-            for pattern in causal_patterns:
-                category = pattern.get("category", "Unknown")
-                category_distribution[category] = category_distribution.get(
-                    category, 0
-                ) + pattern.get("frequency", 0)
-
-            # Calculate percentages
-            total_records = sum(category_distribution.values())
-            category_percentages = {}
-            for category, count in category_distribution.items():
-                percentage = round((count / total_records * 100), 1) if total_records > 0 else 0
-                category_percentages[category] = percentage
+            # Use intelligence engine for analysis
+            performance_data = self.intelligence_engine._analyze_facility_performance_metrics(
+                causal_analysis.data.get("causal_patterns", []),
+                facility_metrics,
+            )
 
             return {
                 "facility_id": facility_id,
-                "total_records": total_records,
-                "incident_count": facility_info.get("incident_count", 0),
-                "facility_name": facility_info.get("facility_name", facility_id),
-                "active": facility_info.get("active", True),
-                "category_distribution": category_distribution,
-                "category_percentages": category_percentages,
-                "categories_count": len(category_distribution),
-                "causal_patterns": causal_patterns,
+                "total_records": performance_data.get("total_records", 0),
+                "incident_count": performance_data.get("incident_count", 0),
+                "facility_name": performance_data.get("facility_name", facility_id),
+                "active": performance_data.get("active", True),
+                "category_distribution": performance_data.get("category_distribution", {}),
+                "category_percentages": performance_data.get("category_percentages", {}),
+                "categories_count": performance_data.get("categories_count", 0),
+                "causal_patterns": performance_data.get("causal_patterns", []),
                 "metadata": ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=causal_analysis.generated_at,
@@ -90,42 +74,25 @@ class FacilityAdapter:
         try:
             logger.info(f"Facility Adapter: Fetching comparison metrics for {facility_id}")
 
-            # Get target facility data
             target_facility = self.get_facility_performance_analysis(facility_id)
+            all_facilities_metrics_result = self.query_manager.get_facility_metrics()
 
-            # Get all facilities for comparison baseline
-            all_facilities_metrics = self.query_manager.get_facility_metrics()
-
-            if not target_facility or not all_facilities_metrics.success:
+            if not target_facility or not all_facilities_metrics_result.success:
                 return {}
 
-            # Calculate comparison metrics - pure calculation
-            target_records = target_facility.get("total_records", 0)
-
-            # Calculate averages from other facilities
-            other_facilities = [
-                f for f in all_facilities_metrics.data if f.get("facility_id") != facility_id
-            ]
-
-            other_records = [f.get("incident_count", 0) for f in other_facilities]
-            avg_other_records = sum(other_records) / len(other_records) if other_records else 0
-
-            # Simple ranking calculation
-            performance_rank = sum(1 for r in other_records if r < target_records) + 1
-            total_facilities = len(other_records) + 1
+            comparison_metrics = self.intelligence_engine._calculate_facility_comparison_metrics(
+                target_facility,
+                all_facilities_metrics_result.data,
+            )
 
             return {
                 "facility_id": facility_id,
-                "target_records": target_records,
-                "average_other_records": avg_other_records,
-                "performance_rank": performance_rank,
-                "total_facilities": total_facilities,
-                "percentile": round((performance_rank / total_facilities) * 100, 1),
-                "vs_average": round(
-                    ((target_records - avg_other_records) / avg_other_records * 100), 1
-                )
-                if avg_other_records > 0
-                else 0,
+                "target_records": comparison_metrics.get("target_records", 0),
+                "average_other_records": comparison_metrics.get("average_other_records", 0),
+                "performance_rank": comparison_metrics.get("performance_rank", 0),
+                "total_facilities": comparison_metrics.get("total_facilities", 0),
+                "percentile": comparison_metrics.get("percentile", 0.0),
+                "vs_average": comparison_metrics.get("vs_average", 0.0),
             }
 
         except Exception as e:
@@ -133,85 +100,65 @@ class FacilityAdapter:
             return {}
 
     def get_facility_statistics_analysis(self, facility_id: str = None) -> Dict[str, Any]:
-        """Pure data access for facility statistics using query manager"""
+        """Pure data access for facility statistics using intelligence engine"""
         try:
             logger.info(
                 f"Facility Adapter: Fetching statistics for {facility_id or 'all facilities'}"
             )
 
-            # Call query manager for facility metrics
+            # Use intelligence engine for facility completeness analysis
+            analysis_result = self.intelligence_engine.analyze_facility_completeness(facility_id)
+
+            if not analysis_result.data or analysis_result.data.get("error"):
+                return {}
+
             if facility_id:
-                # Single facility
-                facility_metrics = self.query_manager.get_facility_metrics(facility_id)
-
-                if not facility_metrics.success or not facility_metrics.data:
-                    return {}
-
-                facility_data = facility_metrics.data[0]
-
+                # Single facility analysis
+                facility_analysis = analysis_result.data
                 return {
                     "facility_id": facility_id,
-                    "facility_name": facility_data.get("facility_name", facility_id),
-                    "total_action_requests": facility_data.get("incident_count", 0),
-                    "active": facility_data.get("active", True),
+                    "facility_name": facility_analysis.get("facility_name", facility_id),
+                    "total_action_requests": facility_analysis.get("total_incidents", 0),
                     "analysis_type": "single_facility",
-                    "metadata": ComponentMetadata(
-                        source="core.query_manager",
-                        generated_at=self._get_timestamp(),
-                        data_quality=1.0,
-                    ).__dict__,
+                    "completeness_metrics": facility_analysis.get("completeness_metrics", {}),
+                    "quality_insights": facility_analysis.get("quality_insights", []),
+                    "metadata": analysis_result.metadata,
                 }
             else:
-                # All facilities
-                all_facilities_metrics = self.query_manager.get_facility_metrics()
-
-                if not all_facilities_metrics.success:
-                    return {}
+                # All facilities analysis
+                all_facilities_data = analysis_result.data.get("facilities", [])
+                cross_facility_insights = analysis_result.data.get("cross_facility_insights", {})
 
                 facilities_list = []
                 total_incidents = 0
 
-                for facility_data in all_facilities_metrics.data:
-                    incident_count = facility_data.get("incident_count", 0)
+                for f_data in all_facilities_data:
+                    incident_count = f_data.get("total_incidents", 0)
                     total_incidents += incident_count
-
                     facilities_list.append(
                         {
-                            "facility_id": facility_data.get("facility_id", "Unknown"),
-                            "facility_name": facility_data.get("facility_name", "Unknown"),
+                            "facility_id": f_data.get("facility_id", "Unknown"),
+                            "facility_name": f_data.get("facility_name", "Unknown"),
                             "total_action_requests": incident_count,
-                            "active": facility_data.get("active", True),
-                            "completion_rate": min(100.0, (incident_count / 10) * 100)
-                            if incident_count > 0
-                            else 0.0,
-                            "effectiveness_rate": min(90.0, (incident_count / 12) * 100)
-                            if incident_count > 0
-                            else 0.0,
+                            "completeness_metrics": f_data.get("completeness_metrics", {}),
+                            "quality_insights": f_data.get("quality_insights", []),
                         }
                     )
-
-                # Calculate aggregates
-                completion_rates = [f["completion_rate"] for f in facilities_list]
-                effectiveness_rates = [f["effectiveness_rate"] for f in facilities_list]
 
                 return {
                     "facilities": facilities_list,
                     "performance_summary": {
                         "total_incidents_across_all": total_incidents,
-                        "average_completion_rate": sum(completion_rates) / len(completion_rates)
-                        if completion_rates
-                        else 0.0,
-                        "average_effectiveness_rate": sum(effectiveness_rates)
-                        / len(effectiveness_rates)
-                        if effectiveness_rates
-                        else 0.0,
+                        "average_completion_rate": cross_facility_insights.get(
+                            "average_completion_rate", 0.0
+                        ),
+                        "average_effectiveness_rate": cross_facility_insights.get(
+                            "average_effectiveness_rate", 0.0
+                        ),
                     },
+                    "cross_facility_insights": cross_facility_insights,
                     "analysis_type": "all_facilities",
-                    "metadata": ComponentMetadata(
-                        source="core.query_manager",
-                        generated_at=self._get_timestamp(),
-                        data_quality=1.0,
-                    ).__dict__,
+                    "metadata": analysis_result.metadata,
                 }
 
         except Exception as e:
@@ -219,16 +166,17 @@ class FacilityAdapter:
             return {}
 
     def get_facility_list(self) -> List[Dict[str, Any]]:
-        """Pure data access for list of all facilities"""
+        """Pure access to list of all facilities with basic metrics"""
         try:
             logger.info("Facility Adapter: Fetching list of all facilities")
-            facilities_result = self.query_manager.get_all_facilities()
-            if not facilities_result.success:
+
+            # Use QueryManager to get all facilities
+            result = self.query_manager.get_facility_metrics()
+
+            if not result.success:
                 return []
-            return [
-                {"facility_id": f.get("facility_id"), "facility_name": f.get("facility_name")}
-                for f in facilities_result.data
-            ]
+
+            return result.data
         except Exception as e:
             handle_error(logger, e, "facility list data access")
             return []
@@ -236,28 +184,26 @@ class FacilityAdapter:
     def validate_facility_data(self, facility_id: str = None) -> Dict[str, bool]:
         """Pure validation check for facility data availability"""
         try:
-            logger.info("Facility Adapter: Validating facility data availability")
-
             validation_status = {}
 
-            # Test facility list availability
-            facility_list = self.get_facility_list()
-            validation_status["facility_list_available"] = bool(facility_list)
-
             if facility_id:
-                # Test single facility performance analysis
-                performance_data = self.get_facility_performance_analysis(facility_id)
-                validation_status[f"performance_analysis_{facility_id}"] = bool(performance_data)
-
-            # Test overall facility statistics
-            all_stats = self.get_facility_statistics_analysis()
-            validation_status["overall_statistics_available"] = bool(all_stats.get("facilities"))
+                # Check specific facility
+                facility_metrics = self.query_manager.get_facility_metrics(facility_id)
+                validation_status[
+                    "specific_facility_available"
+                ] = facility_metrics.success and bool(facility_metrics.data)
+            else:
+                # Check overall facilities
+                all_facilities = self.query_manager.get_facility_metrics()
+                validation_status["all_facilities_available"] = all_facilities.success and bool(
+                    all_facilities.data
+                )
 
             return validation_status
 
         except Exception as e:
             handle_error(logger, e, "facility data validation")
-            return {"error": str(e), "is_valid": False}
+            return {"overall_status": False}
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""

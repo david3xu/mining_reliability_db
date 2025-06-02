@@ -4,7 +4,14 @@ Data Import Script for Mining Reliability Database
 Standardized configuration access and unified initialization pattern.
 """
 
+import os
+import sys
+
+# Add the project root to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import argparse
+import logging
 from pathlib import Path
 
 from configs.environment import get_data_dir
@@ -18,17 +25,17 @@ from mine_core.shared.common import handle_error, setup_project_environment
 def import_facility(facility_id, data_dir=None, db_config=None):
     """Import data for a specific facility"""
     try:
-        logger.info(f"Starting import for facility: {facility_id}")
+        logging.info(f"Starting import for facility: {facility_id}")
 
         # Extract data using unified configuration
         extractor = FacilityDataExtractor(data_dir)
         facility_data = extractor.extract_facility_data(facility_id)
 
         if not facility_data or not facility_data.get("records"):
-            logger.error(f"No data found for facility {facility_id}")
+            logging.error(f"No data found for facility {facility_id}")
             return False
 
-        logger.info(f"Extracted {len(facility_data.get('records', []))} records for {facility_id}")
+        logging.info(f"Extracted {len(facility_data.get('records', []))} records for {facility_id}")
 
         # Transform data
         transformer = DataTransformer()
@@ -40,36 +47,36 @@ def import_facility(facility_id, data_dir=None, db_config=None):
         result = loader.load_data(transformed_data)
 
         if result:
-            logger.info(f"Successfully imported data for facility {facility_id}")
+            logging.info(f"Successfully imported data for facility {facility_id}")
         else:
-            logger.error(f"Failed to import data for facility {facility_id}")
+            logging.error(f"Failed to import data for facility {facility_id}")
 
         return result
 
     except Exception as e:
-        handle_error(logger, e, f"importing facility {facility_id}")
+        handle_error(logging.getLogger(__name__), e, f"importing facility {facility_id}")
         return False
 
 
 def import_all_facilities(data_dir=None, db_config=None):
     """Import data for all available facilities"""
-    logger.info("Starting import for all facilities")
+    logging.info("Starting import for all facilities")
 
     extractor = FacilityDataExtractor(data_dir)
     facilities = extractor.get_available_facilities()
 
     if not facilities:
-        logger.error("No facility data found")
+        logging.error("No facility data found")
         return False
 
-    logger.info(f"Found {len(facilities)} facilities to import: {facilities}")
+    logging.info(f"Found {len(facilities)} facilities to import: {facilities}")
 
     success_count = 0
     for facility_id in facilities:
         if import_facility(facility_id, data_dir, db_config):
             success_count += 1
 
-    logger.info(f"Import completed: {success_count}/{len(facilities)} facilities successful")
+    logging.info(f"Import completed: {success_count}/{len(facilities)} facilities successful")
     return success_count == len(facilities)
 
 
@@ -88,8 +95,7 @@ def main():
     args = parser.parse_args()
 
     # Standardized project initialization
-    global logger
-    logger = setup_project_environment("import_data", args.log_level)
+    setup_project_environment("import_data", args.log_level)
 
     try:
         # Setup database connection for validation using unified configuration
@@ -106,7 +112,7 @@ def main():
             else None
         )
 
-        logger.info(f"Using data directory: {data_dir}")
+        logging.info(f"Using data directory: {data_dir}")
 
         # Import data
         if args.facility:
@@ -116,15 +122,15 @@ def main():
 
         if success:
             print("Data import successful!")
-            logger.info("Data import completed successfully")
+            logging.info("Data import completed successfully")
             return 0
         else:
             print("Data import failed for some facilities")
-            logger.error("Data import failed")
+            logging.error("Data import failed")
             return 1
 
     except Exception as e:
-        handle_error(logger, e, "data import")
+        handle_error(logging.getLogger(__name__), e, "data import")
         print(f"Data import failed: {e}")
         return 1
 

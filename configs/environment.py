@@ -28,6 +28,8 @@ __all__ = [
     "validate_required_env",
     "get_entity_names",
     "get_entity_primary_key",
+    "get_field_category_display_mapping",
+    "get_entity_connections",
     # Dashboard config
     "get_dashboard_config",
     "get_dashboard_server_config",
@@ -54,6 +56,7 @@ class ConfigurationManager:
         self._field_analysis_cache: Optional[Dict[str, Any]] = None
         self._dashboard_styling_cache: Optional[Dict[str, Any]] = None
         self._dashboard_charts_cache: Optional[Dict[str, Any]] = None
+        self._field_category_display_cache: Optional[Dict[str, Any]] = None
         self._lock = threading.Lock()
 
     def get_system_constants(self) -> Dict[str, Any]:
@@ -140,6 +143,16 @@ class ConfigurationManager:
                     self._field_analysis_cache = self._load_json_config("field_analysis.json")
         return self._field_analysis_cache
 
+    def get_field_category_display_mapping(self) -> Dict[str, Any]:
+        """Load field category display mapping with thread-safe caching"""
+        if self._field_category_display_cache is None:
+            with self._lock:
+                if self._field_category_display_cache is None:
+                    self._field_category_display_cache = self._load_json_config(
+                        "field_category_display_mapping.json"
+                    )
+        return self._field_category_display_cache
+
     def clear_cache(self):
         """Clear configuration cache (useful for testing)"""
         with self._lock:
@@ -153,6 +166,7 @@ class ConfigurationManager:
             self._field_analysis_cache = None
             self._dashboard_styling_cache = None
             self._dashboard_charts_cache = None
+            self._field_category_display_cache = None
 
     def _load_json_config(self, filename: str) -> Dict[str, Any]:
         """Load JSON configuration file with error handling"""
@@ -193,7 +207,12 @@ class ConfigurationManager:
 
     def _get_default_charts_config(self) -> Dict[str, Any]:
         """Get default charts configuration"""
-        return {"font_family": "Arial, sans-serif", "default_height": 400, "title_font_size": 18}
+        return {
+            "font_family": "Arial, sans-serif",
+            "default_height": 400,
+            "title_font_size": 18,
+            "card_padding": "15px",
+        }
 
 
 # Singleton configuration manager
@@ -336,6 +355,11 @@ def get_entity_connections() -> Dict[str, Any]:
 def get_field_analysis_config() -> Dict[str, Any]:
     """Public function to access field analysis configuration"""
     return _config_manager.get_field_analysis_config()
+
+
+def get_field_category_display_mapping() -> Dict[str, Any]:
+    """Load field category display mapping with optimized caching"""
+    return _config_manager.get_field_category_display_mapping()
 
 
 def get_entity_names() -> List[str]:

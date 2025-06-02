@@ -12,7 +12,7 @@ from dashboard.adapters import get_config_adapter
 
 def create_pie_chart(labels: list, values: list, title: str) -> dcc.Graph:
     """Pure pie chart component - 8 lines of logic"""
-    config = get_config_adapter().get_chart_styling_template()
+    config = get_config_adapter().get_dashboard_chart_styling_template()
 
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo="label+percent")])
     fig.update_layout(
@@ -24,12 +24,16 @@ def create_pie_chart(labels: list, values: list, title: str) -> dcc.Graph:
     return dcc.Graph(figure=fig)
 
 
-def create_bar_chart(x_data: list, y_data: list, title: str) -> dcc.Graph:
+def create_bar_chart(x_data: list, y_data: list, title: str, bar_colors: list = None) -> dcc.Graph:
     """Pure bar chart component - 8 lines of logic"""
-    config = get_config_adapter().get_chart_styling_template()
+    config = get_config_adapter().get_dashboard_chart_styling_template()
 
     fig = go.Figure(
-        data=[go.Bar(x=x_data, y=y_data, marker_color=config.get("colors", ["#4A90E2"])[0])]
+        data=[
+            go.Bar(
+                x=x_data, y=y_data, marker_color=bar_colors or config.get("colors", ["#4A90E2"])[0]
+            )
+        ]
     )
     fig.update_layout(
         title=title,

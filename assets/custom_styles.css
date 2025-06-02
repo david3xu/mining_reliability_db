@@ -1,0 +1,13 @@
+.card-value, .card-label {
+    text-decoration: none !important;
+}
+
+/* For anchor tags within metric cards */
+.metric-card a {
+    text-decoration: none !important;
+}
+
+/* Remove underscore from links within the historical records table */
+#timeline-table td a {
+    text-decoration: none !important;
+}

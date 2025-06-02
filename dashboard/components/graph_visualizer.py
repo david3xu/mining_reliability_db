@@ -27,10 +27,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # Clean adapter-based imports - NO direct mine_core access
-from dashboard.adapters import get_data_adapter
-
-# Configuration-driven styling
-from dashboard.adapters.config_adapter import get_config_adapter
+from dashboard.adapters import get_config_adapter, get_data_adapter
+from dashboard.utils.styling import (
+    get_chart_layout_template,
+    get_colors,
+    get_dashboard_styles,
+    get_fonts,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,9 +47,8 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
         logger.info(f"Creating causal network graph for facility: {facility_id or 'all'}")
 
         # Get configuration
+        colors = get_colors()
         config_adapter = get_config_adapter()
-        styling_config = config_adapter.get_styling_config()
-        chart_config = config_adapter.get_dashboard_chart_config()
 
         # Use adapter instead of direct mine_core access
         adapter = get_data_adapter()
@@ -83,7 +85,11 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
             # Future: Full Cytoscape implementation
             network_placeholder = html.Div(
                 [
-                    html.H5("Causal Relationship Network", className="mb-3"),
+                    html.H5(
+                        "Causal Relationship Network",
+                        className="mb-3",
+                        style={"color": colors.get("text_light")},
+                    ),
                     html.Div(
                         [
                             html.P(
@@ -107,7 +113,7 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
                             ),
                         ],
                         style={
-                            "border": f"2px dashed {styling_config.get('grid_color', '#E5E5E5')}",
+                            "border": f"2px dashed {colors.get('grid_color', '#E5E5E5')}",
                             "padding": "20px",
                             "borderRadius": "8px",
                             "textAlign": "center",
@@ -116,9 +122,17 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
                             "alignItems": "center",
                             "justifyContent": "center",
                             "flexDirection": "column",
+                            "backgroundColor": colors.get("background_light"),
+                            "color": colors.get("text_primary"),
                         },
                     ),
-                ]
+                ],
+                style={
+                    "backgroundColor": colors.get("background_dark"),
+                    "color": colors.get("text_light"),
+                    "padding": "20px",
+                    "borderRadius": "8px",
+                },
             )
         else:
             # Fallback: Basic correlation visualization using adapter data
@@ -141,9 +155,9 @@ def create_correlation_heatmap() -> html.Div:
     """
     try:
         # Get configuration
-        config_adapter = get_config_adapter()
-        styling_config = config_adapter.get_styling_config()
-        chart_config = config_adapter.get_dashboard_chart_config()
+        colors = get_colors()
+        chart_layout_template = get_chart_layout_template()
+        fonts = get_fonts()
 
         # Use adapter for facility data as correlation proxy
         adapter = get_data_adapter()
@@ -152,9 +166,17 @@ def create_correlation_heatmap() -> html.Div:
         if not facility_data or not facility_data.labels:
             return html.Div(
                 [
-                    html.H5("Correlation Analysis"),
-                    html.P("No correlation data available for visualization"),
-                ]
+                    html.H5("Correlation Analysis", style={"color": colors.get("text_light")}),
+                    html.P(
+                        "No correlation data available for visualization",
+                        style={"color": colors.get("text_light")},
+                    ),
+                ],
+                style={
+                    "backgroundColor": colors.get("background_dark"),
+                    "padding": "20px",
+                    "borderRadius": "8px",
+                },
             )
 
         # Create simple correlation visualization using facility data
@@ -179,37 +201,32 @@ def create_correlation_heatmap() -> html.Div:
         )
 
         fig.update_layout(
-            title={
-                "text": "Causal Correlation Patterns (Simplified View)",
-                "font": {
-                    "family": chart_config.get("font_family", "Arial, sans-serif"),
-                    "size": chart_config.get("title_font_size", 18),
-                    "color": styling_config.get("text_primary", "#333333"),
-                },
-                "x": 0.5,
-                "xanchor": "center",
-            },
-            paper_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            plot_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            xaxis={"title": "Facility", "tickangle": -45},
-            yaxis={"title": "Causal Pattern"},
-            height=chart_config.get("default_height", 400),
+            **chart_layout_template,
+            title_text="Causal Correlation Patterns (Simplified View)",
+            title_font_color=colors.get("text_primary"),
+            xaxis_title="Facility",
+            yaxis_title="Causal Pattern",
+            font=fonts,
+            paper_bgcolor=colors.get("background_light"),
+            plot_bgcolor=colors.get("background_light"),
         )
 
         return html.Div(
             [
-                html.H5("Correlation Analysis (Simplified View)", className="mb-3"),
-                dcc.Graph(figure=fig),
-                html.Small(
-                    "Note: Full network visualization available in Phase 6 with Cytoscape integration",
-                    className="text-muted",
-                ),
-            ]
+                dcc.Graph(figure=fig, style={"backgroundColor": colors.get("background_dark")}),
+            ],
+            style={
+                "backgroundColor": colors.get("background_dark"),
+                "padding": "20px",
+                "borderRadius": "8px",
+                "color": colors.get("text_light"),
+            },
         )
 
     except Exception as e:
+        config_adapter = get_config_adapter()
         config_adapter.handle_error_utility(logger, e, "correlation heatmap creation")
-        return html.Div([html.P("Failed to create correlation visualization")])
+        return html.Div([dbc.Alert("Failed to create correlation heatmap", color="danger")])
 
 
 def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
@@ -220,7 +237,7 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
     try:
         # Get configuration
         config_adapter = get_config_adapter()
-        styling_config = config_adapter.get_styling_config()
+        colors = get_colors()
         chart_config = config_adapter.get_dashboard_chart_config()
 
         # Use adapter for data access
@@ -257,10 +274,8 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
                 mode="markers+text",
                 marker=dict(
                     size=[min(val / 10, 50) for val in y_positions],
-                    color=styling_config.get("chart_colors", ["#4A90E2"])[
-                        0 : len(facility_data.labels)
-                    ],
-                    line=dict(width=2, color=styling_config.get("border_color", "#CCCCCC")),
+                    color=colors.get("chart_colors", ["#4A90E2"])[0 : len(facility_data.labels)],
+                    line=dict(width=2, color=colors.get("border_color", "#CCCCCC")),
                 ),
                 text=[
                     label[:15] + "..." if len(label) > 15 else label
@@ -277,13 +292,13 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
                 "font": {
                     "family": chart_config.get("font_family", "Arial, sans-serif"),
                     "size": chart_config.get("title_font_size", 18),
-                    "color": styling_config.get("text_primary", "#333333"),
+                    "color": colors.get("text_primary"),
                 },
                 "x": 0.5,
                 "xanchor": "center",
             },
-            paper_bgcolor=styling_config.get("background_light", "#FFFFFF"),
-            plot_bgcolor=styling_config.get("background_light", "#FFFFFF"),
+            paper_bgcolor=colors.get("background_light"),
+            plot_bgcolor=colors.get("background_light"),
             xaxis={"visible": False},
             yaxis={"title": "Incident Frequency"},
             height=chart_config.get("default_height", 400),
@@ -292,7 +307,11 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
 
         return html.Div(
             [
-                html.H5("Root Cause Flow Analysis", className="mb-3"),
+                html.H5(
+                    "Root Cause Flow Analysis",
+                    className="mb-3",
+                    style={"color": colors.get("text_light")},
+                ),
                 dcc.Graph(figure=fig),
                 html.P(
                     [
@@ -303,10 +322,24 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
                         ),
                     ]
                 ),
-            ]
+            ],
+            style={
+                "border": f"2px dashed {colors.get('grid_color', '#E5E5E5')}",
+                "padding": "20px",
+                "borderRadius": "8px",
+                "textAlign": "center",
+                "minHeight": "300px",
+                "display": "flex",
+                "alignItems": "center",
+                "justifyContent": "center",
+                "flexDirection": "column",
+                "backgroundColor": colors.get("background_light"),
+                "color": colors.get("text_primary"),
+            },
         )
 
     except Exception as e:
+        config_adapter = get_config_adapter()
         config_adapter.handle_error_utility(logger, e, "root cause flow diagram creation")
         return html.Div([html.P("Failed to create flow diagram")])
 
@@ -318,7 +351,11 @@ def create_interactive_node_explorer() -> html.Div:
     """
     placeholder_content = html.Div(
         [
-            html.H5("Interactive Node Explorer", className="mb-3"),
+            html.H5(
+                "Interactive Node Explorer",
+                className="mb-3",
+                style={"color": get_colors().get("text_light")},
+            ),
             dbc.Card(
                 [
                     dbc.CardBody(
