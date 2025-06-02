@@ -58,7 +58,7 @@ cp -r configs configs_backup
 
 ### **Step 3: Update Query Layer**
 ```bash
-# Replace query files with schema-driven versions  
+# Replace query files with schema-driven versions
 # Use artifacts: queries_py_new, database_init_new, entities_init_new
 ```
 
@@ -85,7 +85,7 @@ rm configs/settings.py
 # Add your real facility files
 # Place in: data/facility_data/
 # - facility_001.json
-# - facility_002.json  
+# - facility_002.json
 # - facility_003.json
 # - facility_004.json
 ```
@@ -107,7 +107,7 @@ python -c "from configs.environment import get_schema; print(len(get_schema()['e
 ```
 Hardcoded Values Sources:
 ├── definitions.py (200+ lines of entity classes)
-├── transformer.py (hardcoded entity order)  
+├── transformer.py (hardcoded entity order)
 ├── loader.py (hardcoded relationships)
 ├── queries.py (hardcoded field names)
 ├── settings.py (duplicate configuration)
@@ -118,7 +118,7 @@ Hardcoded Values Sources:
 ```
 Schema-Driven Sources:
 ├── model_schema.json (entities, relationships, primary keys)
-├── field_mappings.json (41-field mappings)  
+├── field_mappings.json (41-field mappings)
 └── environment.py (database configuration)
 ```
 
@@ -175,7 +175,7 @@ mv configs_backup configs
 - ✅ Schema-driven processing throughout
 - ✅ No fake data contamination
 
-### **Long-term Benefits**  
+### **Long-term Benefits**
 - 🚀 Schema changes automatically propagate
 - 🚀 New entities easy to add
 - 🚀 Field mappings centrally managed
@@ -188,7 +188,7 @@ mv configs_backup configs
 **All modified files are provided as artifacts above:**
 
 1. **Core Files**: `definitions_py_new`, `transformer_py_new`, `loader_py_new`, `db_py_new`
-2. **Query Files**: `queries_py_new`, `database_init_new`, `entities_init_new`  
+2. **Query Files**: `queries_py_new`, `database_init_new`, `entities_init_new`
 3. **Processing**: `extractor_py_new`
 4. **Cleanup**: `cleanup_script`, `settings_removal`
 

@@ -5,18 +5,20 @@ Clean implementation without backwards compatibility pollution.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
-from configs.environment import get_mappings, get_entity_names
+from typing import Any, Dict, List, Optional
+
+from configs.environment import get_entity_names, get_mappings
 from mine_core.shared.common import handle_error
 from mine_core.shared.field_utils import (
+    clean_label,
+    extract_root_cause_tail,
+    get_missing_indicator,
     has_real_value,
     is_missing_data_indicator,
-    get_missing_indicator,
-    clean_label,
-    extract_root_cause_tail
 )
 
 logger = logging.getLogger(__name__)
+
 
 class DataTransformer:
     """Streamlined transformer for clean datasets with causal intelligence"""
@@ -42,12 +44,8 @@ class DataTransformer:
 
         # Initialize simplified structure
         transformed = {
-            "facility": {
-                "facility_id": facility_id,
-                "facility_name": facility_id,
-                "active": True
-            },
-            "entities": {entity_name: [] for entity_name in self.entity_names}
+            "facility": {"facility_id": facility_id, "facility_name": facility_id, "active": True},
+            "entities": {entity_name: [] for entity_name in self.entity_names},
         }
 
         # Process each record with simplified logic
@@ -62,8 +60,13 @@ class DataTransformer:
         logger.info(f"Transformed {total_entities} entities from {len(records)} records")
         return transformed
 
-    def _transform_record(self, record: Dict[str, Any], facility_id: str,
-                         transformed: Dict[str, Any], record_index: int = 0) -> None:
+    def _transform_record(
+        self,
+        record: Dict[str, Any],
+        facility_id: str,
+        transformed: Dict[str, Any],
+        record_index: int = 0,
+    ) -> None:
         """Transform single record with simplified processing"""
         action_request_number = record.get("Action Request Number:")
         if not action_request_number:
@@ -75,8 +78,9 @@ class DataTransformer:
         # Create entities in hierarchical order
         self._create_hierarchical_entities(record, base_id, facility_id, transformed)
 
-    def _create_hierarchical_entities(self, record: Dict[str, Any], base_id: str,
-                                    facility_id: str, transformed: Dict[str, Any]) -> None:
+    def _create_hierarchical_entities(
+        self, record: Dict[str, Any], base_id: str, facility_id: str, transformed: Dict[str, Any]
+    ) -> None:
         """Create entities following hierarchical workflow pattern"""
 
         # ActionRequest (always created)
@@ -108,7 +112,9 @@ class DataTransformer:
             department["actionrequest_id"] = action_request["actionrequest_id"]
             transformed["entities"]["Department"].append(department)
 
-    def _create_root_cause_with_intelligence(self, record: Dict[str, Any], base_id: str) -> Dict[str, Any]:
+    def _create_root_cause_with_intelligence(
+        self, record: Dict[str, Any], base_id: str
+    ) -> Dict[str, Any]:
         """Create RootCause entity with enhanced causal intelligence"""
         root_cause = self._create_entity_with_labeling(record, "RootCause", base_id)
 
@@ -118,13 +124,18 @@ class DataTransformer:
 
         return root_cause
 
-    def _create_problem_entities(self, record: Dict[str, Any], base_id: str,
-                               transformed: Dict[str, Any]) -> None:
+    def _create_problem_entities(
+        self, record: Dict[str, Any], base_id: str, transformed: Dict[str, Any]
+    ) -> None:
         """Create entities connected to Problem"""
         entity_configs = [
             ("Asset", ["Asset Number(s)", "Asset Activity numbers"], "asset_id"),
-            ("RecurringStatus", ["Recurring Problem(s)", "Recurring Comment"], "recurringstatus_id"),
-            ("AmountOfLoss", ["Amount of Loss"], "amountofloss_id")
+            (
+                "RecurringStatus",
+                ["Recurring Problem(s)", "Recurring Comment"],
+                "recurringstatus_id",
+            ),
+            ("AmountOfLoss", ["Amount of Loss"], "amountofloss_id"),
         ]
 
         for entity_type, required_fields, id_field in entity_configs:
@@ -133,8 +144,9 @@ class DataTransformer:
                 entity["problem_id"] = f"problem-{base_id}"
                 transformed["entities"][entity_type].append(entity)
 
-    def _create_action_plan_chain(self, record: Dict[str, Any], base_id: str,
-                                transformed: Dict[str, Any]) -> None:
+    def _create_action_plan_chain(
+        self, record: Dict[str, Any], base_id: str, transformed: Dict[str, Any]
+    ) -> None:
         """Create ActionPlan and connected entities"""
         # ActionPlan
         if self._has_required_data("ActionPlan", record):
@@ -144,9 +156,13 @@ class DataTransformer:
 
             # Connected entities
             connected_configs = [
-                ("Verification", ["Effectiveness Verification Due Date", "IsActionPlanEffective"], "verification_id"),
+                (
+                    "Verification",
+                    ["Effectiveness Verification Due Date", "IsActionPlanEffective"],
+                    "verification_id",
+                ),
                 ("Review", ["Is Resp Satisfactory?", "Reviewed Date:"], "review_id"),
-                ("EquipmentStrategy", ["If yes, APSS Doc #"], "equipmentstrategy_id")
+                ("EquipmentStrategy", ["If yes, APSS Doc #"], "equipmentstrategy_id"),
             ]
 
             for entity_type, required_fields, id_field in connected_configs:
@@ -155,7 +171,9 @@ class DataTransformer:
                     entity["actionplan_id"] = action_plan["actionplan_id"]
                     transformed["entities"][entity_type].append(entity)
 
-    def _create_entity_with_labeling(self, record: Dict[str, Any], entity_type: str, base_id: str) -> Dict[str, Any]:
+    def _create_entity_with_labeling(
+        self, record: Dict[str, Any], entity_type: str, base_id: str
+    ) -> Dict[str, Any]:
         """Create entity with complete properties and dynamic labeling"""
         entity = {}
 
@@ -200,7 +218,7 @@ class DataTransformer:
             "Verification": ["is_action_plan_effective", "action_plan_eval_comment"],
             "Department": ["init_dept", "rec_dept"],
             "Asset": ["asset_numbers", "asset_activity_numbers"],
-            "Facility": ["facility_name", "facility_id"]
+            "Facility": ["facility_name", "facility_id"],
         }
 
         priority_fields = display_priorities.get(entity_type, [])
@@ -216,7 +234,9 @@ class DataTransformer:
         # Fallback to entity type
         return entity_type
 
-    def _apply_cascade_labeling(self, entity_data: Dict[str, Any], entity_type: str) -> Optional[str]:
+    def _apply_cascade_labeling(
+        self, entity_data: Dict[str, Any], entity_type: str
+    ) -> Optional[str]:
         """Apply simplified cascade labeling strategy"""
         cascade_config = self.cascade_config.get(entity_type, {})
         priority_fields = cascade_config.get("label_priority", [])
@@ -252,7 +272,9 @@ class DataTransformer:
             return value.strip()
         return value
 
-    def _generate_base_id(self, action_request_number: str, facility_id: str, record_index: int = 0) -> str:
+    def _generate_base_id(
+        self, action_request_number: str, facility_id: str, record_index: int = 0
+    ) -> str:
         """Generate base ID for all related entities"""
         clean_number = clean_label(action_request_number)
         clean_facility = clean_label(facility_id)

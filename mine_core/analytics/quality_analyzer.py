@@ -5,11 +5,13 @@ All entity names, relationships, and fields sourced from model_schema.json
 """
 
 import logging
-from typing import Dict, List, Any, Tuple
-from mine_core.database.db import get_database
+from typing import Any, Dict, List, Tuple
+
 from configs.environment import get_schema
+from mine_core.database.db import get_database
 
 logger = logging.getLogger(__name__)
+
 
 class QualityAnalyzer:
     """Schema-driven data quality analysis for engineer root cause effectiveness"""
@@ -110,35 +112,45 @@ class QualityAnalyzer:
         stats = completeness_result[0] if completeness_result else {}
 
         # Calculate completeness percentages
-        total = stats.get('total_requests', 0)
+        total = stats.get("total_requests", 0)
         if total == 0:
             return {"error": f"No data found for facility {facility_id}"}
 
         completeness_analysis = {
-            "facility_name": facility_info['name'],
+            "facility_name": facility_info["name"],
             "total_incidents": total,
             "completeness_metrics": {
                 "basic_info": {
-                    "title": round((stats.get('has_title', 0) / total) * 100, 1),
-                    "stage": round((stats.get('has_stage', 0) / total) * 100, 1),
-                    "categories": round((stats.get('has_categories', 0) / total) * 100, 1)
+                    "title": round((stats.get("has_title", 0) / total) * 100, 1),
+                    "stage": round((stats.get("has_stage", 0) / total) * 100, 1),
+                    "categories": round((stats.get("has_categories", 0) / total) * 100, 1),
                 },
                 "workflow_chain": {
-                    "has_problem": round((stats.get('has_problem', 0) / total) * 100, 1),
-                    "has_root_cause": round((stats.get('has_root_cause', 0) / total) * 100, 1),
-                    "has_action_plan": round((stats.get('has_action_plan', 0) / total) * 100, 1),
-                    "has_verification": round((stats.get('has_verification', 0) / total) * 100, 1)
+                    "has_problem": round((stats.get("has_problem", 0) / total) * 100, 1),
+                    "has_root_cause": round((stats.get("has_root_cause", 0) / total) * 100, 1),
+                    "has_action_plan": round((stats.get("has_action_plan", 0) / total) * 100, 1),
+                    "has_verification": round((stats.get("has_verification", 0) / total) * 100, 1),
                 },
                 "engineer_critical": {
-                    "problem_description": round((stats.get('has_problem_description', 0) / total) * 100, 1),
-                    "cause_description": round((stats.get('has_cause_description', 0) / total) * 100, 1),
-                    "plan_description": round((stats.get('has_plan_description', 0) / total) * 100, 1),
-                    "effectiveness_data": round((stats.get('has_effectiveness_data', 0) / total) * 100, 1)
-                }
-            }
+                    "problem_description": round(
+                        (stats.get("has_problem_description", 0) / total) * 100, 1
+                    ),
+                    "cause_description": round(
+                        (stats.get("has_cause_description", 0) / total) * 100, 1
+                    ),
+                    "plan_description": round(
+                        (stats.get("has_plan_description", 0) / total) * 100, 1
+                    ),
+                    "effectiveness_data": round(
+                        (stats.get("has_effectiveness_data", 0) / total) * 100, 1
+                    ),
+                },
+            },
         }
 
-        completeness_analysis["quality_insights"] = self._generate_quality_insights(completeness_analysis)
+        completeness_analysis["quality_insights"] = self._generate_quality_insights(
+            completeness_analysis
+        )
 
         return completeness_analysis
 
@@ -156,17 +168,16 @@ class QualityAnalyzer:
         """
         facilities = self.db.execute_query(facilities_query)
 
-        comparison = {
-            "facilities": [],
-            "cross_facility_insights": {}
-        }
+        comparison = {"facilities": [], "cross_facility_insights": {}}
 
         for facility in facilities:
-            facility_analysis = self._analyze_single_facility(facility['id'])
-            if 'error' not in facility_analysis:
+            facility_analysis = self._analyze_single_facility(facility["id"])
+            if "error" not in facility_analysis:
                 comparison["facilities"].append(facility_analysis)
 
-        comparison["cross_facility_insights"] = self._generate_cross_facility_insights(comparison["facilities"])
+        comparison["cross_facility_insights"] = self._generate_cross_facility_insights(
+            comparison["facilities"]
+        )
 
         return comparison
 
@@ -208,18 +219,14 @@ class QualityAnalyzer:
 
         impact_results = self.db.execute_query(impact_query)
 
-        analysis = {
-            "chain_completeness": {},
-            "usability_assessment": {},
-            "engineer_impact": {}
-        }
+        analysis = {"chain_completeness": {}, "usability_assessment": {}, "engineer_impact": {}}
 
-        total_incidents = sum(result['count'] for result in impact_results)
+        total_incidents = sum(result["count"] for result in impact_results)
 
         for result in impact_results:
-            chain_key = result['chain_status']
-            usable_key = result['usability_status']
-            count = result['count']
+            chain_key = result["chain_status"]
+            usable_key = result["usability_status"]
+            count = result["count"]
             percentage = round((count / total_incidents) * 100, 1)
 
             if chain_key not in analysis["chain_completeness"]:
@@ -234,7 +241,7 @@ class QualityAnalyzer:
         analysis["engineer_impact"] = {
             "usable_for_analysis": usable_percentage,
             "data_quality_impact": round(100 - usable_percentage, 1),
-            "recommendation": "Focus on completing workflow chains for engineer effectiveness"
+            "recommendation": "Focus on completing workflow chains for engineer effectiveness",
         }
 
         return analysis
@@ -246,17 +253,25 @@ class QualityAnalyzer:
 
         workflow = metrics["workflow_chain"]
         if workflow["has_root_cause"] < 70:
-            insights.append(f"Critical: {100 - workflow['has_root_cause']:.1f}% of incidents lack root cause analysis")
+            insights.append(
+                f"Critical: {100 - workflow['has_root_cause']:.1f}% of incidents lack root cause analysis"
+            )
 
         if workflow["has_verification"] < 50:
-            insights.append(f"Warning: {100 - workflow['has_verification']:.1f}% of action plans lack effectiveness verification")
+            insights.append(
+                f"Warning: {100 - workflow['has_verification']:.1f}% of action plans lack effectiveness verification"
+            )
 
         engineer = metrics["engineer_critical"]
         if engineer["problem_description"] < 80:
-            insights.append(f"Impact: {100 - engineer['problem_description']:.1f}% of problems lack clear descriptions")
+            insights.append(
+                f"Impact: {100 - engineer['problem_description']:.1f}% of problems lack clear descriptions"
+            )
 
         if engineer["effectiveness_data"] < 60:
-            insights.append(f"Learning Gap: {100 - engineer['effectiveness_data']:.1f}% of solutions lack effectiveness data")
+            insights.append(
+                f"Learning Gap: {100 - engineer['effectiveness_data']:.1f}% of solutions lack effectiveness data"
+            )
 
         return insights
 
@@ -265,22 +280,20 @@ class QualityAnalyzer:
         if len(facilities) < 2:
             return {}
 
-        insights = {
-            "best_performers": {},
-            "improvement_opportunities": [],
-            "patterns": []
-        }
+        insights = {"best_performers": {}, "improvement_opportunities": [], "patterns": []}
 
         categories = ["workflow_chain", "engineer_critical"]
         for category in categories:
-            best_facility = max(facilities,
-                              key=lambda f: sum(f["completeness_metrics"][category].values()))
-            worst_facility = min(facilities,
-                                key=lambda f: sum(f["completeness_metrics"][category].values()))
+            best_facility = max(
+                facilities, key=lambda f: sum(f["completeness_metrics"][category].values())
+            )
+            worst_facility = min(
+                facilities, key=lambda f: sum(f["completeness_metrics"][category].values())
+            )
 
             insights["best_performers"][category] = {
                 "best": best_facility["facility_name"],
-                "worst": worst_facility["facility_name"]
+                "worst": worst_facility["facility_name"],
             }
 
         for facility in facilities:

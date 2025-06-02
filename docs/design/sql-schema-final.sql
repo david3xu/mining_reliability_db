@@ -163,11 +163,11 @@ function extractListValue(fieldName, values) {
     if (!Array.isArray(values) || values.length === 0) {
         return null;
     }
-    
+
     if (fieldName === 'Root Cause' && values.length > 1) {
         return values[1];  // Return tail (second) item for Root Cause
     }
-    
+
     return values[0];  // Return head (first) item for all other fields
 }
 */

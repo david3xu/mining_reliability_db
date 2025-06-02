@@ -5,10 +5,15 @@ Core validation of complete data flow through architectural layers.
 """
 
 import logging
-from typing import Dict, List, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
-from dashboard.adapters import get_data_adapter, get_workflow_adapter, get_facility_adapter, get_config_adapter
+from dashboard.adapters import (
+    get_config_adapter,
+    get_data_adapter,
+    get_facility_adapter,
+    get_workflow_adapter,
+)
 from mine_core.business.intelligence_engine import get_intelligence_engine
 from mine_core.business.workflow_processor import get_workflow_processor
 from mine_core.database.query_manager import get_query_manager
@@ -16,14 +21,17 @@ from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class IntegrationResult:
     """Direct integration test result"""
+
     test_name: str
     success: bool
     data_flow_valid: bool
     response_data: Dict[str, Any]
     error_details: str = None
+
 
 class IntegrationTester:
     """Direct integration validation across architectural layers"""
@@ -70,9 +78,9 @@ class IntegrationTester:
 
             # Validate data flow
             data_flow_valid = (
-                facility_result.success and
-                portfolio_analysis.quality_score > 0 and
-                bool(workflow_analysis.get("total_entities", 0) > 0)
+                facility_result.success
+                and portfolio_analysis.quality_score > 0
+                and bool(workflow_analysis.get("total_entities", 0) > 0)
             )
 
             return IntegrationResult(
@@ -82,8 +90,8 @@ class IntegrationTester:
                 response_data={
                     "query_manager_status": facility_result.success,
                     "intelligence_engine_quality": portfolio_analysis.quality_score,
-                    "workflow_processor_entities": workflow_analysis.get("total_entities", 0)
-                }
+                    "workflow_processor_entities": workflow_analysis.get("total_entities", 0),
+                },
             )
 
         except Exception as e:
@@ -93,7 +101,7 @@ class IntegrationTester:
                 success=False,
                 data_flow_valid=False,
                 response_data={},
-                error_details=str(e)
+                error_details=str(e),
             )
 
     def _test_adapter_layer_integration(self) -> IntegrationResult:
@@ -107,10 +115,10 @@ class IntegrationTester:
 
             # Validate adapter responses
             data_flow_valid = (
-                portfolio_data.total_records > 0 and
-                bool(workflow_data.get("total_entities", 0) > 0) and
-                len(facility_list) > 0 and
-                bool(styling_config.get("primary_color"))
+                portfolio_data.total_records > 0
+                and bool(workflow_data.get("total_entities", 0) > 0)
+                and len(facility_list) > 0
+                and bool(styling_config.get("primary_color"))
             )
 
             return IntegrationResult(
@@ -121,8 +129,8 @@ class IntegrationTester:
                     "data_adapter_records": portfolio_data.total_records,
                     "workflow_adapter_entities": workflow_data.get("total_entities", 0),
                     "facility_adapter_count": len(facility_list),
-                    "config_adapter_styling": bool(styling_config)
-                }
+                    "config_adapter_styling": bool(styling_config),
+                },
             )
 
         except Exception as e:
@@ -132,7 +140,7 @@ class IntegrationTester:
                 success=False,
                 data_flow_valid=False,
                 response_data={},
-                error_details=str(e)
+                error_details=str(e),
             )
 
     def _test_data_flow_integration(self) -> IntegrationResult:
@@ -152,9 +160,9 @@ class IntegrationTester:
 
             # Validate complete data flow
             data_flow_valid = (
-                bool(facility_analysis.get("facility_id")) and
-                facility_analysis.get("total_records", 0) >= 0 and
-                bool(facility_comparison.get("facility_id"))
+                bool(facility_analysis.get("facility_id"))
+                and facility_analysis.get("total_records", 0) >= 0
+                and bool(facility_comparison.get("facility_id"))
             )
 
             return IntegrationResult(
@@ -164,8 +172,8 @@ class IntegrationTester:
                 response_data={
                     "test_facility": facility_id,
                     "analysis_records": facility_analysis.get("total_records", 0),
-                    "comparison_available": bool(facility_comparison)
-                }
+                    "comparison_available": bool(facility_comparison),
+                },
             )
 
         except Exception as e:
@@ -175,21 +183,21 @@ class IntegrationTester:
                 success=False,
                 data_flow_valid=False,
                 response_data={},
-                error_details=str(e)
+                error_details=str(e),
             )
 
     def _test_component_integration(self) -> IntegrationResult:
         """Test component integration with adapters"""
         try:
             # Test component imports
-            from dashboard.components.portfolio_overview import create_complete_dashboard
-            from dashboard.components.workflow_analysis import create_workflow_analysis_layout
             from dashboard.components.data_quality import create_data_quality_layout
+            from dashboard.components.micro.chart_base import create_pie_chart
 
             # Test micro-component imports
             from dashboard.components.micro.metric_card import create_metric_card
-            from dashboard.components.micro.chart_base import create_pie_chart
             from dashboard.components.micro.table_base import create_data_table
+            from dashboard.components.portfolio_overview import create_complete_dashboard
+            from dashboard.components.workflow_analysis import create_workflow_analysis_layout
 
             # Test component creation (basic validation)
             dashboard_component = create_complete_dashboard()
@@ -197,11 +205,9 @@ class IntegrationTester:
             quality_component = create_data_quality_layout()
 
             # Validate components created successfully
-            data_flow_valid = all([
-                bool(dashboard_component),
-                bool(workflow_component),
-                bool(quality_component)
-            ])
+            data_flow_valid = all(
+                [bool(dashboard_component), bool(workflow_component), bool(quality_component)]
+            )
 
             return IntegrationResult(
                 test_name="component_integration",
@@ -210,8 +216,8 @@ class IntegrationTester:
                 response_data={
                     "main_components_imported": 3,
                     "micro_components_imported": 3,
-                    "components_created": data_flow_valid
-                }
+                    "components_created": data_flow_valid,
+                },
             )
 
         except Exception as e:
@@ -221,7 +227,7 @@ class IntegrationTester:
                 success=False,
                 data_flow_valid=False,
                 response_data={},
-                error_details=str(e)
+                error_details=str(e),
             )
 
     def _analyze_integration_results(self, results: List[IntegrationResult]) -> Dict[str, Any]:
@@ -245,10 +251,11 @@ class IntegrationTester:
                     "success": r.success,
                     "data_flow_valid": r.data_flow_valid,
                     "response_data": r.response_data,
-                    "error": r.error_details
-                } for r in results
+                    "error": r.error_details,
+                }
+                for r in results
             ],
-            "recommendations": self._generate_recommendations(results)
+            "recommendations": self._generate_recommendations(results),
         }
 
     def _generate_recommendations(self, results: List[IntegrationResult]) -> List[str]:
@@ -302,14 +309,14 @@ DETAILED RESULTS:
 ----------------
 """
 
-        for test in results['test_details']:
-            status = "✅" if test['success'] else "❌"
-            flow_status = "✅" if test['data_flow_valid'] else "❌"
+        for test in results["test_details"]:
+            status = "✅" if test["success"] else "❌"
+            flow_status = "✅" if test["data_flow_valid"] else "❌"
 
             report += f"{status} {test['test_name']}: "
             report += f"Flow {flow_status}\n"
 
-            if test['error']:
+            if test["error"]:
                 report += f"   Error: {test['error']}\n"
 
         report += f"""
@@ -324,10 +331,11 @@ RECOMMENDATIONS:
 ---------------
 """
 
-        for rec in results['recommendations']:
+        for rec in results["recommendations"]:
             report += f"• {rec}\n"
 
         return report
+
 
 def main():
     """Integration testing CLI"""
@@ -353,11 +361,12 @@ def main():
         print(f"Integration: {results['integration_status'].upper()}")
         print(f"Score: {results['integration_score']:.1%}")
 
-        if results['failed_tests'] > 0:
+        if results["failed_tests"] > 0:
             print(f"Failed Tests: {results['failed_tests']}")
             return 1
 
         return 0
+
 
 if __name__ == "__main__":
     exit(main())

@@ -5,12 +5,14 @@ Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_environment, handle_error
-from mine_core.pipelines.extractor import FacilityDataExtractor
-from mine_core.pipelines.transformer import DataTransformer
-from mine_core.pipelines.loader import Neo4jLoader
-from mine_core.database.db import get_database, close_database
+
 from configs.environment import get_data_dir
+from mine_core.database.db import close_database, get_database
+from mine_core.pipelines.extractor import FacilityDataExtractor
+from mine_core.pipelines.loader import Neo4jLoader
+from mine_core.pipelines.transformer import DataTransformer
+from mine_core.shared.common import handle_error, setup_project_environment
+
 
 def import_facility(facility_id, data_dir=None, db_config=None):
     """Import data for a specific facility"""
@@ -47,6 +49,7 @@ def import_facility(facility_id, data_dir=None, db_config=None):
         handle_error(logger, e, f"importing facility {facility_id}")
         return False
 
+
 def import_all_facilities(data_dir=None, db_config=None):
     """Import data for all available facilities"""
     logger.info("Starting import for all facilities")
@@ -67,6 +70,7 @@ def import_all_facilities(data_dir=None, db_config=None):
 
     logger.info(f"Import completed: {success_count}/{len(facilities)} facilities successful")
     return success_count == len(facilities)
+
 
 def main():
     """Main execution function"""
@@ -92,7 +96,11 @@ def main():
 
         # Use unified configuration gateway for data directory
         data_dir = args.data_dir or get_data_dir()
-        db_config = (args.uri, args.user, args.password) if any([args.uri, args.user, args.password]) else None
+        db_config = (
+            (args.uri, args.user, args.password)
+            if any([args.uri, args.user, args.password])
+            else None
+        )
 
         logger.info(f"Using data directory: {data_dir}")
 
@@ -118,6 +126,7 @@ def main():
 
     finally:
         close_database()
+
 
 if __name__ == "__main__":
     exit(main())

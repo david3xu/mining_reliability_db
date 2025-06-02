@@ -4,9 +4,9 @@ Consolidated Field Processing Utilities - Single Validation Authority
 Centralized field validation, processing, and missing data management.
 """
 
-import re
 import logging
-from typing import Any, Optional, List, Dict
+import re
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,16 @@ MISSING_DATA_INDICATORS = {
     "N/A",
     "n/a",
     "Unknown",
-    "unknown"
+    "unknown",
 }
 
 # Missing data context mappings
 MISSING_DATA_CONTEXT = {
     "DATA_NOT_AVAILABLE": "Field exists but value missing - potential collection system issue",
     "NOT_SPECIFIED": "Field intentionally left blank - business process gap",
-    "NOT_APPLICABLE": "Field doesn't apply to this case - correct operational variance"
+    "NOT_APPLICABLE": "Field doesn't apply to this case - correct operational variance",
 }
+
 
 def has_real_value(value: Any) -> bool:
     """
@@ -42,15 +43,25 @@ def has_real_value(value: Any) -> bool:
 
     if isinstance(value, str):
         cleaned = value.strip().lower()
-        return cleaned not in {"", "null", "n/a", "unknown", "data_not_available", "not_specified", "not_applicable"}
+        return cleaned not in {
+            "",
+            "null",
+            "n/a",
+            "unknown",
+            "data_not_available",
+            "not_specified",
+            "not_applicable",
+        }
 
     return value is not None
+
 
 def is_missing_data_indicator(value: Any) -> bool:
     """Check if value is an explicit missing data indicator"""
     if value is None:
         return True
     return str(value) in MISSING_DATA_INDICATORS
+
 
 def get_missing_indicator(field_name: str, context: str = "general") -> str:
     """Get appropriate missing data indicator based on field type and context"""
@@ -65,13 +76,14 @@ def get_missing_indicator(field_name: str, context: str = "general") -> str:
     else:
         return "DATA_NOT_AVAILABLE"
 
+
 def clean_label(value: str) -> str:
     """Clean field value for Neo4j label compatibility"""
     if not isinstance(value, str):
         value = str(value)
 
     # Remove special characters, keep alphanumeric and underscores
-    cleaned = re.sub(r'[^a-zA-Z0-9_]', '', value.replace(' ', '_').replace('-', '_'))
+    cleaned = re.sub(r"[^a-zA-Z0-9_]", "", value.replace(" ", "_").replace("-", "_"))
 
     # Ensure starts with letter
     if cleaned and cleaned[0].isdigit():
@@ -79,6 +91,7 @@ def clean_label(value: str) -> str:
 
     # Limit length for Neo4j compatibility
     return cleaned[:50] if cleaned else "UnknownValue"
+
 
 def extract_field_priority(record: Dict[str, Any], priority_fields: List[str]) -> Optional[str]:
     """Extract first available field value from priority list"""
@@ -88,11 +101,15 @@ def extract_field_priority(record: Dict[str, Any], priority_fields: List[str]) -
             return str(value)
     return None
 
+
 def create_entity_id(entity_type: str, base_id: str) -> str:
     """Generate unique ID for entity"""
     return f"{entity_type.lower()}-{base_id}"
 
-def validate_field_for_entity(field_name: str, value: Any, required_fields: List[str] = None) -> bool:
+
+def validate_field_for_entity(
+    field_name: str, value: Any, required_fields: List[str] = None
+) -> bool:
     """Validate if field should create entity"""
     # Must have real value
     if not has_real_value(value):
@@ -104,12 +121,22 @@ def validate_field_for_entity(field_name: str, value: Any, required_fields: List
 
     # Check field patterns that should always create entities
     significant_patterns = [
-        "number", "id", "title", "name", "type", "category",
-        "status", "stage", "cause", "plan", "action"
+        "number",
+        "id",
+        "title",
+        "name",
+        "type",
+        "category",
+        "status",
+        "stage",
+        "cause",
+        "plan",
+        "action",
     ]
 
     field_lower = field_name.lower()
     return any(pattern in field_lower for pattern in significant_patterns)
+
 
 def normalize_field_value(value: Any, field_type: str = "string") -> Any:
     """Normalize field value based on type"""
@@ -138,7 +165,10 @@ def normalize_field_value(value: Any, field_type: str = "string") -> Any:
     # Default to string
     return str(value).strip() if value else get_missing_indicator("", "general")
 
-def get_entity_label_cascade(record: Dict[str, Any], entity_config: Dict[str, Any]) -> Optional[str]:
+
+def get_entity_label_cascade(
+    record: Dict[str, Any], entity_config: Dict[str, Any]
+) -> Optional[str]:
     """Get entity label using cascade priority"""
     priority_fields = entity_config.get("label_priority", [])
 
@@ -150,6 +180,7 @@ def get_entity_label_cascade(record: Dict[str, Any], entity_config: Dict[str, An
 
     # Fallback to entity type
     return entity_config.get("entity_type", "UnknownEntity")
+
 
 def extract_root_cause_tail(value: str, delimiters: List[str] = None) -> str:
     """Extract tail component from root cause for causal intelligence"""
@@ -172,15 +203,16 @@ def extract_root_cause_tail(value: str, delimiters: List[str] = None) -> str:
     # No delimiters found - return original value
     return str_value
 
+
 def validate_entity_completeness(entity_data: Dict[str, Any], required_fields: List[str]) -> float:
     """Calculate completeness ratio for entity data"""
     if not required_fields:
         return 1.0
 
-    fields_with_data = sum(1 for field in required_fields
-                          if has_real_value(entity_data.get(field)))
+    fields_with_data = sum(1 for field in required_fields if has_real_value(entity_data.get(field)))
 
     return fields_with_data / len(required_fields)
+
 
 def get_field_category(field_name: str) -> str:
     """Categorize field for analytical purposes"""
@@ -201,6 +233,7 @@ def get_field_category(field_name: str) -> str:
     else:
         return "general"
 
+
 def validate_cascade_labeling(entity_data: Dict[str, Any], cascade_config: Dict[str, Any]) -> str:
     """Validate and apply cascade labeling strategy"""
     priority_fields = cascade_config.get("label_priority", [])
@@ -216,6 +249,7 @@ def validate_cascade_labeling(entity_data: Dict[str, Any], cascade_config: Dict[
 
     # Fallback to entity type
     return entity_type
+
 
 def get_causal_intelligence_fields(record: Dict[str, Any]) -> Dict[str, str]:
     """Extract causal intelligence fields for root cause analysis"""
@@ -234,6 +268,7 @@ def get_causal_intelligence_fields(record: Dict[str, Any]) -> Dict[str, str]:
 
     return causal_fields
 
+
 def format_value_for_storage(value: Any) -> str:
     """Format value for consistent database storage"""
     if not has_real_value(value):
@@ -246,12 +281,16 @@ def format_value_for_storage(value: Any) -> str:
     else:
         return str(value)
 
+
 def calculate_data_quality_score(entity_data: Dict[str, Any], total_possible_fields: int) -> float:
     """Calculate data quality score for entity"""
     if total_possible_fields == 0:
         return 1.0
 
-    fields_with_data = sum(1 for value in entity_data.values()
-                          if has_real_value(value) and not is_missing_data_indicator(str(value)))
+    fields_with_data = sum(
+        1
+        for value in entity_data.values()
+        if has_real_value(value) and not is_missing_data_indicator(str(value))
+    )
 
     return min(1.0, fields_with_data / total_possible_fields)

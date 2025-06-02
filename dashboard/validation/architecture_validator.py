@@ -5,27 +5,32 @@ Direct analysis of architectural compliance with MDC principles.
 """
 
 import ast
-import os
 import logging
-from typing import Dict, List, Any, Tuple
-from pathlib import Path
+import os
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class ComplianceResult:
     """Architecture compliance analysis result"""
+
     is_compliant: bool
     violations: List[str]
     score: float
     layer_analysis: Dict[str, Any]
 
+
 class ArchitectureValidator:
     """Direct architectural compliance analysis"""
 
     def __init__(self, project_root: str = None):
-        self.project_root = Path(project_root) if project_root else Path(__file__).parent.parent.parent
+        self.project_root = (
+            Path(project_root) if project_root else Path(__file__).parent.parent.parent
+        )
         self.violations = []
 
     def validate_complete_architecture(self) -> ComplianceResult:
@@ -41,10 +46,12 @@ class ArchitectureValidator:
         dependency_violations = self._validate_dependency_flow()
 
         # Calculate compliance score
-        total_violations = (len(core_analysis["violations"]) +
-                           len(adapter_analysis["violations"]) +
-                           len(component_analysis["violations"]) +
-                           len(dependency_violations))
+        total_violations = (
+            len(core_analysis["violations"])
+            + len(adapter_analysis["violations"])
+            + len(component_analysis["violations"])
+            + len(dependency_violations)
+        )
 
         compliance_score = max(0.0, 1.0 - (total_violations / 20))
         is_compliant = compliance_score >= 0.95
@@ -57,8 +64,8 @@ class ArchitectureValidator:
                 "core": core_analysis,
                 "adapter": adapter_analysis,
                 "component": component_analysis,
-                "dependency_flow": {"violations": dependency_violations}
-            }
+                "dependency_flow": {"violations": dependency_violations},
+            },
         )
 
     def _validate_core_layer(self) -> Dict[str, Any]:
@@ -84,7 +91,7 @@ class ArchitectureValidator:
         return {
             "compliant": len(violations) == 0,
             "violations": violations,
-            "services_found": len(list(core_path.glob("*.py")))
+            "services_found": len(list(core_path.glob("*.py"))),
         }
 
     def _validate_adapter_layer(self) -> Dict[str, Any]:
@@ -97,7 +104,12 @@ class ArchitectureValidator:
             return {"compliant": False, "violations": violations}
 
         # Check specialized adapters exist
-        required_adapters = ["data_adapter.py", "workflow_adapter.py", "facility_adapter.py", "config_adapter.py"]
+        required_adapters = [
+            "data_adapter.py",
+            "workflow_adapter.py",
+            "facility_adapter.py",
+            "config_adapter.py",
+        ]
         for adapter in required_adapters:
             if not (adapter_path / adapter).exists():
                 violations.append(f"Missing specialized adapter: {adapter}")
@@ -111,7 +123,9 @@ class ArchitectureValidator:
         return {
             "compliant": len(violations) == 0,
             "violations": violations,
-            "adapters_found": len([f for f in adapter_path.glob("*.py") if f.name != "__init__.py"])
+            "adapters_found": len(
+                [f for f in adapter_path.glob("*.py") if f.name != "__init__.py"]
+            ),
         }
 
     def _validate_component_layer(self) -> Dict[str, Any]:
@@ -128,7 +142,12 @@ class ArchitectureValidator:
         if not micro_path.exists():
             violations.append("Micro-components directory missing")
         else:
-            required_micros = ["metric_card.py", "chart_base.py", "table_base.py", "workflow_stage.py"]
+            required_micros = [
+                "metric_card.py",
+                "chart_base.py",
+                "table_base.py",
+                "workflow_stage.py",
+            ]
             for micro in required_micros:
                 if not (micro_path / micro).exists():
                     violations.append(f"Missing micro-component: {micro}")
@@ -142,7 +161,9 @@ class ArchitectureValidator:
         return {
             "compliant": len(violations) == 0,
             "violations": violations,
-            "components_found": len([f for f in component_path.glob("*.py") if f.name != "__init__.py"])
+            "components_found": len(
+                [f for f in component_path.glob("*.py") if f.name != "__init__.py"]
+            ),
         }
 
     def _validate_dependency_flow(self) -> List[str]:
@@ -177,12 +198,16 @@ class ArchitectureValidator:
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom):
                     if node.module and "dashboard" in node.module:
-                        violations.append(f"{file_path.name}: Core imports dashboard module {node.module}")
+                        violations.append(
+                            f"{file_path.name}: Core imports dashboard module {node.module}"
+                        )
 
                 # Check function length compliance
                 if isinstance(node, ast.FunctionDef):
                     if len(node.body) > 50:
-                        violations.append(f"{file_path.name}: Function {node.name} exceeds 50 lines")
+                        violations.append(
+                            f"{file_path.name}: Function {node.name} exceeds 50 lines"
+                        )
 
         except Exception as e:
             violations.append(f"{file_path.name}: Analysis failed - {str(e)}")
@@ -200,7 +225,11 @@ class ArchitectureValidator:
             # Check for direct mine_core.database imports (should use core layer)
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom):
-                    if node.module and "mine_core.database" in node.module and "query_manager" not in node.module:
+                    if (
+                        node.module
+                        and "mine_core.database" in node.module
+                        and "query_manager" not in node.module
+                    ):
                         violations.append(f"{file_path.name}: Direct database import {node.module}")
 
                     # Check for config imports (should use config_adapter)
@@ -210,9 +239,14 @@ class ArchitectureValidator:
 
                 # Check for business logic (calculations, analysis)
                 if isinstance(node, ast.FunctionDef):
-                    if any(keyword in node.name.lower() for keyword in ["calculate", "analyze", "process", "compute"]):
+                    if any(
+                        keyword in node.name.lower()
+                        for keyword in ["calculate", "analyze", "process", "compute"]
+                    ):
                         if len(node.body) > 20:
-                            violations.append(f"{file_path.name}: Adapter function {node.name} contains business logic")
+                            violations.append(
+                                f"{file_path.name}: Adapter function {node.name} contains business logic"
+                            )
 
         except Exception as e:
             violations.append(f"{file_path.name}: Analysis failed - {str(e)}")
@@ -231,7 +265,9 @@ class ArchitectureValidator:
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom):
                     if node.module and "mine_core" in node.module:
-                        violations.append(f"{file_path.name}: Component imports core module {node.module}")
+                        violations.append(
+                            f"{file_path.name}: Component imports core module {node.module}"
+                        )
 
                     # Check for direct config imports
                     if node.module and "configs.environment" in node.module:
@@ -240,7 +276,9 @@ class ArchitectureValidator:
                 # Check function size compliance
                 if isinstance(node, ast.FunctionDef):
                     if len(node.body) > 30:
-                        violations.append(f"{file_path.name}: Component function {node.name} exceeds 30 lines")
+                        violations.append(
+                            f"{file_path.name}: Component function {node.name} exceeds 30 lines"
+                        )
 
         except Exception as e:
             violations.append(f"{file_path.name}: Analysis failed - {str(e)}")
@@ -280,7 +318,10 @@ class ArchitectureValidator:
 
             # Should import core business logic
             if "config_adapter" not in file_path.name:
-                if "from mine_core.business" not in content and "from mine_core.database.query_manager" not in content:
+                if (
+                    "from mine_core.business" not in content
+                    and "from mine_core.database.query_manager" not in content
+                ):
                     violations.append(f"{file_path.name}: Adapter missing core imports")
 
             # Should not import components
@@ -353,6 +394,7 @@ RECOMMENDATION:
 
         return report
 
+
 # Validation CLI interface
 def main():
     """Architecture validation CLI"""
@@ -374,6 +416,7 @@ def main():
         print(f"Violations: {len(result.violations)}")
 
         return 0 if result.is_compliant else 1
+
 
 if __name__ == "__main__":
     exit(main())

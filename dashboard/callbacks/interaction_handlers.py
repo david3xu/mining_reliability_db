@@ -5,7 +5,8 @@ Clean interaction logic with adapter-driven URL generation.
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from dash import Input, Output, State, callback, ctx
 from dash.exceptions import PreventUpdate
 
@@ -14,6 +15,7 @@ from dashboard.routing.url_manager import get_url_manager
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class InteractionHandlers:
     """Pure interaction handling with adapter integration"""
@@ -26,9 +28,9 @@ class InteractionHandlers:
         """Register chart click callbacks"""
 
         @app.callback(
-            Output('url-location', 'pathname'),
-            Input('facility-pie-chart', 'clickData'),
-            prevent_initial_call=True
+            Output("url-location", "pathname"),
+            Input("facility-pie-chart", "clickData"),
+            prevent_initial_call=True,
         )
         def handle_facility_chart_click(click_data):
             """Direct facility navigation from pie chart"""
@@ -36,7 +38,7 @@ class InteractionHandlers:
                 if not click_data:
                     raise PreventUpdate
 
-                facility_name = click_data['points'][0]['label']
+                facility_name = click_data["points"][0]["label"]
                 logger.info(f"Chart interaction: {facility_name}")
 
                 # Validate facility exists
@@ -50,9 +52,9 @@ class InteractionHandlers:
                 raise PreventUpdate
 
         @app.callback(
-            Output('url-location', 'pathname', allow_duplicate=True),
-            Input('field-bar-chart', 'clickData'),
-            prevent_initial_call=True
+            Output("url-location", "pathname", allow_duplicate=True),
+            Input("field-bar-chart", "clickData"),
+            prevent_initial_call=True,
         )
         def handle_field_chart_click(click_data):
             """Direct field analysis navigation"""
@@ -60,7 +62,7 @@ class InteractionHandlers:
                 if not click_data:
                     raise PreventUpdate
 
-                field_type = click_data['points'][0]['x']
+                field_type = click_data["points"][0]["x"]
                 logger.info(f"Field chart interaction: {field_type}")
 
                 return "/data-types-distribution"
@@ -73,9 +75,9 @@ class InteractionHandlers:
         """Register table click callbacks"""
 
         @app.callback(
-            Output('url-location', 'pathname', allow_duplicate=True),
-            Input('timeline-table', 'active_cell'),
-            prevent_initial_call=True
+            Output("url-location", "pathname", allow_duplicate=True),
+            Input("timeline-table", "active_cell"),
+            prevent_initial_call=True,
         )
         def handle_table_interaction(active_cell):
             """Direct facility navigation from table"""
@@ -86,8 +88,8 @@ class InteractionHandlers:
                 # Get table data through adapter
                 timeline_data = self.facility_adapter.get_facility_list()
 
-                if active_cell['row'] < len(timeline_data):
-                    facility_id = timeline_data[active_cell['row']]['facility_id']
+                if active_cell["row"] < len(timeline_data):
+                    facility_id = timeline_data[active_cell["row"]]["facility_id"]
                     logger.info(f"Table interaction: {facility_id}")
 
                     return f"/facility/{facility_id}"
@@ -102,9 +104,9 @@ class InteractionHandlers:
         """Register navigation state management"""
 
         @app.callback(
-            Output('dashboard-state', 'data'),
-            Input('url-location', 'pathname'),
-            prevent_initial_call=True
+            Output("dashboard-state", "data"),
+            Input("url-location", "pathname"),
+            prevent_initial_call=True,
         )
         def update_navigation_state(pathname):
             """Track navigation state for breadcrumbs"""
@@ -112,9 +114,9 @@ class InteractionHandlers:
                 breadcrumbs = self.url_manager.get_breadcrumbs(pathname)
 
                 return {
-                    'current_path': pathname,
-                    'breadcrumbs': breadcrumbs,
-                    'timestamp': ctx.triggered[0]['prop_id']
+                    "current_path": pathname,
+                    "breadcrumbs": breadcrumbs,
+                    "timestamp": ctx.triggered[0]["prop_id"],
                 }
 
             except Exception as e:
@@ -124,19 +126,21 @@ class InteractionHandlers:
     def get_chart_config(self) -> Dict[str, Any]:
         """Chart interaction configuration"""
         return {
-            'displayModeBar': True,
-            'modeBarButtonsToRemove': ['pan2d', 'lasso2d'],
-            'displaylogo': False,
-            'toImageButtonOptions': {
-                'format': 'png',
-                'filename': 'mining_chart',
-                'height': 500,
-                'width': 700
-            }
+            "displayModeBar": True,
+            "modeBarButtonsToRemove": ["pan2d", "lasso2d"],
+            "displaylogo": False,
+            "toImageButtonOptions": {
+                "format": "png",
+                "filename": "mining_chart",
+                "height": 500,
+                "width": 700,
+            },
         }
+
 
 # Singleton pattern
 _interaction_handlers = None
+
 
 def get_interaction_handlers():
     """Get singleton interaction handlers instance"""

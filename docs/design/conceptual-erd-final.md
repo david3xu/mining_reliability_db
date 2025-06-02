@@ -6,12 +6,12 @@ Pattern exploration of the raw data reveals a natural workflow sequence for inci
 
 ```
 Hub-and-Spoke Pattern:            Hierarchical Chain Pattern:
-                                  
-    ┌─── Problem                  Facility → ActionRequest → Problem → 
+
+    ┌─── Problem                  Facility → ActionRequest → Problem →
     │                                        RootCause → ActionPlan → Verification
-ActionRequest ─┼─── RootCause       
-    │                            
-    └─── ActionPlan              
+ActionRequest ─┼─── RootCause
+    │
+    └─── ActionPlan
 ```
 
 The hierarchical chain better captures the progression of incident management:
@@ -30,7 +30,7 @@ erDiagram
     Problem ||--o{ RootCause : "analyzes"
     RootCause ||--o{ ActionPlan : "resolves"
     ActionPlan ||--o{ Verification : "validates"
-    
+
     ActionRequest {
         integer action_request_id PK
         integer facility_id FK

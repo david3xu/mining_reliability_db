@@ -6,13 +6,21 @@ Clean implementation without backwards compatibility pollution.
 
 import logging
 from contextlib import contextmanager
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 from neo4j import GraphDatabase
-from configs.environment import get_db_config, get_entity_primary_key, get_connection_timeout, get_max_retries
+
+from configs.environment import (
+    get_connection_timeout,
+    get_db_config,
+    get_entity_primary_key,
+    get_max_retries,
+)
 from mine_core.shared.common import handle_error
 from mine_core.shared.field_utils import clean_label, has_real_value
 
 logger = logging.getLogger(__name__)
+
 
 class SimplifiedDatabase:
     """Streamlined database interface for clean dataset processing"""
@@ -45,7 +53,7 @@ class SimplifiedDatabase:
             self._driver = GraphDatabase.driver(
                 self._uri,
                 auth=(self._user, self._password),
-                connection_timeout=get_connection_timeout()
+                connection_timeout=get_connection_timeout(),
             )
             self._driver.verify_connectivity()
             logger.info("Neo4j connection verified")
@@ -80,8 +88,9 @@ class SimplifiedDatabase:
             handle_error(logger, e, f"Query execution: {query[:100]}...")
             raise
 
-    def create_entity_with_dynamic_label(self, entity_type: str, properties: Dict[str, Any],
-                                       dynamic_label: str = None) -> bool:
+    def create_entity_with_dynamic_label(
+        self, entity_type: str, properties: Dict[str, Any], dynamic_label: str = None
+    ) -> bool:
         """Create entity with dynamic labeling support"""
         primary_key = get_entity_primary_key(entity_type)
         if not primary_key:
@@ -101,8 +110,11 @@ class SimplifiedDatabase:
                 labels.append(clean_dynamic)
 
         # Filter out None values and missing indicators
-        valid_props = {k: v for k, v in properties.items()
-                      if v is not None and not self._is_missing_indicator(v)}
+        valid_props = {
+            k: v
+            for k, v in properties.items()
+            if v is not None and not self._is_missing_indicator(v)
+        }
 
         # Build label string and SET clause
         label_string = ":".join(labels)
@@ -116,10 +128,14 @@ class SimplifiedDatabase:
                 session.run(query, **valid_props)
             return True
         except Exception as e:
-            handle_error(logger, e, f"Creating entity {entity_type} with dynamic label {dynamic_label}")
+            handle_error(
+                logger, e, f"Creating entity {entity_type} with dynamic label {dynamic_label}"
+            )
             return False
 
-    def batch_create_entities_with_labels(self, entity_type: str, entities_list: List[Dict[str, Any]]) -> bool:
+    def batch_create_entities_with_labels(
+        self, entity_type: str, entities_list: List[Dict[str, Any]]
+    ) -> bool:
         """Batch create entities with dynamic labeling"""
         if not entities_list:
             return True
@@ -139,14 +155,22 @@ class SimplifiedDatabase:
             with self.session() as session:
                 for entity in entities_list:
                     dynamic_label = entity.pop("_dynamic_label", None)
-                    self._create_single_entity_with_label(session, entity_type, entity, primary_key, dynamic_label)
+                    self._create_single_entity_with_label(
+                        session, entity_type, entity, primary_key, dynamic_label
+                    )
             return True
         except Exception as e:
             handle_error(logger, e, f"Batch creating {entity_type}")
             return False
 
-    def _create_single_entity_with_label(self, session, entity_type: str, entity: Dict[str, Any],
-                                       primary_key: str, dynamic_label: str = None):
+    def _create_single_entity_with_label(
+        self,
+        session,
+        entity_type: str,
+        entity: Dict[str, Any],
+        primary_key: str,
+        dynamic_label: str = None,
+    ):
         """Create single entity with optional dynamic label"""
         # Determine labels
         labels = [entity_type]
@@ -156,8 +180,9 @@ class SimplifiedDatabase:
                 labels.append(clean_dynamic)
 
         # Filter meaningful properties
-        meaningful_props = {k: v for k, v in entity.items()
-                          if v is not None and not self._is_missing_indicator(v)}
+        meaningful_props = {
+            k: v for k, v in entity.items() if v is not None and not self._is_missing_indicator(v)
+        }
 
         # Build query
         label_string = ":".join(labels)
@@ -176,8 +201,9 @@ class SimplifiedDatabase:
 
         session.run(query, entity=meaningful_props)
 
-    def create_relationship(self, from_type: str, from_id: str, rel_type: str,
-                          to_type: str, to_id: str) -> bool:
+    def create_relationship(
+        self, from_type: str, from_id: str, rel_type: str, to_type: str, to_id: str
+    ) -> bool:
         """Create relationship using schema primary keys with validation"""
         from_pk = get_entity_primary_key(from_type)
         to_pk = get_entity_primary_key(to_type)
@@ -201,7 +227,9 @@ class SimplifiedDatabase:
                 if record and record["relationships_created"] > 0:
                     return True
                 else:
-                    logger.warning(f"No relationship created: {from_type}({from_id}) -[{rel_type}]-> {to_type}({to_id})")
+                    logger.warning(
+                        f"No relationship created: {from_type}({from_id}) -[{rel_type}]-> {to_type}({to_id})"
+                    )
                     return False
 
         except Exception as e:
@@ -229,7 +257,7 @@ class SimplifiedDatabase:
         return {
             "causal_patterns": results,
             "total_incidents_analyzed": len(results),
-            "facility_scope": facility_id or "all_facilities"
+            "facility_scope": facility_id or "all_facilities",
         }
 
     def validate_data_integrity(self) -> Dict[str, Any]:
@@ -289,7 +317,7 @@ class SimplifiedDatabase:
             "CREATE INDEX action_request_number_index IF NOT EXISTS FOR (ar:ActionRequest) ON (ar.action_request_number)",
             "CREATE INDEX root_cause_index IF NOT EXISTS FOR (rc:RootCause) ON (rc.root_cause)",
             "CREATE INDEX categories_index IF NOT EXISTS FOR (ar:ActionRequest) ON (ar.categories)",
-            "CREATE INDEX stage_index IF NOT EXISTS FOR (ar:ActionRequest) ON (ar.stage)"
+            "CREATE INDEX stage_index IF NOT EXISTS FOR (ar:ActionRequest) ON (ar.stage)",
         ]
 
         try:
@@ -302,8 +330,10 @@ class SimplifiedDatabase:
             handle_error(logger, e, "performance optimization")
             return False
 
+
 # Singleton instance
 _db_instance = None
+
 
 def get_database(uri=None, user=None, password=None):
     """Get singleton database instance"""
@@ -311,6 +341,7 @@ def get_database(uri=None, user=None, password=None):
     if _db_instance is None:
         _db_instance = SimplifiedDatabase(uri, user, password)
     return _db_instance
+
 
 def close_database():
     """Close singleton database connection"""

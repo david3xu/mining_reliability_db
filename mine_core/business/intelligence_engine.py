@@ -5,24 +5,27 @@ Centralized intelligence operations with schema-driven analysis capabilities.
 """
 
 import logging
-from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
-from mine_core.database.query_manager import get_query_manager, QueryResult
-from configs.environment import get_mappings, get_schema, get_entity_names
+from configs.environment import get_entity_names, get_mappings, get_schema
+from mine_core.database.query_manager import QueryResult, get_query_manager
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class IntelligenceResult:
     """Standardized intelligence analysis result"""
+
     analysis_type: str
     data: Dict[str, Any]
     metadata: Dict[str, Any]
     quality_score: float
     generated_at: str
+
 
 class IntelligenceEngine:
     """Core business intelligence and analysis engine"""
@@ -59,7 +62,7 @@ class IntelligenceEngine:
                 "facilities": len(facilities),
                 "years_coverage": year_coverage,
                 "year_detail": year_detail,
-                "facilities_data": facilities
+                "facilities_data": facilities,
             }
 
             quality_score = self._calculate_portfolio_quality(portfolio_data)
@@ -69,7 +72,7 @@ class IntelligenceEngine:
                 data=portfolio_data,
                 metadata={"source": "core_intelligence", "facilities_analyzed": len(facilities)},
                 quality_score=quality_score,
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -98,7 +101,7 @@ class IntelligenceEngine:
                 "values": values,
                 "percentages": percentages,
                 "total_records": total_records,
-                "distribution_analysis": self._analyze_distribution_balance(values)
+                "distribution_analysis": self._analyze_distribution_balance(values),
             }
 
             quality_score = 1.0 if total_records > 0 else 0.0
@@ -108,7 +111,7 @@ class IntelligenceEngine:
                 data=distribution_data,
                 metadata={"facilities_count": len(facilities), "total_records": total_records},
                 quality_score=quality_score,
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -130,7 +133,7 @@ class IntelligenceEngine:
                 "categorical_fields": "Categorical (Discrete)",
                 "boolean_fields": "Boolean (Binary)",
                 "identification_fields": "List (Multi-value)",
-                "quantitative_fields": "Numeric (Quantitative)"
+                "quantitative_fields": "Numeric (Quantitative)",
             }
 
             labels = []
@@ -150,7 +153,7 @@ class IntelligenceEngine:
                 "values": values,
                 "percentages": percentages,
                 "total_fields": total_fields,
-                "category_analysis": self._analyze_field_balance(field_categories)
+                "category_analysis": self._analyze_field_balance(field_categories),
             }
 
             quality_score = 1.0 if total_fields > 0 else 0.0
@@ -160,7 +163,7 @@ class IntelligenceEngine:
                 data=distribution_data,
                 metadata={"source": "schema_configuration", "categories": len(category_mapping)},
                 quality_score=quality_score,
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -186,9 +189,12 @@ class IntelligenceEngine:
             return IntelligenceResult(
                 analysis_type="temporal_timeline",
                 data=timeline_data,
-                metadata={"facilities": len(facilities), "years": len(timeline_data.get("year_range", []))},
+                metadata={
+                    "facilities": len(facilities),
+                    "years": len(timeline_data.get("year_range", [])),
+                },
                 quality_score=1.0 if timeline_data["total_records"] > 0 else 0.0,
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -210,7 +216,7 @@ class IntelligenceEngine:
                 "causal_patterns": causal_result.data,
                 "pattern_analysis": patterns_analysis,
                 "facility_scope": facility_id or "all_facilities",
-                "total_patterns": len(causal_result.data)
+                "total_patterns": len(causal_result.data),
             }
 
             quality_score = self._calculate_causal_quality(causal_result.data)
@@ -218,9 +224,12 @@ class IntelligenceEngine:
             return IntelligenceResult(
                 analysis_type="causal_intelligence",
                 data=intelligence_data,
-                metadata={"facility_filter": facility_id, "patterns_found": len(causal_result.data)},
+                metadata={
+                    "facility_filter": facility_id,
+                    "patterns_found": len(causal_result.data),
+                },
                 quality_score=quality_score,
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -248,7 +257,7 @@ class IntelligenceEngine:
                 "workflow_completeness": quality_metrics,
                 "entity_analysis": entity_analysis,
                 "overall_score": quality_metrics.get("overall_quality", 0.0),
-                "recommendations": self._generate_quality_recommendations(quality_metrics)
+                "recommendations": self._generate_quality_recommendations(quality_metrics),
             }
 
             return IntelligenceResult(
@@ -256,7 +265,7 @@ class IntelligenceEngine:
                 data=quality_data,
                 metadata={"entities_analyzed": len(entity_analysis), "workflow_stages": 5},
                 quality_score=quality_data["overall_score"],
-                generated_at=datetime.now().isoformat()
+                generated_at=datetime.now().isoformat(),
             )
 
         except Exception as e:
@@ -276,7 +285,7 @@ class IntelligenceEngine:
         return {
             "total_fields": len(unique_fields),
             "entities_mapped": len(entity_mappings),
-            "field_list": list(unique_fields)
+            "field_list": list(unique_fields),
         }
 
     def _calculate_year_span(self, temporal_data: List[Dict[str, Any]]) -> str:
@@ -307,7 +316,7 @@ class IntelligenceEngine:
         return {
             "concentration_ratio": round((max_value / total) * 100, 1) if total > 0 else 0,
             "balance_score": 1.0 - (max_value / total) if total > 0 else 0,
-            "distribution_type": "concentrated" if max_value / total > 0.5 else "balanced"
+            "distribution_type": "concentrated" if max_value / total > 0.5 else "balanced",
         }
 
     def _analyze_field_balance(self, field_categories: Dict[str, List]) -> Dict[str, Any]:
@@ -317,11 +326,16 @@ class IntelligenceEngine:
 
         return {
             "category_distribution": category_counts,
-            "dominant_category": max(category_counts, key=category_counts.get) if category_counts else None,
-            "balance_score": len([c for c in category_counts.values() if c > 0]) / len(category_counts)
+            "dominant_category": max(category_counts, key=category_counts.get)
+            if category_counts
+            else None,
+            "balance_score": len([c for c in category_counts.values() if c > 0])
+            / len(category_counts),
         }
 
-    def _build_timeline_matrix(self, facilities: List[Dict], temporal_data: List[Dict]) -> Dict[str, Any]:
+    def _build_timeline_matrix(
+        self, facilities: List[Dict], temporal_data: List[Dict]
+    ) -> Dict[str, Any]:
         """Build timeline matrix from facility and temporal data"""
         # Extract years
         years = sorted(list(set([int(item["year"]) for item in temporal_data if item.get("year")])))
@@ -355,7 +369,7 @@ class IntelligenceEngine:
             "rows": rows,
             "year_range": years,
             "total_records": total_records,
-            "facilities_count": len(facility_names)
+            "facilities_count": len(facility_names),
         }
 
     def _analyze_causal_patterns(self, patterns: List[Dict]) -> Dict[str, Any]:
@@ -370,7 +384,7 @@ class IntelligenceEngine:
             "pattern_count": len(patterns),
             "frequency_range": {"min": min(frequencies), "max": max(frequencies)},
             "high_frequency_patterns": len([f for f in frequencies if f > 5]),
-            "pattern_diversity": len(set([p.get("primary_cause") for p in patterns]))
+            "pattern_diversity": len(set([p.get("primary_cause") for p in patterns])),
         }
 
     def _calculate_portfolio_quality(self, portfolio_data: Dict) -> float:
@@ -379,7 +393,7 @@ class IntelligenceEngine:
             1.0 if portfolio_data["total_records"] > 0 else 0.0,
             1.0 if portfolio_data["facilities"] > 0 else 0.0,
             1.0 if portfolio_data["data_fields"] > 0 else 0.0,
-            1.0 if portfolio_data["years_coverage"] > 0 else 0.0
+            1.0 if portfolio_data["years_coverage"] > 0 else 0.0,
         ]
         return sum(factors) / len(factors)
 
@@ -405,7 +419,7 @@ class IntelligenceEngine:
             "problem_definition_rate": completion_data.get("problems_defined", 0) / total,
             "causal_analysis_rate": completion_data.get("causes_analyzed", 0) / total,
             "action_planning_rate": completion_data.get("plans_developed", 0) / total,
-            "verification_rate": completion_data.get("plans_verified", 0) / total
+            "verification_rate": completion_data.get("plans_verified", 0) / total,
         }
 
         metrics["overall_quality"] = sum(metrics.values()) / len(metrics)
@@ -419,10 +433,7 @@ class IntelligenceEngine:
 
         for entity_name in entity_names:
             count = self.query_manager.get_entity_count(entity_name)
-            entity_analysis[entity_name] = {
-                "count": count,
-                "has_data": count > 0
-            }
+            entity_analysis[entity_name] = {"count": count, "has_data": count > 0}
 
         return entity_analysis
 
@@ -448,11 +459,13 @@ class IntelligenceEngine:
             data={},
             metadata={"error": "Analysis failed"},
             quality_score=0.0,
-            generated_at=datetime.now().isoformat()
+            generated_at=datetime.now().isoformat(),
         )
+
 
 # Singleton pattern
 _intelligence_engine = None
+
 
 def get_intelligence_engine() -> IntelligenceEngine:
     """Get singleton intelligence engine instance"""

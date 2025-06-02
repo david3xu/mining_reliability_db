@@ -4,9 +4,9 @@ Purified Dashboard Application - Pure Bootstrap Architecture
 Clean application entry point with routing delegation and adapter validation.
 """
 
-import sys
-import os
 import logging
+import os
+import sys
 from pathlib import Path
 
 # Add project root to path
@@ -14,20 +14,20 @@ project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
 import dash
-from dash import dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
+from dash import Input, Output, callback, dcc, html
 from dash.exceptions import PreventUpdate
 
-from mine_core.shared.common import setup_project_environment, handle_error
+# Adapter validation
+from dashboard.adapters import get_config_adapter, get_data_adapter
+from dashboard.routing.navigation_builder import get_navigation_builder
 
 # Pure routing and navigation
 from dashboard.routing.url_manager import get_url_manager
-from dashboard.routing.navigation_builder import get_navigation_builder
-
-# Adapter validation
-from dashboard.adapters import get_data_adapter, get_config_adapter
+from mine_core.shared.common import handle_error, setup_project_environment
 
 logger = None
+
 
 class PurifiedDashboardApp:
     """Clean application bootstrap with routing delegation"""
@@ -78,14 +78,17 @@ class PurifiedDashboardApp:
                 __name__,
                 external_stylesheets=[
                     dbc.themes.BOOTSTRAP,
-                    {"href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css", "rel": "stylesheet"}
+                    {
+                        "href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
+                        "rel": "stylesheet",
+                    },
                 ],
                 suppress_callback_exceptions=True,
                 title="Mining Reliability Database",
                 meta_tags=[
                     {"name": "viewport", "content": "width=device-width, initial-scale=1.0"},
-                    {"name": "description", "content": "Professional Mining Reliability Analysis"}
-                ]
+                    {"name": "description", "content": "Professional Mining Reliability Analysis"},
+                ],
             )
 
             self.app.layout = self._create_layout()
@@ -99,20 +102,20 @@ class PurifiedDashboardApp:
         """Create application layout with navigation delegation"""
         navigation_builder = get_navigation_builder()
 
-        return html.Div([
-            dcc.Location(id="url", refresh=False),
-            navigation_builder.build_main_navigation(),
-            html.Div(id="page-content", className="container-fluid p-4")
-        ])
+        return html.Div(
+            [
+                dcc.Location(id="url", refresh=False),
+                navigation_builder.build_main_navigation(),
+                html.Div(id="page-content", className="container-fluid p-4"),
+            ]
+        )
 
     def _setup_routing(self):
         """Setup routing through URL manager"""
         url_manager = get_url_manager()
 
         @self.app.callback(
-            Output("page-content", "children"),
-            Input("url", "pathname"),
-            prevent_initial_call=False
+            Output("page-content", "children"), Input("url", "pathname"), prevent_initial_call=False
         )
         def route_page(pathname):
             """Route pages through URL manager"""
@@ -134,35 +137,47 @@ class PurifiedDashboardApp:
         try:
             if component_name == "portfolio_overview":
                 from dashboard.components.portfolio_overview import create_complete_dashboard
+
                 return create_complete_dashboard()
 
             elif component_name == "data_quality_layout":
                 from dashboard.components.data_quality import create_data_quality_layout
+
                 return create_data_quality_layout()
 
             elif component_name == "workflow_analysis_layout":
                 from dashboard.components.workflow_analysis import create_workflow_analysis_layout
+
                 return create_workflow_analysis_layout()
 
             elif component_name == "workflow_process_page":
                 from dashboard.components.workflow_analysis import create_workflow_process_page
+
                 return create_workflow_process_page()
 
             elif component_name == "historical_records_page":
                 from dashboard.components.portfolio_overview import create_historical_records_page
+
                 return create_historical_records_page()
 
             elif component_name == "facilities_distribution_page":
-                from dashboard.components.portfolio_overview import create_facilities_distribution_page
+                from dashboard.components.portfolio_overview import (
+                    create_facilities_distribution_page,
+                )
+
                 return create_facilities_distribution_page()
 
             elif component_name == "data_types_distribution_page":
-                from dashboard.components.portfolio_overview import create_data_types_distribution_page
+                from dashboard.components.portfolio_overview import (
+                    create_data_types_distribution_page,
+                )
+
                 return create_data_types_distribution_page()
 
             elif component_name == "facility_detail_layout":
                 facility_id = route_config.get("facility_id")
                 from dashboard.components.facility_detail import create_facility_detail_layout
+
                 return create_facility_detail_layout(facility_id)
 
             elif component_name == "facilities_summary":
@@ -182,24 +197,42 @@ class PurifiedDashboardApp:
             portfolio_data = data_adapter.get_portfolio_metrics()
             facility_data = data_adapter.get_facility_breakdown()
 
-            return html.Div([
-                html.H2("Four Facilities Summary", className="text-primary mb-4"),
-                html.P(f"Analysis across {facility_data.total_records:,} records from {len(facility_data.labels)} facilities"),
-
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Card([
-                            dbc.CardBody([
-                                html.H4(label, className="card-title"),
-                                html.H2(f"{value:,}", className="text-success"),
-                                html.P(f"{percentage:.1f}% of total", className="text-muted")
-                            ])
-                        ])
-                    ], md=3) for label, value, percentage in zip(
-                        facility_data.labels, facility_data.values, facility_data.percentages
-                    )
-                ])
-            ])
+            return html.Div(
+                [
+                    html.H2("Four Facilities Summary", className="text-primary mb-4"),
+                    html.P(
+                        f"Analysis across {facility_data.total_records:,} records from {len(facility_data.labels)} facilities"
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    dbc.Card(
+                                        [
+                                            dbc.CardBody(
+                                                [
+                                                    html.H4(label, className="card-title"),
+                                                    html.H2(f"{value:,}", className="text-success"),
+                                                    html.P(
+                                                        f"{percentage:.1f}% of total",
+                                                        className="text-muted",
+                                                    ),
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ],
+                                md=3,
+                            )
+                            for label, value, percentage in zip(
+                                facility_data.labels,
+                                facility_data.values,
+                                facility_data.percentages,
+                            )
+                        ]
+                    ),
+                ]
+            )
 
         except Exception as e:
             handle_error(logger, e, "facilities summary creation")
@@ -207,32 +240,38 @@ class PurifiedDashboardApp:
 
     def _create_not_found_page(self, pathname):
         """Create 404 page"""
-        return dbc.Container([
-            dbc.Alert([
-                html.H4("Page Not Found"),
-                html.P(f"Route '{pathname}' does not exist"),
-                dbc.Button("Return to Portfolio", href="/", color="primary")
-            ], color="warning")
-        ])
+        return dbc.Container(
+            [
+                dbc.Alert(
+                    [
+                        html.H4("Page Not Found"),
+                        html.P(f"Route '{pathname}' does not exist"),
+                        dbc.Button("Return to Portfolio", href="/", color="primary"),
+                    ],
+                    color="warning",
+                )
+            ]
+        )
 
     def _create_error_page(self, error_message):
         """Create error page"""
-        return dbc.Container([
-            dbc.Alert([
-                html.H4("Application Error"),
-                html.P(error_message),
-                dbc.Button("Return to Portfolio", href="/", color="secondary")
-            ], color="danger")
-        ])
+        return dbc.Container(
+            [
+                dbc.Alert(
+                    [
+                        html.H4("Application Error"),
+                        html.P(error_message),
+                        dbc.Button("Return to Portfolio", href="/", color="secondary"),
+                    ],
+                    color="danger",
+                )
+            ]
+        )
 
     def run_server(self, **kwargs):
         """Run dashboard server with status reporting"""
         try:
-            server_config = {
-                "host": self.host,
-                "port": self.port,
-                "debug": self.debug
-            }
+            server_config = {"host": self.host, "port": self.port, "debug": self.debug}
             server_config.update(kwargs)
 
             print("\n" + "=" * 60)
@@ -256,6 +295,7 @@ class PurifiedDashboardApp:
             handle_error(logger, e, "server startup")
             raise
 
+
 def create_app(debug=None, port=None, host=None):
     """Application factory"""
     try:
@@ -264,6 +304,7 @@ def create_app(debug=None, port=None, host=None):
         if logger:
             handle_error(logger, e, "application creation")
         raise
+
 
 def main():
     """CLI entry point"""
@@ -287,6 +328,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

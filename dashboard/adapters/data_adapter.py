@@ -5,18 +5,24 @@ Clean adapter calling core business logic with zero embedded intelligence.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+from dashboard.adapters.interfaces import (
+    ComponentMetadata,
+    FacilityData,
+    FieldData,
+    PortfolioData,
+    TimelineData,
+    ValidationResult,
+)
 
 # Pure core layer imports - no business logic in adapter
 from mine_core.business.intelligence_engine import get_intelligence_engine
-from dashboard.adapters.interfaces import (
-    PortfolioData, FacilityData, FieldData, TimelineData,
-    ComponentMetadata, ValidationResult
-)
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class PurifiedDataAdapter:
     """Pure data access adapter - calls core business logic only"""
@@ -50,8 +56,8 @@ class PurifiedDataAdapter:
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
-                    data_quality=analysis_result.quality_score
-                )
+                    data_quality=analysis_result.quality_score,
+                ),
             )
 
         except Exception as e:
@@ -80,8 +86,8 @@ class PurifiedDataAdapter:
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
-                    data_quality=analysis_result.quality_score
-                )
+                    data_quality=analysis_result.quality_score,
+                ),
             )
 
         except Exception as e:
@@ -110,8 +116,8 @@ class PurifiedDataAdapter:
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
-                    data_quality=analysis_result.quality_score
-                )
+                    data_quality=analysis_result.quality_score,
+                ),
             )
 
         except Exception as e:
@@ -141,8 +147,8 @@ class PurifiedDataAdapter:
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
-                    data_quality=analysis_result.quality_score
-                )
+                    data_quality=analysis_result.quality_score,
+                ),
             )
 
         except Exception as e:
@@ -169,8 +175,8 @@ class PurifiedDataAdapter:
                 "metadata": ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
-                    data_quality=analysis_result.quality_score
-                ).__dict__
+                    data_quality=analysis_result.quality_score,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -200,9 +206,11 @@ class PurifiedDataAdapter:
                 "facility_id": facility_id,
                 "target_records": target_records,
                 "average_other_records": avg_records,
-                "vs_average": ((target_records - avg_records) / avg_records * 100) if avg_records > 0 else 0,
+                "vs_average": ((target_records - avg_records) / avg_records * 100)
+                if avg_records > 0
+                else 0,
                 "performance_rank": 1,  # Simplified - core logic would calculate
-                "total_facilities": total_facilities
+                "total_facilities": total_facilities,
             }
 
         except Exception as e:
@@ -235,63 +243,94 @@ class PurifiedDataAdapter:
                 is_valid=all_valid,
                 component_status=validation_status,
                 error_details=None if all_valid else "Some core services failed",
-                data_quality_score=quality_score
+                data_quality_score=quality_score,
             )
 
         except Exception as e:
             handle_error(logger, e, "data validation")
             return ValidationResult(
-                is_valid=False,
-                component_status={},
-                error_details=str(e),
-                data_quality_score=0.0
+                is_valid=False, component_status={}, error_details=str(e), data_quality_score=0.0
             )
+
+    # Interface compatibility aliases for standardized access
+    def get_portfolio_data(self) -> PortfolioData:
+        """Interface-compliant alias for portfolio metrics"""
+        return self.get_portfolio_metrics()
+
+    def get_facility_data(self) -> FacilityData:
+        """Interface-compliant alias for facility breakdown"""
+        return self.get_facility_breakdown()
+
+    def get_field_data(self) -> FieldData:
+        """Interface-compliant alias for field distribution"""
+        return self.get_field_distribution()
+
+    def get_timeline_data(self) -> TimelineData:
+        """Interface-compliant alias for historical timeline"""
+        return self.get_historical_timeline()
 
     # Pure data transformation helpers - no business logic
 
     def _get_timestamp(self) -> str:
         """Pure timestamp generation"""
         from datetime import datetime
+
         return datetime.now().isoformat()
 
     def _create_empty_portfolio_data(self) -> PortfolioData:
         """Pure empty data creation"""
         return PortfolioData(
-            total_records=0, data_fields=0, facilities=0, years_coverage=0,
-            year_detail="No data", metadata=ComponentMetadata(
+            total_records=0,
+            data_fields=0,
+            facilities=0,
+            years_coverage=0,
+            year_detail="No data",
+            metadata=ComponentMetadata(
                 source="adapter_fallback", generated_at=self._get_timestamp(), data_quality=0.0
-            )
+            ),
         )
 
     def _create_empty_facility_data(self) -> FacilityData:
         """Pure empty data creation"""
         return FacilityData(
-            labels=[], values=[], percentages=[], total_records=0,
+            labels=[],
+            values=[],
+            percentages=[],
+            total_records=0,
             metadata=ComponentMetadata(
                 source="adapter_fallback", generated_at=self._get_timestamp(), data_quality=0.0
-            )
+            ),
         )
 
     def _create_empty_field_data(self) -> FieldData:
         """Pure empty data creation"""
         return FieldData(
-            labels=[], values=[], percentages=[], total_fields=0,
+            labels=[],
+            values=[],
+            percentages=[],
+            total_fields=0,
             metadata=ComponentMetadata(
                 source="adapter_fallback", generated_at=self._get_timestamp(), data_quality=0.0
-            )
+            ),
         )
 
     def _create_empty_timeline_data(self) -> TimelineData:
         """Pure empty data creation"""
         return TimelineData(
-            columns=[], rows=[], year_range=[], total_records=0, facilities_count=0,
+            columns=[],
+            rows=[],
+            year_range=[],
+            total_records=0,
+            facilities_count=0,
             metadata=ComponentMetadata(
                 source="adapter_fallback", generated_at=self._get_timestamp(), data_quality=0.0
-            )
+            ),
         )
+
 
 # Singleton pattern
 _purified_adapter = None
+
 
 def get_data_adapter() -> PurifiedDataAdapter:
     """Get singleton purified adapter instance"""
@@ -299,6 +338,7 @@ def get_data_adapter() -> PurifiedDataAdapter:
     if _purified_adapter is None:
         _purified_adapter = PurifiedDataAdapter()
     return _purified_adapter
+
 
 def reset_adapter():
     """Reset adapter instance"""

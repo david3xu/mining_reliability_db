@@ -5,14 +5,16 @@ Specialized adapter for workflow-specific data operations with zero business log
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
+from dashboard.adapters.interfaces import ComponentMetadata
 
 # Pure core layer imports
 from mine_core.business.workflow_processor import get_workflow_processor
-from dashboard.adapters.interfaces import ComponentMetadata
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class WorkflowAdapter:
     """Pure workflow data access - calls core workflow processor only"""
@@ -38,8 +40,8 @@ class WorkflowAdapter:
                 "metadata": ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if schema_analysis.get("total_entities", 0) > 0 else 0.0
-                ).__dict__
+                    data_quality=1.0 if schema_analysis.get("total_entities", 0) > 0 else 0.0,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -63,8 +65,8 @@ class WorkflowAdapter:
                 "metadata": ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if distribution_data.get("total_entities", 0) > 0 else 0.0
-                ).__dict__
+                    data_quality=1.0 if distribution_data.get("total_entities", 0) > 0 else 0.0,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -88,8 +90,8 @@ class WorkflowAdapter:
                 "metadata": ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if mapping_data.get("total_mappings", 0) > 0 else 0.0
-                ).__dict__
+                    data_quality=1.0 if mapping_data.get("total_mappings", 0) > 0 else 0.0,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -109,15 +111,17 @@ class WorkflowAdapter:
 
             # Pure data transformation to dictionary format
             return {
-                "workflow_stages": self._transform_workflow_stages(workflow_analysis.workflow_stages),
+                "workflow_stages": self._transform_workflow_stages(
+                    workflow_analysis.workflow_stages
+                ),
                 "supporting_entities": workflow_analysis.supporting_entities,
                 "completion_summary": workflow_analysis.completion_summary,
-                "display_config": {}, # Would be populated from config adapter
+                "display_config": {},  # Would be populated from config adapter
                 "metadata": ComponentMetadata(
                     source="core.workflow_processor.neo4j",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if workflow_analysis.workflow_stages else 0.0
-                ).__dict__
+                    data_quality=1.0 if workflow_analysis.workflow_stages else 0.0,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -156,8 +160,8 @@ class WorkflowAdapter:
                 "metadata": ComponentMetadata(
                     source="core.workflow_processor.complete",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if complete_data.get("workflow_stages") else 0.0
-                ).__dict__
+                    data_quality=1.0 if complete_data.get("workflow_stages") else 0.0,
+                ).__dict__,
             }
 
         except Exception as e:
@@ -174,7 +178,9 @@ class WorkflowAdapter:
             validation_status["workflow_schema"] = bool(schema_data.get("total_entities", 0) > 0)
 
             entity_data = self.workflow_processor.analyze_entity_field_distribution()
-            validation_status["entity_distribution"] = bool(entity_data.get("total_entities", 0) > 0)
+            validation_status["entity_distribution"] = bool(
+                entity_data.get("total_entities", 0) > 0
+            )
 
             mapping_data = self.workflow_processor.analyze_field_mappings()
             validation_status["field_mapping"] = bool(mapping_data.get("total_mappings", 0) > 0)
@@ -197,20 +203,19 @@ class WorkflowAdapter:
         for stage in workflow_stages:
             # Convert WorkflowStage dataclass to dictionary
             stage_dict = {
-                "stage_number": getattr(stage, 'stage_number', 1),
-                "entity_name": getattr(stage, 'entity_name', ''),
-                "title": getattr(stage, 'title', ''),
-                "field_count": getattr(stage, 'field_count', 0),
-                "completion_rate": getattr(stage, 'completion_rate', 0.0),
-                "source_fields": getattr(stage, 'business_fields', []),
-                "complexity_level": getattr(stage, 'complexity_level', 'simple'),
-
+                "stage_number": getattr(stage, "stage_number", 1),
+                "entity_name": getattr(stage, "entity_name", ""),
+                "title": getattr(stage, "title", ""),
+                "field_count": getattr(stage, "field_count", 0),
+                "completion_rate": getattr(stage, "completion_rate", 0.0),
+                "source_fields": getattr(stage, "business_fields", []),
+                "complexity_level": getattr(stage, "complexity_level", "simple"),
                 # Standard workflow stage properties
-                "display_title": getattr(stage, 'title', getattr(stage, 'entity_name', '')),
+                "display_title": getattr(stage, "title", getattr(stage, "entity_name", "")),
                 "color": "#4A90E2",  # Default color - would come from config adapter
                 "card_min_height": "300px",
                 "header_bg_opacity": 0.3,
-                "show_description": False
+                "show_description": False,
             }
 
             transformed_stages.append(stage_dict)
@@ -220,10 +225,13 @@ class WorkflowAdapter:
     def _get_timestamp(self) -> str:
         """Pure timestamp generation"""
         from datetime import datetime
+
         return datetime.now().isoformat()
+
 
 # Singleton pattern
 _workflow_adapter = None
+
 
 def get_workflow_adapter() -> WorkflowAdapter:
     """Get singleton workflow adapter instance"""
@@ -231,6 +239,7 @@ def get_workflow_adapter() -> WorkflowAdapter:
     if _workflow_adapter is None:
         _workflow_adapter = WorkflowAdapter()
     return _workflow_adapter
+
 
 def reset_workflow_adapter():
     """Reset workflow adapter instance"""

@@ -5,9 +5,11 @@ Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_environment, handle_error
-from mine_core.database.db import get_database, close_database
+
 from configs.environment import get_batch_size
+from mine_core.database.db import close_database, get_database
+from mine_core.shared.common import handle_error, setup_project_environment
+
 
 def get_database_stats(db):
     """Get current database statistics"""
@@ -41,15 +43,12 @@ def get_database_stats(db):
             result = session.run("MATCH ()-[r]->() RETURN count(r) AS count")
             rel_count = result.single()["count"]
 
-            return {
-                "nodes": node_stats,
-                "total_nodes": total_nodes,
-                "relationships": rel_count
-            }
+            return {"nodes": node_stats, "total_nodes": total_nodes, "relationships": rel_count}
 
     except Exception as e:
         handle_error(logger, e, "getting database stats")
         return {"nodes": {}, "total_nodes": 0, "relationships": 0}
+
 
 def delete_all_data(db, batch_size):
     """Delete all nodes and relationships in batches"""
@@ -60,12 +59,14 @@ def delete_all_data(db, batch_size):
             # Delete relationships first
             deleted_rel_count = 0
             while True:
-                result = session.run(f"""
+                result = session.run(
+                    f"""
                     MATCH ()-[r]->()
                     WITH r LIMIT {batch_size}
                     DELETE r
                     RETURN count(r) AS deleted
-                """)
+                """
+                )
                 deleted = result.single()["deleted"]
                 deleted_rel_count += deleted
                 if deleted == 0:
@@ -75,24 +76,29 @@ def delete_all_data(db, batch_size):
             # Delete nodes
             deleted_node_count = 0
             while True:
-                result = session.run(f"""
+                result = session.run(
+                    f"""
                     MATCH (n)
                     WITH n LIMIT {batch_size}
                     DELETE n
                     RETURN count(n) AS deleted
-                """)
+                """
+                )
                 deleted = result.single()["deleted"]
                 deleted_node_count += deleted
                 if deleted == 0:
                     break
                 logger.info(f"Deleted {deleted} nodes (Total: {deleted_node_count})")
 
-        logger.info(f"Data deletion complete: {deleted_node_count} nodes, {deleted_rel_count} relationships")
+        logger.info(
+            f"Data deletion complete: {deleted_node_count} nodes, {deleted_rel_count} relationships"
+        )
         return True
 
     except Exception as e:
         handle_error(logger, e, "deleting data")
         return False
+
 
 def drop_constraints(db):
     """Drop all database constraints"""
@@ -103,7 +109,7 @@ def drop_constraints(db):
                 constraints = session.run("SHOW CONSTRAINTS").data()
                 constraint_count = 0
                 for constraint in constraints:
-                    if 'name' in constraint:
+                    if "name" in constraint:
                         session.run(f"DROP CONSTRAINT {constraint['name']}")
                         constraint_count += 1
                         logger.info(f"Dropped constraint: {constraint['name']}")
@@ -120,13 +126,16 @@ def drop_constraints(db):
         handle_error(logger, e, "dropping constraints")
         return False
 
+
 def reset_database(db, batch_size, drop_schema=False):
     """Reset Neo4j database completely"""
     logger.info("Starting database reset")
 
     # Get initial stats
     initial_stats = get_database_stats(db)
-    logger.info(f"Initial state: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships")
+    logger.info(
+        f"Initial state: {initial_stats['total_nodes']} nodes, {initial_stats['relationships']} relationships"
+    )
 
     # Delete all data
     if not delete_all_data(db, batch_size):
@@ -142,15 +151,18 @@ def reset_database(db, batch_size, drop_schema=False):
 
     # Verify final state
     final_stats = get_database_stats(db)
-    logger.info(f"Final state: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships")
+    logger.info(
+        f"Final state: {final_stats['total_nodes']} nodes, {final_stats['relationships']} relationships"
+    )
 
-    success = final_stats['total_nodes'] == 0 and final_stats['relationships'] == 0
+    success = final_stats["total_nodes"] == 0 and final_stats["relationships"] == 0
     if success:
         logger.info("Database reset completed successfully")
     else:
         logger.error("Database reset incomplete")
 
     return success
+
 
 def main():
     """Main execution function"""
@@ -182,20 +194,20 @@ def main():
         print(f"  Nodes: {initial_stats['total_nodes']}")
         print(f"  Relationships: {initial_stats['relationships']}")
 
-        if initial_stats['nodes']:
+        if initial_stats["nodes"]:
             print("  Node breakdown:")
-            for label, count in initial_stats['nodes'].items():
+            for label, count in initial_stats["nodes"].items():
                 print(f"    {label}: {count}")
         print()
 
         # Confirm reset unless forced
         if not args.force:
-            if initial_stats['total_nodes'] == 0 and initial_stats['relationships'] == 0:
+            if initial_stats["total_nodes"] == 0 and initial_stats["relationships"] == 0:
                 print("Database is already empty.")
                 return 0
 
             confirm = input("Reset database? This deletes all data. (y/n): ")
-            if confirm.lower() != 'y':
+            if confirm.lower() != "y":
                 print("Reset cancelled")
                 return 0
 
@@ -216,6 +228,7 @@ def main():
 
     finally:
         close_database()
+
 
 if __name__ == "__main__":
     exit(main())

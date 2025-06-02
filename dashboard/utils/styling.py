@@ -4,8 +4,10 @@ Adapter-Based Styling Utilities - Configuration Access Layer
 Direct styling configuration through adapter pattern.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 from dashboard.adapters import get_config_adapter
+
 
 def get_colors() -> Dict[str, str]:
     """Direct color configuration access"""
@@ -23,8 +25,9 @@ def get_colors() -> Dict[str, str]:
         "text_secondary": styling.get("text_secondary", "#666666"),
         "text_light": styling.get("text_light", "#FFFFFF"),
         "grid_color": "#E5E5E5",
-        "border_color": "#CCCCCC"
+        "border_color": "#CCCCCC",
     }
+
 
 def get_fonts() -> Dict[str, Any]:
     """Direct typography configuration access"""
@@ -38,8 +41,9 @@ def get_fonts() -> Dict[str, Any]:
         "body_size": chart.get("body_font_size", 14),
         "caption_size": chart.get("caption_font_size", 12),
         "metric_size": 32,
-        "metric_label_size": 14
+        "metric_label_size": 14,
     }
+
 
 def get_layout_dimensions() -> Dict[str, Any]:
     """Direct layout dimension configuration"""
@@ -54,8 +58,9 @@ def get_layout_dimensions() -> Dict[str, Any]:
         "metric_card_width": chart.get("metric_card_width", 220),
         "chart_height": chart.get("default_height", 400),
         "table_height": chart.get("table_height", 300),
-        "mobile_breakpoint": "768px"
+        "mobile_breakpoint": "768px",
     }
+
 
 def get_metric_card_style(color: str = None) -> Dict[str, Any]:
     """Standard metric card styling from configuration"""
@@ -77,8 +82,9 @@ def get_metric_card_style(color: str = None) -> Dict[str, Any]:
         "display": "flex",
         "flexDirection": "column",
         "justifyContent": "center",
-        "alignItems": "center"
+        "alignItems": "center",
     }
+
 
 def get_chart_layout_template(title: str = "") -> Dict[str, Any]:
     """Standard chart layout from configuration"""
@@ -92,21 +98,22 @@ def get_chart_layout_template(title: str = "") -> Dict[str, Any]:
             "font": {
                 "family": fonts["primary_font"],
                 "size": fonts["title_size"],
-                "color": colors["text_primary"]
+                "color": colors["text_primary"],
             },
             "x": 0.5,
-            "xanchor": "center"
+            "xanchor": "center",
         },
         "paper_bgcolor": colors["background_light"],
         "plot_bgcolor": colors["background_light"],
         "font": {
             "family": fonts["primary_font"],
             "size": fonts["body_size"],
-            "color": colors["text_primary"]
+            "color": colors["text_primary"],
         },
         "margin": {"l": 60, "r": 30, "t": 60, "b": 60},
-        "height": layout["chart_height"]
+        "height": layout["chart_height"],
     }
+
 
 def get_bar_chart_style() -> Dict[str, Any]:
     """Bar chart styling configuration"""
@@ -116,11 +123,12 @@ def get_bar_chart_style() -> Dict[str, Any]:
     return {
         "marker": {
             "color": colors["chart_colors"],
-            "line": {"color": colors["border_color"], "width": 1}
+            "line": {"color": colors["border_color"], "width": 1},
         },
         "textfont": {"size": fonts["caption_size"]},
-        "textposition": "outside"
+        "textposition": "outside",
     }
+
 
 def get_pie_chart_style() -> Dict[str, Any]:
     """Pie chart styling configuration"""
@@ -130,13 +138,14 @@ def get_pie_chart_style() -> Dict[str, Any]:
     return {
         "marker": {
             "colors": colors["chart_colors"],
-            "line": {"color": colors["background_light"], "width": 2}
+            "line": {"color": colors["background_light"], "width": 2},
         },
         "textfont": {"size": fonts["body_size"], "color": colors["text_light"]},
         "textposition": "inside",
         "textinfo": "label+percent",
-        "hovertemplate": "<b>%{label}</b><br>Records: %{value}<br>Percentage: %{percent}<extra></extra>"
+        "hovertemplate": "<b>%{label}</b><br>Records: %{value}<br>Percentage: %{percent}<extra></extra>",
     }
+
 
 def get_table_style() -> Dict[str, Any]:
     """Data table styling configuration"""
@@ -150,25 +159,26 @@ def get_table_style() -> Dict[str, Any]:
             "padding": "12px",
             "fontFamily": fonts["primary_font"],
             "fontSize": fonts["body_size"],
-            "border": f"1px solid {colors['border_color']}"
+            "border": f"1px solid {colors['border_color']}",
         },
         "style_header": {
             "backgroundColor": colors["primary_blue"],
             "color": colors["text_light"],
             "fontWeight": "bold",
-            "border": f"1px solid {colors['primary_blue']}"
+            "border": f"1px solid {colors['primary_blue']}",
         },
         "style_data": {
             "backgroundColor": colors["background_light"],
-            "color": colors["text_primary"]
+            "color": colors["text_primary"],
         },
         "style_table": {
             "height": f"{layout['table_height']}px",
             "overflowY": "auto",
             "border": f"1px solid {colors['border_color']}",
-            "borderRadius": "8px"
-        }
+            "borderRadius": "8px",
+        },
     }
+
 
 def get_dashboard_styles() -> Dict[str, Any]:
     """Complete dashboard styling configuration"""
@@ -180,7 +190,7 @@ def get_dashboard_styles() -> Dict[str, Any]:
         "main_container": {
             "backgroundColor": colors["background_light"],
             "padding": layout["container_padding"],
-            "fontFamily": fonts["primary_font"]
+            "fontFamily": fonts["primary_font"],
         },
         "header_section": {
             "textAlign": "center",
@@ -188,29 +198,30 @@ def get_dashboard_styles() -> Dict[str, Any]:
             "padding": "20px",
             "backgroundColor": colors["background_dark"],
             "color": colors["text_light"],
-            "borderRadius": "10px"
+            "borderRadius": "10px",
         },
         "metrics_row": {
             "display": "flex",
             "justifyContent": "space-around",
             "flexWrap": "wrap",
             "marginBottom": "30px",
-            "gap": "15px"
+            "gap": "15px",
         },
         "charts_section": {
             "display": "grid",
             "gridTemplateColumns": "1fr 1fr",
             "gap": "30px",
-            "marginBottom": "30px"
+            "marginBottom": "30px",
         },
         "table_section": {
             "marginTop": "30px",
             "backgroundColor": colors["background_light"],
             "borderRadius": "8px",
             "padding": "20px",
-            "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)"
-        }
+            "boxShadow": "0 2px 4px rgba(0, 0, 0, 0.1)",
+        },
     }
+
 
 def get_responsive_style(component_type: str, screen_size: str = "desktop") -> Dict[str, Any]:
     """Responsive styling adjustments"""
@@ -219,7 +230,7 @@ def get_responsive_style(component_type: str, screen_size: str = "desktop") -> D
     if screen_size == "mobile" and component_type in dashboard_styles:
         mobile_overrides = {
             "charts_section": {"gridTemplateColumns": "1fr"},
-            "metrics_row": {"flexDirection": "column", "alignItems": "center"}
+            "metrics_row": {"flexDirection": "column", "alignItems": "center"},
         }
 
         if component_type in mobile_overrides:
@@ -229,11 +240,13 @@ def get_responsive_style(component_type: str, screen_size: str = "desktop") -> D
 
     return dashboard_styles.get(component_type, {})
 
+
 # Legacy compatibility exports
 COLORS = get_colors()
 FONTS = get_fonts()
 LAYOUT = get_layout_dimensions()
 DASHBOARD_STYLES = get_dashboard_styles()
+
 
 def apply_theme_mode(dark_mode: bool = False):
     """Theme mode application"""

@@ -4,14 +4,16 @@ Data Preprocessing Script for Mining Reliability Database
 Converts list fields to strings, enhances root cause intelligence, and applies schema-aware type conversion.
 """
 
-import json
 import argparse
-from pathlib import Path
+import json
 from datetime import datetime
-from typing import Dict, List, Any, Union, Optional
-from mine_core.shared.common import setup_project_environment, handle_error
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+from configs.environment import get_data_dir, get_field_mappings, get_root_cause_delimiters
+from mine_core.shared.common import handle_error, setup_project_environment
 from mine_core.shared.field_utils import extract_root_cause_tail, has_real_value
-from configs.environment import get_data_dir, get_root_cause_delimiters, get_field_mappings
+
 
 def convert_list_to_string(value: Union[List, Any], delimiter: str = "; ") -> str:
     """Convert list field to string using consistent delimiter"""
@@ -22,6 +24,7 @@ def convert_list_to_string(value: Union[List, Any], delimiter: str = "; ") -> st
 
     # If not a list, return as string
     return str(value) if has_real_value(value) else "DATA_NOT_AVAILABLE"
+
 
 def enhance_root_cause_intelligence(record: Dict[str, Any]) -> Dict[str, Any]:
     """Add root cause tail field for enhanced causal intelligence"""
@@ -42,6 +45,7 @@ def enhance_root_cause_intelligence(record: Dict[str, Any]) -> Dict[str, Any]:
 
     return record
 
+
 def load_schema_definitions() -> Optional[Dict[str, Any]]:
     """Load model schema definitions from config file"""
     try:
@@ -49,7 +53,7 @@ def load_schema_definitions() -> Optional[Dict[str, Any]]:
         schema_file = config_dir / "model_schema.json"
 
         if schema_file.exists():
-            with open(schema_file, 'r') as f:
+            with open(schema_file, "r") as f:
                 return json.load(f)
         else:
             logger.warning(f"Schema file not found: {schema_file}")
@@ -57,6 +61,7 @@ def load_schema_definitions() -> Optional[Dict[str, Any]]:
     except Exception as e:
         logger.warning(f"Failed to load schema definitions: {e}")
         return None
+
 
 def convert_to_schema_type(value: Any, field_type: str) -> Any:
     """Convert value to the specified schema type"""
@@ -75,8 +80,8 @@ def convert_to_schema_type(value: Any, field_type: str) -> Any:
                 if value.lower() in ["", "null", "none", "n/a"]:
                     return None
                 # Remove any non-numeric characters except negative sign
-                cleaned = ''.join(c for c in value if c.isdigit() or c == '-')
-                return int(cleaned) if cleaned and cleaned != '-' else None
+                cleaned = "".join(c for c in value if c.isdigit() or c == "-")
+                return int(cleaned) if cleaned and cleaned != "-" else None
             return int(value) if value is not None else None
         elif field_type == "boolean":
             if isinstance(value, str):
@@ -94,7 +99,13 @@ def convert_to_schema_type(value: Any, field_type: str) -> Any:
                 if value.lower() in ["", "null", "none", "n/a"]:
                     return None
                 # Try to parse common date formats including ISO format
-                for fmt in ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%d/%m/%Y", "%m/%d/%Y", "%Y-%m-%d %H:%M:%S"]:
+                for fmt in [
+                    "%Y-%m-%d",
+                    "%Y-%m-%dT%H:%M:%S",
+                    "%d/%m/%Y",
+                    "%m/%d/%Y",
+                    "%Y-%m-%d %H:%M:%S",
+                ]:
                     try:
                         parsed_date = datetime.strptime(value, fmt)
                         return parsed_date.strftime("%Y-%m-%d")
@@ -109,7 +120,10 @@ def convert_to_schema_type(value: Any, field_type: str) -> Any:
         logger.debug(f"Type conversion failed for value '{value}' to type '{field_type}': {e}")
         return str(value) if value is not None else None
 
-def apply_schema_type_conversion(record: Dict[str, Any], field_mappings: Dict[str, Any], schema_data: Dict[str, Any]) -> Dict[str, Any]:
+
+def apply_schema_type_conversion(
+    record: Dict[str, Any], field_mappings: Dict[str, Any], schema_data: Dict[str, Any]
+) -> Dict[str, Any]:
     """Apply schema-aware type conversion to a record using configuration files"""
     if not field_mappings or not schema_data:
         return record
@@ -141,7 +155,9 @@ def apply_schema_type_conversion(record: Dict[str, Any], field_mappings: Dict[st
                     if converted_value != original_value:
                         converted_record[data_field] = converted_value
                         conversion_stats["converted"] += 1
-                        logger.debug(f"Converted field '{data_field}' from '{original_value}' to '{converted_value}' (type: {field_type})")
+                        logger.debug(
+                            f"Converted field '{data_field}' from '{original_value}' to '{converted_value}' (type: {field_type})"
+                        )
                     else:
                         conversion_stats["skipped"] += 1
 
@@ -154,6 +170,7 @@ def apply_schema_type_conversion(record: Dict[str, Any], field_mappings: Dict[st
 
     return converted_record
 
+
 def analyze_all_field_types(records: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
     """Comprehensive analysis of ALL field types across records"""
     field_analysis = {}
@@ -161,11 +178,7 @@ def analyze_all_field_types(records: List[Dict[str, Any]]) -> Dict[str, Dict[str
     for record in records:
         for field_name, value in record.items():
             if field_name not in field_analysis:
-                field_analysis[field_name] = {
-                    "list_count": 0,
-                    "string_count": 0,
-                    "total_count": 0
-                }
+                field_analysis[field_name] = {"list_count": 0, "string_count": 0, "total_count": 0}
 
             field_analysis[field_name]["total_count"] += 1
 
@@ -175,6 +188,7 @@ def analyze_all_field_types(records: List[Dict[str, Any]]) -> Dict[str, Dict[str
                 field_analysis[field_name]["string_count"] += 1
 
     return field_analysis
+
 
 def identify_list_fields(field_analysis: Dict[str, Dict[str, int]]) -> List[str]:
     """Identify fields that should be converted from lists to strings"""
@@ -187,16 +201,20 @@ def identify_list_fields(field_analysis: Dict[str, Dict[str, int]]) -> List[str]
 
     return list_fields
 
-def preprocess_record(record: Dict[str, Any], list_fields: List[str], field_mappings: Dict[str, Any] = None, schema_data: Dict[str, Any] = None) -> Dict[str, Any]:
+
+def preprocess_record(
+    record: Dict[str, Any],
+    list_fields: List[str],
+    field_mappings: Dict[str, Any] = None,
+    schema_data: Dict[str, Any] = None,
+) -> Dict[str, Any]:
     """Preprocess single record: convert lists, enhance intelligence, and apply schema type conversion"""
     processed_record = record.copy()
 
     # Convert identified list fields to strings
     for field_name in list_fields:
         if field_name in processed_record:
-            processed_record[field_name] = convert_list_to_string(
-                processed_record[field_name]
-            )
+            processed_record[field_name] = convert_list_to_string(processed_record[field_name])
 
     # Enhance root cause intelligence
     processed_record = enhance_root_cause_intelligence(processed_record)
@@ -205,17 +223,20 @@ def preprocess_record(record: Dict[str, Any], list_fields: List[str], field_mapp
     if field_mappings and schema_data:
         try:
             processed_record = apply_schema_type_conversion(
-                processed_record,
-                field_mappings,
-                schema_data
+                processed_record, field_mappings, schema_data
             )
             logger.debug("Applied schema-aware type conversion")
         except Exception as e:
-            logger.warning(f"Schema type conversion failed: {e}, proceeding without type conversion")
+            logger.warning(
+                f"Schema type conversion failed: {e}, proceeding without type conversion"
+            )
 
     return processed_record
 
-def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_conversion: bool = True) -> Dict[str, Any]:
+
+def preprocess_facility_data(
+    input_file: Path, output_file: Path, enable_schema_conversion: bool = True
+) -> Dict[str, Any]:
     """Preprocess facility data file with comprehensive field analysis and schema-aware type conversion"""
     logger.info(f"Preprocessing {input_file}")
 
@@ -232,14 +253,18 @@ def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_
                 if field_mappings and schema_data:
                     logger.info("Schema type conversion initialized successfully")
                 else:
-                    logger.warning("Failed to load configuration files, proceeding without type conversion")
+                    logger.warning(
+                        "Failed to load configuration files, proceeding without type conversion"
+                    )
                     enable_schema_conversion = False
             except Exception as e:
-                logger.warning(f"Failed to initialize schema conversion: {e}, proceeding without type conversion")
+                logger.warning(
+                    f"Failed to initialize schema conversion: {e}, proceeding without type conversion"
+                )
                 enable_schema_conversion = False
 
         # Load raw data
-        with open(input_file, 'r') as f:
+        with open(input_file, "r") as f:
             data = json.load(f)
 
         # Extract records from data structure
@@ -272,7 +297,9 @@ def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_
         # Log field analysis summary
         for field_name, stats in field_analysis.items():
             if stats["list_count"] > 0:
-                logger.info(f"Field '{field_name}': {stats['list_count']}/{stats['total_count']} are lists")
+                logger.info(
+                    f"Field '{field_name}': {stats['list_count']}/{stats['total_count']} are lists"
+                )
 
         # Preprocess all records
         processed_records = []
@@ -284,7 +311,7 @@ def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_
                     record,
                     list_fields,
                     field_mappings if enable_schema_conversion else None,
-                    schema_data if enable_schema_conversion else None
+                    schema_data if enable_schema_conversion else None,
                 )
                 processed_records.append(processed_record)
                 conversion_stats["converted_records"] += 1
@@ -302,24 +329,22 @@ def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_
             # Multi-sheet structure
             processed_data = {"sheets": {}}
             for sheet_name, sheet_data in data["sheets"].items():
-                processed_data["sheets"][sheet_name] = {
-                    "records": processed_records
-                }
+                processed_data["sheets"][sheet_name] = {"records": processed_records}
         elif isinstance(data, dict) and "records" in data:
             # Single records structure
-            processed_data = {
-                "records": processed_records
-            }
+            processed_data = {"records": processed_records}
         else:
             # Direct list
             processed_data = processed_records
 
         # Save processed data
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(processed_data, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Preprocessed {len(processed_records)} records")
-        logger.info(f"Schema type conversion: {conversion_stats['converted_records']} successful, {conversion_stats['conversion_errors']} errors")
+        logger.info(
+            f"Schema type conversion: {conversion_stats['converted_records']} successful, {conversion_stats['conversion_errors']} errors"
+        )
         logger.info(f"Output saved to {output_file}")
 
         return {
@@ -328,15 +353,19 @@ def preprocess_facility_data(input_file: Path, output_file: Path, enable_schema_
             "list_fields": list_fields,
             "schema_conversion_enabled": enable_schema_conversion,
             "conversion_stats": conversion_stats,
-            "root_cause_enhanced": sum(1 for r in processed_records
-                                     if has_real_value(r.get("Root Cause Tail")))
+            "root_cause_enhanced": sum(
+                1 for r in processed_records if has_real_value(r.get("Root Cause Tail"))
+            ),
         }
 
     except Exception as e:
         handle_error(logger, e, f"preprocessing {input_file}")
         return {"processed": 0, "field_analysis": {}, "error": str(e)}
 
-def preprocess_all_facilities(raw_data_dir: str = None, output_data_dir: str = None, enable_schema_conversion: bool = True) -> Dict[str, Any]:
+
+def preprocess_all_facilities(
+    raw_data_dir: str = None, output_data_dir: str = None, enable_schema_conversion: bool = True
+) -> Dict[str, Any]:
     """Preprocess all facility data files from raw_data to facility_data"""
     # Set up directories
     if raw_data_dir is None:
@@ -368,7 +397,7 @@ def preprocess_all_facilities(raw_data_dir: str = None, output_data_dir: str = N
         "all_field_analysis": {},
         "list_fields_found": set(),
         "root_cause_enhancements": 0,
-        "schema_conversion_enabled": enable_schema_conversion
+        "schema_conversion_enabled": enable_schema_conversion,
     }
 
     for json_file in json_files:
@@ -395,15 +424,24 @@ def preprocess_all_facilities(raw_data_dir: str = None, output_data_dir: str = N
     logger.info(f"Preprocessing complete: {summary}")
     return summary
 
+
 def main():
     """Main execution function"""
     parser = argparse.ArgumentParser(
         description="Preprocess mining reliability data: convert lists to strings, enhance root cause intelligence, and apply schema-aware type conversion"
     )
     parser.add_argument("--facility", type=str, help="Process specific facility file")
-    parser.add_argument("--raw-data-dir", type=str, help="Raw data directory path (default: data/raw_data)")
-    parser.add_argument("--output-data-dir", type=str, help="Output data directory path (default: data/facility_data)")
-    parser.add_argument("--no-schema-conversion", action="store_true", help="Disable schema-aware type conversion")
+    parser.add_argument(
+        "--raw-data-dir", type=str, help="Raw data directory path (default: data/raw_data)"
+    )
+    parser.add_argument(
+        "--output-data-dir",
+        type=str,
+        help="Output data directory path (default: data/facility_data)",
+    )
+    parser.add_argument(
+        "--no-schema-conversion", action="store_true", help="Disable schema-aware type conversion"
+    )
     parser.add_argument("--log-level", type=str, help="Logging level")
 
     args = parser.parse_args()
@@ -447,20 +485,28 @@ def main():
                 print(f"Successfully preprocessed {args.facility}")
                 print(f"Records processed: {result['processed']}")
                 print(f"List fields converted: {result['list_fields']}")
-                print(f"Schema conversion: {'enabled' if result.get('schema_conversion_enabled') else 'disabled'}")
-                print(f"Root cause intelligence enhanced: {result.get('root_cause_enhanced', 0)} records")
+                print(
+                    f"Schema conversion: {'enabled' if result.get('schema_conversion_enabled') else 'disabled'}"
+                )
+                print(
+                    f"Root cause intelligence enhanced: {result.get('root_cause_enhanced', 0)} records"
+                )
                 return 0
             else:
                 print(f"Preprocessing failed for {args.facility}")
                 return 1
         else:
             # Process all facilities
-            summary = preprocess_all_facilities(raw_data_dir, output_data_dir, enable_schema_conversion)
+            summary = preprocess_all_facilities(
+                raw_data_dir, output_data_dir, enable_schema_conversion
+            )
 
             print("Preprocessing Summary:")
             print(f"Files processed: {summary['processed_files']}")
             print(f"Total records: {summary['total_records']}")
-            print(f"Schema conversion: {'enabled' if summary.get('schema_conversion_enabled') else 'disabled'}")
+            print(
+                f"Schema conversion: {'enabled' if summary.get('schema_conversion_enabled') else 'disabled'}"
+            )
             print(f"List fields found: {summary['list_fields_found']}")
             print(f"Root cause enhancements: {summary['root_cause_enhancements']}")
 
@@ -469,7 +515,9 @@ def main():
                 print("\nField Analysis Summary:")
                 for field_name, stats in summary["all_field_analysis"].items():
                     if stats["list_count"] > 0:
-                        print(f"  {field_name}: {stats['list_count']}/{stats['total_count']} were lists")
+                        print(
+                            f"  {field_name}: {stats['list_count']}/{stats['total_count']} were lists"
+                        )
 
             return 0 if summary["processed_files"] > 0 else 1
 
@@ -477,6 +525,7 @@ def main():
         handle_error(logger, e, "data preprocessing")
         print(f"Preprocessing failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

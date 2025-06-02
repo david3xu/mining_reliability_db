@@ -5,12 +5,14 @@ Streamlined analytics with enhanced causal intelligence capabilities.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from mine_core.database.db import get_database
 
 logger = logging.getLogger(__name__)
 
 # Core facility and incident queries
+
 
 def get_facilities() -> List[Dict[str, Any]]:
     """Get all facilities with operational metrics"""
@@ -26,6 +28,7 @@ def get_facilities() -> List[Dict[str, Any]]:
     ORDER BY f.facility_name
     """
     return get_database().execute_query(query)
+
 
 def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
     """Get facility details with operational summary"""
@@ -44,6 +47,7 @@ def get_facility(facility_id: str) -> Optional[Dict[str, Any]]:
     """
     results = get_database().execute_query(query, facility_id=facility_id)
     return results[0] if results else None
+
 
 def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[str, Any]]:
     """Get action requests with enhanced operational context"""
@@ -86,7 +90,9 @@ def get_action_requests(facility_id: str = None, limit: int = 100) -> List[Dict[
 
     return get_database().execute_query(query, **params)
 
+
 # Enhanced causal intelligence queries
+
 
 def get_root_cause_intelligence_summary(facility_id: str = None) -> Dict[str, Any]:
     """Comprehensive causal intelligence analysis for operational decision-making"""
@@ -130,8 +136,9 @@ def get_root_cause_intelligence_summary(facility_id: str = None) -> Dict[str, An
         "causal_patterns": causal_patterns,
         "resolution_effectiveness": effectiveness_data,
         "analysis_scope": facility_id or "all_facilities",
-        "total_patterns_identified": len(causal_patterns)
+        "total_patterns_identified": len(causal_patterns),
     }
+
 
 def get_operational_performance_dashboard(facility_id: str = None) -> Dict[str, Any]:
     """Comprehensive operational performance metrics for management oversight"""
@@ -194,9 +201,12 @@ def get_operational_performance_dashboard(facility_id: str = None) -> Dict[str, 
     return {
         "temporal_trends": get_database().execute_query(performance_query, **params),
         "category_performance": get_database().execute_query(category_query, **params),
-        "workflow_efficiency": get_database().execute_query(workflow_query, **params)[0] if get_database().execute_query(workflow_query, **params) else {},
-        "facility_scope": facility_id or "enterprise_wide"
+        "workflow_efficiency": get_database().execute_query(workflow_query, **params)[0]
+        if get_database().execute_query(workflow_query, **params)
+        else {},
+        "facility_scope": facility_id or "enterprise_wide",
     }
+
 
 def get_predictive_intelligence_indicators() -> List[Dict[str, Any]]:
     """Identify patterns for predictive operational intelligence"""
@@ -227,6 +237,7 @@ def get_predictive_intelligence_indicators() -> List[Dict[str, Any]]:
     ORDER BY pattern_frequency DESC, success_probability ASC
     """
     return get_database().execute_query(query)
+
 
 def get_missing_data_quality_intelligence() -> Dict[str, Any]:
     """Systematic missing data analysis for operational process improvement"""
@@ -259,6 +270,7 @@ def get_missing_data_quality_intelligence() -> Dict[str, Any]:
     results = get_database().execute_query(query)
     return results[0] if results else {}
 
+
 def get_causal_correlation_matrix() -> List[Dict[str, Any]]:
     """Advanced causal correlation analysis for root cause intelligence"""
     query = """
@@ -280,6 +292,7 @@ def get_causal_correlation_matrix() -> List[Dict[str, Any]]:
     LIMIT 25
     """
     return get_database().execute_query(query)
+
 
 def get_field_completion_statistics() -> Dict[str, Any]:
     """Get field completion statistics directly from Neo4j graph data"""
@@ -321,10 +334,12 @@ def get_field_completion_statistics() -> Dict[str, Any]:
     return {
         "field_completion_rates": field_completion,
         "total_fields": total_fields,
-        "source": "neo4j_direct_query"
+        "source": "neo4j_direct_query",
     }
 
+
 # Neo4j-driven analytics queries for completion rates system
+
 
 def get_entity_completion_rates() -> Dict[str, Any]:
     """Get completion rates for all workflow entities using separate simple queries"""
@@ -344,14 +359,18 @@ def get_entity_completion_rates() -> Dict[str, Any]:
         ar_results = db.execute_query(ar_query)
         if ar_results:
             ar_data = ar_results[0]
-            total = ar_data['total_count']
-            completed = ar_data['title_complete'] + ar_data['date_complete'] + ar_data['stage_complete']
+            total = ar_data["total_count"]
+            completed = (
+                ar_data["title_complete"] + ar_data["date_complete"] + ar_data["stage_complete"]
+            )
             total_fields = total * 3
-            entity_rates['ActionRequest'] = {
-                'total_count': total,
-                'completed_fields': completed,
-                'total_fields': total_fields,
-                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            entity_rates["ActionRequest"] = {
+                "total_count": total,
+                "completed_fields": completed,
+                "total_fields": total_fields,
+                "completion_rate": round(completed * 100.0 / total_fields, 1)
+                if total_fields > 0
+                else 0.0,
             }
 
         # Problem completion rates
@@ -364,14 +383,16 @@ def get_entity_completion_rates() -> Dict[str, Any]:
         p_results = db.execute_query(p_query)
         if p_results:
             p_data = p_results[0]
-            total = p_data['total_count']
-            completed = p_data['what_complete'] + p_data['req_complete']
+            total = p_data["total_count"]
+            completed = p_data["what_complete"] + p_data["req_complete"]
             total_fields = total * 2
-            entity_rates['Problem'] = {
-                'total_count': total,
-                'completed_fields': completed,
-                'total_fields': total_fields,
-                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            entity_rates["Problem"] = {
+                "total_count": total,
+                "completed_fields": completed,
+                "total_fields": total_fields,
+                "completion_rate": round(completed * 100.0 / total_fields, 1)
+                if total_fields > 0
+                else 0.0,
             }
 
         # RootCause completion rates
@@ -384,14 +405,16 @@ def get_entity_completion_rates() -> Dict[str, Any]:
         rc_results = db.execute_query(rc_query)
         if rc_results:
             rc_data = rc_results[0]
-            total = rc_data['total_count']
-            completed = rc_data['cause_complete'] + rc_data['evidence_complete']
+            total = rc_data["total_count"]
+            completed = rc_data["cause_complete"] + rc_data["evidence_complete"]
             total_fields = total * 2
-            entity_rates['RootCause'] = {
-                'total_count': total,
-                'completed_fields': completed,
-                'total_fields': total_fields,
-                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            entity_rates["RootCause"] = {
+                "total_count": total,
+                "completed_fields": completed,
+                "total_fields": total_fields,
+                "completion_rate": round(completed * 100.0 / total_fields, 1)
+                if total_fields > 0
+                else 0.0,
             }
 
         # ActionPlan completion rates
@@ -404,14 +427,16 @@ def get_entity_completion_rates() -> Dict[str, Any]:
         ap_results = db.execute_query(ap_query)
         if ap_results:
             ap_data = ap_results[0]
-            total = ap_data['total_count']
-            completed = ap_data['plan_complete'] + ap_data['date_complete']
+            total = ap_data["total_count"]
+            completed = ap_data["plan_complete"] + ap_data["date_complete"]
             total_fields = total * 2
-            entity_rates['ActionPlan'] = {
-                'total_count': total,
-                'completed_fields': completed,
-                'total_fields': total_fields,
-                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            entity_rates["ActionPlan"] = {
+                "total_count": total,
+                "completed_fields": completed,
+                "total_fields": total_fields,
+                "completion_rate": round(completed * 100.0 / total_fields, 1)
+                if total_fields > 0
+                else 0.0,
             }
 
         # Verification completion rates
@@ -424,14 +449,16 @@ def get_entity_completion_rates() -> Dict[str, Any]:
         v_results = db.execute_query(v_query)
         if v_results:
             v_data = v_results[0]
-            total = v_data['total_count']
-            completed = v_data['effective_complete'] + v_data['date_complete']
+            total = v_data["total_count"]
+            completed = v_data["effective_complete"] + v_data["date_complete"]
             total_fields = total * 2
-            entity_rates['Verification'] = {
-                'total_count': total,
-                'completed_fields': completed,
-                'total_fields': total_fields,
-                'completion_rate': round(completed * 100.0 / total_fields, 1) if total_fields > 0 else 0.0
+            entity_rates["Verification"] = {
+                "total_count": total,
+                "completed_fields": completed,
+                "total_fields": total_fields,
+                "completion_rate": round(completed * 100.0 / total_fields, 1)
+                if total_fields > 0
+                else 0.0,
             }
 
         return entity_rates
@@ -439,6 +466,7 @@ def get_entity_completion_rates() -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error getting entity completion rates: {e}")
         return {}
+
 
 def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
     """Get facility action statistics using direct Neo4j aggregation"""
@@ -557,11 +585,16 @@ def get_facility_action_statistics(facility_id: str = None) -> Dict[str, Any]:
     try:
         results = get_database().execute_query(query, **params)
         if results and len(results) > 0:
-            return results[0].get('facility_statistics', {}) if not facility_id else results[0].get('facility_stats', {})
+            return (
+                results[0].get("facility_statistics", {})
+                if not facility_id
+                else results[0].get("facility_stats", {})
+            )
         return {}
     except Exception as e:
         logger.error(f"Error getting facility action statistics: {e}")
         return {}
+
 
 # Backward compatibility functions
 def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
@@ -604,6 +637,7 @@ def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
     """
     results = get_database().execute_query(query, action_request_id=action_request_id)
     return results[0] if results else {}
+
 
 # Legacy function aliases for backward compatibility
 get_department = get_operational_performance_dashboard

@@ -5,11 +5,13 @@ Systematic investigation of incident patterns for engineer knowledge sharing
 """
 
 import logging
-from typing import Dict, List, Any, Tuple
-from mine_core.database.db import get_database
+from typing import Any, Dict, List, Tuple
+
 from configs.environment import get_schema
+from mine_core.database.db import get_database
 
 logger = logging.getLogger(__name__)
+
 
 class PatternDiscovery:
     """
@@ -71,7 +73,7 @@ class PatternDiscovery:
             "knowledge_transfer_opportunities": transfer_opportunities,
             "strategic_recommendations": self._generate_strategic_recommendations(
                 performance_patterns, asset_patterns, solution_patterns
-            )
+            ),
         }
 
     def _profile_facility_performance(self) -> Dict[str, Any]:
@@ -129,7 +131,7 @@ class PatternDiscovery:
         performance_analysis = {
             "facility_rankings": performance_results,
             "performance_insights": [],
-            "benchmarking_opportunities": []
+            "benchmarking_opportunities": [],
         }
 
         if len(performance_results) >= 2:
@@ -140,19 +142,23 @@ class PatternDiscovery:
             performance_analysis["performance_insights"] = [
                 f"Best Performer: {best_performer['facility']} - {best_performer['effectiveness_rate']}% solution effectiveness",
                 f"Improvement Target: {worst_performer['facility']} - {worst_performer['effectiveness_rate']}% solution effectiveness",
-                f"Performance Gap: {best_performer['effectiveness_rate'] - worst_performer['effectiveness_rate']:.1f}% effectiveness difference"
+                f"Performance Gap: {best_performer['effectiveness_rate'] - worst_performer['effectiveness_rate']:.1f}% effectiveness difference",
             ]
 
             # Identify benchmarking opportunities
-            avg_effectiveness = sum(r['effectiveness_rate'] for r in performance_results) / len(performance_results)
+            avg_effectiveness = sum(r["effectiveness_rate"] for r in performance_results) / len(
+                performance_results
+            )
             for facility_data in performance_results:
-                if facility_data['effectiveness_rate'] < avg_effectiveness:
-                    gap = avg_effectiveness - facility_data['effectiveness_rate']
-                    performance_analysis["benchmarking_opportunities"].append({
-                        "facility": facility_data['facility'],
-                        "improvement_potential": round(gap, 1),
-                        "current_effectiveness": facility_data['effectiveness_rate']
-                    })
+                if facility_data["effectiveness_rate"] < avg_effectiveness:
+                    gap = avg_effectiveness - facility_data["effectiveness_rate"]
+                    performance_analysis["benchmarking_opportunities"].append(
+                        {
+                            "facility": facility_data["facility"],
+                            "improvement_potential": round(gap, 1),
+                            "current_effectiveness": facility_data["effectiveness_rate"],
+                        }
+                    )
 
         return performance_analysis
 
@@ -215,40 +221,48 @@ class PatternDiscovery:
         asset_insights = {
             "high_risk_assets": [],
             "cross_facility_patterns": [],
-            "knowledge_sharing_opportunities": []
+            "knowledge_sharing_opportunities": [],
         }
 
         for asset_data in asset_results:
-            asset_type = asset_data['asset_type']
-            patterns = asset_data['facility_patterns']
-            total_incidents = asset_data['total_asset_incidents']
+            asset_type = asset_data["asset_type"]
+            patterns = asset_data["facility_patterns"]
+            total_incidents = asset_data["total_asset_incidents"]
 
             # Identify high-risk assets (multiple facilities, high incident count)
             if len(patterns) >= 2 and total_incidents >= 5:
-                asset_insights["high_risk_assets"].append({
-                    "asset_type": asset_type,
-                    "total_incidents": total_incidents,
-                    "affected_facilities": len(patterns),
-                    "facility_details": patterns
-                })
+                asset_insights["high_risk_assets"].append(
+                    {
+                        "asset_type": asset_type,
+                        "total_incidents": total_incidents,
+                        "affected_facilities": len(patterns),
+                        "facility_details": patterns,
+                    }
+                )
 
             # Identify cross-facility patterns
             if len(patterns) >= 2:
-                success_rates = [p['success_rate'] for p in patterns if p['success_rate'] > 0]
+                success_rates = [p["success_rate"] for p in patterns if p["success_rate"] > 0]
                 if success_rates:
                     max_success = max(success_rates)
                     min_success = min(success_rates)
 
                     if max_success - min_success > 30:  # Significant difference
-                        best_facility = next(p['facility'] for p in patterns if p['success_rate'] == max_success)
-                        worst_facility = next(p['facility'] for p in patterns if p['success_rate'] == min_success)
+                        best_facility = next(
+                            p["facility"] for p in patterns if p["success_rate"] == max_success
+                        )
+                        worst_facility = next(
+                            p["facility"] for p in patterns if p["success_rate"] == min_success
+                        )
 
-                        asset_insights["knowledge_sharing_opportunities"].append({
-                            "asset_type": asset_type,
-                            "learn_from": best_facility,
-                            "apply_to": worst_facility,
-                            "success_gap": round(max_success - min_success, 1)
-                        })
+                        asset_insights["knowledge_sharing_opportunities"].append(
+                            {
+                                "asset_type": asset_type,
+                                "learn_from": best_facility,
+                                "apply_to": worst_facility,
+                                "success_gap": round(max_success - min_success, 1),
+                            }
+                        )
 
         return asset_insights
 
@@ -306,32 +320,40 @@ class PatternDiscovery:
         solution_insights = {
             "proven_solutions": [],
             "failed_approaches": [],
-            "best_practice_opportunities": []
+            "best_practice_opportunities": [],
         }
 
         for result in solution_results:
-            cause = result['cause_category']
-            patterns = result['solution_patterns']
+            cause = result["cause_category"]
+            patterns = result["solution_patterns"]
 
             # Analyze solution effectiveness patterns
-            effective_solutions = [p for p in patterns if p['effective']]
-            failed_solutions = [p for p in patterns if not p['effective']]
+            effective_solutions = [p for p in patterns if p["effective"]]
+            failed_solutions = [p for p in patterns if not p["effective"]]
 
             # Identify proven solutions (high success rate, multiple facilities)
             if len(effective_solutions) >= 2:
-                solution_insights["proven_solutions"].append({
-                    "root_cause": cause,
-                    "successful_approaches": len(effective_solutions),
-                    "proven_solutions": [p['solution'][:100] + "..." for p in effective_solutions[:3]]
-                })
+                solution_insights["proven_solutions"].append(
+                    {
+                        "root_cause": cause,
+                        "successful_approaches": len(effective_solutions),
+                        "proven_solutions": [
+                            p["solution"][:100] + "..." for p in effective_solutions[:3]
+                        ],
+                    }
+                )
 
             # Identify consistently failed approaches
             if len(failed_solutions) >= 2:
-                solution_insights["failed_approaches"].append({
-                    "root_cause": cause,
-                    "failed_attempts": len(failed_solutions),
-                    "avoid_solutions": [p['solution'][:100] + "..." for p in failed_solutions[:2]]
-                })
+                solution_insights["failed_approaches"].append(
+                    {
+                        "root_cause": cause,
+                        "failed_attempts": len(failed_solutions),
+                        "avoid_solutions": [
+                            p["solution"][:100] + "..." for p in failed_solutions[:2]
+                        ],
+                    }
+                )
 
         return solution_insights
 
@@ -386,47 +408,55 @@ class PatternDiscovery:
         transfer_opportunities = {
             "high_value_transfers": [],
             "expertise_centers": {},
-            "learning_gaps": []
+            "learning_gaps": [],
         }
 
         for result in transfer_results:
-            cause_type = result['cause_type']
-            expertise_data = result['facility_expertise']
+            cause_type = result["cause_type"]
+            expertise_data = result["facility_expertise"]
 
             # Identify expertise centers and learning gaps
-            expertise_data.sort(key=lambda x: x['expertise_score'], reverse=True)
+            expertise_data.sort(key=lambda x: x["expertise_score"], reverse=True)
 
             if len(expertise_data) >= 2:
                 expert_facility = expertise_data[0]
                 learning_facility = expertise_data[-1]
 
-                expertise_gap = expert_facility['expertise_score'] - learning_facility['expertise_score']
+                expertise_gap = (
+                    expert_facility["expertise_score"] - learning_facility["expertise_score"]
+                )
 
                 # High-value transfer opportunity (>30% expertise gap)
                 if expertise_gap > 30:
-                    transfer_opportunities["high_value_transfers"].append({
-                        "knowledge_area": cause_type,
-                        "expert_facility": expert_facility['facility'],
-                        "expert_success_rate": expert_facility['expertise_score'],
-                        "learning_facility": learning_facility['facility'],
-                        "learning_success_rate": learning_facility['expertise_score'],
-                        "improvement_potential": round(expertise_gap, 1)
-                    })
+                    transfer_opportunities["high_value_transfers"].append(
+                        {
+                            "knowledge_area": cause_type,
+                            "expert_facility": expert_facility["facility"],
+                            "expert_success_rate": expert_facility["expertise_score"],
+                            "learning_facility": learning_facility["facility"],
+                            "learning_success_rate": learning_facility["expertise_score"],
+                            "improvement_potential": round(expertise_gap, 1),
+                        }
+                    )
 
                 # Map expertise centers
-                expert_name = expert_facility['facility']
+                expert_name = expert_facility["facility"]
                 if expert_name not in transfer_opportunities["expertise_centers"]:
                     transfer_opportunities["expertise_centers"][expert_name] = []
 
-                if expert_facility['expertise_score'] > 70:  # High expertise threshold
-                    transfer_opportunities["expertise_centers"][expert_name].append({
-                        "expertise_area": cause_type,
-                        "success_rate": expert_facility['expertise_score']
-                    })
+                if expert_facility["expertise_score"] > 70:  # High expertise threshold
+                    transfer_opportunities["expertise_centers"][expert_name].append(
+                        {
+                            "expertise_area": cause_type,
+                            "success_rate": expert_facility["expertise_score"],
+                        }
+                    )
 
         return transfer_opportunities
 
-    def _generate_strategic_recommendations(self, performance: Dict, assets: Dict, solutions: Dict) -> List[str]:
+    def _generate_strategic_recommendations(
+        self, performance: Dict, assets: Dict, solutions: Dict
+    ) -> List[str]:
         """Generate strategic recommendations based on pattern analysis"""
         recommendations = []
 

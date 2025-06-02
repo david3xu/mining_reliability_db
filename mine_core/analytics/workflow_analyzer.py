@@ -5,11 +5,13 @@ Investigates workflow completeness patterns for engineer effectiveness
 """
 
 import logging
-from typing import Dict, List, Any, Tuple
-from mine_core.database.db import get_database
+from typing import Any, Dict, List, Tuple
+
 from configs.environment import get_schema
+from mine_core.database.db import get_database
 
 logger = logging.getLogger(__name__)
+
 
 class WorkflowAnalyzer:
     """Analyzes incident workflow completeness using EDA methodology with schema-driven queries"""
@@ -62,7 +64,9 @@ class WorkflowAnalyzer:
             "workflow_patterns": chain_analysis,
             "critical_gaps": gap_analysis,
             "engineer_impact": impact_analysis,
-            "recommendations": self._generate_workflow_recommendations(chain_analysis, gap_analysis)
+            "recommendations": self._generate_workflow_recommendations(
+                chain_analysis, gap_analysis
+            ),
         }
 
     def _investigate_chain_patterns(self, facility_id: str = None) -> Dict[str, Any]:
@@ -125,12 +129,12 @@ class WorkflowAnalyzer:
         total_incidents = 0
 
         for result in results:
-            facility = result.get('facility', 'Unknown')
+            facility = result.get("facility", "Unknown")
             if facility not in pattern_analysis:
                 pattern_analysis[facility] = {}
 
-            pattern_type = result['pattern_type']
-            count = result['incident_count']
+            pattern_type = result["pattern_type"]
+            count = result["incident_count"]
             pattern_analysis[facility][pattern_type] = count
             total_incidents += count
 
@@ -140,12 +144,14 @@ class WorkflowAnalyzer:
             facility_total = sum(patterns.values())
             pattern_analysis_with_percentages[facility] = patterns.copy()
             for pattern, count in patterns.items():
-                pattern_analysis_with_percentages[facility][f"{pattern}_percentage"] = round((count / facility_total) * 100, 1)
+                pattern_analysis_with_percentages[facility][f"{pattern}_percentage"] = round(
+                    (count / facility_total) * 100, 1
+                )
 
         return {
             "patterns_by_facility": pattern_analysis_with_percentages,
             "total_incidents_analyzed": total_incidents,
-            "pattern_insights": self._interpret_chain_patterns(pattern_analysis_with_percentages)
+            "pattern_insights": self._interpret_chain_patterns(pattern_analysis_with_percentages),
         }
 
     def _investigate_workflow_gaps(self, facility_id: str = None) -> Dict[str, Any]:
@@ -205,9 +211,9 @@ class WorkflowAnalyzer:
         critical_gaps = []
 
         for result in gap_results:
-            facility = result.get('facility', 'Unknown')
-            gap_type = result['gap_type']
-            count = result['gap_count']
+            facility = result.get("facility", "Unknown")
+            gap_type = result["gap_type"]
+            count = result["gap_count"]
 
             if facility not in gap_analysis:
                 gap_analysis[facility] = {}
@@ -215,22 +221,26 @@ class WorkflowAnalyzer:
             gap_analysis[facility][gap_type] = count
 
             # Identify critical gaps (>20% of incidents)
-            if gap_type != 'complete' and count > 0:
-                facility_total = sum(r['gap_count'] for r in gap_results if r['facility'] == facility)
+            if gap_type != "complete" and count > 0:
+                facility_total = sum(
+                    r["gap_count"] for r in gap_results if r["facility"] == facility
+                )
                 gap_percentage = (count / facility_total) * 100
 
                 if gap_percentage > 20:
-                    critical_gaps.append({
-                        "facility": facility,
-                        "gap_type": gap_type,
-                        "affected_incidents": count,
-                        "percentage": round(gap_percentage, 1)
-                    })
+                    critical_gaps.append(
+                        {
+                            "facility": facility,
+                            "gap_type": gap_type,
+                            "affected_incidents": count,
+                            "percentage": round(gap_percentage, 1),
+                        }
+                    )
 
         return {
             "gaps_by_facility": gap_analysis,
             "critical_gaps": critical_gaps,
-            "gap_insights": self._interpret_workflow_gaps(critical_gaps)
+            "gap_insights": self._interpret_workflow_gaps(critical_gaps),
         }
 
     def _assess_engineer_impact(self, facility_id: str = None) -> Dict[str, Any]:
@@ -290,9 +300,9 @@ class WorkflowAnalyzer:
         engineer_impact = {}
 
         for result in impact_results:
-            facility = result.get('facility', 'Unknown')
-            usability = result['usability_status']
-            count = result['incident_count']
+            facility = result.get("facility", "Unknown")
+            usability = result["usability_status"]
+            count = result["incident_count"]
 
             if facility not in engineer_impact:
                 engineer_impact[facility] = {"total": 0}
@@ -313,7 +323,7 @@ class WorkflowAnalyzer:
 
         return {
             "engineer_effectiveness": engineer_impact,
-            "impact_insights": self._interpret_engineer_impact(engineer_impact)
+            "impact_insights": self._interpret_engineer_impact(engineer_impact),
         }
 
     def _interpret_chain_patterns(self, patterns: Dict[str, Any]) -> List[str]:
@@ -326,10 +336,14 @@ class WorkflowAnalyzer:
             problem_only_pct = data.get("problem_only_percentage", 0)
 
             if complete_pct < 30:
-                insights.append(f"{facility}: Only {complete_pct}% complete workflows - major learning opportunity loss")
+                insights.append(
+                    f"{facility}: Only {complete_pct}% complete workflows - major learning opportunity loss"
+                )
 
             if problem_only_pct > 40:
-                insights.append(f"{facility}: {problem_only_pct}% incidents stop at problem stage - workflow breakdown")
+                insights.append(
+                    f"{facility}: {problem_only_pct}% incidents stop at problem stage - workflow breakdown"
+                )
 
         return insights
 
@@ -341,7 +355,7 @@ class WorkflowAnalyzer:
             "missing_verification": "Critical: Cannot assess solution effectiveness",
             "missing_root_cause": "High: Cannot learn from failure patterns",
             "missing_action_plan": "Medium: Cannot understand solution approaches",
-            "missing_problem": "Low: Basic data entry issue"
+            "missing_problem": "Low: Basic data entry issue",
         }
 
         for gap in critical_gaps:
@@ -364,14 +378,20 @@ class WorkflowAnalyzer:
                 impact = data["data_quality_impact"]
 
                 if score < 40:
-                    insights.append(f"{facility}: Only {score}% of incidents usable for engineer analysis")
+                    insights.append(
+                        f"{facility}: Only {score}% of incidents usable for engineer analysis"
+                    )
 
                 if impact > 60:
-                    insights.append(f"{facility}: {impact}% data quality impact severely limits learning")
+                    insights.append(
+                        f"{facility}: {impact}% data quality impact severely limits learning"
+                    )
 
         return insights
 
-    def _generate_workflow_recommendations(self, chain_analysis: Dict, gap_analysis: Dict) -> List[str]:
+    def _generate_workflow_recommendations(
+        self, chain_analysis: Dict, gap_analysis: Dict
+    ) -> List[str]:
         """Generate actionable recommendations based on workflow analysis"""
         recommendations = []
 
@@ -387,6 +407,8 @@ class WorkflowAnalyzer:
         for facility, data in patterns.items():
             complete_pct = data.get("complete_chain_percentage", 0)
             if complete_pct < 25:
-                recommendations.append(f"Focus: Increase complete workflow chains at {facility} (currently {complete_pct}%)")
+                recommendations.append(
+                    f"Focus: Increase complete workflow chains at {facility} (currently {complete_pct}%)"
+                )
 
         return recommendations

@@ -5,13 +5,15 @@ Adapter-driven navigation with real facility data.
 """
 
 import logging
-import dash_bootstrap_components as dbc
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from dashboard.adapters import get_facility_adapter, get_config_adapter
+import dash_bootstrap_components as dbc
+
+from dashboard.adapters import get_config_adapter, get_facility_adapter
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class NavigationBuilder:
     """Dynamic navigation construction using adapter data"""
@@ -26,9 +28,7 @@ class NavigationBuilder:
             styling = self.config_adapter.get_styling_config()
 
             # Core navigation items
-            nav_items = [
-                dbc.NavItem(dbc.NavLink("Portfolio", href="/", className="nav-link"))
-            ]
+            nav_items = [dbc.NavItem(dbc.NavLink("Portfolio", href="/", className="nav-link"))]
 
             # Analysis dropdown with facility data
             analysis_dropdown = self._build_analysis_dropdown()
@@ -46,7 +46,7 @@ class NavigationBuilder:
                 color=styling.get("background_dark", "#1E1E1E"),
                 dark=True,
                 fluid=True,
-                className="mb-3"
+                className="mb-3",
             )
 
         except Exception as e:
@@ -68,7 +68,7 @@ class NavigationBuilder:
                 dropdown_items.append(
                     dbc.DropdownMenuItem(
                         f"{facility_id} ({incident_count:,} records)",
-                        href=f"/facility/{facility_id}"
+                        href=f"/facility/{facility_id}",
                     )
                 )
 
@@ -76,21 +76,27 @@ class NavigationBuilder:
             if dropdown_items:
                 dropdown_items.append(dbc.DropdownMenuItem(divider=True))
 
-            dropdown_items.extend([
-                dbc.DropdownMenuItem("Historical Records", href="/historical-records"),
-                dbc.DropdownMenuItem("Facilities Distribution", href="/facilities-distribution"),
-                dbc.DropdownMenuItem("Data Types Distribution", href="/data-types-distribution"),
-                dbc.DropdownMenuItem(divider=True),
-                dbc.DropdownMenuItem("Data Quality", href="/data-quality"),
-                dbc.DropdownMenuItem("Workflow Analysis", href="/workflow")
-            ])
+            dropdown_items.extend(
+                [
+                    dbc.DropdownMenuItem("Historical Records", href="/historical-records"),
+                    dbc.DropdownMenuItem(
+                        "Facilities Distribution", href="/facilities-distribution"
+                    ),
+                    dbc.DropdownMenuItem(
+                        "Data Types Distribution", href="/data-types-distribution"
+                    ),
+                    dbc.DropdownMenuItem(divider=True),
+                    dbc.DropdownMenuItem("Data Quality", href="/data-quality"),
+                    dbc.DropdownMenuItem("Workflow Analysis", href="/workflow"),
+                ]
+            )
 
             return dbc.DropdownMenu(
                 children=dropdown_items,
                 nav=True,
                 in_navbar=True,
                 label="Analysis",
-                className="nav-link"
+                className="nav-link",
             )
 
         except Exception as e:
@@ -99,7 +105,7 @@ class NavigationBuilder:
                 children=[dbc.DropdownMenuItem("Analysis Unavailable", disabled=True)],
                 nav=True,
                 in_navbar=True,
-                label="Analysis"
+                label="Analysis",
             )
 
     def _build_system_dropdown(self) -> dbc.DropdownMenu:
@@ -109,33 +115,29 @@ class NavigationBuilder:
                 dbc.DropdownMenuItem("Summary", href="/summary"),
                 dbc.DropdownMenuItem("System Status", href="#", disabled=True),
                 dbc.DropdownMenuItem(divider=True),
-                dbc.DropdownMenuItem("Documentation", href="#", disabled=True)
+                dbc.DropdownMenuItem("Documentation", href="#", disabled=True),
             ],
             nav=True,
             in_navbar=True,
             label="System",
-            className="nav-link"
+            className="nav-link",
         )
 
     def _build_fallback_navigation(self) -> dbc.NavbarSimple:
         """Fallback navigation when adapters fail"""
         return dbc.NavbarSimple(
-            children=[
-                dbc.NavItem(dbc.NavLink("Portfolio", href="/"))
-            ],
+            children=[dbc.NavItem(dbc.NavLink("Portfolio", href="/"))],
             brand="Mining Reliability Database",
             brand_href="/",
             color="#1E1E1E",
             dark=True,
-            fluid=True
+            fluid=True,
         )
 
     def build_breadcrumbs(self, pathname: str) -> dbc.Breadcrumb:
         """Build breadcrumb navigation for current path"""
         try:
-            breadcrumb_items = [
-                dbc.BreadcrumbItem("Portfolio", href="/", external_link=True)
-            ]
+            breadcrumb_items = [dbc.BreadcrumbItem("Portfolio", href="/", external_link=True)]
 
             if pathname and pathname != "/":
                 if pathname.startswith("/facility/"):
@@ -148,10 +150,12 @@ class NavigationBuilder:
                 elif pathname == "/workflow":
                     breadcrumb_items.append(dbc.BreadcrumbItem("Workflow Analysis", active=True))
                 elif pathname == "/workflow-process":
-                    breadcrumb_items.extend([
-                        dbc.BreadcrumbItem("Workflow", href="/workflow", external_link=True),
-                        dbc.BreadcrumbItem("Process Analysis", active=True)
-                    ])
+                    breadcrumb_items.extend(
+                        [
+                            dbc.BreadcrumbItem("Workflow", href="/workflow", external_link=True),
+                            dbc.BreadcrumbItem("Process Analysis", active=True),
+                        ]
+                    )
                 else:
                     page_name = pathname.replace("/", "").replace("-", " ").title()
                     breadcrumb_items.append(dbc.BreadcrumbItem(page_name, active=True))
@@ -172,7 +176,7 @@ class NavigationBuilder:
             "/summary": "Four Facilities Summary",
             "/historical-records": "Historical Records Analysis",
             "/facilities-distribution": "Facilities Distribution",
-            "/data-types-distribution": "Data Types Distribution"
+            "/data-types-distribution": "Data Types Distribution",
         }
 
         if pathname in title_mapping:
@@ -203,8 +207,10 @@ class NavigationBuilder:
             handle_error(logger, e, "navigation data validation")
             return {"facilities_available": False, "styling_available": False}
 
+
 # Singleton pattern
 _navigation_builder = None
+
 
 def get_navigation_builder() -> NavigationBuilder:
     """Get singleton navigation builder instance"""

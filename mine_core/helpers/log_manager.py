@@ -4,17 +4,17 @@ Logging Manager
 Provides consistent logging setup across the application.
 """
 
-import os
 import logging
 import logging.handlers
+import os
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 # Cache for loggers
 _loggers: Dict[str, logging.Logger] = {}
 
-def setup_logging(level: str = None, log_file: str = None,
-                 log_format: str = None) -> None:
+
+def setup_logging(level: str = None, log_file: str = None, log_format: str = None) -> None:
     """
     Set up application-wide logging configuration
 
@@ -31,8 +31,7 @@ def setup_logging(level: str = None, log_file: str = None,
     level = level or os.environ.get("LOG_LEVEL", "INFO")
     log_file = log_file or os.environ.get("LOG_FILE")
     log_format = log_format or os.environ.get(
-        "LOG_FORMAT",
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        "LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Convert level string to logging level
@@ -64,13 +63,14 @@ def setup_logging(level: str = None, log_file: str = None,
 
         # Create rotating file handler
         file_handler = logging.handlers.RotatingFileHandler(
-            log_file, maxBytes=10*1024*1024, backupCount=5
+            log_file, maxBytes=10 * 1024 * 1024, backupCount=5
         )
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
 
     # Log configuration
     root_logger.info(f"Logging configured: level={level}, file={log_file}")
+
 
 def get_logger(name: str) -> logging.Logger:
     """
