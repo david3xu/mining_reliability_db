@@ -1,305 +1,79 @@
-# Mining Reliability DB - Git Exclusion Patterns
-# Updated for unified configuration architecture
-
-# =============================================================================
-# GIT SPECIFIC
-# =============================================================================
-
-# Git garbage collection and temporary files
-.git/gc.log
-.git/objects/*/tmp_*
-.git/objects/pack/tmp_*
-.git/objects/info/alternates
-.git/objects/info/http-alternates
-
-# Git hooks
-.git/hooks/*.sample
-.git/hooks/*.old
-
-# =============================================================================
-# PYTHON DEVELOPMENT ARTIFACTS
-# =============================================================================
-
-# Python bytecode and caching
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
-.coverage
-htmlcov/
-.mypy_cache/
-.ruff_cache/
-
-# Distribution / packaging
-dist/
+*.so
+.Python
 build/
-*.egg-info/
+develop-eggs/
+dist/
+downloads/
+eggs/
 .eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Virtual environments
+# Virtual Environment
 venv/
 env/
 ENV/
-.venv/
-.env-*/
+.venv
 
-# =============================================================================
-# DEVELOPMENT ENVIRONMENTS
-# =============================================================================
+# Environment Variables
+.env
+.env.local
+.env.production
 
-# IDE and editor files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Development configuration overrides
-.env.local
-.env.development
-.env.staging
-.env.production
+# Jupyter Notebooks
+.ipynb_checkpoints
 
-# =============================================================================
-# DATABASE AND DATA STORAGE
-# =============================================================================
-
-# Local Neo4j data
-.neo4j/
-neo4j-data/
-
-# Database dumps and backups
-*.dump
-*.backup
-neo4j-backup-*
-
-# =============================================================================
-# ENVIRONMENT AND SECRETS
-# =============================================================================
-
-# Environment variables and secrets
-.env
-.env.*
-!.env.example
-
-# Configuration overrides
-config.local.json
-settings.local.json
-
-# SSL certificates and keys
-*.pem
-*.key
-*.crt
-*.p12
-
-# =============================================================================
-# DATA FILES AND ANALYSIS
-# =============================================================================
-
-# Raw data files
-data/raw_data/*.json
-!data/raw_data/sample_*.json
-
-# Facility data (except sample)
-data/facility_data/*.json
-!data/facility_data/sample.json
-
-# Analysis and reporting outputs
-analysis_output/
-manager_reports/
-reports/
-exports/
-
-# Large data files
-*.xlsx
-*.csv
+# Database
 *.db
-*.sqlite
-*.parquet
+*.sqlite3
 
-# =============================================================================
-# LOGGING AND MONITORING
-# =============================================================================
-
-# Log files from unified logging system
+# Logs
 logs/
 *.log
-mining_reliability*.log
 
-# Performance monitoring
-performance_reports/
-profiling_output/
-
-# =============================================================================
-# TESTING AND QUALITY ASSURANCE
-# =============================================================================
-
-# Test artifacts
-.coverage.*
-coverage.xml
+# Cache
+.cache/
 .pytest_cache/
-test-results/
-test_*.xml
 
-# Performance test data
-benchmark_results/
-load_test_data/
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
 
-# =============================================================================
-# DOCUMENTATION GENERATION
-# =============================================================================
+# Data Files
+data/raw/
+data/processed/
+data/exports/
+*.csv
+*.xlsx
+*.json.backup
 
-# Generated documentation
-docs/_build/
-docs/build/
-site/
-
-# Temporary documentation files
-*.tmp.md
-*.draft.md
-
-# =============================================================================
-# OPERATIONAL ARTIFACTS
-# =============================================================================
-
-# Docker volumes and data
-docker-data/
-.docker/
-
-# Temporary operational files
-tmp/
-temp/
-.tmp/
-
-# Process ID files
-*.pid
-
-# =============================================================================
-# SECURITY AND COMPLIANCE
-# =============================================================================
-
-# Security scan results
-security_reports/
-vulnerability_scan/
-
-# Compliance artifacts
-audit_logs/
-compliance_reports/
-
-# =============================================================================
-# SYSTEM AND OS ARTIFACTS
-# =============================================================================
-
-# OS specific files
+# OS
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# System backup files
-*.bak
-*.orig
-*.rej
+# Docker
+.dockerignore
 
-# =============================================================================
-# DEVELOPMENT UTILITIES
-# =============================================================================
-
-# Code formatting artifacts
-.black_cache/
-.isort.cfg.bak
-
-# Type checking artifacts
-.mypy_cache/
-.pytype/
-
-# Linting reports
-pylint_report.txt
-flake8_report.txt
-
-# =============================================================================
-# PRODUCTION DEPLOYMENT
-# =============================================================================
-
-# Deployment artifacts
-deployment/
-.deploy/
-k8s-manifests.local/
-
-# Configuration management
-.terraform/
-terraform.tfstate*
-.terraformrc
-
-# =============================================================================
-# JUPYTER AND ANALYSIS NOTEBOOKS
-# =============================================================================
-
-# Jupyter notebook checkpoints
-.ipynb_checkpoints/
-
-# Jupyter lab workspace
-.jupyter/
-
-# Analysis notebooks (if containing sensitive data)
-*_analysis.ipynb
-*_exploration.ipynb
-
-# =============================================================================
-# CUSTOM PROJECT EXCLUSIONS
-# =============================================================================
-
-# Custom configuration overrides
-mine_core/local_config/
-configs/local/
-
-# Development data samples
-dev_data/
-sample_exports/
-
-# Performance benchmarks
-benchmarks/results/
-performance_data/
-
-# Integration test artifacts
-integration_test_data/
-test_databases/
-
-# =============================================================================
-# PACKAGE MANAGER ARTIFACTS
-# =============================================================================
-
-# pip
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Poetry
-poetry.lock.backup
-
-# pipenv
-Pipfile.lock.backup
-
-# =============================================================================
-# CONTINUOUS INTEGRATION
-# =============================================================================
-
-# CI/CD artifacts
-.github/workflows/cache/
-.circleci/cache/
-.gitlab-ci-cache/
-
-# Build artifacts
-build_artifacts/
-ci_reports/
-
-# =============================================================================
-# ARCHITECTURE DOCUMENTATION
-# =============================================================================
-
-# Generated architecture diagrams
-architecture_diagrams/*.generated.*
-*.puml.png
-*.puml.svg
-
-# Temporary documentation work
-docs/draft/
-documentation_work/
+# Temporary Files
+tmp/
+temp/
+*.tmp

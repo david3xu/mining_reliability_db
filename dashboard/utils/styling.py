@@ -1,70 +1,66 @@
 #!/usr/bin/env python3
 """
-Configuration-Driven Styling System
-Clean theme management using centralized configuration.
+Adapter-Based Styling Utilities - Configuration Access Layer
+Direct styling configuration through adapter pattern.
 """
 
 from typing import Dict, Any
-from configs.environment import get_dashboard_styling_config, get_dashboard_chart_config
+from dashboard.adapters import get_config_adapter
 
 def get_colors() -> Dict[str, str]:
-    """Get color palette from configuration"""
-    styling_config = get_dashboard_styling_config()
+    """Direct color configuration access"""
+    config_adapter = get_config_adapter()
+    styling = config_adapter.get_styling_config()
 
     return {
-        # Primary colors from config
-        "primary_blue": styling_config.get("primary_color", "#4A90E2"),
-        "light_blue": styling_config.get("light_blue", "#7BB3F0"),
-        "dark_blue": styling_config.get("dark_blue", "#2E5C8A"),
-
-        # Chart colors from config
-        "chart_colors": styling_config.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
-
-        # Background and text from config
-        "background_light": styling_config.get("background_light", "#FFFFFF"),
-        "background_dark": styling_config.get("background_dark", "#1E1E1E"),
-        "text_primary": styling_config.get("text_primary", "#333333"),
-        "text_secondary": styling_config.get("text_secondary", "#666666"),
-        "text_light": styling_config.get("text_light", "#FFFFFF"),
-
-        # Grid and borders - fallback defaults
+        "primary_blue": styling.get("primary_color", "#4A90E2"),
+        "light_blue": styling.get("light_blue", "#7BB3F0"),
+        "dark_blue": styling.get("dark_blue", "#2E5C8A"),
+        "chart_colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
+        "background_light": styling.get("background_light", "#FFFFFF"),
+        "background_dark": styling.get("background_dark", "#1E1E1E"),
+        "text_primary": styling.get("text_primary", "#333333"),
+        "text_secondary": styling.get("text_secondary", "#666666"),
+        "text_light": styling.get("text_light", "#FFFFFF"),
         "grid_color": "#E5E5E5",
         "border_color": "#CCCCCC"
     }
 
 def get_fonts() -> Dict[str, Any]:
-    """Get typography configuration"""
-    chart_config = get_dashboard_chart_config()
+    """Direct typography configuration access"""
+    config_adapter = get_config_adapter()
+    chart = config_adapter.get_chart_config()
 
     return {
-        "primary_font": chart_config.get("font_family", "Arial, sans-serif"),
-        "title_size": chart_config.get("title_font_size", 24),
-        "subtitle_size": chart_config.get("subtitle_font_size", 18),
-        "body_size": chart_config.get("body_font_size", 14),
-        "caption_size": chart_config.get("caption_font_size", 12),
+        "primary_font": chart.get("font_family", "Arial, sans-serif"),
+        "title_size": chart.get("title_font_size", 24),
+        "subtitle_size": chart.get("subtitle_font_size", 18),
+        "body_size": chart.get("body_font_size", 14),
+        "caption_size": chart.get("caption_font_size", 12),
         "metric_size": 32,
         "metric_label_size": 14
     }
 
-def get_layout_config() -> Dict[str, Any]:
-    """Get layout dimensions from configuration"""
-    chart_config = get_dashboard_chart_config()
+def get_layout_dimensions() -> Dict[str, Any]:
+    """Direct layout dimension configuration"""
+    config_adapter = get_config_adapter()
+    chart = config_adapter.get_chart_config()
 
     return {
         "container_padding": "20px",
         "component_margin": "15px",
         "card_padding": "20px",
-        "metric_card_height": chart_config.get("metric_card_height", 120),
-        "metric_card_width": chart_config.get("metric_card_width", 220),
-        "chart_height": chart_config.get("default_height", 400),
-        "table_height": chart_config.get("table_height", 300),
+        "metric_card_height": chart.get("metric_card_height", 120),
+        "metric_card_width": chart.get("metric_card_width", 220),
+        "chart_height": chart.get("default_height", 400),
+        "table_height": chart.get("table_height", 300),
         "mobile_breakpoint": "768px"
     }
 
-def get_metric_card_style(color=None):
-    """Generate metric card styling from configuration"""
+def get_metric_card_style(color: str = None) -> Dict[str, Any]:
+    """Standard metric card styling from configuration"""
     colors = get_colors()
-    layout = get_layout_config()
+    layout = get_layout_dimensions()
 
     card_color = color or colors["primary_blue"]
 
@@ -84,11 +80,11 @@ def get_metric_card_style(color=None):
         "alignItems": "center"
     }
 
-def get_chart_layout_template(title=""):
-    """Generate chart layout from configuration"""
+def get_chart_layout_template(title: str = "") -> Dict[str, Any]:
+    """Standard chart layout from configuration"""
     colors = get_colors()
     fonts = get_fonts()
-    layout = get_layout_config()
+    layout = get_layout_dimensions()
 
     return {
         "title": {
@@ -112,8 +108,8 @@ def get_chart_layout_template(title=""):
         "height": layout["chart_height"]
     }
 
-def get_bar_chart_style():
-    """Bar chart styling from configuration"""
+def get_bar_chart_style() -> Dict[str, Any]:
+    """Bar chart styling configuration"""
     colors = get_colors()
     fonts = get_fonts()
 
@@ -126,8 +122,8 @@ def get_bar_chart_style():
         "textposition": "outside"
     }
 
-def get_pie_chart_style():
-    """Pie chart styling from configuration"""
+def get_pie_chart_style() -> Dict[str, Any]:
+    """Pie chart styling configuration"""
     colors = get_colors()
     fonts = get_fonts()
 
@@ -142,11 +138,11 @@ def get_pie_chart_style():
         "hovertemplate": "<b>%{label}</b><br>Records: %{value}<br>Percentage: %{percent}<extra></extra>"
     }
 
-def get_table_style():
-    """Data table styling from configuration"""
+def get_table_style() -> Dict[str, Any]:
+    """Data table styling configuration"""
     colors = get_colors()
     fonts = get_fonts()
-    layout = get_layout_config()
+    layout = get_layout_dimensions()
 
     return {
         "style_cell": {
@@ -174,11 +170,11 @@ def get_table_style():
         }
     }
 
-def get_dashboard_styles():
-    """Complete dashboard styling from configuration"""
+def get_dashboard_styles() -> Dict[str, Any]:
+    """Complete dashboard styling configuration"""
     colors = get_colors()
     fonts = get_fonts()
-    layout = get_layout_config()
+    layout = get_layout_dimensions()
 
     return {
         "main_container": {
@@ -216,20 +212,8 @@ def get_dashboard_styles():
         }
     }
 
-# Legacy compatibility - expose via CONSTANTS for existing code
-COLORS = get_colors()
-FONTS = get_fonts()
-LAYOUT = get_layout_config()
-DASHBOARD_STYLES = get_dashboard_styles()
-
-# Utility functions
-def apply_theme_mode(dark_mode=False):
-    """Apply theme mode - updates configuration dynamically"""
-    # In production, this would update the configuration source
-    pass
-
-def get_responsive_style(component_type, screen_size="desktop"):
-    """Get responsive styling"""
+def get_responsive_style(component_type: str, screen_size: str = "desktop") -> Dict[str, Any]:
+    """Responsive styling adjustments"""
     dashboard_styles = get_dashboard_styles()
 
     if screen_size == "mobile" and component_type in dashboard_styles:
@@ -244,3 +228,13 @@ def get_responsive_style(component_type, screen_size="desktop"):
             return style
 
     return dashboard_styles.get(component_type, {})
+
+# Legacy compatibility exports
+COLORS = get_colors()
+FONTS = get_fonts()
+LAYOUT = get_layout_dimensions()
+DASHBOARD_STYLES = get_dashboard_styles()
+
+def apply_theme_mode(dark_mode: bool = False):
+    """Theme mode application"""
+    pass  # Configuration-driven themes handled by adapter

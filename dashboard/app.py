@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Dashboard Application - Complete Navigation System
-Professional navigation accessing all 6 analytical perspectives.
+Purified Dashboard Application - Pure Bootstrap Architecture
+Clean application entry point with routing delegation and adapter validation.
 """
 
 import sys
@@ -13,428 +13,276 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
-# Dash framework
 import dash
 from dash import dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
 
-# Configuration and utilities
 from mine_core.shared.common import setup_project_environment, handle_error
 
-# Components
-from dashboard.components.portfolio_overview import (
-    create_complete_dashboard,
-    create_historical_records_page,
-    create_facilities_distribution_page,
-    create_data_types_distribution_page
-)
-from dashboard.components.facility_detail import create_facility_detail_layout
-from dashboard.components.data_quality import create_data_quality_layout
-from dashboard.components.workflow_analysis import create_workflow_analysis_layout
+# Pure routing and navigation
+from dashboard.routing.url_manager import get_url_manager
+from dashboard.routing.navigation_builder import get_navigation_builder
 
-# Data validation
-from dashboard.utils.data_transformers import validate_dashboard_data
-
-# Layout infrastructure
-from dashboard.layouts.main_layout import create_error_boundary
+# Adapter validation
+from dashboard.adapters import get_data_adapter, get_config_adapter
 
 logger = None
 
-class CompleteDashboardApplication:
-    """Professional navigation system for all analytical perspectives"""
+class PurifiedDashboardApp:
+    """Clean application bootstrap with routing delegation"""
 
     def __init__(self, debug=None, port=None, host=None):
-        """Initialize complete navigation system"""
         self.debug = debug if debug is not None else False
         self.port = port or 8050
         self.host = host or "127.0.0.1"
 
-        self.app = None
-        self.validation_status = {}
-
         self._setup_logging()
-        self._validate_system()
+        self._validate_adapters()
         self._initialize_app()
-        self._setup_routing_callbacks()
+        self._setup_routing()
 
     def _setup_logging(self):
-        """Setup logging using project infrastructure"""
+        """Initialize logging through project infrastructure"""
         global logger
         try:
-            logger = setup_project_environment("complete_dashboard_app")
-            logger.info("Complete navigation system initialization started")
+            logger = setup_project_environment("purified_dashboard")
+            logger.info("Purified dashboard initialization started")
         except Exception as e:
             logging.basicConfig(level=logging.INFO)
             logger = logging.getLogger(__name__)
-            logger.warning(f"Failed to setup project environment: {e}")
+            logger.warning(f"Project environment setup failed: {e}")
 
-    def _validate_system(self):
-        """Validate complete navigation system"""
-        logger.info("Validating complete analytical system...")
-
+    def _validate_adapters(self):
+        """Validate adapter layer availability"""
         try:
-            self.validation_status = validate_dashboard_data()
-            system_ready = self.validation_status.get("phase2_complete", False)
+            data_adapter = get_data_adapter()
+            config_adapter = get_config_adapter()
 
-            if system_ready:
-                logger.info("✅ Complete navigation system validated")
+            validation = data_adapter.validate_data_availability()
+            if validation.is_valid:
+                logger.info("✅ Adapter layer validated")
             else:
-                logger.warning("⚠️ System validation issues detected")
+                logger.warning("⚠️ Adapter validation issues detected")
 
         except Exception as e:
-            handle_error(logger, e, "complete system validation")
-            self.validation_status = {"phase2_complete": False}
+            handle_error(logger, e, "adapter validation")
 
     def _initialize_app(self):
-        """Initialize Dash application with complete navigation"""
+        """Initialize Dash application with clean architecture"""
         try:
-            external_stylesheets = [
-                dbc.themes.BOOTSTRAP,
-                {
-                    "href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
-                    "rel": "stylesheet"
-                }
-            ]
+            config_adapter = get_config_adapter()
+            styling = config_adapter.get_styling_config()
 
             self.app = dash.Dash(
                 __name__,
-                external_stylesheets=external_stylesheets,
+                external_stylesheets=[
+                    dbc.themes.BOOTSTRAP,
+                    {"href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css", "rel": "stylesheet"}
+                ],
                 suppress_callback_exceptions=True,
-                title="Mining Reliability Database - Complete Analysis System",
+                title="Mining Reliability Database",
                 meta_tags=[
                     {"name": "viewport", "content": "width=device-width, initial-scale=1.0"},
-                    {"name": "description", "content": "Complete Mining Reliability Analysis Dashboard"}
+                    {"name": "description", "content": "Professional Mining Reliability Analysis"}
                 ]
             )
 
-            # Add custom CSS for hover effects
-            self.app.index_string = '''
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    {%metas%}
-                    <title>{%title%}</title>
-                    {%favicon%}
-                    {%css%}
-                    <style>
-                        .metric-card-hover:hover {
-                            transform: translateY(-2px) !important;
-                            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2) !important;
-                        }
-                        .metric-card-hover {
-                            transition: all 0.3s ease !important;
-                        }
-                        .metric-card-interactive:hover {
-                            transform: translateY(-3px);
-                            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-                            border-color: #ffffff40 !important;
-                        }
-                    </style>
-                </head>
-                <body>
-                    {%app_entry%}
-                    <footer>
-                        {%config%}
-                        {%scripts%}
-                        {%renderer%}
-                    </footer>
-                </body>
-            </html>
-            '''
-
             self.app.layout = self._create_layout()
-            logger.info("Complete navigation application initialized successfully")
+            logger.info("Purified application initialized")
 
         except Exception as e:
-            handle_error(logger, e, "complete navigation application initialization")
+            handle_error(logger, e, "application initialization")
             raise
 
     def _create_layout(self):
-        """Create application layout with complete navigation"""
-        try:
-            return html.Div([
-                dcc.Location(id="url", refresh=False),
-                self._create_navigation_bar(),
-                html.Div(id="page-content", className="mt-3")
-            ])
+        """Create application layout with navigation delegation"""
+        navigation_builder = get_navigation_builder()
 
-        except Exception as e:
-            handle_error(logger, e, "complete layout creation")
-            return html.Div([
-                dbc.Container([
-                    create_error_boundary(f"Navigation system error: {str(e)}")
-                ])
-            ])
+        return html.Div([
+            dcc.Location(id="url", refresh=False),
+            navigation_builder.build_main_navigation(),
+            html.Div(id="page-content", className="container-fluid p-4")
+        ])
 
-    def _create_navigation_bar(self):
-        """Create professional navigation bar for all analytical perspectives"""
+    def _setup_routing(self):
+        """Setup routing through URL manager"""
+        url_manager = get_url_manager()
 
-        return dbc.NavbarSimple(
-            children=[
-                dbc.NavItem(dbc.NavLink("Portfolio", href="/", className="nav-link")),
-                dbc.NavItem(dbc.NavLink("Data Quality", href="/data-quality", className="nav-link")),
-                dbc.NavItem(dbc.NavLink("Workflow", href="/workflow", className="nav-link")),
-                dbc.NavItem(dbc.NavLink("Summary", href="/summary", className="nav-link")),
-                dbc.DropdownMenu(
-                    children=[
-                        dbc.DropdownMenuItem("Pinjarra", href="/facility/pinjarra"),
-                        dbc.DropdownMenuItem("WA Mining", href="/facility/wa-mining"),
-                        dbc.DropdownMenuItem("Kwinana", href="/facility/kwinana"),
-                        dbc.DropdownMenuItem(divider=True),
-                        dbc.DropdownMenuItem("Historical Records", href="/historical-records"),
-                        dbc.DropdownMenuItem("Facilities Distribution", href="/facilities-distribution"),
-                        dbc.DropdownMenuItem("Data Types Distribution", href="/data-types-distribution")
-                    ],
-                    nav=True,
-                    in_navbar=True,
-                    label="Analysis",
-                    className="nav-link"
-                )
-            ],
-            brand="Mining Reliability Database",
-            brand_href="/",
-            brand_style={"fontSize": "18px", "fontWeight": "bold"},
-            color="#1E1E1E",
-            dark=True,
-            fluid=True,
-            className="mb-3"
+        @self.app.callback(
+            Output("page-content", "children"),
+            Input("url", "pathname"),
+            prevent_initial_call=False
         )
+        def route_page(pathname):
+            """Route pages through URL manager"""
+            try:
+                if not url_manager.validate_route(pathname):
+                    return self._create_not_found_page(pathname)
 
-    def _setup_routing_callbacks(self):
-        """Setup complete routing for all analytical perspectives"""
+                route_config = url_manager.resolve_route(pathname)
+                return self._load_page_component(route_config)
+
+            except Exception as e:
+                handle_error(logger, e, f"routing for {pathname}")
+                return self._create_error_page(str(e))
+
+    def _load_page_component(self, route_config: dict):
+        """Load page component based on route configuration"""
+        component_name = route_config.get("component")
+
         try:
-            @self.app.callback(
-                Output("page-content", "children"),
-                Input("url", "pathname"),
-                prevent_initial_call=False
-            )
-            def display_page(pathname):
-                """Complete routing logic for all analytical perspectives"""
-                try:
-                    if pathname is None or pathname == "/":
-                        # Portfolio Overview (home)
-                        return self._create_main_container(create_complete_dashboard())
+            if component_name == "portfolio_overview":
+                from dashboard.components.portfolio_overview import create_complete_dashboard
+                return create_complete_dashboard()
 
-                    elif pathname == "/data-quality":
-                        # Data Quality Foundation analysis
-                        logger.info("Routing to data quality analysis")
-                        return self._create_main_container(create_data_quality_layout())
+            elif component_name == "data_quality_layout":
+                from dashboard.components.data_quality import create_data_quality_layout
+                return create_data_quality_layout()
 
-                    elif pathname == "/workflow":
-                        # Workflow Understanding analysis
-                        logger.info("Routing to workflow analysis")
-                        return self._create_main_container(create_workflow_analysis_layout())
+            elif component_name == "workflow_analysis_layout":
+                from dashboard.components.workflow_analysis import create_workflow_analysis_layout
+                return create_workflow_analysis_layout()
 
-                    elif pathname == "/workflow-process":
-                        # Dedicated workflow process analysis
-                        logger.info("Routing to workflow process analysis")
-                        from dashboard.components.workflow_analysis import create_workflow_process_page
-                        return self._create_main_container(create_workflow_process_page())
+            elif component_name == "workflow_process_page":
+                from dashboard.components.workflow_analysis import create_workflow_process_page
+                return create_workflow_process_page()
 
-                    elif pathname == "/summary":
-                        # Four Facilities Summary
-                        logger.info("Routing to facilities summary")
-                        return self._create_main_container(self._create_facilities_summary())
+            elif component_name == "historical_records_page":
+                from dashboard.components.portfolio_overview import create_historical_records_page
+                return create_historical_records_page()
 
-                    elif pathname == "/historical-records":
-                        # Historical records analysis
-                        logger.info("Routing to historical records")
-                        return self._create_main_container(create_historical_records_page())
+            elif component_name == "facilities_distribution_page":
+                from dashboard.components.portfolio_overview import create_facilities_distribution_page
+                return create_facilities_distribution_page()
 
-                    elif pathname == "/facilities-distribution":
-                        # Facilities distribution analysis
-                        logger.info("Routing to facilities distribution")
-                        return self._create_main_container(create_facilities_distribution_page())
+            elif component_name == "data_types_distribution_page":
+                from dashboard.components.portfolio_overview import create_data_types_distribution_page
+                return create_data_types_distribution_page()
 
-                    elif pathname == "/data-types-distribution":
-                        # Data types distribution analysis
-                        logger.info("Routing to data types distribution")
-                        return self._create_main_container(create_data_types_distribution_page())
+            elif component_name == "facility_detail_layout":
+                facility_id = route_config.get("facility_id")
+                from dashboard.components.facility_detail import create_facility_detail_layout
+                return create_facility_detail_layout(facility_id)
 
-                    elif pathname.startswith("/facility/"):
-                        # Individual facility analysis
-                        facility_id = pathname.replace("/facility/", "")
-                        logger.info(f"Routing to facility analysis: {facility_id}")
-                        return self._create_main_container(create_facility_detail_layout(facility_id))
+            elif component_name == "facilities_summary":
+                return self._create_facilities_summary()
 
-                    else:
-                        # Unknown route
-                        return self._create_main_container(html.Div([
-                            dbc.Alert([
-                                html.H4("Page Not Found"),
-                                html.P(f"The requested page '{pathname}' does not exist."),
-                                dbc.Button("Return to Portfolio", href="/", color="primary")
-                            ], color="warning")
-                        ]))
-
-                except Exception as e:
-                    handle_error(logger, e, f"page routing for {pathname}")
-                    return self._create_main_container(create_error_boundary(f"Failed to load {pathname}"))
-
-            logger.info("Complete routing callbacks setup completed")
+            else:
+                return self._create_not_found_page(route_config.get("page", "unknown"))
 
         except Exception as e:
-            handle_error(logger, e, "complete routing callbacks setup")
-
-    def _create_main_container(self, content):
-        """Create main container for page content"""
-        return dbc.Container([content], fluid=True, className="p-4")
+            handle_error(logger, e, f"component loading for {component_name}")
+            return self._create_error_page(f"Component {component_name} failed to load")
 
     def _create_facilities_summary(self):
-        """Create four facilities summary analysis"""
+        """Create facilities summary page"""
         try:
-            from dashboard.utils.data_transformers import get_facility_breakdown_data, get_portfolio_metrics
-
-            # Real data integration
-            portfolio_data = get_portfolio_metrics()
-            facility_data = get_facility_breakdown_data()
-
-            if not facility_data:
-                return dbc.Alert("No facility data available for summary", color="warning")
-
-            # Summary metrics
-            total_records = portfolio_data.get("total_records", {}).get("value", 0)
-            total_facilities = len(facility_data.get("labels", []))
-
-            # Create facility comparison cards
-            facility_cards = []
-            for i, (label, value, percentage) in enumerate(zip(
-                facility_data.get("labels", []),
-                facility_data.get("values", []),
-                facility_data.get("percentages", [])
-            )):
-                card = dbc.Card([
-                    dbc.CardBody([
-                        html.H4(label, className="card-title text-primary"),
-                        html.H2(f"{value:,}", className="text-success"),
-                        html.P(f"{percentage:.1f}% of total records", className="text-muted"),
-                        dbc.Button("Analyze", href=f"/facility/{label.lower()}",
-                                 color="outline-primary", size="sm")
-                    ])
-                ], className="mb-3")
-                facility_cards.append(card)
+            data_adapter = get_data_adapter()
+            portfolio_data = data_adapter.get_portfolio_metrics()
+            facility_data = data_adapter.get_facility_breakdown()
 
             return html.Div([
-                html.H2("Four Facilities Analysis Summary", className="text-primary mb-4"),
-                html.P(f"Comprehensive assessment across {total_facilities} operational facilities with {total_records:,} total records",
-                      className="text-muted mb-4"),
+                html.H2("Four Facilities Summary", className="text-primary mb-4"),
+                html.P(f"Analysis across {facility_data.total_records:,} records from {len(facility_data.labels)} facilities"),
 
                 dbc.Row([
-                    dbc.Col([card], md=6, lg=3) for card in facility_cards
-                ]),
-
-                html.Hr(className="my-4"),
-
-                html.H4("Facilities Distribution Overview", className="text-secondary mb-3"),
-                create_facilities_distribution_page()
+                    dbc.Col([
+                        dbc.Card([
+                            dbc.CardBody([
+                                html.H4(label, className="card-title"),
+                                html.H2(f"{value:,}", className="text-success"),
+                                html.P(f"{percentage:.1f}% of total", className="text-muted")
+                            ])
+                        ])
+                    ], md=3) for label, value, percentage in zip(
+                        facility_data.labels, facility_data.values, facility_data.percentages
+                    )
+                ])
             ])
 
         except Exception as e:
             handle_error(logger, e, "facilities summary creation")
-            return dbc.Alert("Failed to load facilities summary", color="danger")
+            return self._create_error_page("Facilities summary unavailable")
+
+    def _create_not_found_page(self, pathname):
+        """Create 404 page"""
+        return dbc.Container([
+            dbc.Alert([
+                html.H4("Page Not Found"),
+                html.P(f"Route '{pathname}' does not exist"),
+                dbc.Button("Return to Portfolio", href="/", color="primary")
+            ], color="warning")
+        ])
+
+    def _create_error_page(self, error_message):
+        """Create error page"""
+        return dbc.Container([
+            dbc.Alert([
+                html.H4("Application Error"),
+                html.P(error_message),
+                dbc.Button("Return to Portfolio", href="/", color="secondary")
+            ], color="danger")
+        ])
 
     def run_server(self, **kwargs):
-        """Run complete analytical dashboard server"""
+        """Run dashboard server with status reporting"""
         try:
             server_config = {
                 "host": self.host,
                 "port": self.port,
-                "debug": self.debug,
-                "dev_tools_hot_reload": self.debug,
-                "dev_tools_ui": self.debug
+                "debug": self.debug
             }
             server_config.update(kwargs)
 
-            logger.info(f"Starting complete analytical dashboard on {self.host}:{self.port}")
-
-            data_quality = self.validation_status.get("data_quality_score", 0.0)
-
-            print("\n" + "=" * 80)
-            print("🚀 COMPLETE MINING RELIABILITY ANALYTICAL DASHBOARD")
-            print("=" * 80)
+            print("\n" + "=" * 60)
+            print("🚀 PURIFIED MINING RELIABILITY DASHBOARD")
+            print("=" * 60)
             print(f"📊 URL: http://{self.host}:{self.port}")
-            print(f"🔧 Debug: {self.debug}")
-            print(f"📈 Data Quality: {data_quality:.1%}")
-            print("🧭 Complete Navigation Structure:")
-            print("   📋 Portfolio Overview (/) - Home dashboard")
-            print("   🔍 Data Quality (/data-quality) - Reliability analysis")
-            print("   🔄 Workflow (/workflow) - Process mapping")
-            print("   📊 Summary (/summary) - Four facilities assessment")
-            print("   🏭 Individual Facilities:")
-            print("      • Pinjarra (/facility/pinjarra)")
-            print("      • WA Mining (/facility/wa-mining)")
-            print("      • Kwinana (/facility/kwinana)")
-            print("   📈 Analysis Pages:")
-            print("      • Historical Records (/historical-records)")
-            print("      • Facilities Distribution (/facilities-distribution)")
-            print("      • Data Types Distribution (/data-types-distribution)")
-            print("=" * 80)
-            print("💡 Use navigation bar to access all analytical perspectives")
-            print("=" * 80)
+            print(f"🏗️ Architecture: Core → Adapter → Component")
+            print(f"🔧 Debug Mode: {self.debug}")
+            print("=" * 60)
+            print("🧭 Navigation:")
+            print("   📋 Portfolio Overview (/)")
+            print("   🔍 Data Quality (/data-quality)")
+            print("   🔄 Workflow Analysis (/workflow)")
+            print("   📊 Summary (/summary)")
+            print("   🏭 Facility Analysis (dynamic)")
+            print("=" * 60)
 
             self.app.run_server(**server_config)
 
         except Exception as e:
-            handle_error(logger, e, "complete server startup")
+            handle_error(logger, e, "server startup")
             raise
 
-    def get_validation_status(self):
-        """Get current validation status"""
-        return self.validation_status.copy()
-
-# Application factory
-def create_dashboard_app(debug=None, port=None, host=None):
-    """Create complete dashboard application instance"""
+def create_app(debug=None, port=None, host=None):
+    """Application factory"""
     try:
-        return CompleteDashboardApplication(debug=debug, port=port, host=host)
+        return PurifiedDashboardApp(debug=debug, port=port, host=host)
     except Exception as e:
         if logger:
-            handle_error(logger, e, "complete dashboard application creation")
+            handle_error(logger, e, "application creation")
         raise
 
-# CLI interface
 def main():
-    """Main entry point"""
+    """CLI entry point"""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Complete Mining Reliability Dashboard")
+    parser = argparse.ArgumentParser(description="Purified Mining Reliability Dashboard")
     parser.add_argument("--port", type=int, help="Server port")
     parser.add_argument("--host", type=str, help="Server host")
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument("--validate", action="store_true", help="Validate complete system")
+    parser.add_argument("--debug", action="store_true", help="Debug mode")
 
     args = parser.parse_args()
 
     try:
-        dashboard_app = create_dashboard_app(
-            debug=args.debug,
-            port=args.port,
-            host=args.host
-        )
-
-        if args.validate:
-            validation_status = dashboard_app.get_validation_status()
-            print("\nComplete System Validation:")
-
-            components = ["portfolio_metrics", "field_distribution", "facility_breakdown", "historical_timeline"]
-            for component in components:
-                status = validation_status.get(component, False)
-                component_name = component.replace("_", " ").title()
-                print(f"  {component_name}: {'✅ READY' if status else '❌ LIMITED'}")
-
-            overall_score = sum(validation_status.get(c, False) for c in components) / len(components)
-            print(f"\nOverall Readiness: {overall_score:.1%}")
-            print("Complete Navigation: ✅ READY")
-            print("All 6 Analytical Perspectives: ✅ ACCESSIBLE")
-
-            return 0 if overall_score >= 0.67 else 1
-        else:
-            dashboard_app.run_server()
-            return 0
+        app = create_app(debug=args.debug, port=args.port, host=args.host)
+        app.run_server()
+        return 0
 
     except KeyboardInterrupt:
-        print("\n🛑 Complete dashboard stopped")
+        print("\n🛑 Dashboard stopped")
         return 0
     except Exception as e:
         print(f"Error: {e}")
@@ -443,16 +291,13 @@ def main():
 if __name__ == "__main__":
     exit(main())
 
-# Production WSGI export
+# Production WSGI
 try:
-    dashboard_instance = create_dashboard_app()
-    app = dashboard_instance.app
+    production_app = create_app()
+    app = production_app.app
     server = app.server
 except Exception as e:
     print(f"Production app creation failed: {e}")
     app = dash.Dash(__name__)
-    app.layout = html.Div([
-        html.H1("Complete Dashboard Error"),
-        html.P(f"Failed to initialize: {str(e)}")
-    ])
+    app.layout = html.Div("Production initialization failed")
     server = app.server

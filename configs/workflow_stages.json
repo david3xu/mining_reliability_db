@@ -1,110 +1,303 @@
 {
-  "display_config": {
-    "default_max_fields": 6,
-    "default_card_height": "300px",
-    "default_header_bg_opacity": 0.3,
-    "default_show_description": false,
-    "font_sizes": {
-      "stage_number": "14px",
-      "title": "18px",
-      "field_count": "14px",
-      "field_list": "11px",
-      "description": "12px"
-    },
-    "card_style": {
-      "field_line_height": "1.3",
-      "completion_rate_padding": "5px 10px",
-      "completion_rate_border_radius": "10px"
-    }
+  "workflow_version": "2.0.0",
+  "architecture_compliance": "workflow_processor_optimized",
+  "metadata": {
+    "last_updated": "2024-01-15",
+    "cache_ttl_seconds": 1800,
+    "component_optimized": true,
+    "micro_component_support": true
   },
   "workflow_stages": [
     {
       "stage_number": 1,
       "entity_name": "ActionRequest",
-      "title": "Action Request",
-      "description": "Initial incident or problem report",
-      "color": "#4A90E2",
-      "max_fields_to_display": 6,
-      "card_min_height": "300px",
-      "header_bg_opacity": 0.3,
-      "show_description": true,
+      "title": "Incident Reporting",
+      "adapter_config": {
+        "primary_adapter": "data_adapter",
+        "access_method": "get_portfolio_metrics",
+        "performance_priority": "high"
+      },
+      "component_config": {
+        "micro_component": "workflow_stage",
+        "card_color": "#4A90E2",
+        "card_min_height": "300px",
+        "header_bg_opacity": 0.3,
+        "show_description": true
+      },
       "business_fields": [
-        "action_request_number",
-        "title",
-        "initiation_date",
-        "categories",
-        "action_types"
+        "Action Request Number",
+        "Date Opened",
+        "Description",
+        "Categories",
+        "Facility"
       ],
-      "process_fields": [
-        "requested_response_time",
-        "past_due_status",
-        "stage",
-        "operating_centre"
-      ]
+      "intelligence_config": {
+        "completion_weight": 0.2,
+        "quality_indicators": ["Description"],
+        "temporal_analysis": true,
+        "facility_grouping": true
+      },
+      "workflow_processor_config": {
+        "entry_point": true,
+        "completion_dependency": null,
+        "business_impact": 0.2,
+        "stage_type": "initiation"
+      }
     },
     {
       "stage_number": 2,
       "entity_name": "Problem",
-      "title": "Problem Identification",
-      "description": "Detailed problem statement",
-      "color": "#7ED321",
-      "max_fields_to_display": 6,
-      "card_min_height": "300px",
-      "header_bg_opacity": 0.25,
-      "show_description": true,
-      "business_fields": ["what_happened"],
-      "process_fields": ["requirement"]
+      "title": "Problem Definition",
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_method": "get_workflow_business_analysis_neo4j",
+        "dependency_check": "ActionRequest"
+      },
+      "component_config": {
+        "micro_component": "workflow_stage",
+        "card_color": "#F5A623",
+        "card_min_height": "300px",
+        "header_bg_opacity": 0.3,
+        "show_description": true
+      },
+      "business_fields": [
+        "Problem Number",
+        "Problem Statement",
+        "Problem Type",
+        "Action Request Number"
+      ],
+      "intelligence_config": {
+        "completion_weight": 0.25,
+        "quality_indicators": ["Problem Statement"],
+        "categorical_analysis": ["Problem Type"],
+        "dependency_tracking": true
+      },
+      "workflow_processor_config": {
+        "entry_point": false,
+        "completion_dependency": "ActionRequest",
+        "business_impact": 0.25,
+        "stage_type": "analysis"
+      }
     },
     {
       "stage_number": 3,
       "entity_name": "RootCause",
-      "title": "Root Cause Analysis",
-      "description": "Investigation and causal factors",
-      "color": "#F5A623",
-      "max_fields_to_display": 6,
-      "card_min_height": "300px",
-      "header_bg_opacity": 0.35,
-      "show_description": true,
-      "business_fields": ["root_cause", "root_cause_tail"],
-      "process_fields": ["objective_evidence"]
+      "title": "Causal Analysis",
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_method": "get_complete_workflow_analysis",
+        "causal_intelligence": true
+      },
+      "component_config": {
+        "micro_component": "workflow_stage",
+        "card_color": "#7ED321",
+        "card_min_height": "320px",
+        "header_bg_opacity": 0.3,
+        "show_description": true,
+        "highlight_causal": true
+      },
+      "business_fields": [
+        "Root Cause Number",
+        "Root Cause",
+        "Root Cause Tail",
+        "Problem Number"
+      ],
+      "intelligence_config": {
+        "completion_weight": 0.3,
+        "causal_analysis": true,
+        "pattern_detection": true,
+        "frequency_analysis": true
+      },
+      "workflow_processor_config": {
+        "entry_point": false,
+        "completion_dependency": "Problem",
+        "business_impact": 0.3,
+        "stage_type": "causal_analysis",
+        "intelligence_priority": "high"
+      }
     },
     {
       "stage_number": 4,
       "entity_name": "ActionPlan",
-      "title": "Action Planning",
-      "description": "Corrective actions and implementation plan",
-      "color": "#B57EDC",
-      "max_fields_to_display": 8,
-      "card_min_height": "320px",
-      "header_bg_opacity": 0.4,
-      "show_description": true,
+      "title": "Resolution Planning",
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_method": "get_workflow_business_analysis_neo4j",
+        "dependency_check": "RootCause"
+      },
+      "component_config": {
+        "micro_component": "workflow_stage",
+        "card_color": "#B57EDC",
+        "card_min_height": "300px",
+        "header_bg_opacity": 0.3,
+        "show_description": true
+      },
       "business_fields": [
-        "action_plan",
-        "recommended_action",
-        "immediate_containment",
-        "due_date"
+        "Action Plan Number",
+        "Action Plan",
+        "Root Cause Number"
       ],
-      "process_fields": [
-        "complete",
-        "completion_date",
-        "comments",
-        "response_date",
-        "response_revision_date",
-        "did_plan_require_strategy_change"
-      ]
+      "intelligence_config": {
+        "completion_weight": 0.15,
+        "quality_indicators": ["Action Plan"],
+        "solution_tracking": true
+      },
+      "workflow_processor_config": {
+        "entry_point": false,
+        "completion_dependency": "RootCause",
+        "business_impact": 0.15,
+        "stage_type": "solution"
+      }
     },
     {
       "stage_number": 5,
       "entity_name": "Verification",
-      "title": "Verification & Closure",
-      "description": "Effectiveness review and closure decision",
-      "color": "#D0021B",
-      "max_fields_to_display": 4,
-      "card_min_height": "280px",
-      "header_bg_opacity": 0.45,
-      "show_description": true,
-      "business_fields": ["is_action_plan_effective"],
-      "process_fields": ["action_plan_eval_comment"]
+      "title": "Effectiveness Check",
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_method": "get_workflow_business_analysis_neo4j",
+        "completion_tracking": true
+      },
+      "component_config": {
+        "micro_component": "workflow_stage",
+        "card_color": "#D32F2F",
+        "card_min_height": "280px",
+        "header_bg_opacity": 0.3,
+        "show_description": true,
+        "final_stage": true
+      },
+      "business_fields": [
+        "Verification Number",
+        "Verification Result",
+        "Action Plan Number"
+      ],
+      "intelligence_config": {
+        "completion_weight": 0.1,
+        "final_stage": true,
+        "completion_indicator": true,
+        "effectiveness_tracking": true
+      },
+      "workflow_processor_config": {
+        "entry_point": false,
+        "completion_dependency": "ActionPlan",
+        "business_impact": 0.1,
+        "stage_type": "verification",
+        "final_stage": true
+      }
     }
-  ]
+  ],
+  "display_config": {
+    "layout_optimization": {
+      "responsive_breakpoints": {
+        "mobile": "768px",
+        "tablet": "1024px",
+        "desktop": "1200px"
+      },
+      "grid_system": {
+        "columns": 5,
+        "gap": "20px",
+        "card_aspect_ratio": "4:3"
+      }
+    },
+    "visual_design": {
+      "card_border_radius": "8px",
+      "card_shadow": "0 4px 6px rgba(0, 0, 0, 0.1)",
+      "header_font_weight": "bold",
+      "transition_duration": "0.3s"
+    },
+    "interaction_config": {
+      "hover_effects": true,
+      "click_navigation": false,
+      "tooltip_enabled": true,
+      "progress_indicators": true
+    },
+    "connection_display": {
+      "show_arrows": true,
+      "arrow_color": "#666666",
+      "arrow_thickness": "2px",
+      "connection_style": "curved"
+    }
+  },
+  "adapter_integration": {
+    "workflow_processor_methods": {
+      "stage_analysis": "analyze_workflow_schema",
+      "completion_tracking": "process_workflow_business_analysis",
+      "field_distribution": "analyze_entity_field_distribution",
+      "mapping_analysis": "analyze_field_mappings"
+    },
+    "data_flow_optimization": {
+      "batch_stage_queries": true,
+      "parallel_completion_check": true,
+      "cache_stage_results": true,
+      "precompute_dependencies": true
+    },
+    "performance_targets": {
+      "stage_load_time_ms": 100,
+      "completion_calc_time_ms": 50,
+      "workflow_render_time_ms": 200
+    }
+  },
+  "intelligence_engine_integration": {
+    "completion_analysis": {
+      "algorithm": "weighted_completion",
+      "quality_factors": [
+        "field_completeness",
+        "dependency_satisfaction",
+        "business_impact_weight"
+      ],
+      "threshold_excellent": 0.9,
+      "threshold_good": 0.7,
+      "threshold_acceptable": 0.5
+    },
+    "pattern_detection": {
+      "stage_bottlenecks": true,
+      "completion_trends": true,
+      "quality_regression": true
+    },
+    "predictive_analytics": {
+      "completion_prediction": true,
+      "bottleneck_forecasting": true,
+      "quality_trajectory": true
+    }
+  },
+  "component_micro_architecture": {
+    "workflow_stage_component": {
+      "function_size_limit": 18,
+      "single_responsibility": "stage_display",
+      "adapter_dependency": "workflow_adapter",
+      "config_dependency": "config_adapter"
+    },
+    "composition_pattern": {
+      "stage_cards": "micro_components",
+      "connection_arrows": "pure_css",
+      "progress_indicators": "calculated_values",
+      "layout_grid": "responsive_flexbox"
+    }
+  },
+  "validation_config": {
+    "stage_integrity": {
+      "required_stages": ["ActionRequest", "Problem", "RootCause"],
+      "stage_sequence_validation": true,
+      "dependency_chain_check": true
+    },
+    "performance_validation": {
+      "max_stage_count": 10,
+      "max_fields_per_stage": 15,
+      "max_render_time_ms": 500
+    },
+    "adapter_compliance": {
+      "required_adapter_methods": [
+        "get_workflow_business_analysis_neo4j",
+        "get_complete_workflow_analysis"
+      ],
+      "response_format_validation": true
+    }
+  },
+  "feature_flags": {
+    "advanced_workflow_analysis": true,
+    "real_time_completion_tracking": true,
+    "predictive_bottleneck_detection": false,
+    "interactive_stage_drilling": true,
+    "workflow_performance_optimization": true
+  }
 }

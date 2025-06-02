@@ -1,4 +1,12 @@
 {
+  "analysis_version": "2.0.0",
+  "architecture_compliance": "adapter_integrated",
+  "metadata": {
+    "last_updated": "2024-01-15",
+    "cache_ttl_seconds": 900,
+    "adapter_integration": true,
+    "validation_framework": true
+  },
   "completion_thresholds": {
     "very_low": 20,
     "low": 40,
@@ -30,16 +38,240 @@
     "margin_left": 200,
     "margin_right": 50,
     "margin_top": 60,
-    "margin_bottom": 50
+    "margin_bottom": 50,
+    "adapter_optimization": {
+      "chart_base_integration": true,
+      "config_adapter_styling": true,
+      "responsive_chart_sizing": true,
+      "performance_optimization": true
+    }
   },
   "exclusions": {
     "exclude_complete_fields": true,
     "minimum_completion_threshold": 0,
-    "exclude_system_fields": ["id", "created_at", "updated_at", "node_type"]
+    "exclude_system_fields": ["id", "created_at", "updated_at", "node_type"],
+    "adapter_exclusions": {
+      "exclude_adapter_metadata": true,
+      "exclude_cache_fields": true,
+      "exclude_technical_fields": true
+    }
   },
   "analysis_config": {
     "max_records_to_analyze": 10000,
     "include_null_values": false,
-    "case_sensitive_matching": false
+    "case_sensitive_matching": false,
+    "adapter_analysis_config": {
+      "parallel_field_analysis": true,
+      "batch_processing_enabled": true,
+      "incremental_analysis": true,
+      "real_time_updates": false
+    }
+  },
+  "adapter_integration": {
+    "data_quality_analysis": {
+      "primary_adapter": "data_adapter",
+      "analysis_methods": [
+        "get_portfolio_metrics",
+        "get_facility_breakdown",
+        "get_field_distribution"
+      ],
+      "quality_scoring_integration": true,
+      "metadata_analysis": true
+    },
+    "workflow_quality_analysis": {
+      "primary_adapter": "workflow_adapter",
+      "analysis_methods": [
+        "get_workflow_schema_analysis",
+        "get_entity_field_distribution",
+        "get_field_mapping_analysis"
+      ],
+      "stage_completion_analysis": true,
+      "mapping_quality_assessment": true
+    },
+    "facility_quality_analysis": {
+      "primary_adapter": "facility_adapter",
+      "analysis_methods": [
+        "get_facility_performance_analysis",
+        "get_facility_statistics_analysis"
+      ],
+      "facility_comparison_quality": true,
+      "causal_data_quality": true
+    }
+  },
+  "intelligence_engine_integration": {
+    "quality_intelligence": {
+      "completeness_scoring": {
+        "algorithm": "weighted_completeness",
+        "weight_factors": {
+          "critical_fields": 0.4,
+          "high_priority_fields": 0.3,
+          "medium_priority_fields": 0.2,
+          "low_priority_fields": 0.1
+        },
+        "quality_grade_thresholds": {
+          "excellent": 0.9,
+          "good": 0.8,
+          "acceptable": 0.7,
+          "poor": 0.5
+        }
+      },
+      "pattern_analysis": {
+        "missing_data_patterns": true,
+        "completion_trends": true,
+        "quality_correlation": true,
+        "anomaly_detection": false
+      },
+      "predictive_quality": {
+        "quality_forecasting": false,
+        "completion_prediction": false,
+        "data_decay_modeling": false
+      }
+    }
+  },
+  "component_integration": {
+    "data_quality_components": {
+      "quality_metrics_cards": {
+        "adapter_data_source": "data_adapter.get_portfolio_metrics",
+        "micro_component": "metric_card",
+        "styling_source": "config_adapter.get_metric_card_styling"
+      },
+      "field_completeness_chart": {
+        "adapter_data_source": "data_adapter.get_field_distribution",
+        "micro_component": "chart_base.create_bar_chart",
+        "styling_source": "config_adapter.get_chart_styling_template"
+      },
+      "facility_quality_comparison": {
+        "adapter_data_source": "facility_adapter.get_facility_statistics_analysis",
+        "micro_component": "chart_base.create_bar_chart",
+        "color_mapping": "completion_colors"
+      },
+      "quality_summary_table": {
+        "adapter_data_source": "facility_adapter.get_facility_list",
+        "micro_component": "table_base.create_data_table",
+        "conditional_formatting": "completion_colors"
+      }
+    }
+  },
+  "validation_framework": {
+    "field_analysis_validation": {
+      "completeness_validation": {
+        "minimum_field_coverage": 0.5,
+        "required_field_validation": true,
+        "missing_data_threshold": 0.3,
+        "quality_score_validation": true
+      },
+      "data_integrity_validation": {
+        "field_type_consistency": true,
+        "value_format_validation": true,
+        "relationship_integrity": true,
+        "temporal_consistency": true
+      },
+      "adapter_compliance_validation": {
+        "adapter_method_validation": true,
+        "data_contract_compliance": true,
+        "response_format_validation": true,
+        "error_handling_validation": true
+      }
+    },
+    "performance_validation": {
+      "analysis_performance_thresholds": {
+        "max_analysis_time_ms": 5000,
+        "max_memory_usage_mb": 100,
+        "max_concurrent_analyses": 3
+      },
+      "component_rendering_validation": {
+        "chart_render_time_ms": 1000,
+        "table_render_time_ms": 500,
+        "card_render_time_ms": 200
+      }
+    }
+  },
+  "caching_optimization": {
+    "analysis_result_caching": {
+      "field_analysis_cache_ttl": 1800,
+      "quality_score_cache_ttl": 3600,
+      "completion_stats_cache_ttl": 900,
+      "component_data_cache_ttl": 600
+    },
+    "cache_invalidation": {
+      "auto_invalidation": true,
+      "data_change_triggers": true,
+      "manual_cache_clearing": true,
+      "cache_warming": false
+    }
+  },
+  "reporting_framework": {
+    "quality_reporting": {
+      "automated_quality_reports": {
+        "enabled": false,
+        "report_frequency": "weekly",
+        "report_format": "json",
+        "include_trends": true
+      },
+      "quality_alerts": {
+        "enabled": true,
+        "quality_degradation_threshold": 0.1,
+        "missing_data_threshold": 0.2,
+        "alert_cooldown_hours": 24
+      }
+    },
+    "export_capabilities": {
+      "quality_data_export": {
+        "formats": ["csv", "json", "excel"],
+        "include_metadata": true,
+        "include_analysis_details": true
+      }
+    }
+  },
+  "advanced_analysis": {
+    "field_relationship_analysis": {
+      "cross_field_correlation": false,
+      "field_dependency_analysis": false,
+      "completion_impact_analysis": true
+    },
+    "temporal_quality_analysis": {
+      "quality_trends_over_time": false,
+      "seasonal_quality_patterns": false,
+      "completion_rate_trends": true
+    },
+    "facility_quality_comparison": {
+      "inter_facility_quality_ranking": true,
+      "quality_disparity_analysis": true,
+      "facility_benchmark_analysis": true
+    }
+  },
+  "accessibility_support": {
+    "visual_accessibility": {
+      "color_blind_friendly_colors": true,
+      "high_contrast_mode_support": false,
+      "alternative_color_schemes": true
+    },
+    "data_accessibility": {
+      "screen_reader_friendly_tables": true,
+      "alternative_text_for_charts": true,
+      "keyboard_navigation_support": true
+    }
+  },
+  "monitoring_and_alerting": {
+    "quality_monitoring": {
+      "continuous_quality_monitoring": true,
+      "quality_threshold_monitoring": true,
+      "completion_rate_tracking": true
+    },
+    "performance_monitoring": {
+      "analysis_performance_tracking": true,
+      "component_performance_monitoring": true,
+      "adapter_response_time_tracking": true
+    }
+  },
+  "feature_flags": {
+    "advanced_quality_analytics": true,
+    "real_time_quality_monitoring": false,
+    "predictive_quality_modeling": false,
+    "automated_quality_reporting": false,
+    "quality_alerting": true,
+    "performance_optimization": true,
+    "accessibility_enhancements": true,
+    "experimental_analysis": false
   }
 }

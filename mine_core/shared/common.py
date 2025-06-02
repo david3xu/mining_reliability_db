@@ -72,6 +72,10 @@ def handle_error(logger: logging.Logger, error: Exception, context: str) -> None
     """Standardized error handling and logging"""
     logger.error(f"Error in {context}: {error}")
 
+def get_logger(name: str = None) -> logging.Logger:
+    """Get a logger instance for the specified module"""
+    return setup_logging(name=name)
+
 def ensure_directory(path: Path) -> Path:
     """Ensure directory exists, create if necessary"""
     path.mkdir(parents=True, exist_ok=True)
