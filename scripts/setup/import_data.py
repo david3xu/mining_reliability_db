@@ -5,6 +5,7 @@ Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
+from pathlib import Path
 
 from configs.environment import get_data_dir
 from mine_core.database.db import close_database, get_database
@@ -95,7 +96,10 @@ def main():
         get_database(args.uri, args.user, args.password)
 
         # Use unified configuration gateway for data directory
-        data_dir = args.data_dir or get_data_dir()
+        base_data_dir = args.data_dir or get_data_dir()
+        # Ensure we include the facility_data subdirectory
+        data_dir = Path(base_data_dir) / "facility_data" if not args.data_dir else base_data_dir
+
         db_config = (
             (args.uri, args.user, args.password)
             if any([args.uri, args.user, args.password])

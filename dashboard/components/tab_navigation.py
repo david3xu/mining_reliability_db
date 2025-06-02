@@ -9,6 +9,16 @@ from dash import dcc, html
 
 from dashboard.adapters import get_config_adapter
 
+__all__ = [
+    "create_tab_navigation",
+    "create_tab_container",
+    "create_breadcrumb_navigation",
+    "get_tab_content_id",
+    "get_tab_metadata",
+    "create_tab_header",
+    "create_page_header",
+]
+
 
 def create_tab_navigation(active_tab: str = "portfolio") -> dbc.Tabs:
     """Professional tab navigation interface"""

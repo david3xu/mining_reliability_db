@@ -10,11 +10,10 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 # Pure adapter dependencies - no direct core/config access
-from dashboard.adapters import get_data_adapter
+from dashboard.adapters import get_config_adapter, get_data_adapter
 from dashboard.components.micro.chart_base import create_bar_chart, create_pie_chart
 from dashboard.components.micro.metric_card import create_metric_card
 from dashboard.components.micro.table_base import create_data_table
-from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +26,6 @@ __all__ = [
     "create_historical_records_page",
     "create_facilities_distribution_page",
     "create_data_types_distribution_page",
-    # Legacy compatibility functions
-    "create_metrics_cards",
-    "create_facility_pie_chart",
-    "create_field_distribution_chart",
-    "create_historical_table",
-    "create_portfolio_layout",
 ]
 
 
@@ -40,6 +33,7 @@ def create_metrics_section() -> html.Div:
     """Pure metrics display - 12 lines"""
     try:
         adapter = get_data_adapter()
+        config_adapter = get_config_adapter()
         portfolio_data = adapter.get_portfolio_metrics()
 
         metrics = [
@@ -63,7 +57,7 @@ def create_metrics_section() -> html.Div:
             className="p-4 bg-dark text-white rounded",
         )
     except Exception as e:
-        handle_error(logger, e, "metrics section creation")
+        config_adapter.handle_error_utility(logger, e, "metrics section creation")
         return html.Div("Metrics unavailable")
 
 
@@ -71,10 +65,11 @@ def create_facility_chart() -> dcc.Graph:
     """Pure facility chart - 8 lines"""
     try:
         adapter = get_data_adapter()
+        config_adapter = get_config_adapter()
         facility_data = adapter.get_facility_breakdown()
         return create_pie_chart(facility_data.labels, facility_data.values, "Facility Distribution")
     except Exception as e:
-        handle_error(logger, e, "facility chart creation")
+        config_adapter.handle_error_utility(logger, e, "facility chart creation")
         return dcc.Graph(figure={})
 
 
@@ -82,10 +77,11 @@ def create_field_chart() -> dcc.Graph:
     """Pure field chart - 8 lines"""
     try:
         adapter = get_data_adapter()
+        config_adapter = get_config_adapter()
         field_data = adapter.get_field_distribution()
         return create_bar_chart(field_data.labels, field_data.values, "Data Types Distribution")
     except Exception as e:
-        handle_error(logger, e, "field chart creation")
+        config_adapter.handle_error_utility(logger, e, "field chart creation")
         return dcc.Graph(figure={})
 
 
@@ -93,10 +89,11 @@ def create_timeline_table() -> any:
     """Pure timeline table - 10 lines"""
     try:
         adapter = get_data_adapter()
+        config_adapter = get_config_adapter()
         timeline_data = adapter.get_historical_timeline()
         return create_data_table(timeline_data.rows, timeline_data.columns, "timeline-table")
     except Exception as e:
-        handle_error(logger, e, "timeline table creation")
+        config_adapter.handle_error_utility(logger, e, "timeline table creation")
         return html.Div("Timeline unavailable")
 
 
@@ -104,6 +101,7 @@ def create_complete_dashboard() -> html.Div:
     """Main dashboard composition - 18 lines"""
     try:
         adapter = get_data_adapter()
+        config_adapter = get_config_adapter()
         validation = adapter.validate_data_availability()
 
         if not validation.is_valid:
@@ -124,13 +122,14 @@ def create_complete_dashboard() -> html.Div:
             className="container-fluid p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "complete dashboard creation")
+        config_adapter.handle_error_utility(logger, e, "complete dashboard creation")
         return dbc.Alert("Dashboard creation failed", color="danger")
 
 
 def create_historical_records_page() -> html.Div:
     """Historical records analysis page - 15 lines"""
     try:
+        config_adapter = get_config_adapter()
         return html.Div(
             [
                 dbc.Container(
@@ -151,13 +150,14 @@ def create_historical_records_page() -> html.Div:
             className="p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "historical records page creation")
+        config_adapter.handle_error_utility(logger, e, "historical records page creation")
         return dbc.Alert("Historical records unavailable", color="danger")
 
 
 def create_facilities_distribution_page() -> html.Div:
     """Facilities distribution page - 15 lines"""
     try:
+        config_adapter = get_config_adapter()
         return html.Div(
             [
                 dbc.Container(
@@ -178,13 +178,14 @@ def create_facilities_distribution_page() -> html.Div:
             className="p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "facilities distribution page creation")
+        config_adapter.handle_error_utility(logger, e, "facilities distribution page creation")
         return dbc.Alert("Facilities distribution unavailable", color="danger")
 
 
 def create_data_types_distribution_page() -> html.Div:
     """Data types distribution page - 15 lines"""
     try:
+        config_adapter = get_config_adapter()
         return html.Div(
             [
                 dbc.Container(
@@ -205,31 +206,5 @@ def create_data_types_distribution_page() -> html.Div:
             className="p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "data types distribution page creation")
+        config_adapter.handle_error_utility(logger, e, "data types distribution page creation")
         return dbc.Alert("Data types distribution unavailable", color="danger")
-
-
-# Legacy compatibility functions
-def create_metrics_cards() -> html.Div:
-    """Legacy compatibility"""
-    return create_metrics_section()
-
-
-def create_facility_pie_chart() -> dcc.Graph:
-    """Legacy compatibility"""
-    return create_facility_chart()
-
-
-def create_field_distribution_chart() -> dcc.Graph:
-    """Legacy compatibility"""
-    return create_field_chart()
-
-
-def create_historical_table() -> any:
-    """Legacy compatibility"""
-    return create_timeline_table()
-
-
-def create_portfolio_layout() -> html.Div:
-    """Legacy compatibility"""
-    return create_complete_dashboard()

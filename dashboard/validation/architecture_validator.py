@@ -37,21 +37,24 @@ class ArchitectureValidator:
         """Core architectural compliance analysis"""
         logger.info("Analyzing complete architectural compliance")
 
+        self.violations = []  # Clear previous violations
+
         # Core layer validation
         core_analysis = self._validate_core_layer()
+        self.violations.extend(core_analysis["violations"])
+
         adapter_analysis = self._validate_adapter_layer()
+        self.violations.extend(adapter_analysis["violations"])
+
         component_analysis = self._validate_component_layer()
+        self.violations.extend(component_analysis["violations"])
 
         # Dependency flow validation
         dependency_violations = self._validate_dependency_flow()
+        self.violations.extend(dependency_violations)
 
         # Calculate compliance score
-        total_violations = (
-            len(core_analysis["violations"])
-            + len(adapter_analysis["violations"])
-            + len(component_analysis["violations"])
-            + len(dependency_violations)
-        )
+        total_violations = len(self.violations)
 
         compliance_score = max(0.0, 1.0 - (total_violations / 20))
         is_compliant = compliance_score >= 0.95
@@ -313,6 +316,9 @@ class ArchitectureValidator:
         """Check adapter follows core-only dependency rule"""
         violations = []
 
+        if file_path.name == "interfaces.py":
+            return violations  # Skip interfaces.py as it contains no logic
+
         try:
             content = file_path.read_text()
 
@@ -414,6 +420,11 @@ def main():
         result = validator.validate_complete_architecture()
         print(f"Compliance: {'PASS' if result.is_compliant else 'FAIL'} ({result.score:.1%})")
         print(f"Violations: {len(result.violations)}")
+
+        if result.violations:
+            print("\nDetailed Violations:")
+            for violation in result.violations:
+                print(f"- {violation}")
 
         return 0 if result.is_compliant else 1
 

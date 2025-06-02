@@ -36,6 +36,8 @@ class FacilityDataExtractor:
             return []
 
         json_files = list(self.data_dir.glob("*.json"))
+        # Extract facility IDs from all JSON files
+        # We'll handle different data formats during extraction
         facilities = [f.stem for f in json_files]
 
         logger.info(f"Found {len(facilities)} files: {facilities}")

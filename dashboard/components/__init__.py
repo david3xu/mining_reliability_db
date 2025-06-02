@@ -22,6 +22,16 @@ from dashboard.components.facility_detail import (
     create_recurring_issues_analysis,
 )
 
+# Interactive Elements
+from dashboard.components.interactive_elements import (
+    create_interactive_bar_chart,
+    create_interactive_data_table,
+    create_interactive_metric_card,
+    create_interactive_pie_chart,
+    create_loading_overlay,
+    create_navigation_toast,
+)
+
 # Layout Infrastructure
 from dashboard.components.layout_template import (
     create_main_grid,
@@ -50,6 +60,15 @@ from dashboard.components.portfolio_overview import (
     create_historical_records_page,
     create_metrics_section,
     create_timeline_table,
+)
+
+# Navigation Components
+from dashboard.components.tab_navigation import (
+    create_breadcrumb_navigation,
+    create_page_header,
+    create_tab_container,
+    create_tab_navigation,
+    get_tab_content_id,
 )
 
 # Atomized Workflow Components
@@ -91,6 +110,19 @@ __all__ = [
     "create_facility_category_chart",
     "create_recurring_issues_analysis",
     "create_operating_centre_table",
+    # Interactive Elements
+    "create_interactive_metric_card",
+    "create_interactive_pie_chart",
+    "create_interactive_bar_chart",
+    "create_interactive_data_table",
+    "create_navigation_toast",
+    "create_loading_overlay",
+    # Navigation Components
+    "create_tab_navigation",
+    "create_tab_container",
+    "create_breadcrumb_navigation",
+    "get_tab_content_id",
+    "create_page_header",
     # Layout Infrastructure
     "create_standard_layout",
     "create_metric_card",
@@ -107,17 +139,3 @@ __all__ = [
     "create_workflow_stage_card",
     "create_facility_summary_card",
 ]
-
-# Legacy Compatibility Aliases
-create_enhanced_field_distribution_chart = create_field_chart
-create_enhanced_facility_pie_chart = create_facility_chart
-create_enhanced_historical_table = create_timeline_table
-create_metrics_cards = create_metrics_section
-create_field_distribution_chart = create_field_chart
-create_facility_pie_chart = create_facility_chart
-create_historical_table = create_timeline_table
-create_portfolio_layout = create_complete_dashboard
-create_workflow_metrics_cards = create_workflow_metrics
-create_process_flow_diagram = create_process_flow
-create_stage_field_distribution = create_entity_distribution_chart
-create_workflow_mapping_table = create_mapping_table

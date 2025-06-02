@@ -11,7 +11,6 @@ from dash import dash_table, dcc, html
 
 from dashboard.adapters import get_config_adapter, get_data_adapter
 from dashboard.components.layout_template import create_metric_card, create_standard_layout
-from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ def create_quality_metrics_cards() -> list:
         return cards
 
     except Exception as e:
-        handle_error(logger, e, "quality metrics cards creation")
+        config_adapter.handle_error_utility(logger, e, "quality metrics cards creation")
         return []
 
 
@@ -109,7 +108,7 @@ def create_field_completeness_chart() -> dcc.Graph:
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        handle_error(logger, e, "field completeness chart creation")
+        config_adapter.handle_error_utility(logger, e, "field completeness chart creation")
         return dcc.Graph(figure={})
 
 
@@ -152,7 +151,7 @@ def create_facility_quality_comparison() -> dcc.Graph:
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        handle_error(logger, e, "facility quality comparison creation")
+        config_adapter.handle_error_utility(logger, e, "facility quality comparison creation")
         return dcc.Graph(figure={})
 
 
@@ -223,13 +222,14 @@ def create_quality_summary_table() -> dash_table.DataTable:
         )
 
     except Exception as e:
-        handle_error(logger, e, "quality summary table creation")
+        config_adapter.handle_error_utility(logger, e, "quality summary table creation")
         return dash_table.DataTable(data=[])
 
 
 def create_data_quality_layout() -> html.Div:
     """Complete data quality layout using adapter pattern"""
     try:
+        config_adapter = get_config_adapter()
         return create_standard_layout(
             tab_id="quality",
             metric_cards=create_quality_metrics_cards(),
@@ -240,7 +240,7 @@ def create_data_quality_layout() -> html.Div:
         )
 
     except Exception as e:
-        handle_error(logger, e, "data quality layout creation")
+        config_adapter.handle_error_utility(logger, e, "data quality layout creation")
         return html.Div(
             [
                 html.H3("Data Quality Analysis Error"),

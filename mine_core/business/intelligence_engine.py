@@ -408,50 +408,6 @@ class IntelligenceEngine:
 
         return (pattern_score + diversity_score) / 2
 
-    def _calculate_quality_metrics(self, completion_data: Dict) -> Dict[str, Any]:
-        """Calculate comprehensive quality metrics"""
-        total = completion_data.get("total_requests", 0)
-
-        if total == 0:
-            return {"overall_quality": 0.0}
-
-        metrics = {
-            "problem_definition_rate": completion_data.get("problems_defined", 0) / total,
-            "causal_analysis_rate": completion_data.get("causes_analyzed", 0) / total,
-            "action_planning_rate": completion_data.get("plans_developed", 0) / total,
-            "verification_rate": completion_data.get("plans_verified", 0) / total,
-        }
-
-        metrics["overall_quality"] = sum(metrics.values()) / len(metrics)
-
-        return metrics
-
-    def _analyze_entity_completeness(self) -> Dict[str, Any]:
-        """Analyze completeness across entities"""
-        entity_names = get_entity_names()
-        entity_analysis = {}
-
-        for entity_name in entity_names:
-            count = self.query_manager.get_entity_count(entity_name)
-            entity_analysis[entity_name] = {"count": count, "has_data": count > 0}
-
-        return entity_analysis
-
-    def _generate_quality_recommendations(self, quality_metrics: Dict) -> List[str]:
-        """Generate quality improvement recommendations"""
-        recommendations = []
-
-        if quality_metrics.get("problem_definition_rate", 0) < 0.8:
-            recommendations.append("Improve problem definition documentation")
-
-        if quality_metrics.get("causal_analysis_rate", 0) < 0.6:
-            recommendations.append("Enhance root cause analysis processes")
-
-        if quality_metrics.get("verification_rate", 0) < 0.5:
-            recommendations.append("Strengthen action plan verification procedures")
-
-        return recommendations
-
     def _create_empty_result(self, analysis_type: str) -> IntelligenceResult:
         """Create empty result for error cases"""
         return IntelligenceResult(

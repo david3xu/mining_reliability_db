@@ -10,20 +10,29 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 # Pure adapter dependencies
-from dashboard.adapters import get_workflow_adapter
+from dashboard.adapters import get_config_adapter, get_workflow_adapter
 from dashboard.components.micro.chart_base import create_bar_chart
 from dashboard.components.micro.metric_card import create_metric_card
 from dashboard.components.micro.table_base import create_data_table
 from dashboard.components.micro.workflow_stage import create_workflow_stage_card
-from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
+__all__ = [
+    "create_workflow_metrics",
+    "create_process_flow",
+    "create_entity_distribution_chart",
+    "create_mapping_table",
+    "create_workflow_analysis_layout",
+    "create_workflow_process_page",
+]
 
 
 def create_workflow_metrics() -> html.Div:
     """Pure workflow metrics - 15 lines"""
     try:
         adapter = get_workflow_adapter()
+        config_adapter = get_config_adapter()
         schema_data = adapter.get_workflow_schema_analysis()
         mapping_data = adapter.get_field_mapping_counts()
 
@@ -43,7 +52,7 @@ def create_workflow_metrics() -> html.Div:
             ]
         )
     except Exception as e:
-        handle_error(logger, e, "workflow metrics creation")
+        config_adapter.handle_error_utility(logger, e, "workflow metrics creation")
         return html.Div("Workflow metrics unavailable")
 
 
@@ -51,6 +60,7 @@ def create_process_flow() -> html.Div:
     """Pure process flow diagram - 18 lines"""
     try:
         adapter = get_workflow_adapter()
+        config_adapter = get_config_adapter()
         workflow_data = adapter.get_workflow_business_analysis_neo4j()
 
         if not workflow_data.get("workflow_stages"):
@@ -80,7 +90,7 @@ def create_process_flow() -> html.Div:
             ]
         )
     except Exception as e:
-        handle_error(logger, e, "process flow creation")
+        config_adapter.handle_error_utility(logger, e, "process flow creation")
         return html.Div("Process flow unavailable")
 
 
@@ -88,6 +98,7 @@ def create_entity_distribution_chart() -> dcc.Graph:
     """Pure entity distribution chart - 10 lines"""
     try:
         adapter = get_workflow_adapter()
+        config_adapter = get_config_adapter()
         entity_data = adapter.get_entity_field_distribution()
 
         if not entity_data.get("entity_names"):
@@ -97,7 +108,7 @@ def create_entity_distribution_chart() -> dcc.Graph:
             entity_data["entity_names"], entity_data["field_counts"], "Entity Field Distribution"
         )
     except Exception as e:
-        handle_error(logger, e, "entity distribution chart creation")
+        config_adapter.handle_error_utility(logger, e, "entity distribution chart creation")
         return dcc.Graph(figure={})
 
 
@@ -105,6 +116,7 @@ def create_mapping_table() -> any:
     """Pure mapping analysis table - 12 lines"""
     try:
         adapter = get_workflow_adapter()
+        config_adapter = get_config_adapter()
         mapping_data = adapter.get_field_mapping_analysis()
 
         if not mapping_data.get("mappings"):
@@ -126,7 +138,7 @@ def create_mapping_table() -> any:
             table_data, ["Entity", "Target Field", "Source Field", "Category", "Critical"]
         )
     except Exception as e:
-        handle_error(logger, e, "mapping table creation")
+        config_adapter.handle_error_utility(logger, e, "mapping table creation")
         return html.Div("Mapping table unavailable")
 
 
@@ -134,6 +146,7 @@ def create_workflow_analysis_layout() -> html.Div:
     """Main workflow layout - 20 lines"""
     try:
         adapter = get_workflow_adapter()
+        config_adapter = get_config_adapter()
         validation = adapter.validate_workflow_data()
 
         if not validation.get("workflow_schema", False):
@@ -155,13 +168,14 @@ def create_workflow_analysis_layout() -> html.Div:
             className="container-fluid p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "workflow analysis layout creation")
+        config_adapter.handle_error_utility(logger, e, "workflow analysis layout creation")
         return dbc.Alert("Workflow analysis failed", color="danger")
 
 
 def create_workflow_process_page() -> html.Div:
     """Dedicated workflow process page - 25 lines"""
     try:
+        config_adapter = get_config_adapter()
         return html.Div(
             [
                 dbc.Container(
@@ -202,26 +216,5 @@ def create_workflow_process_page() -> html.Div:
             className="p-4",
         )
     except Exception as e:
-        handle_error(logger, e, "workflow process page creation")
+        config_adapter.handle_error_utility(logger, e, "workflow process page creation")
         return dbc.Alert("Workflow process page unavailable", color="danger")
-
-
-# Legacy compatibility functions
-def create_workflow_metrics_cards() -> html.Div:
-    """Legacy compatibility"""
-    return create_workflow_metrics()
-
-
-def create_process_flow_diagram() -> html.Div:
-    """Legacy compatibility"""
-    return create_process_flow()
-
-
-def create_stage_field_distribution() -> dcc.Graph:
-    """Legacy compatibility"""
-    return create_entity_distribution_chart()
-
-
-def create_workflow_mapping_table() -> any:
-    """Legacy compatibility"""
-    return create_mapping_table()

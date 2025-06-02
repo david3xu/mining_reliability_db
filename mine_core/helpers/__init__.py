@@ -1,5 +1,6 @@
 """
-Helper utilities for Mining Reliability Database
+Helper Functions Package
+Common utilities for logging, error handling, and diagnostics.
 """
 
 from mine_core.helpers.log_manager import get_logger, setup_logging

@@ -26,6 +26,20 @@ from dashboard.utils.styling import (
     get_responsive_style,
     get_table_style,
 )
+from dashboard.utils.url_builders import (
+    build_analysis_url,
+    build_detail_url,
+    build_facility_url,
+    build_filter_url,
+    create_breadcrumb_data,
+    get_navigation_context,
+    get_page_title,
+    is_dashboard_url,
+    is_valid_facility_url,
+    parse_detail_url,
+    parse_facility_url,
+    sanitize_url_component,
+)
 
 __all__ = [
     # Data transformers
@@ -49,4 +63,17 @@ __all__ = [
     "get_table_style",
     "apply_theme_mode",
     "get_responsive_style",
+    # URL builders
+    "sanitize_url_component",
+    "build_facility_url",
+    "build_analysis_url",
+    "build_detail_url",
+    "build_filter_url",
+    "parse_facility_url",
+    "parse_detail_url",
+    "create_breadcrumb_data",
+    "get_navigation_context",
+    "is_valid_facility_url",
+    "is_dashboard_url",
+    "get_page_title",
 ]

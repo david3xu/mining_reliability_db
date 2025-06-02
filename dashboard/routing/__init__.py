@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 """
-Dashboard Routing Package
-URL management and navigation infrastructure.
+Routing Package - Page Routing & Navigation
+URL managers and page navigation components.
 """
 
-from dashboard.routing.navigation_builder import NavigationBuilder, get_navigation_builder
+from dashboard.routing.navigation_builder import (
+    NavigationBuilder,
+    build_breadcrumbs,
+    get_navigation_builder,
+    get_page_title,
+)
 from dashboard.routing.url_manager import URLManager, get_url_manager
 
-__all__ = ["URLManager", "get_url_manager", "NavigationBuilder", "get_navigation_builder"]
+__all__ = [
+    "URLManager",
+    "get_url_manager",
+    "NavigationBuilder",
+    "get_navigation_builder",
+    "build_breadcrumbs",
+    "get_page_title",
+]

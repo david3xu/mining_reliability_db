@@ -26,12 +26,11 @@ except ImportError:
 import plotly.express as px
 import plotly.graph_objects as go
 
-# Configuration-driven styling
-from configs.environment import get_dashboard_chart_config, get_dashboard_styling_config
-
 # Clean adapter-based imports - NO direct mine_core access
 from dashboard.adapters import get_data_adapter
-from mine_core.shared.common import handle_error
+
+# Configuration-driven styling
+from dashboard.adapters.config_adapter import get_config_adapter
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +44,9 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
         logger.info(f"Creating causal network graph for facility: {facility_id or 'all'}")
 
         # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        config_adapter = get_config_adapter()
+        styling_config = config_adapter.get_styling_config()
+        chart_config = config_adapter.get_dashboard_chart_config()
 
         # Use adapter instead of direct mine_core access
         adapter = get_data_adapter()
@@ -59,9 +59,9 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
             portfolio_data = adapter.get_portfolio_metrics()
             has_data = portfolio_data.total_records > 0
         except Exception as e:
-            from mine_core.shared.common import handle_error
-
-            handle_error(logger, e, "portfolio data validation for network analysis")
+            config_adapter.handle_error_utility(
+                logger, e, "portfolio data validation for network analysis"
+            )
             has_data = False
 
         if not has_data:
@@ -127,7 +127,8 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
         return network_placeholder
 
     except Exception as e:
-        handle_error(logger, e, "causal network graph creation")
+        config_adapter = get_config_adapter()
+        config_adapter.handle_error_utility(logger, e, "causal network graph creation")
         return html.Div(
             [dbc.Alert("Failed to create causal network visualization", color="danger")]
         )
@@ -140,8 +141,9 @@ def create_correlation_heatmap() -> html.Div:
     """
     try:
         # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        config_adapter = get_config_adapter()
+        styling_config = config_adapter.get_styling_config()
+        chart_config = config_adapter.get_dashboard_chart_config()
 
         # Use adapter for facility data as correlation proxy
         adapter = get_data_adapter()
@@ -206,7 +208,7 @@ def create_correlation_heatmap() -> html.Div:
         )
 
     except Exception as e:
-        handle_error(logger, e, "correlation heatmap creation")
+        config_adapter.handle_error_utility(logger, e, "correlation heatmap creation")
         return html.Div([html.P("Failed to create correlation visualization")])
 
 
@@ -217,8 +219,9 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
     """
     try:
         # Get configuration
-        styling_config = get_dashboard_styling_config()
-        chart_config = get_dashboard_chart_config()
+        config_adapter = get_config_adapter()
+        styling_config = config_adapter.get_styling_config()
+        chart_config = config_adapter.get_dashboard_chart_config()
 
         # Use adapter for data access
         adapter = get_data_adapter()
@@ -304,7 +307,7 @@ def create_root_cause_flow_diagram(facility_id: str = None) -> html.Div:
         )
 
     except Exception as e:
-        handle_error(logger, e, "root cause flow diagram creation")
+        config_adapter.handle_error_utility(logger, e, "root cause flow diagram creation")
         return html.Div([html.P("Failed to create flow diagram")])
 
 
@@ -404,7 +407,8 @@ def create_network_analysis_dashboard() -> html.Div:
         return html.Div([header, content])
 
     except Exception as e:
-        handle_error(logger, e, "network analysis dashboard creation")
+        config_adapter = get_config_adapter()
+        config_adapter.handle_error_utility(logger, e, "network analysis dashboard creation")
         return html.Div(
             [
                 html.H2("Network Analysis Error"),

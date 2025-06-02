@@ -5,6 +5,7 @@ Single source for all system configuration with full adapter method support.
 """
 
 import json
+import logging
 import os
 import threading
 from pathlib import Path
@@ -17,6 +18,26 @@ try:
     load_dotenv()
 except ImportError:
     pass
+
+__all__ = [
+    # Core config functions
+    "get_config",
+    "get_schema",
+    "get_env",
+    "get_env_required",
+    "validate_required_env",
+    "get_entity_names",
+    "get_entity_primary_key",
+    # Dashboard config
+    "get_dashboard_config",
+    "get_dashboard_server_config",
+    "get_dashboard_performance_config",
+    # Utility functions
+    "ensure_directory",
+    "get_project_root",
+]
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigurationManager:
@@ -317,6 +338,26 @@ def get_field_analysis_config() -> Dict[str, Any]:
     return _config_manager.get_field_analysis_config()
 
 
+def get_entity_names() -> List[str]:
+    """Get list of all entity names from schema configuration"""
+    schema = get_schema()
+    entities = schema.get("entities", [])
+    return [entity.get("name") for entity in entities if entity.get("name")]
+
+
+def get_entity_primary_key(entity_name: str) -> Optional[str]:
+    """Get the primary key field for a given entity from schema"""
+    schema = get_schema()
+    entities = schema.get("entities", [])
+    for entity in entities:
+        if entity.get("name") == entity_name:
+            properties = entity.get("properties", {})
+            for prop_name, prop_details in properties.items():
+                if prop_details.get("primary_key"):
+                    return prop_name
+    return None
+
+
 # Dashboard-specific configuration functions
 def get_dashboard_server_config() -> Dict[str, Any]:
     """Get dashboard server configuration"""
@@ -338,93 +379,6 @@ def get_dashboard_performance_config() -> Dict[str, Any]:
     """Get dashboard performance configuration"""
     config = get_dashboard_config()
     return config.get("performance", {"query_timeout_warning": 5.0, "cache_ttl_seconds": 300})
-
-
-# NEW: Missing adapter support methods
-def get_metric_card_styling() -> Dict[str, Any]:
-    """Get metric card styling configuration for adapters"""
-    styling = get_dashboard_styling_config()
-    micro_styles = styling.get("micro_component_styles", {})
-    metric_card = micro_styles.get("metric_card", {})
-
-    return {
-        "primary_color": styling.get("primary_color", "#4A90E2"),
-        "text_light": styling.get("text_light", "#FFFFFF"),
-        "card_height": metric_card.get("default_dimensions", {})
-        .get("height", "120px")
-        .replace("px", ""),
-        "card_width": metric_card.get("default_dimensions", {})
-        .get("width", "220px")
-        .replace("px", ""),
-    }
-
-
-def get_chart_styling_template() -> Dict[str, Any]:
-    """Get chart styling template for adapters"""
-    styling = get_dashboard_styling_config()
-    charts = get_dashboard_chart_config()
-
-    return {
-        "colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
-        "font_family": charts.get("font_family", "Arial, sans-serif"),
-        "title_font_size": charts.get("title_font_size", 18),
-        "height": charts.get("default_height", 400),
-        "background": styling.get("background_light", "#FFFFFF"),
-    }
-
-
-def get_completion_thresholds() -> Dict[str, int]:
-    """Get completion thresholds from field analysis config"""
-    field_config = get_field_analysis_config()
-    return field_config.get(
-        "completion_thresholds", {"very_low": 20, "low": 40, "medium": 60, "good": 80, "high": 100}
-    )
-
-
-def get_completion_colors() -> Dict[str, str]:
-    """Get completion colors from field analysis config"""
-    field_config = get_field_analysis_config()
-    return field_config.get(
-        "completion_colors",
-        {
-            "very_low": "#D32F2F",
-            "low": "#F57C00",
-            "medium": "#FFA000",
-            "good": "#7CB342",
-            "high": "#388E3C",
-        },
-    )
-
-
-def get_chart_display_config() -> Dict[str, Any]:
-    """Get chart display configuration from field analysis"""
-    field_config = get_field_analysis_config()
-    return field_config.get(
-        "chart_config", {"row_height": 25, "min_height": 400, "max_completion": 100}
-    )
-
-
-def get_entities_from_schema() -> Dict[str, Dict[str, Any]]:
-    """Get entities dictionary from schema"""
-    schema = get_schema()
-    return {e["name"]: e for e in schema.get("entities", [])}
-
-
-def get_entity_primary_key(entity_name: str) -> Optional[str]:
-    """Get primary key for entity from schema"""
-    entities = get_entities_from_schema()
-    entity = entities.get(entity_name, {})
-    properties = entity.get("properties", {})
-
-    for prop_name, prop_info in properties.items():
-        if prop_info.get("primary_key", False):
-            return prop_name
-    return None
-
-
-def get_entity_names() -> List[str]:
-    """Get all entity names from schema"""
-    return list(get_entities_from_schema().keys())
 
 
 def get_project_root() -> Path:
@@ -477,3 +431,8 @@ def get_all_config() -> Dict[str, Any]:
             "charts_loaded": _config_manager._dashboard_charts_cache is not None,
         },
     }
+
+
+def get_config() -> Dict[str, Any]:
+    """Get all configuration settings - alias for get_all_config"""
+    return get_all_config()

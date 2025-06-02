@@ -4,7 +4,12 @@ Core Database Package
 Centralized data access and query management.
 """
 
-from mine_core.database.db import get_database
+from mine_core.database.db import (
+    get_causal_intelligence_summary,
+    get_database,
+    optimize_performance,
+    validate_data_integrity,
+)
 
 # Legacy compatibility
 from mine_core.database.queries import (  # Legacy function aliases
@@ -26,7 +31,12 @@ from mine_core.database.queries import (  # Legacy function aliases
     get_root_cause_frequency,
     get_root_cause_intelligence_summary,
 )
-from mine_core.database.query_manager import QueryManager, get_query_manager
+from mine_core.database.query_manager import (
+    QueryManager,
+    get_entities_by_type,
+    get_query_manager,
+    get_relationship_data,
+)
 
 __all__ = [
     # Core Query Management
@@ -46,6 +56,13 @@ __all__ = [
     "get_field_completion_statistics",
     "get_entity_completion_rates",
     "get_facility_action_statistics",
+    # DB operations
+    "get_causal_intelligence_summary",
+    "validate_data_integrity",
+    "optimize_performance",
+    # Query manager functions
+    "get_entities_by_type",
+    "get_relationship_data",
     # Legacy function aliases for backward compatibility
     "get_assets",
     "get_department",
