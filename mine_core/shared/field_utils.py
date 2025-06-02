@@ -22,7 +22,7 @@ __all__ = [
     "validate_field_for_entity",
     "normalize_field_value",
     "get_entity_label_cascade",
-    "extract_root_cause_tail",
+    "extract_root_cause_tail_extraction",
     "validate_entity_completeness",
     "get_field_category",
     "validate_cascade_labeling",
@@ -202,7 +202,7 @@ def get_entity_label_cascade(
     return entity_config.get("entity_type", "UnknownEntity")
 
 
-def extract_root_cause_tail(value: str, delimiters: List[str] = None) -> str:
+def extract_root_cause_tail_extraction(value: str, delimiters: List[str] = None) -> str:
     """Extract tail component from root cause for causal intelligence"""
     if not has_real_value(value):
         return "NOT_SPECIFIED"
@@ -272,19 +272,13 @@ def validate_cascade_labeling(entity_data: Dict[str, Any], cascade_config: Dict[
 
 
 def get_causal_intelligence_fields(record: Dict[str, Any]) -> Dict[str, str]:
-    """Extract causal intelligence fields for root cause analysis"""
-    causal_fields = {}
+    """Extract primary and secondary root cause fields for intelligence analysis"""
+    causal_fields = {"primary_cause": "NOT_SPECIFIED", "secondary_cause": "NOT_SPECIFIED"}
 
-    # Primary root cause
-    root_cause = record.get("Root Cause")
+    root_cause = record.get("Root Cause", "")
     if has_real_value(root_cause):
         causal_fields["primary_cause"] = str(root_cause)
-        causal_fields["secondary_cause"] = extract_root_cause_tail(str(root_cause))
-
-    # Supporting evidence
-    evidence = record.get("Obj. Evidence")
-    if has_real_value(evidence):
-        causal_fields["evidence"] = str(evidence)
+        causal_fields["secondary_cause"] = extract_root_cause_tail_extraction(str(root_cause))
 
     return causal_fields
 

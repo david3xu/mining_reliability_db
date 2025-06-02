@@ -245,7 +245,7 @@ class SimplifiedDatabase:
         MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
         {facility_filter}
         OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
-        WITH rc.root_cause AS primary_cause, rc.root_cause_tail AS secondary_cause, count(*) AS frequency
+        WITH rc.root_cause AS primary_cause, rc.root_cause_tail_extraction AS secondary_cause, count(*) AS frequency
         WHERE primary_cause IS NOT NULL
         RETURN primary_cause, secondary_cause, frequency
         ORDER BY frequency DESC

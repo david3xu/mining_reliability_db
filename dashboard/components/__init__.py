@@ -5,13 +5,7 @@ Clean exports for micro-component composition with adapter dependencies.
 """
 
 # Data Quality Components
-from dashboard.components.data_quality import (
-    create_data_quality_layout,
-    create_facility_quality_comparison,
-    create_field_completeness_chart,
-    create_quality_metrics_cards,
-    create_quality_summary_table,
-)
+from dashboard.components.data_quality import create_data_quality_layout
 
 # Facility Detail Components
 from dashboard.components.facility_detail import (
@@ -73,12 +67,8 @@ from dashboard.components.tab_navigation import (
 
 # Atomized Workflow Components
 from dashboard.components.workflow_analysis import (
-    create_entity_distribution_chart,
-    create_mapping_table,
-    create_process_flow,
     create_workflow_analysis_layout,
     create_workflow_metrics,
-    create_workflow_process_page,
 )
 
 __all__ = [
@@ -94,16 +84,8 @@ __all__ = [
     # Atomized Workflow Components
     "create_workflow_analysis_layout",
     "create_workflow_metrics",
-    "create_process_flow",
-    "create_entity_distribution_chart",
-    "create_mapping_table",
-    "create_workflow_process_page",
     # Data Quality Components
     "create_data_quality_layout",
-    "create_quality_metrics_cards",
-    "create_field_completeness_chart",
-    "create_facility_quality_comparison",
-    "create_quality_summary_table",
     # Facility Detail Components
     "create_facility_detail_layout",
     "create_facility_metrics_cards",

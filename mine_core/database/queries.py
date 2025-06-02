@@ -106,7 +106,7 @@ def get_root_cause_intelligence_summary(facility_id: str = None) -> Dict[str, An
     MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
     WHERE rc.root_cause IS NOT NULL AND rc.root_cause <> 'DATA_NOT_AVAILABLE'
     WITH rc.root_cause AS primary_cause,
-         rc.root_cause_tail AS secondary_cause,
+         rc.root_cause_tail_extraction AS secondary_cause,
          ar.categories AS category,
          count(*) AS frequency
     RETURN primary_cause, secondary_cause, category, frequency
@@ -219,7 +219,7 @@ def get_predictive_intelligence_indicators() -> List[Dict[str, Any]]:
 
     WITH ar.categories AS incident_category,
          rc.root_cause AS primary_cause,
-         rc.root_cause_tail AS secondary_cause,
+         rc.root_cause_tail_extraction AS secondary_cause,
          f.facility_id AS facility,
          count(*) AS pattern_frequency,
          count(CASE WHEN v.is_action_plan_effective = true THEN 1 END) AS successful_outcomes
@@ -281,7 +281,7 @@ def get_causal_correlation_matrix() -> List[Dict[str, Any]]:
 
     WITH ar.categories AS incident_category,
          rc1.root_cause AS primary_cause,
-         rc1.root_cause_tail AS secondary_cause,
+         rc1.root_cause_tail_extraction AS secondary_cause,
          a.asset_numbers AS asset_involved,
          count(*) AS correlation_strength
 
@@ -620,7 +620,7 @@ def get_incident_chain(action_request_id: str) -> Dict[str, Any]:
 
            rc.rootcause_id AS cause_id,
            rc.root_cause AS primary_cause,
-           rc.root_cause_tail AS secondary_cause,
+           rc.root_cause_tail_extraction AS secondary_cause,
            rc.objective_evidence AS objective_evidence,
 
            ap.actionplan_id AS plan_id,

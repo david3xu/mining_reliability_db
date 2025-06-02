@@ -79,7 +79,7 @@ class NavigationBuilder:
             return self._build_fallback_navigation()
 
     def _build_analysis_dropdown(self) -> dbc.DropdownMenu:
-        """Build analysis dropdown without facility links"""
+        """Build analysis dropdown with facility data"""
         try:
             dropdown_items = []
 

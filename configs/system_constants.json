@@ -2,7 +2,7 @@
   "constants_version": "2.0.0",
   "architecture_compliance": "adapter_optimized",
   "metadata": {
-    "last_updated": "2024-01-15",
+    "last_updated": "2025-06-02",
     "cache_ttl_seconds": 3600,
     "performance_optimized": true,
     "adapter_integration": true
@@ -289,7 +289,7 @@
     "preserve_original": true,
     "enable_causal_correlation": true,
     "primary_field": "root_cause",
-    "secondary_field": "root_cause_tail",
+    "secondary_field": "root_cause_tail_extraction",
     "causal_intelligence_optimization": {
       "pattern_caching": {
         "enabled": true,

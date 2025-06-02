@@ -30,7 +30,6 @@ class URLManager:
             "/",
             "/data-quality",
             "/workflow",
-            "/workflow-process",
             "/summary",
             "/historical-records",
             "/facilities-distribution",
@@ -61,9 +60,6 @@ class URLManager:
 
         if pathname == "/workflow":
             return {"page": "workflow", "component": "workflow_analysis_layout"}
-
-        if pathname == "/workflow-process":
-            return {"page": "workflow_process", "component": "workflow_process_page"}
 
         if pathname == "/summary":
             return {"page": "summary", "component": "facilities_summary"}
@@ -119,6 +115,29 @@ class URLManager:
             breadcrumbs.append({"label": "Analysis", "url": pathname})
 
         return breadcrumbs
+
+    def get_page_title(self, pathname: str) -> str:
+        """Get page title based on pathname"""
+        title_mapping = {
+            "/": "Portfolio Overview",
+            "/data-quality": "Data Quality Foundation",
+            "/workflow": "Workflow Understanding",
+            "/summary": "Four Facilities Summary",
+            "/historical-records": "Historical Records Analysis",
+            "/facilities-distribution": "Facilities Distribution",
+            "/data-types-distribution": "Data Types Distribution",
+        }
+
+        if pathname in title_mapping:
+            return title_mapping[pathname]
+
+        if pathname and pathname.startswith("/facility/"):
+            facility_id = pathname.replace("/facility/", "")
+            validation = self.facility_adapter.validate_facility_data(facility_id)
+            if validation.get("facility_exists", False):
+                return f"Facility: {facility_id}"
+
+        return "Not Found"
 
 
 # Singleton pattern

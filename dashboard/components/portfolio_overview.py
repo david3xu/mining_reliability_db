@@ -8,10 +8,12 @@ import logging
 from typing import Any, Dict
 
 import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
 from dash import dcc, html
 
 # Pure adapter dependencies - no direct core/config access
 from dashboard.adapters import get_config_adapter, get_data_adapter, handle_error_utility
+from dashboard.components.layout_template import create_standard_layout
 from dashboard.components.micro.chart_base import create_bar_chart, create_pie_chart
 from dashboard.components.micro.metric_card import create_metric_card
 from dashboard.components.micro.table_base import create_data_table
@@ -28,7 +30,64 @@ __all__ = [
     "create_historical_records_page",
     "create_facilities_distribution_page",
     "create_data_types_distribution_page",
+    "create_facility_temporal_chart",
 ]
+
+
+def create_facility_temporal_chart() -> dcc.Graph:
+    """Line chart showing facility trends over time"""
+    try:
+        data_adapter = get_data_adapter()
+        timeline_data = data_adapter.get_historical_timeline()
+
+        # Extract temporal matrix data directly from dataclass attributes
+        rows = timeline_data.rows
+        columns = timeline_data.columns  # Added to dynamically get columns
+
+        # Dynamic year extraction (exclude 'facility' and 'total' columns)
+        year_columns = [col for col in columns if col not in ["facility", "total"]]
+
+        if not rows or not year_columns:
+            return dcc.Graph(figure={})
+
+        fig = go.Figure()
+
+        # Create line for each facility (exclude Total row)
+        facility_rows = [row for row in rows if row.get("facility") != "Total"]
+
+        for row in facility_rows:
+            facility_name = row.get("facility", "Unknown")
+            # Ensure year values are retrieved correctly, defaulting to 0
+            year_values = [row.get(str(year), 0) for year in year_columns]
+
+            fig.add_trace(
+                go.Scatter(
+                    x=year_columns,
+                    y=year_values,
+                    mode="lines+markers",
+                    name=facility_name,
+                    line=dict(width=3),
+                    marker=dict(size=8),
+                )
+            )
+
+        fig.update_layout(
+            title="Facility Historical Trends",
+            xaxis_title="Year",
+            yaxis_title="Record Count",
+            height=500,
+            font={"family": "Arial", "size": 12},
+            legend=dict(x=0, y=1),
+            paper_bgcolor="#2F2F2F",
+            plot_bgcolor="#2F2F2F",
+            font_color="white",
+        )
+
+        return dcc.Graph(figure=fig)
+
+    except Exception as e:
+        handle_error_utility(logger, e, "facility temporal chart")
+        return dcc.Graph(figure={})
 
 
 def create_metrics_section() -> html.Div:
@@ -148,12 +207,12 @@ def create_complete_dashboard() -> html.Div:
 
 
 def create_historical_records_page() -> html.Div:
-    """Historical records analysis page - 15 lines"""
+    """Historical analysis with table and chart"""
     try:
-        config_adapter = get_config_adapter()
-        return html.Div(
-            [
-                dbc.Container(
+        return create_standard_layout(
+            title="Historical Records Analysis",
+            content_cards=[
+                html.Div(
                     [
                         dbc.Button(
                             "← Back to Portfolio",
@@ -162,18 +221,28 @@ def create_historical_records_page() -> html.Div:
                             size="sm",
                             className="mb-3",
                         ),
-                        html.H2("Historical Records Analysis", className="text-primary mb-4"),
-                        create_timeline_table(),
-                    ],
-                    fluid=True,
+                        # Line chart section
+                        html.Div(
+                            [
+                                html.H4("Facility Trends Over Time", className="mb-3"),
+                                create_facility_temporal_chart(),
+                            ],
+                            className="mb-5",
+                        ),
+                        # Original table section
+                        html.Div(
+                            [
+                                html.H4("Historical Records Data", className="mb-3"),
+                                create_timeline_table(),
+                            ]
+                        ),
+                    ]
                 )
             ],
-            className="p-4",
-            style=get_dashboard_styles().get("main_container"),
         )
     except Exception as e:
-        handle_error_utility(logger, e, "historical records page creation")
-        return dbc.Alert("Historical records unavailable", color="danger")
+        handle_error_utility(logger, e, "historical records page")
+        return html.Div("Historical records unavailable")
 
 
 def create_facilities_distribution_page() -> html.Div:

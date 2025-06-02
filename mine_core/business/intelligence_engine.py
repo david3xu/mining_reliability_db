@@ -153,8 +153,8 @@ class IntelligenceEngine:
                 entity_properties_in_schema = schema_entities_map.get(entity_name, {})
 
                 for internal_field_name, raw_data_field_name in field_map.items():
-                    if internal_field_name == "root_cause_tail":
-                        continue  # Exclude 'root_cause_tail' as it is a derived field
+                    if internal_field_name == "root_cause_tail_extraction":
+                        continue  # Exclude 'root_cause_tail_extraction' as it is a derived field
 
                     prop_details = entity_properties_in_schema.get(internal_field_name)
 
@@ -206,8 +206,8 @@ class IntelligenceEngine:
                 entity_properties_in_schema = schema_entities_map.get(entity_name, {})
 
                 for internal_field_name, raw_data_field_name in field_map.items():
-                    if internal_field_name == "root_cause_tail":
-                        continue  # Exclude 'root_cause_tail' as it is a derived field
+                    if internal_field_name == "root_cause_tail_extraction":
+                        continue  # Exclude 'root_cause_tail_extraction' as it is a derived field
 
                     prop_details = entity_properties_in_schema.get(internal_field_name)
 
@@ -782,14 +782,7 @@ class IntelligenceEngine:
         for entity_type in entity_types:
             total_count = self.query_manager.get_entity_count(entity_type)
 
-            primary_key = get_entity_primary_key(entity_type)  # Retrieve the primary key
-
-            meaningful_data_count = 0
-            if primary_key:  # Only proceed if a primary key is found
-                # Correctly construct the filter for existing (non-null) primary keys
-                meaningful_data_count = self.query_manager.get_entity_count(
-                    entity_type, filters={primary_key: "__IS_NOT_NULL__"}
-                )
+            meaningful_data_count = self.query_manager.get_entity_count(entity_type)
 
             completeness_percentage = (
                 (meaningful_data_count / total_count) * 100 if total_count > 0 else 0
