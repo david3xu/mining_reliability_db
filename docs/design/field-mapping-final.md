@@ -58,7 +58,7 @@ Four raw data fields contain multiple values requiring special handling:
 - Extraction: Use tail item (second element) if available
 - Example:
   ```
-  ["Foreign material in wear plate", "Inadequate training for replacement"] 
+  ["Foreign material in wear plate", "Inadequate training for replacement"]
   → "Inadequate training for replacement"
   ```
 
@@ -66,7 +66,7 @@ Four raw data fields contain multiple values requiring special handling:
 - Extraction: Use head item (first element)
 - Example:
   ```
-  ["Shake enjoy site interview agent myself", "Score indeed kind clearly road today"] 
+  ["Shake enjoy site interview agent myself", "Score indeed kind clearly road today"]
   → "Shake enjoy site interview agent myself"
   ```
 
@@ -74,7 +74,7 @@ Four raw data fields contain multiple values requiring special handling:
 - Extraction: Use head item (first element)
 - Example:
   ```
-  ["Dinner leader book nearly", "Cause onto beat debate listen test"] 
+  ["Dinner leader book nearly", "Cause onto beat debate listen test"]
   → "Dinner leader book nearly"
   ```
 
@@ -82,7 +82,7 @@ Four raw data fields contain multiple values requiring special handling:
 - Extraction: Use head item (first element)
 - Example:
   ```
-  ["Their film job worker", "Effect action realize among short can ready"] 
+  ["Their film job worker", "Effect action realize among short can ready"]
   → "Their film job worker"
   ```
 

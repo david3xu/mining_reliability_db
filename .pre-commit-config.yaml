@@ -1,0 +1,75 @@
+# Pre-commit Hook Configuration for Mining Reliability Dashboard
+# Ensures consistency standards are maintained across all commits
+
+repos:
+  # Code formatting and standards
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  # Python code quality
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: ["--line-length=100"]
+
+  # Import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--line-length=100"]
+
+  # Custom consistency validation
+  - repo: local
+    hooks:
+      - id: consistency-validation
+        name: Configuration Consistency Validation
+        entry: python scripts/validate_consistency.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+
+      - id: interface-compliance
+        name: Interface Compliance Check
+        entry: python scripts/check_interface_compliance.py
+        language: system
+        files: ^dashboard/adapters/.*\.py$
+        pass_filenames: false
+
+      - id: config-naming-consistency
+        name: Configuration Naming Consistency
+        entry: python scripts/enforce_config_consistency.py
+        language: system
+        files: ^(dashboard/adapters/config_adapter\.py|configs/environment\.py)$
+        pass_filenames: false
+
+      - id: architecture-compliance
+        name: Architecture Compliance Check
+        entry: python dashboard/validation/architecture_validator.py
+        language: system
+        files: ^(mine_core/|dashboard/).*\.py$
+        pass_filenames: false
+
+# Configuration for specific tools
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

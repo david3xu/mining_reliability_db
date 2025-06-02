@@ -11,8 +11,4 @@ __description__ = "Professional operational intelligence dashboard"
 # Main application entry point
 from dashboard.app import PurifiedDashboardApp, create_app
 
-__all__ = [
-    'PurifiedDashboardApp',
-    'create_app',
-    '__version__'
-]
+__all__ = ["PurifiedDashboardApp", "create_app", "__version__"]

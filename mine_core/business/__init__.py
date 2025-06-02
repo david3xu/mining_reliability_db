@@ -8,8 +8,8 @@ from mine_core.business.intelligence_engine import IntelligenceEngine, get_intel
 from mine_core.business.workflow_processor import WorkflowProcessor, get_workflow_processor
 
 __all__ = [
-    'IntelligenceEngine',
-    'get_intelligence_engine',
-    'WorkflowProcessor',
-    'get_workflow_processor'
+    "IntelligenceEngine",
+    "get_intelligence_engine",
+    "WorkflowProcessor",
+    "get_workflow_processor",
 ]

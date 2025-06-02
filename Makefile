@@ -156,3 +156,30 @@ secure-clean: clean ## Secure cleanup including sensitive data
 	find . -name "*.log" -delete
 	find . -name ".env.*" -not -name ".env.example" -delete
 	@echo "Secure cleanup completed"
+
+# Consistency and Quality Assurance
+validate-consistency: ## Run automated consistency validation
+	python scripts/validate_consistency.py
+
+check-interfaces: ## Check adapter interface compliance
+	python scripts/check_interface_compliance.py
+
+check-config-naming: ## Check configuration naming consistency
+	python scripts/enforce_config_consistency.py
+
+analyze-unused-functions: ## Analyze potentially unused functions
+	python scripts/analyze_unused_functions.py
+
+validate-architecture: ## Validate architecture compliance
+	python dashboard/validation/architecture_validator.py
+
+quality-check: validate-consistency check-interfaces check-config-naming analyze-unused-functions validate-architecture ## Run all quality checks
+
+# Pre-commit setup
+setup-pre-commit: ## Install and setup pre-commit hooks
+	pip install pre-commit
+	pre-commit install
+	@echo "Pre-commit hooks installed successfully"
+
+run-pre-commit: ## Run pre-commit hooks on all files
+	pre-commit run --all-files

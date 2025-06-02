@@ -4,25 +4,28 @@ Consolidated Project Utilities - Environment-independent shared functions
 Project setup, logging, and error handling utilities.
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
 from typing import Optional
+
 
 def setup_project_path():
     """Add project root to Python path - standardized for all scripts"""
     # Import here to avoid circular dependency
     from configs.environment import get_project_root
+
     project_root = get_project_root()
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
     return project_root
 
+
 def setup_logging(level: str = None, name: str = None) -> logging.Logger:
     """Unified logging setup using environment configuration"""
     # Import here to avoid circular dependency
-    from configs.environment import get_log_level, get_log_file
+    from configs.environment import get_log_file, get_log_level
 
     # Get configuration from environment gateway
     log_level = level or get_log_level()
@@ -55,6 +58,7 @@ def setup_logging(level: str = None, name: str = None) -> logging.Logger:
     # Return logger for specific module
     return logging.getLogger(name or __name__)
 
+
 def setup_project_environment(script_name: str = None, log_level: str = None) -> logging.Logger:
     """Standardized initialization for all scripts - single entry point"""
     # Setup project path
@@ -68,13 +72,16 @@ def setup_project_environment(script_name: str = None, log_level: str = None) ->
 
     return logger
 
+
 def handle_error(logger: logging.Logger, error: Exception, context: str) -> None:
     """Standardized error handling and logging"""
     logger.error(f"Error in {context}: {error}")
 
+
 def get_logger(name: str = None) -> logging.Logger:
     """Get a logger instance for the specified module"""
     return setup_logging(name=name)
+
 
 def ensure_directory(path: Path) -> Path:
     """Ensure directory exists, create if necessary"""

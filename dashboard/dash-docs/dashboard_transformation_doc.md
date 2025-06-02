@@ -51,7 +51,7 @@ AFTER:  Dashboard → Adapter → mine_core (Controlled)
 
 #### File: `dashboard/adapters/data_adapter.py`
 **Purpose**: Single point of mine_core coupling
-**Logic**: 
+**Logic**:
 - Encapsulate all database queries in one location
 - Provide dashboard-specific data transformation
 - Enable component testing with mocked adapter
@@ -60,7 +60,7 @@ AFTER:  Dashboard → Adapter → mine_core (Controlled)
 **Key Methods**:
 ```python
 get_portfolio_metrics() → PortfolioData
-get_facility_breakdown() → FacilityData  
+get_facility_breakdown() → FacilityData
 get_field_distribution() → FieldData
 get_historical_timeline() → TimelineData
 ```
@@ -89,7 +89,7 @@ get_historical_timeline() → TimelineData
 # BEFORE
 from mine_core.database.queries import get_facilities
 
-# AFTER  
+# AFTER
 from dashboard.adapters import get_data_adapter
 adapter = get_data_adapter()
 ```
@@ -125,7 +125,7 @@ adapter = get_data_adapter()
 
 ### Decision 1: Single Adapter vs Multiple Adapters
 **Choice**: Single comprehensive adapter
-**Reasoning**: 
+**Reasoning**:
 - Simplifies dependency management
 - Enables cross-component data optimization
 - Reduces cognitive overhead for developers
@@ -254,7 +254,7 @@ class DashboardDataAdapter:
 
 ### Phase 6: Network Analysis
 ```python
-# Adapter extension required  
+# Adapter extension required
 class DashboardDataAdapter:
     def get_causal_network(facility_id: str) → NetworkData
     def get_correlation_matrix() → CorrelationData
@@ -295,7 +295,7 @@ class DashboardDataAdapter:
 
 ### Technical Metrics
 - ✅ **0 direct mine_core imports** in dashboard module
-- ✅ **0 hardcoded configuration values** 
+- ✅ **0 hardcoded configuration values**
 - ✅ **100% component adapter compliance**
 - ✅ **<5% performance overhead**
 

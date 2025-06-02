@@ -5,23 +5,26 @@ Single authority for all Neo4j database interactions with schema-driven design.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
 from contextlib import contextmanager
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
+from configs.environment import get_entity_primary_key, get_schema
 from mine_core.database.db import get_database
-from configs.environment import get_schema, get_entity_primary_key
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class QueryResult:
     """Standardized query result container"""
+
     data: List[Dict[str, Any]]
     count: int
     success: bool
     metadata: Dict[str, Any]
+
 
 class QueryManager:
     """Centralized database query management with schema integration"""
@@ -39,7 +42,7 @@ class QueryManager:
                 data=results,
                 count=len(results),
                 success=True,
-                metadata={"query_type": "raw", "params": params}
+                metadata={"query_type": "raw", "params": params},
             )
         except Exception as e:
             handle_error(logger, e, "query execution")
@@ -58,15 +61,20 @@ class QueryManager:
             handle_error(logger, e, f"entity count for {entity_type}")
             return 0
 
-    def get_entities_by_type(self, entity_type: str, limit: int = 1000,
-                           filters: Dict[str, Any] = None) -> QueryResult:
+    def get_entities_by_type(
+        self, entity_type: str, limit: int = 1000, filters: Dict[str, Any] = None
+    ) -> QueryResult:
         """Get entities by type with schema-driven property selection"""
         try:
             # Get properties from schema
             entity_def = self._get_entity_definition(entity_type)
             if not entity_def:
-                return QueryResult(data=[], count=0, success=False,
-                                 metadata={"error": f"Unknown entity type: {entity_type}"})
+                return QueryResult(
+                    data=[],
+                    count=0,
+                    success=False,
+                    metadata={"error": f"Unknown entity type: {entity_type}"},
+                )
 
             properties = list(entity_def.get("properties", {}).keys())
             property_list = ", ".join([f"n.{prop} AS {prop}" for prop in properties])
@@ -89,16 +97,18 @@ class QueryManager:
             handle_error(logger, e, f"entities retrieval for {entity_type}")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
-    def get_relationship_data(self, from_type: str, rel_type: str,
-                            to_type: str, limit: int = 1000) -> QueryResult:
+    def get_relationship_data(
+        self, from_type: str, rel_type: str, to_type: str, limit: int = 1000
+    ) -> QueryResult:
         """Get relationship data between entity types"""
         try:
             from_pk = get_entity_primary_key(from_type)
             to_pk = get_entity_primary_key(to_type)
 
             if not from_pk or not to_pk:
-                return QueryResult(data=[], count=0, success=False,
-                                 metadata={"error": "Missing primary keys"})
+                return QueryResult(
+                    data=[], count=0, success=False, metadata={"error": "Missing primary keys"}
+                )
 
             query = f"""
             MATCH (from:{from_type})-[r:{rel_type}]->(to:{to_type})
@@ -191,12 +201,16 @@ class QueryManager:
         try:
             # Get date field from schema
             entity_def = self._get_entity_definition(entity_type)
-            date_fields = [prop for prop, config in entity_def.get("properties", {}).items()
-                          if config.get("type") == "date"]
+            date_fields = [
+                prop
+                for prop, config in entity_def.get("properties", {}).items()
+                if config.get("type") == "date"
+            ]
 
             if not date_fields:
-                return QueryResult(data=[], count=0, success=False,
-                                 metadata={"error": "No date fields found"})
+                return QueryResult(
+                    data=[], count=0, success=False, metadata={"error": "No date fields found"}
+                )
 
             date_field = date_fields[0]  # Use first date field
 
@@ -240,8 +254,10 @@ class QueryManager:
 
         return f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
+
 # Singleton pattern
 _query_manager = None
+
 
 def get_query_manager() -> QueryManager:
     """Get singleton query manager instance"""

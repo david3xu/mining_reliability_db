@@ -5,11 +5,12 @@ Converts 'Requested Response Time' from text (e.g., "48 hours", "2 weeks") to in
 Ensures 'Days Past Due' is properly formatted as integer
 """
 
-import json
 import argparse
+import json
 import re
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 
 def convert_response_time_to_days(response_time_text: Any) -> Optional[int]:
     """Convert response time text to integer days (1-90 range)"""
@@ -26,22 +27,22 @@ def convert_response_time_to_days(response_time_text: Any) -> Optional[int]:
     text = response_time_text.strip().lower()
 
     # Extract number from text
-    number_match = re.search(r'(\d+)', text)
+    number_match = re.search(r"(\d+)", text)
     if not number_match:
         return None
 
     number = int(number_match.group(1))
 
     # Convert based on time unit
-    if 'hour' in text:
+    if "hour" in text:
         # Convert hours to days (24 hours = 1 day)
         days = max(1, round(number / 24))
-    elif 'day' in text:
+    elif "day" in text:
         days = number
-    elif 'week' in text:
+    elif "week" in text:
         # Convert weeks to days
         days = number * 7
-    elif 'month' in text:
+    elif "month" in text:
         # Convert months to days (30 days per month)
         days = number * 30
     else:
@@ -50,6 +51,7 @@ def convert_response_time_to_days(response_time_text: Any) -> Optional[int]:
 
     # Clamp to valid range (1-90 days)
     return max(1, min(90, days))
+
 
 def fix_days_past_due(days_past_due: Any) -> Optional[int]:
     """Ensure Days Past Due is properly formatted as integer"""
@@ -67,6 +69,7 @@ def fix_days_past_due(days_past_due: Any) -> Optional[int]:
 
     return None
 
+
 def fix_record(record: Dict[str, Any]) -> Dict[str, Any]:
     """Fix a single record's response time and days past due fields"""
     fixed_record = record.copy()
@@ -77,11 +80,15 @@ def fix_record(record: Dict[str, Any]) -> Dict[str, Any]:
         converted_value = convert_response_time_to_days(original_value)
         if converted_value is not None:
             fixed_record["Requested Response Time"] = converted_value
-            print(f"  Converted 'Requested Response Time': '{original_value}' → {converted_value} days")
+            print(
+                f"  Converted 'Requested Response Time': '{original_value}' → {converted_value} days"
+            )
         else:
             # Set a default value for invalid entries
             fixed_record["Requested Response Time"] = 7  # 1 week default
-            print(f"  Fixed invalid 'Requested Response Time': '{original_value}' → 7 days (default)")
+            print(
+                f"  Fixed invalid 'Requested Response Time': '{original_value}' → 7 days (default)"
+            )
 
     # Fix Days Past Due
     if "Days Past Due" in fixed_record:
@@ -93,6 +100,7 @@ def fix_record(record: Dict[str, Any]) -> Dict[str, Any]:
 
     return fixed_record
 
+
 def fix_raw_data_file(input_file: Path, output_file: Path = None) -> Dict[str, Any]:
     """Fix a single raw data file"""
     if output_file is None:
@@ -102,7 +110,7 @@ def fix_raw_data_file(input_file: Path, output_file: Path = None) -> Dict[str, A
 
     try:
         # Load data
-        with open(input_file, 'r') as f:
+        with open(input_file, "r") as f:
             data = json.load(f)
 
         # Handle different data structures
@@ -140,8 +148,9 @@ def fix_raw_data_file(input_file: Path, output_file: Path = None) -> Dict[str, A
             fixed_records.append(fixed_record)
 
             # Count conversions
-            if (record.get("Requested Response Time") != fixed_record.get("Requested Response Time") or
-                record.get("Days Past Due") != fixed_record.get("Days Past Due")):
+            if record.get("Requested Response Time") != fixed_record.get(
+                "Requested Response Time"
+            ) or record.get("Days Past Due") != fixed_record.get("Days Past Due"):
                 conversion_count += 1
 
         # Reconstruct data structure
@@ -151,29 +160,25 @@ def fix_raw_data_file(input_file: Path, output_file: Path = None) -> Dict[str, A
             if "sheets" in data:
                 final_data = {"sheets": {}}
                 for sheet_name, sheet_data in data["sheets"].items():
-                    final_data["sheets"][sheet_name] = {
-                        "records": fixed_records
-                    }
+                    final_data["sheets"][sheet_name] = {"records": fixed_records}
             elif "records" in data:
                 final_data = {"records": fixed_records}
             else:
                 final_data = fixed_records[0] if len(fixed_records) == 1 else fixed_records
 
         # Save fixed data
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(final_data, f, indent=2, ensure_ascii=False)
 
         print(f"  ✅ Fixed {len(fixed_records)} records ({conversion_count} conversions)")
         print(f"  📁 Saved to {output_file}")
 
-        return {
-            "processed": len(fixed_records),
-            "conversions": conversion_count
-        }
+        return {"processed": len(fixed_records), "conversions": conversion_count}
 
     except Exception as e:
         print(f"  ❌ Error fixing {input_file.name}: {e}")
         return {"processed": 0, "conversions": 0, "error": str(e)}
+
 
 def fix_all_raw_data(raw_data_dir: str = None, backup: bool = True) -> Dict[str, Any]:
     """Fix all raw data files in the directory"""
@@ -202,7 +207,7 @@ def fix_all_raw_data(raw_data_dir: str = None, backup: bool = True) -> Dict[str,
         "processed_files": 0,
         "total_records": 0,
         "total_conversions": 0,
-        "files_with_errors": []
+        "files_with_errors": [],
     }
 
     for json_file in json_files:
@@ -210,6 +215,7 @@ def fix_all_raw_data(raw_data_dir: str = None, backup: bool = True) -> Dict[str,
         if backup:
             backup_file = backup_dir / json_file.name
             import shutil
+
             shutil.copy2(json_file, backup_file)
             print(f"  💾 Backed up to {backup_file}")
 
@@ -237,13 +243,16 @@ def fix_all_raw_data(raw_data_dir: str = None, backup: bool = True) -> Dict[str,
 
     return summary
 
+
 def main():
     """Main execution function"""
     parser = argparse.ArgumentParser(
         description="Fix raw data: convert 'Requested Response Time' to integer days (1-90) and ensure 'Days Past Due' is integer"
     )
     parser.add_argument("--file", type=str, help="Fix specific file instead of all files")
-    parser.add_argument("--raw-data-dir", type=str, help="Raw data directory path (default: data/raw_data)")
+    parser.add_argument(
+        "--raw-data-dir", type=str, help="Raw data directory path (default: data/raw_data)"
+    )
     parser.add_argument("--no-backup", action="store_true", help="Skip creating backup files")
 
     args = parser.parse_args()
@@ -268,6 +277,7 @@ def main():
                 backup_dir.mkdir(exist_ok=True)
                 backup_file = backup_dir / input_file.name
                 import shutil
+
                 shutil.copy2(input_file, backup_file)
                 print(f"💾 Backed up to {backup_file}")
 
@@ -295,6 +305,7 @@ def main():
     except Exception as e:
         print(f"❌ Error: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

@@ -4,19 +4,21 @@ Simplified Pipeline Integration Tests for Mining Reliability Database
 End-to-end testing of clean dataset processing with causal intelligence.
 """
 
-import pytest
-import sys
-import os
-import tempfile
 import json
+import os
+import sys
+import tempfile
 from unittest.mock import Mock, patch
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from mine_core.pipelines.extractor import FacilityDataExtractor
-from mine_core.pipelines.transformer import DataTransformer
 from mine_core.pipelines.loader import Neo4jLoader
+from mine_core.pipelines.transformer import DataTransformer
+
 
 class TestSimplifiedETLPipeline:
     """Test streamlined ETL pipeline for clean datasets"""
@@ -28,52 +30,44 @@ class TestSimplifiedETLPipeline:
                 "ActionRequest": {
                     "action_request_number": "Action Request Number:",
                     "title": "Title",
-                    "categories": "Categories"
+                    "categories": "Categories",
                 },
-                "Problem": {
-                    "what_happened": "What happened?",
-                    "requirement": "Requirement"
-                },
+                "Problem": {"what_happened": "What happened?", "requirement": "Requirement"},
                 "RootCause": {
                     "root_cause": "Root Cause",
                     "root_cause_tail": "Root Cause",
-                    "objective_evidence": "Obj. Evidence"
+                    "objective_evidence": "Obj. Evidence",
                 },
-                "ActionPlan": {
-                    "action_plan": "Action Plan",
-                    "complete": "Complete"
-                },
-                "Verification": {
-                    "is_action_plan_effective": "IsActionPlanEffective"
-                }
+                "ActionPlan": {"action_plan": "Action Plan", "complete": "Complete"},
+                "Verification": {"is_action_plan_effective": "IsActionPlanEffective"},
             },
             "cascade_labeling": {
                 "ActionRequest": {
                     "label_priority": ["Title", "Categories"],
                     "required_fields": ["Action Request Number:"],
-                    "entity_type": "ActionRequest"
+                    "entity_type": "ActionRequest",
                 },
                 "Problem": {
                     "label_priority": ["What happened?"],
                     "required_fields": ["What happened?"],
-                    "entity_type": "Problem"
+                    "entity_type": "Problem",
                 },
                 "RootCause": {
                     "label_priority": ["Root Cause"],
                     "required_fields": ["Root Cause"],
-                    "entity_type": "RootCause"
+                    "entity_type": "RootCause",
                 },
                 "ActionPlan": {
                     "label_priority": ["Action Plan"],
                     "required_fields": ["Action Plan"],
-                    "entity_type": "ActionPlan"
+                    "entity_type": "ActionPlan",
                 },
                 "Verification": {
                     "label_priority": ["IsActionPlanEffective"],
                     "required_fields": ["IsActionPlanEffective"],
-                    "entity_type": "Verification"
-                }
-            }
+                    "entity_type": "Verification",
+                },
+            },
         }
 
         self.sample_clean_data = {
@@ -88,7 +82,7 @@ class TestSimplifiedETLPipeline:
                     "Obj. Evidence": "Belt inspection revealed multiple stress fractures",
                     "Action Plan": "Replace belt with higher grade material",
                     "Complete": "true",
-                    "IsActionPlanEffective": "true"
+                    "IsActionPlanEffective": "true",
                 },
                 {
                     "Action Request Number:": "AR-CLEAN-002",
@@ -97,9 +91,9 @@ class TestSimplifiedETLPipeline:
                     "What happened?": "Power interruption to primary systems",
                     "Root Cause": "Circuit breaker malfunction",
                     "Action Plan": "Replace faulty circuit breaker",
-                    "IsActionPlanEffective": "true"
-                }
-            ]
+                    "IsActionPlanEffective": "true",
+                },
+            ],
         }
 
     def test_extractor_clean_data_handling(self):
@@ -107,7 +101,7 @@ class TestSimplifiedETLPipeline:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test data file
             test_file = os.path.join(temp_dir, "clean_facility.json")
-            with open(test_file, 'w') as f:
+            with open(test_file, "w") as f:
                 json.dump(self.sample_clean_data, f)
 
             # Test extraction
@@ -150,7 +144,7 @@ class TestSimplifiedETLPipeline:
         assert ar1["_dynamic_label"] == "Conveyor_Belt_Issue"
         assert ar2["_dynamic_label"] == "Electrical_System_Fault"
 
-    @patch('mine_core.database.db.get_database')
+    @patch("mine_core.database.db.get_database")
     def test_loader_simplified_processing(self, mock_get_db):
         """Test loader with simplified clean data processing"""
         # Setup mock database
@@ -179,11 +173,11 @@ class TestSimplifiedETLPipeline:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test data file
             test_file = os.path.join(temp_dir, "e2e_clean.json")
-            with open(test_file, 'w') as f:
+            with open(test_file, "w") as f:
                 json.dump(self.sample_clean_data, f)
 
             # Mock database for loading phase
-            with patch('mine_core.database.db.get_database') as mock_get_db:
+            with patch("mine_core.database.db.get_database") as mock_get_db:
                 mock_db = Mock()
                 mock_get_db.return_value = mock_db
                 mock_db.create_entity_with_dynamic_label.return_value = True
@@ -220,9 +214,9 @@ class TestSimplifiedETLPipeline:
                     "Root Cause": "Primary hardware failure; Secondary software conflict; Tertiary operator error",
                     "Obj. Evidence": "Hardware diagnostics, software logs, and operator interviews",
                     "Action Plan": "Multi-phase corrective action addressing all factors",
-                    "IsActionPlanEffective": "true"
+                    "IsActionPlanEffective": "true",
                 }
-            ]
+            ],
         }
 
         transformer = DataTransformer(self.test_config, use_config=False)
@@ -248,7 +242,7 @@ class TestSimplifiedETLPipeline:
                     "Title": "Minimal Data Issue"
                     # Most fields missing - should still create basic structure
                 }
-            ]
+            ],
         }
 
         transformer = DataTransformer(self.test_config, use_config=False)
@@ -269,10 +263,7 @@ class TestSimplifiedETLPipeline:
     def test_performance_with_moderate_dataset(self):
         """Test pipeline performance with moderate-sized clean dataset"""
         # Generate moderate test dataset
-        moderate_dataset = {
-            "facility_id": "PERFORMANCE_TEST",
-            "records": []
-        }
+        moderate_dataset = {"facility_id": "PERFORMANCE_TEST", "records": []}
 
         for i in range(50):  # 50 clean records
             record = {
@@ -282,7 +273,7 @@ class TestSimplifiedETLPipeline:
                 "What happened?": f"Test incident {i} with clean data",
                 "Root Cause": f"Primary cause {i}; Secondary factor {i}",
                 "Action Plan": f"Resolution plan {i}",
-                "IsActionPlanEffective": "true" if i % 2 == 0 else "false"
+                "IsActionPlanEffective": "true" if i % 2 == 0 else "false",
             }
             moderate_dataset["records"].append(record)
 
@@ -302,6 +293,7 @@ class TestSimplifiedETLPipeline:
             # Tail should be extracted properly
             assert "Secondary factor" in root_cause["root_cause_tail"]
 
+
 class TestCausalIntelligenceIntegration:
     """Test causal intelligence integration across pipeline"""
 
@@ -313,34 +305,31 @@ class TestCausalIntelligenceIntegration:
             "First, Second, Third",
             "Cause A - Cause B",
             "Factor 1 / Factor 2",
-            "Issue and Related Problem"
+            "Issue and Related Problem",
         ]
 
         config = {
             "entity_mappings": {
-                "RootCause": {
-                    "root_cause": "Root Cause",
-                    "root_cause_tail": "Root Cause"
-                }
+                "RootCause": {"root_cause": "Root Cause", "root_cause_tail": "Root Cause"}
             },
             "cascade_labeling": {
                 "RootCause": {
                     "label_priority": ["Root Cause"],
                     "required_fields": ["Root Cause"],
-                    "entity_type": "RootCause"
+                    "entity_type": "RootCause",
                 }
-            }
+            },
         }
 
         transformer = DataTransformer(config, use_config=False)
 
         expected_tails = [
-            "Single cause",      # No delimiter
-            "Secondary",         # Semicolon
-            "Third",            # Comma
-            "Cause B",          # Dash
-            "Factor 2",         # Slash
-            "Related Problem"   # And
+            "Single cause",  # No delimiter
+            "Secondary",  # Semicolon
+            "Third",  # Comma
+            "Cause B",  # Dash
+            "Factor 2",  # Slash
+            "Related Problem",  # And
         ]
 
         for i, pattern in enumerate(causal_patterns):
@@ -361,9 +350,9 @@ class TestCausalIntelligenceIntegration:
                     "Obj. Evidence": "Inspection reports and maintenance history",
                     "Action Plan": "Implement enhanced maintenance protocol",
                     "Complete": "true",
-                    "IsActionPlanEffective": "true"
+                    "IsActionPlanEffective": "true",
                 }
-            ]
+            ],
         }
 
         config = {
@@ -371,31 +360,44 @@ class TestCausalIntelligenceIntegration:
                 "ActionRequest": {
                     "action_request_number": "Action Request Number:",
                     "title": "Title",
-                    "categories": "Categories"
+                    "categories": "Categories",
                 },
-                "Problem": {
-                    "what_happened": "What happened?"
-                },
+                "Problem": {"what_happened": "What happened?"},
                 "RootCause": {
                     "root_cause": "Root Cause",
                     "root_cause_tail": "Root Cause",
-                    "objective_evidence": "Obj. Evidence"
+                    "objective_evidence": "Obj. Evidence",
                 },
-                "ActionPlan": {
-                    "action_plan": "Action Plan",
-                    "complete": "Complete"
-                },
-                "Verification": {
-                    "is_action_plan_effective": "IsActionPlanEffective"
-                }
+                "ActionPlan": {"action_plan": "Action Plan", "complete": "Complete"},
+                "Verification": {"is_action_plan_effective": "IsActionPlanEffective"},
             },
             "cascade_labeling": {
-                "ActionRequest": {"label_priority": ["Title"], "required_fields": ["Action Request Number:"], "entity_type": "ActionRequest"},
-                "Problem": {"label_priority": ["What happened?"], "required_fields": ["What happened?"], "entity_type": "Problem"},
-                "RootCause": {"label_priority": ["Root Cause"], "required_fields": ["Root Cause"], "entity_type": "RootCause"},
-                "ActionPlan": {"label_priority": ["Action Plan"], "required_fields": ["Action Plan"], "entity_type": "ActionPlan"},
-                "Verification": {"label_priority": ["IsActionPlanEffective"], "required_fields": ["IsActionPlanEffective"], "entity_type": "Verification"}
-            }
+                "ActionRequest": {
+                    "label_priority": ["Title"],
+                    "required_fields": ["Action Request Number:"],
+                    "entity_type": "ActionRequest",
+                },
+                "Problem": {
+                    "label_priority": ["What happened?"],
+                    "required_fields": ["What happened?"],
+                    "entity_type": "Problem",
+                },
+                "RootCause": {
+                    "label_priority": ["Root Cause"],
+                    "required_fields": ["Root Cause"],
+                    "entity_type": "RootCause",
+                },
+                "ActionPlan": {
+                    "label_priority": ["Action Plan"],
+                    "required_fields": ["Action Plan"],
+                    "entity_type": "ActionPlan",
+                },
+                "Verification": {
+                    "label_priority": ["IsActionPlanEffective"],
+                    "required_fields": ["IsActionPlanEffective"],
+                    "entity_type": "Verification",
+                },
+            },
         }
 
         transformer = DataTransformer(config, use_config=False)
@@ -416,6 +418,7 @@ class TestCausalIntelligenceIntegration:
         assert root_cause["root_cause_tail"] == "Inadequate preventive maintenance"
         assert action_plan["complete"] == "true"
         assert verification["is_action_plan_effective"] == "true"
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

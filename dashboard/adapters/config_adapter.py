@@ -5,18 +5,38 @@ Clean abstraction layer for all configuration data with zero business logic.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 # Pure configuration imports
 from configs.environment import (
-    get_schema, get_mappings, get_dashboard_config, get_workflow_stages_config,
-    get_entity_classification, get_entity_connections, get_field_analysis_config,
-    get_dashboard_styling_config, get_dashboard_chart_config, get_system_constants,
-    get_entity_names, get_entity_primary_key, get_all_config
+    get_all_config,
+    get_dashboard_chart_config,
+    get_dashboard_config,
+    get_dashboard_styling_config,
+    get_entity_classification,
+    get_entity_connections,
+    get_entity_names,
+    get_entity_primary_key,
+    get_field_analysis_config,
+    get_mappings,
+    get_schema,
+    get_system_constants,
+    get_workflow_stages_config,
+)
+
+# Interface imports for type compliance
+from dashboard.adapters.interfaces import (
+    ComponentMetadata,
+    FacilityData,
+    FieldData,
+    PortfolioData,
+    TimelineData,
+    ValidationResult,
 )
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class ConfigAdapter:
     """Pure configuration access - no processing logic"""
@@ -153,11 +173,11 @@ class ConfigAdapter:
                 "primary_color": "#4A90E2",
                 "chart_colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
                 "background_light": "#FFFFFF",
-                "text_primary": "#333333"
+                "text_primary": "#333333",
             }
 
-    def get_chart_config(self) -> Dict[str, Any]:
-        """Pure access to chart configuration"""
+    def get_dashboard_chart_config(self) -> Dict[str, Any]:
+        """Pure access to dashboard chart configuration"""
         try:
             return get_dashboard_chart_config()
         except Exception as e:
@@ -165,7 +185,7 @@ class ConfigAdapter:
             return {
                 "font_family": "Arial, sans-serif",
                 "default_height": 400,
-                "title_font_size": 18
+                "title_font_size": 18,
             }
 
     def get_server_config(self) -> Dict[str, Any]:
@@ -212,7 +232,13 @@ class ConfigAdapter:
             return field_config.get("completion_colors", {})
         except Exception as e:
             handle_error(logger, e, "completion colors access")
-            return {"very_low": "#D32F2F", "low": "#F57C00", "medium": "#FFA000", "good": "#7CB342", "high": "#388E3C"}
+            return {
+                "very_low": "#D32F2F",
+                "low": "#F57C00",
+                "medium": "#FFA000",
+                "good": "#7CB342",
+                "high": "#388E3C",
+            }
 
     def get_chart_display_config(self) -> Dict[str, Any]:
         """Pure access to chart display configuration"""
@@ -280,7 +306,9 @@ class ConfigAdapter:
             validation_status["mappings"] = bool(self.get_field_mappings_config())
             validation_status["workflow_stages"] = bool(self.get_workflow_stages_config())
             validation_status["dashboard"] = bool(self.get_dashboard_config())
-            validation_status["entity_classification"] = bool(self.get_entity_classification_config())
+            validation_status["entity_classification"] = bool(
+                self.get_entity_classification_config()
+            )
             validation_status["entity_connections"] = bool(self.get_entity_connections_config())
             validation_status["field_analysis"] = bool(self.get_field_analysis_config())
             validation_status["system_constants"] = bool(self.get_system_constants())
@@ -293,41 +321,43 @@ class ConfigAdapter:
 
     # Specialized Access Methods
 
-    def get_metric_card_styling(self) -> Dict[str, Any]:
+    def get_dashboard_metric_card_styling(self) -> Dict[str, Any]:
         """Pure access to metric card styling configuration"""
         try:
             styling = self.get_styling_config()
-            chart = self.get_chart_config()
+            chart = self.get_dashboard_chart_config()
 
             return {
                 "primary_color": styling.get("primary_color", "#4A90E2"),
                 "text_light": styling.get("text_light", "#FFFFFF"),
                 "card_height": chart.get("metric_card_height", 120),
-                "card_width": chart.get("metric_card_width", 220)
+                "card_width": chart.get("metric_card_width", 220),
             }
         except Exception as e:
             handle_error(logger, e, "metric card styling access")
             return {}
 
-    def get_chart_styling_template(self) -> Dict[str, Any]:
+    def get_dashboard_chart_styling_template(self) -> Dict[str, Any]:
         """Pure access to chart styling template"""
         try:
             styling = self.get_styling_config()
-            chart = self.get_chart_config()
+            chart = self.get_dashboard_chart_config()
 
             return {
                 "colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
                 "font_family": chart.get("font_family", "Arial, sans-serif"),
                 "title_font_size": chart.get("title_font_size", 18),
                 "height": chart.get("default_height", 400),
-                "background": styling.get("background_light", "#FFFFFF")
+                "background": styling.get("background_light", "#FFFFFF"),
             }
         except Exception as e:
             handle_error(logger, e, "chart styling template access")
             return {}
 
+
 # Singleton pattern
 _config_adapter = None
+
 
 def get_config_adapter() -> ConfigAdapter:
     """Get singleton configuration adapter instance"""
@@ -335,6 +365,7 @@ def get_config_adapter() -> ConfigAdapter:
     if _config_adapter is None:
         _config_adapter = ConfigAdapter()
     return _config_adapter
+
 
 def reset_config_adapter():
     """Reset configuration adapter instance"""

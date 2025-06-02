@@ -5,14 +5,16 @@ Direct URL management with adapter-driven route generation.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from dash import Input, Output, callback
-from mine_core.shared.common import handle_error
 
 # Pure adapter dependencies
 from dashboard.adapters import get_data_adapter, get_facility_adapter
+from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
+
 
 class URLManager:
     """Direct URL routing with adapter integration"""
@@ -32,7 +34,7 @@ class URLManager:
             "/summary",
             "/historical-records",
             "/facilities-distribution",
-            "/data-types-distribution"
+            "/data-types-distribution",
         ]
 
         # Add dynamic facility routes
@@ -77,7 +79,11 @@ class URLManager:
 
         if pathname.startswith("/facility/"):
             facility_id = pathname.replace("/facility/", "")
-            return {"page": "facility_detail", "component": "facility_detail_layout", "facility_id": facility_id}
+            return {
+                "page": "facility_detail",
+                "component": "facility_detail_layout",
+                "facility_id": facility_id,
+            }
 
         return {"page": "not_found", "component": "error_page"}
 
@@ -114,8 +120,10 @@ class URLManager:
 
         return breadcrumbs
 
+
 # Singleton pattern
 _url_manager = None
+
 
 def get_url_manager() -> URLManager:
     """Get singleton URL manager instance"""

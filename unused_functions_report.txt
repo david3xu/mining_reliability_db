@@ -1,0 +1,1434 @@
+UNUSED FUNCTION ANALYSIS REPORT
+============================================================
+
+Analysis Date: 2025-06-02T10:54:07.797679
+Total Functions Analyzed: 729
+Potentially Unused Functions: 119
+
+Function: validate_unified_field_resolution
+File: /home/291928k/uwa/alcoa/mining_reliability_db/scripts/validate_phase1_core_foundation.py
+Line: 82
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_intelligence_engine
+File: /home/291928k/uwa/alcoa/mining_reliability_db/scripts/validate_phase1_core_foundation.py
+Line: 145
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_workflow_processor
+File: /home/291928k/uwa/alcoa/mining_reliability_db/scripts/validate_phase1_core_foundation.py
+Line: 187
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_query_manager_enhancement
+File: /home/291928k/uwa/alcoa/mining_reliability_db/scripts/validate_phase1_core_foundation.py
+Line: 217
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_architecture_compliance
+File: /home/291928k/uwa/alcoa/mining_reliability_db/scripts/validate_phase1_core_foundation.py
+Line: 255
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_env_required
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 206
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_required_env
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 214
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_dashboard_server_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 321
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_dashboard_performance_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 337
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_chart_display_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 399
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_chart_display_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 243
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: ensure_directory
+File: /home/291928k/uwa/alcoa/mining_reliability_db/configs/environment.py
+Line: 440
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: ensure_directory
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/common.py
+Line: 86
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_metric_card_style
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 65
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_chart_layout_template
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 89
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_bar_chart_style
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 118
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_pie_chart_style
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 133
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_table_style
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 150
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_responsive_style
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/styling.py
+Line: 226
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: build_facility_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 25
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: build_analysis_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 31
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: build_detail_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 42
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: build_filter_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 58
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: is_valid_facility_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 153
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: is_dashboard_url
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 162
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_page_title
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/utils/url_builders.py
+Line: 179
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_page_title
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/routing/navigation_builder.py
+Line: 169
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_metrics_cards
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/portfolio_overview.py
+Line: 196
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_facility_pie_chart
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/portfolio_overview.py
+Line: 201
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_historical_table
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/portfolio_overview.py
+Line: 211
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_portfolio_layout
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/portfolio_overview.py
+Line: 216
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_interactive_metric_card
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/interactive_elements.py
+Line: 17
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_interactive_pie_chart
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/interactive_elements.py
+Line: 58
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_interactive_bar_chart
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/interactive_elements.py
+Line: 105
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_interactive_data_table
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/interactive_elements.py
+Line: 153
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_loading_overlay
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/interactive_elements.py
+Line: 215
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_workflow_metrics_cards
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/workflow_analysis.py
+Line: 210
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_process_flow_diagram
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/workflow_analysis.py
+Line: 215
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_stage_field_distribution
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/workflow_analysis.py
+Line: 220
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_tab_container
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/tab_navigation.py
+Line: 39
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_breadcrumb_navigation
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/tab_navigation.py
+Line: 47
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_tab_content_id
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/tab_navigation.py
+Line: 66
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_page_header
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/tab_navigation.py
+Line: 120
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_network_analysis_dashboard
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/graph_visualizer.py
+Line: 351
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_cytoscape_network
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/graph_visualizer.py
+Line: 420
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_facility_network_comparison
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/graph_visualizer.py
+Line: 434
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_temporal_network_animation
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/graph_visualizer.py
+Line: 445
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_chart_container
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/layout_template.py
+Line: 140
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_empty_state
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/layout_template.py
+Line: 148
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_layout_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/layout_template.py
+Line: 160
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: reset_adapter
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/data_adapter.py
+Line: 343
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_portfolio_data
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/data_adapter.py
+Line: 256
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_facility_data
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/data_adapter.py
+Line: 260
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_field_data
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/data_adapter.py
+Line: 264
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_timeline_data
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/data_adapter.py
+Line: 268
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: reset_facility_adapter
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/facility_adapter.py
+Line: 359
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_facility_overview
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/facility_adapter.py
+Line: 338
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: reset_config_adapter
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 370
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entity_definitions
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 58
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entity_definitions
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/entities/definitions.py
+Line: 60
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entity_list
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 68
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entity_primary_key_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 76
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_field_categories
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 103
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_cascade_labeling_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 112
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_cascade_labeling_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_resolver.py
+Line: 207
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_performance_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 200
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_database_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 262
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_processing_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 271
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_relationships_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 280
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_complete_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 291
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_config_availability
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 299
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_dashboard_metric_card_styling
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 324
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_dashboard_chart_styling_template
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/config_adapter.py
+Line: 340
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: reset_workflow_adapter
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/workflow_adapter.py
+Line: 244
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_complete_workflow_analysis
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/adapters/workflow_adapter.py
+Line: 146
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: register_chart_interactions
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/callbacks/interaction_handlers.py
+Line: 27
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: register_table_interactions
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/callbacks/interaction_handlers.py
+Line: 74
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: build_breadcrumbs
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/routing/navigation_builder.py
+Line: 137
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_facility_summary_card
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/components/micro/facility_card.py
+Line: 13
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: analyze_data_quality
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/business/intelligence_engine.py
+Line: 239
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: extract_field_priority
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 96
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_entity_id
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 105
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_field_for_entity
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 110
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: normalize_field_value
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 141
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entity_label_cascade
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 169
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_entity_completeness
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 207
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_cascade_labeling
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 237
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: format_value_for_storage
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 272
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: calculate_data_quality_score
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_utils.py
+Line: 285
+Confidence: medium
+Reason: Utility function with no detected usage
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_logger
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/common.py
+Line: 81
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_logger
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/helpers/log_manager.py
+Line: 75
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_all_technical_fields
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_resolver.py
+Line: 226
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_all_business_fields
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_resolver.py
+Line: 242
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_field_resolution
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/shared/field_resolver.py
+Line: 258
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_entity_from_dict
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/entities/definitions.py
+Line: 66
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_primary_key
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/entities/definitions.py
+Line: 30
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_required_fields
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/entities/definitions.py
+Line: 38
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: investigate_cross_facility_patterns
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/analytics/pattern_discovery.py
+Line: 51
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: analyze_workflow_integrity
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/analytics/workflow_analyzer.py
+Line: 48
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: analyze_facility_completeness
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/analytics/quality_analyzer.py
+Line: 48
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_missing_data_impact
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/analytics/quality_analyzer.py
+Line: 184
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_facilities
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 17
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_facility
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 33
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_root_cause_intelligence_summary
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 97
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_operational_performance_dashboard
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 143
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_predictive_intelligence_indicators
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 211
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_missing_data_quality_intelligence
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 242
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_incident_chain
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/queries.py
+Line: 600
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_causal_intelligence_summary
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/db.py
+Line: 239
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_data_integrity
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/db.py
+Line: 263
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: optimize_performance
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/db.py
+Line: 313
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_entities_by_type
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/query_manager.py
+Line: 64
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_relationship_data
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/database/query_manager.py
+Line: 100
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: load_facility_data_complete
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/pipelines/loader.py
+Line: 205
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: validate_loading_integrity
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/pipelines/loader.py
+Line: 241
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: extract_all_facilities
+File: /home/291928k/uwa/alcoa/mining_reliability_db/mine_core/pipelines/extractor.py
+Line: 84
+Confidence: medium
+Reason: Function defined but no usage detected
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: route_page
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/app.py
+Line: 120
+Confidence: low
+Reason: Main module function - may be entry point
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: get_layout_config
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/layouts/main_layout.py
+Line: 165
+Confidence: low
+Reason: Main module function - may be entry point
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------
+
+Function: create_error_boundary
+File: /home/291928k/uwa/alcoa/mining_reliability_db/dashboard/layouts/main_layout.py
+Line: 143
+Confidence: low
+Reason: Main module function - may be entry point
+Recommendations:
+  - Verify function is not used externally before removal
+  - Check if function is part of a required interface
+  - Consider adding to __all__ if it should be public API
+
+----------------------------------------

@@ -5,16 +5,15 @@ Clean implementation without backwards compatibility pollution.
 """
 
 import logging
-from typing import Dict, List, Any
-from mine_core.database.db import get_database
+from typing import Any, Dict, List
+
 from configs.environment import get_system_constants
+from mine_core.database.db import get_database
 from mine_core.shared.common import handle_error
-from mine_core.shared.field_utils import (
-    has_real_value,
-    is_missing_data_indicator
-)
+from mine_core.shared.field_utils import has_real_value, is_missing_data_indicator
 
 logger = logging.getLogger(__name__)
+
 
 class Neo4jLoader:
     """Streamlined loader for clean single-value datasets"""
@@ -23,8 +22,12 @@ class Neo4jLoader:
         """Initialize loader with database connection"""
         self.db = get_database(uri, user, password)
         self.system_constants = get_system_constants()
-        self.entity_load_order = self.system_constants.get("processing", {}).get("entity_load_order", [])
-        self.relationship_configs = self.system_constants.get("relationships", {}).get("configs", [])
+        self.entity_load_order = self.system_constants.get("processing", {}).get(
+            "entity_load_order", []
+        )
+        self.relationship_configs = self.system_constants.get("relationships", {}).get(
+            "configs", []
+        )
 
     def close(self):
         """Close database connection"""
@@ -74,7 +77,9 @@ class Neo4jLoader:
                 return False
         return True
 
-    def _load_entities_with_labeling(self, entities: List[Dict[str, Any]], entity_type: str) -> bool:
+    def _load_entities_with_labeling(
+        self, entities: List[Dict[str, Any]], entity_type: str
+    ) -> bool:
         """Load entities with dynamic label support"""
         if not entities:
             logger.debug(f"No {entity_type} entities to load")
@@ -119,7 +124,7 @@ class Neo4jLoader:
             "Problem": ["what_happened"],
             "RootCause": ["root_cause"],
             "ActionPlan": ["action_plan"],
-            "Verification": ["is_action_plan_effective"]
+            "Verification": ["is_action_plan_effective"],
         }
 
         required_fields = critical_fields.get(entity_type, [])
@@ -132,8 +137,7 @@ class Neo4jLoader:
 
         # For entities without specific critical fields, check overall data completeness
         if not required_fields:
-            meaningful_fields = sum(1 for value in entity_data.values()
-                                  if has_real_value(value))
+            meaningful_fields = sum(1 for value in entity_data.values() if has_real_value(value))
             return meaningful_fields >= 1
 
         return False
@@ -142,19 +146,28 @@ class Neo4jLoader:
         """Create all entity relationships"""
         for config in self.relationship_configs:
             from_type, from_field, rel_type, to_type, to_field = config
-            if not self._create_relationship_batch(from_type, from_field, rel_type,
-                                                 to_type, to_field, entities.get(from_type, [])):
+            if not self._create_relationship_batch(
+                from_type, from_field, rel_type, to_type, to_field, entities.get(from_type, [])
+            ):
                 return False
         return True
 
-    def _create_relationship_batch(self, from_type: str, from_field: str, rel_type: str,
-                                 to_type: str, to_field: str, entities: List[Dict[str, Any]]) -> bool:
+    def _create_relationship_batch(
+        self,
+        from_type: str,
+        from_field: str,
+        rel_type: str,
+        to_type: str,
+        to_field: str,
+        entities: List[Dict[str, Any]],
+    ) -> bool:
         """Create relationships in batch for entity type using primary keys"""
         if not entities:
             return True
 
         # Get primary key fields for proper entity matching
         from configs.environment import get_entity_primary_key
+
         from_pk = get_entity_primary_key(from_type)
         to_pk = get_entity_primary_key(to_type)
 
@@ -177,21 +190,27 @@ class Neo4jLoader:
                     failed_count += 1
 
         if relationship_count > 0:
-            logger.info(f"Created {relationship_count} {from_type}-[{rel_type}]->{to_type} relationships")
+            logger.info(
+                f"Created {relationship_count} {from_type}-[{rel_type}]->{to_type} relationships"
+            )
 
         if failed_count > 0:
-            logger.warning(f"Failed to create {failed_count} {from_type}-[{rel_type}]->{to_type} relationships")
+            logger.warning(
+                f"Failed to create {failed_count} {from_type}-[{rel_type}]->{to_type} relationships"
+            )
 
         # Allow some failures but not total failure
         return failed_count < len(entities)
 
-    def load_facility_data_complete(self, facility_id: str, transformed_data: Dict[str, Any]) -> Dict[str, Any]:
+    def load_facility_data_complete(
+        self, facility_id: str, transformed_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Load facility data and return loading statistics"""
         stats = {
             "facility_id": facility_id,
             "entities_loaded": {},
             "relationships_created": 0,
-            "load_success": False
+            "load_success": False,
         }
 
         try:
@@ -209,7 +228,9 @@ class Neo4jLoader:
                 total_entities = sum(len(entity_list) for entity_list in entities.values())
                 stats["relationships_created"] = max(0, total_entities - 1)  # Approximate
 
-                logger.info(f"Successfully loaded facility {facility_id} with {total_entities} total entities")
+                logger.info(
+                    f"Successfully loaded facility {facility_id} with {total_entities} total entities"
+                )
 
         except Exception as e:
             handle_error(logger, e, f"loading facility {facility_id}")
@@ -223,7 +244,7 @@ class Neo4jLoader:
             "facility_check": False,
             "entity_counts": {},
             "relationship_validation": False,
-            "causal_chain_integrity": False
+            "causal_chain_integrity": False,
         }
 
         try:
@@ -233,7 +254,7 @@ class Neo4jLoader:
                 # Check facility exists
                 facility_check = self.db.execute_query(
                     "MATCH (f:Facility {facility_id: $facility_id}) RETURN count(f) AS count",
-                    facility_id=facility_id
+                    facility_id=facility_id,
                 )
                 validation_results["facility_check"] = facility_check[0]["count"] > 0
 
@@ -243,7 +264,7 @@ class Neo4jLoader:
                     if entity_list:
                         actual_count = self.db.execute_query(
                             f"MATCH (e:{entity_type}) WHERE e.facility_id = $facility_id OR e.actionrequest_id CONTAINS $facility_id RETURN count(e) AS count",
-                            facility_id=facility_id
+                            facility_id=facility_id,
                         )
                         validation_results["entity_counts"][entity_type] = actual_count[0]["count"]
 
@@ -254,9 +275,11 @@ class Neo4jLoader:
                     MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
                     RETURN count(*) AS causal_chains
                     """,
-                    facility_id=facility_id
+                    facility_id=facility_id,
                 )
-                validation_results["causal_chain_integrity"] = causal_chain_check[0]["causal_chains"] > 0
+                validation_results["causal_chain_integrity"] = (
+                    causal_chain_check[0]["causal_chains"] > 0
+                )
 
         except Exception as e:
             handle_error(logger, e, "validation")

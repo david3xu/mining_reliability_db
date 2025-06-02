@@ -18,13 +18,14 @@ FIELD RESOLUTION METHODOLOGY:
 """
 
 import json
-from typing import Dict, Any, Optional, List, Union
-from pathlib import Path
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from .constants import DEFAULT_CONFIG_DIR
 
 logger = logging.getLogger(__name__)
+
 
 class FieldResolver:
     """
@@ -37,14 +38,16 @@ class FieldResolver:
 
     def __init__(self, config_path: Optional[str] = None):
         """Initialize field resolver with unified field mappings"""
-        self.config_path = config_path or str(Path(DEFAULT_CONFIG_DIR) / "field_mappings_unified.json")
+        self.config_path = config_path or str(
+            Path(DEFAULT_CONFIG_DIR) / "field_mappings_unified.json"
+        )
         self._unified_mappings = None
         self._load_unified_mappings()
 
     def _load_unified_mappings(self) -> None:
         """Load unified field mappings configuration"""
         try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
+            with open(self.config_path, "r", encoding="utf-8") as f:
                 self._unified_mappings = json.load(f)
 
             logger.info(f"Loaded unified field mappings from {self.config_path}")
@@ -76,7 +79,9 @@ class FieldResolver:
         if not self._unified_mappings:
             return None
 
-        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(entity_name)
+        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(
+            entity_name
+        )
         if not entity_mappings:
             logger.warning(f"Entity '{entity_name}' not found in unified mappings")
             return None
@@ -115,7 +120,9 @@ class FieldResolver:
         if not self._unified_mappings:
             return None
 
-        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(entity_name)
+        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(
+            entity_name
+        )
         if not entity_mappings:
             return None
 
@@ -136,14 +143,18 @@ class FieldResolver:
         if not self._unified_mappings:
             return None
 
-        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(entity_name)
+        entity_mappings = self._unified_mappings.get("unified_field_references", {}).get(
+            entity_name
+        )
         if not entity_mappings:
             return None
 
         raw_data_fields = entity_mappings.get("raw_data_fields", {})
         return raw_data_fields.get(technical_field)
 
-    def resolve_field_mapping(self, entity_name: str, source_type: str, target_type: str, field_name: str) -> Optional[str]:
+    def resolve_field_mapping(
+        self, entity_name: str, source_type: str, target_type: str, field_name: str
+    ) -> Optional[str]:
         """
         Universal field mapping resolver that translates between all three naming conventions.
 
@@ -160,7 +171,7 @@ class FieldResolver:
             return field_name
 
         # First get technical field name (our unified reference)
-        if source_type == 'technical':
+        if source_type == "technical":
             technical_field = field_name
         else:
             technical_field = self.get_technical_field(entity_name, field_name)
@@ -169,11 +180,11 @@ class FieldResolver:
             return None
 
         # Then get target field name
-        if target_type == 'technical':
+        if target_type == "technical":
             return technical_field
-        elif target_type == 'business':
+        elif target_type == "business":
             return self.get_business_field(entity_name, technical_field)
-        elif target_type == 'raw_data':
+        elif target_type == "raw_data":
             return self.get_raw_data_field(entity_name, technical_field)
 
         return None
@@ -264,7 +275,7 @@ class FieldResolver:
             "architecture_compliance": True,
             "field_mapping_consistency": True,
             "errors": [],
-            "warnings": []
+            "warnings": [],
         }
 
         # Check each entity for complete field mappings
@@ -290,6 +301,7 @@ class FieldResolver:
 # Global field resolver instance for application-wide use
 _field_resolver = None
 
+
 def get_field_resolver(config_path: Optional[str] = None) -> FieldResolver:
     """
     Get global field resolver instance (singleton pattern).
@@ -313,14 +325,21 @@ def get_technical_field(entity_name: str, field_identifier: str) -> Optional[str
     """Get technical database field name"""
     return get_field_resolver().get_technical_field(entity_name, field_identifier)
 
+
 def get_business_field(entity_name: str, technical_field: str) -> Optional[str]:
     """Get business display field name"""
     return get_field_resolver().get_business_field(entity_name, technical_field)
+
 
 def get_raw_data_field(entity_name: str, technical_field: str) -> Optional[str]:
     """Get raw data field name"""
     return get_field_resolver().get_raw_data_field(entity_name, technical_field)
 
-def resolve_field_mapping(entity_name: str, source_type: str, target_type: str, field_name: str) -> Optional[str]:
+
+def resolve_field_mapping(
+    entity_name: str, source_type: str, target_type: str, field_name: str
+) -> Optional[str]:
     """Universal field mapping resolver"""
-    return get_field_resolver().resolve_field_mapping(entity_name, source_type, target_type, field_name)
+    return get_field_resolver().resolve_field_mapping(
+        entity_name, source_type, target_type, field_name
+    )

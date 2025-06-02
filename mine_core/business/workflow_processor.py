@@ -5,21 +5,27 @@ Centralized workflow intelligence with schema-driven stage analysis.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from mine_core.database.query_manager import get_query_manager
 from configs.environment import (
-    get_schema, get_mappings, get_entity_names,
-    get_workflow_stages_config, get_entity_classification, get_entity_connections
+    get_entity_classification,
+    get_entity_connections,
+    get_entity_names,
+    get_mappings,
+    get_schema,
+    get_workflow_stages_config,
 )
+from mine_core.database.query_manager import get_query_manager
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class WorkflowStage:
     """Workflow stage data container"""
+
     stage_number: int
     entity_name: str
     title: str
@@ -28,13 +34,16 @@ class WorkflowStage:
     business_fields: List[str]
     complexity_level: str
 
+
 @dataclass
 class WorkflowAnalysis:
     """Complete workflow analysis result"""
+
     workflow_stages: List[WorkflowStage]
     supporting_entities: List[Dict[str, Any]]
     completion_summary: Dict[str, Any]
     metadata: Dict[str, Any]
+
 
 class WorkflowProcessor:
     """Core workflow intelligence and stage analysis engine"""
@@ -68,7 +77,7 @@ class WorkflowProcessor:
                 "total_fields": len(unique_fields),
                 "analytical_dimensions": len(analytical_dimensions),
                 "field_categories": len(field_categories),
-                "entity_complexity": self._analyze_entity_complexity(workflow_entities)
+                "entity_complexity": self._analyze_entity_complexity(workflow_entities),
             }
 
         except Exception as e:
@@ -98,7 +107,7 @@ class WorkflowProcessor:
                 "entity_names": entity_names,
                 "field_counts": field_counts,
                 "total_entities": len(entities),
-                "field_distribution": self._analyze_field_distribution_patterns(field_counts)
+                "field_distribution": self._analyze_field_distribution_patterns(field_counts),
             }
 
         except Exception as e:
@@ -132,7 +141,7 @@ class WorkflowProcessor:
                 "entities_covered": len(entity_mappings),
                 "categories_found": len(set(m["category"] for m in mapping_analysis)),
                 "critical_fields": sum(1 for m in mapping_analysis if m["critical"]),
-                "mapping_patterns": self._analyze_mapping_patterns(mapping_analysis)
+                "mapping_patterns": self._analyze_mapping_patterns(mapping_analysis),
             }
 
         except Exception as e:
@@ -162,8 +171,8 @@ class WorkflowProcessor:
                 metadata={
                     "stage_count": len(workflow_stages),
                     "supporting_count": len(supporting_entities),
-                    "analysis_type": "neo4j_driven"
-                }
+                    "analysis_type": "neo4j_driven",
+                },
             )
 
         except Exception as e:
@@ -187,7 +196,7 @@ class WorkflowProcessor:
                 "total_fields": len(unique_source_fields),
                 "entity_mappings": entity_mappings,
                 "source_fields": unique_source_fields,
-                "mapping_coverage": self._calculate_mapping_coverage(entity_mappings)
+                "mapping_coverage": self._calculate_mapping_coverage(entity_mappings),
             }
 
         except Exception as e:
@@ -213,11 +222,13 @@ class WorkflowProcessor:
             layout_config = entity_classification.get("layout_config", {})
 
             return {
-                "workflow_stages": [self._stage_to_dict(stage) for stage in workflow_analysis.workflow_stages],
+                "workflow_stages": [
+                    self._stage_to_dict(stage) for stage in workflow_analysis.workflow_stages
+                ],
                 "supporting_entities": supporting_entities,
                 "layout_config": layout_config,
                 "connection_config": entity_connections.get("connection_display", {}),
-                "display_config": get_workflow_stages_config().get("display_config", {})
+                "display_config": get_workflow_stages_config().get("display_config", {}),
             }
 
         except Exception as e:
@@ -243,19 +254,25 @@ class WorkflowProcessor:
 
         return workflow_entities
 
-    def _enhance_entity_definition(self, entity_def: Dict[str, Any], stage_number: int) -> Dict[str, Any]:
+    def _enhance_entity_definition(
+        self, entity_def: Dict[str, Any], stage_number: int
+    ) -> Dict[str, Any]:
         """Enhance entity definition with workflow context"""
         entity_name = entity_def["name"]
         properties = entity_def.get("properties", {})
         field_count = len(properties)
 
         # Calculate business field count (exclude technical fields)
-        business_field_count = sum(1 for prop_name, prop_info in properties.items()
-                                 if not self._is_technical_field(prop_name, prop_info))
+        business_field_count = sum(
+            1
+            for prop_name, prop_info in properties.items()
+            if not self._is_technical_field(prop_name, prop_info)
+        )
 
         # Determine complexity
-        complexity_level = ("complex" if field_count >= 8 else
-                          "moderate" if field_count >= 5 else "simple")
+        complexity_level = (
+            "complex" if field_count >= 8 else "moderate" if field_count >= 5 else "simple"
+        )
 
         return {
             "stage_number": stage_number,
@@ -264,10 +281,12 @@ class WorkflowProcessor:
             "field_count": field_count,
             "business_field_count": business_field_count,
             "properties": properties,
-            "complexity_level": complexity_level
+            "complexity_level": complexity_level,
         }
 
-    def _process_workflow_stages(self, workflow_config: Dict, completion_data: Dict) -> List[WorkflowStage]:
+    def _process_workflow_stages(
+        self, workflow_config: Dict, completion_data: Dict
+    ) -> List[WorkflowStage]:
         """Process workflow stages with completion rates"""
         stage_configs = workflow_config.get("workflow_stages", [])
 
@@ -282,7 +301,9 @@ class WorkflowProcessor:
 
             # Calculate complexity
             field_count = len(stage_config.get("business_fields", []))
-            complexity = "complex" if field_count >= 6 else "moderate" if field_count >= 3 else "simple"
+            complexity = (
+                "complex" if field_count >= 6 else "moderate" if field_count >= 3 else "simple"
+            )
 
             stage = WorkflowStage(
                 stage_number=stage_config.get("stage_number", 1),
@@ -291,7 +312,7 @@ class WorkflowProcessor:
                 field_count=field_count,
                 completion_rate=completion_rate,
                 business_fields=stage_config.get("business_fields", []),
-                complexity_level=complexity
+                complexity_level=complexity,
             )
 
             stages.append(stage)
@@ -301,7 +322,11 @@ class WorkflowProcessor:
     def _process_supporting_entities(self) -> List[Dict[str, Any]]:
         """Process supporting entities for workflow context"""
         entity_classification = get_entity_classification()
-        supporting_entities = entity_classification.get("entity_types", {}).get("supporting_entities", {}).get("entities", [])
+        supporting_entities = (
+            entity_classification.get("entity_types", {})
+            .get("supporting_entities", {})
+            .get("entities", [])
+        )
 
         processed_entities = []
         for entity_name in supporting_entities:
@@ -310,9 +335,15 @@ class WorkflowProcessor:
 
         return processed_entities
 
-    def _process_supporting_with_connections(self, entity_classification: Dict, entity_connections: Dict) -> List[Dict[str, Any]]:
+    def _process_supporting_with_connections(
+        self, entity_classification: Dict, entity_connections: Dict
+    ) -> List[Dict[str, Any]]:
         """Process supporting entities with connection information"""
-        supporting_entities = entity_classification.get("entity_types", {}).get("supporting_entities", {}).get("entities", [])
+        supporting_entities = (
+            entity_classification.get("entity_types", {})
+            .get("supporting_entities", {})
+            .get("entities", [])
+        )
         connections = entity_connections.get("supporting_connections", {})
 
         processed = []
@@ -339,7 +370,7 @@ class WorkflowProcessor:
                 "total_count": count,
                 "completion_rate": completion_rate,
                 "completed_fields": count * 2,  # Simplified calculation
-                "total_fields": count * 3  # Simplified calculation
+                "total_fields": count * 3,  # Simplified calculation
             }
 
         return completion_data
@@ -355,8 +386,11 @@ class WorkflowProcessor:
 
         return {
             "complexity_distribution": complexity_counts,
-            "average_fields": sum(e.get("field_count", 0) for e in workflow_entities) / len(workflow_entities),
-            "most_complex": max(workflow_entities, key=lambda e: e.get("field_count", 0))["entity_name"]
+            "average_fields": sum(e.get("field_count", 0) for e in workflow_entities)
+            / len(workflow_entities),
+            "most_complex": max(workflow_entities, key=lambda e: e.get("field_count", 0))[
+                "entity_name"
+            ],
         }
 
     def _analyze_field_distribution_patterns(self, field_counts: List[int]) -> Dict[str, Any]:
@@ -369,7 +403,9 @@ class WorkflowProcessor:
             "max_fields": max(field_counts),
             "average_fields": sum(field_counts) / len(field_counts),
             "field_variance": max(field_counts) - min(field_counts),
-            "balanced_distribution": max(field_counts) / min(field_counts) < 3 if min(field_counts) > 0 else False
+            "balanced_distribution": max(field_counts) / min(field_counts) < 3
+            if min(field_counts) > 0
+            else False,
         }
 
     def _build_category_lookup(self, field_categories: Dict) -> Dict[str, str]:
@@ -381,8 +417,9 @@ class WorkflowProcessor:
                 category_lookup[field] = clean_category
         return category_lookup
 
-    def _analyze_single_mapping(self, entity_name: str, target_field: str,
-                               source_field: str, category_lookup: Dict) -> Dict[str, Any]:
+    def _analyze_single_mapping(
+        self, entity_name: str, target_field: str, source_field: str, category_lookup: Dict
+    ) -> Dict[str, Any]:
         """Analyze single field mapping"""
         # Determine category
         field_category = category_lookup.get(source_field, "General")
@@ -396,7 +433,7 @@ class WorkflowProcessor:
             "target_field": target_field,
             "source_field": source_field,
             "category": field_category,
-            "critical": is_critical
+            "critical": is_critical,
         }
 
     def _analyze_mapping_patterns(self, mappings: List[Dict]) -> Dict[str, Any]:
@@ -414,8 +451,12 @@ class WorkflowProcessor:
         return {
             "entity_distribution": entity_counts,
             "category_distribution": category_counts,
-            "most_mapped_entity": max(entity_counts, key=entity_counts.get) if entity_counts else None,
-            "dominant_category": max(category_counts, key=category_counts.get) if category_counts else None
+            "most_mapped_entity": max(entity_counts, key=entity_counts.get)
+            if entity_counts
+            else None,
+            "dominant_category": max(category_counts, key=category_counts.get)
+            if category_counts
+            else None,
         }
 
     def _generate_completion_summary(self, completion_data: Dict) -> Dict[str, Any]:
@@ -429,7 +470,7 @@ class WorkflowProcessor:
             "average_completion": sum(rates) / len(rates) if rates else 0,
             "highest_completion": max(rates) if rates else 0,
             "lowest_completion": min(rates) if rates else 0,
-            "entities_analyzed": len(completion_data)
+            "entities_analyzed": len(completion_data),
         }
 
     def _calculate_mapping_coverage(self, entity_mappings: Dict) -> Dict[str, Any]:
@@ -441,7 +482,7 @@ class WorkflowProcessor:
             "coverage_ratio": mapped_entities / total_entities if total_entities > 0 else 0,
             "mapped_entities": mapped_entities,
             "total_entities": total_entities,
-            "unmapped_entities": total_entities - mapped_entities
+            "unmapped_entities": total_entities - mapped_entities,
         }
 
     def _is_technical_field(self, prop_name: str, prop_info: Dict) -> bool:
@@ -457,7 +498,7 @@ class WorkflowProcessor:
             "Problem": "Problem Definition",
             "RootCause": "Causal Analysis",
             "ActionPlan": "Resolution Planning",
-            "Verification": "Effectiveness Check"
+            "Verification": "Effectiveness Check",
         }
         return title_mapping.get(entity_name, entity_name)
 
@@ -476,7 +517,7 @@ class WorkflowProcessor:
             "field_count": field_count,
             "completion_rate": completion_rate,
             "entity_count": count,
-            "card_height": 120  # Standard supporting entity height
+            "card_height": 120,  # Standard supporting entity height
         }
 
     def _stage_to_dict(self, stage: WorkflowStage) -> Dict[str, Any]:
@@ -488,11 +529,13 @@ class WorkflowProcessor:
             "field_count": stage.field_count,
             "completion_rate": stage.completion_rate,
             "source_fields": stage.business_fields,
-            "complexity_level": stage.complexity_level
+            "complexity_level": stage.complexity_level,
         }
+
 
 # Singleton pattern
 _workflow_processor = None
+
 
 def get_workflow_processor() -> WorkflowProcessor:
     """Get singleton workflow processor instance"""

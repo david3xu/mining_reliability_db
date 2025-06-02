@@ -5,9 +5,11 @@ Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
-from mine_core.shared.common import setup_project_environment, handle_error
-from mine_core.database.db import get_database, close_database
+
 from configs.environment import get_schema
+from mine_core.database.db import close_database, get_database
+from mine_core.shared.common import handle_error, setup_project_environment
+
 
 def create_constraints(schema, db):
     """Create Neo4j constraints from schema"""
@@ -18,7 +20,7 @@ def create_constraints(schema, db):
         with db.session() as session:
             constraints = session.run("SHOW CONSTRAINTS").data()
             for constraint in constraints:
-                if 'name' in constraint:
+                if "name" in constraint:
                     session.run(f"DROP CONSTRAINT {constraint['name']}")
         logger.info("Dropped existing constraints")
     except Exception as e:
@@ -55,6 +57,7 @@ def create_constraints(schema, db):
 
     return constraints_created
 
+
 def create_schema_structure(schema, db):
     """Create schema structure in Neo4j"""
     relationships_created = 0
@@ -75,9 +78,12 @@ def create_schema_structure(schema, db):
                 relationships_created += 1
                 logger.info(f"Created relationship: {from_entity}-[{rel_type}]->{to_entity}")
         except Exception as e:
-            handle_error(logger, e, f"creating relationship {from_entity}-[{rel_type}]->{to_entity}")
+            handle_error(
+                logger, e, f"creating relationship {from_entity}-[{rel_type}]->{to_entity}"
+            )
 
     return relationships_created
+
 
 def main():
     """Main execution function"""
@@ -126,6 +132,7 @@ def main():
 
     finally:
         close_database()
+
 
 if __name__ == "__main__":
     exit(main())

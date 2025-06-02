@@ -6,13 +6,13 @@ Data Extractor - Simple direct processing of all JSON files
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class FacilityDataExtractor:
     """Extract from all JSON files in directory"""
@@ -50,16 +50,13 @@ class FacilityDataExtractor:
             return {}
 
         try:
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 data = json.load(f)
 
             records = self._extract_records(data)
             logger.info(f"Extracted {len(records)} records from {facility_id}")
 
-            return {
-                "facility_id": facility_id,
-                "records": records
-            }
+            return {"facility_id": facility_id, "records": records}
 
         except Exception as e:
             logger.error(f"Error reading {file_path}: {e}")

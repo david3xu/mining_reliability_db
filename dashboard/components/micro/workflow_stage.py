@@ -5,7 +5,9 @@ Micro-Component: Workflow Stage - Single Process Stage Display
 """
 
 from dash import html
+
 from dashboard.adapters import get_config_adapter
+
 
 def create_workflow_stage_card(stage_data: dict) -> html.Div:
     """Pure workflow stage component - 18 lines of logic"""
@@ -19,18 +21,41 @@ def create_workflow_stage_card(stage_data: dict) -> html.Div:
     color = stage_data.get("color", "#4A90E2")
 
     # Build card content
-    header = html.Div([
-        html.H6(f"STAGE {stage_number}", style={"fontSize": "14px", "margin": "0"}),
-        html.H4(title, style={"fontSize": "18px", "margin": "5px 0 0 0"})
-    ], style={"backgroundColor": "rgba(0,0,0,0.3)", "padding": "10px", "borderRadius": "8px 8px 0 0"})
+    header = html.Div(
+        [
+            html.H6(f"STAGE {stage_number}", style={"fontSize": "14px", "margin": "0"}),
+            html.H4(title, style={"fontSize": "18px", "margin": "5px 0 0 0"}),
+        ],
+        style={
+            "backgroundColor": "rgba(0,0,0,0.3)",
+            "padding": "10px",
+            "borderRadius": "8px 8px 0 0",
+        },
+    )
 
-    content = html.Div([
-        html.P(f"{field_count} Fields", style={"fontSize": "14px", "fontWeight": "bold"}),
-        html.Span(f"{completion_rate}% Complete",
-                 style={"padding": "5px 10px", "borderRadius": "10px", "backgroundColor": "rgba(255,255,255,0.2)"})
-    ], style={"padding": "15px"})
+    content = html.Div(
+        [
+            html.P(f"{field_count} Fields", style={"fontSize": "14px", "fontWeight": "bold"}),
+            html.Span(
+                f"{completion_rate}% Complete",
+                style={
+                    "padding": "5px 10px",
+                    "borderRadius": "10px",
+                    "backgroundColor": "rgba(255,255,255,0.2)",
+                },
+            ),
+        ],
+        style={"padding": "15px"},
+    )
 
-    return html.Div([header, content], style={
-        "backgroundColor": color, "color": "#FFFFFF", "borderRadius": "8px",
-        "minHeight": "280px", "margin": "10px", "boxShadow": "0 4px 6px rgba(0,0,0,0.1)"
-    })
+    return html.Div(
+        [header, content],
+        style={
+            "backgroundColor": color,
+            "color": "#FFFFFF",
+            "borderRadius": "8px",
+            "minHeight": "280px",
+            "margin": "10px",
+            "boxShadow": "0 4px 6px rgba(0,0,0,0.1)",
+        },
+    )

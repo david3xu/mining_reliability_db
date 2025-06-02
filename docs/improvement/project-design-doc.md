@@ -70,28 +70,28 @@ graph TD
     B --> C[DataTransformer]
     C --> D[Neo4jLoader]
     D --> E[Neo4j Database]
-    
+
     F[model_schema.json] --> C
     G[field_mappings.json] --> C
     H[environment.py] --> D
-    
+
     E --> I[Query Interface]
     I --> J[Analysis Tools]
     I --> K[Dashboard Apps]
     I --> L[Reporting Systems]
-    
+
     subgraph "Configuration Layer"
         F
         G
         H
     end
-    
+
     subgraph "ETL Pipeline"
         B
         C
         D
     end
-    
+
     subgraph "Extension Points"
         J
         K
@@ -147,7 +147,7 @@ GET /api/incidents/{id}/chain
 Add entities to `model_schema.json`:
 ```json
 {
-  "name": "SafetyMetric", 
+  "name": "SafetyMetric",
   "properties": {...},
   "relationships": [...]
 }

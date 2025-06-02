@@ -4,18 +4,23 @@ Simplified Test Suite for Field Processing Components
 Focused testing for clean single-value dataset processing with root cause intelligence.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from mine_core.shared.field_utils import (
-    has_real_value, get_missing_indicator, clean_label,
-    extract_root_cause_tail, get_causal_intelligence_fields
-)
 from mine_core.pipelines.transformer import DataTransformer
+from mine_core.shared.field_utils import (
+    clean_label,
+    extract_root_cause_tail,
+    get_causal_intelligence_fields,
+    get_missing_indicator,
+    has_real_value,
+)
+
 
 class TestSimplifiedFieldUtils:
     """Test simplified field utility functions"""
@@ -57,10 +62,16 @@ class TestSimplifiedFieldUtils:
         assert extract_root_cause_tail("Equipment failure; Poor maintenance") == "Poor maintenance"
 
         # Multiple causes with comma
-        assert extract_root_cause_tail("Heat damage, Inadequate ventilation, Design flaw") == "Design flaw"
+        assert (
+            extract_root_cause_tail("Heat damage, Inadequate ventilation, Design flaw")
+            == "Design flaw"
+        )
 
         # Multiple causes with 'and'
-        assert extract_root_cause_tail("Mechanical wear and insufficient lubrication") == "insufficient lubrication"
+        assert (
+            extract_root_cause_tail("Mechanical wear and insufficient lubrication")
+            == "insufficient lubrication"
+        )
 
         # Empty/None cases
         assert extract_root_cause_tail("") == "NOT_SPECIFIED"
@@ -71,7 +82,7 @@ class TestSimplifiedFieldUtils:
         record = {
             "Root Cause": "Equipment overheating; Poor maintenance schedule",
             "Obj. Evidence": "Temperature logs show excessive heat",
-            "Other Field": "Some other data"
+            "Other Field": "Some other data",
         }
 
         causal_fields = get_causal_intelligence_fields(record)
@@ -79,6 +90,7 @@ class TestSimplifiedFieldUtils:
         assert causal_fields["primary_cause"] == "Equipment overheating; Poor maintenance schedule"
         assert causal_fields["secondary_cause"] == "Poor maintenance schedule"
         assert causal_fields["evidence"] == "Temperature logs show excessive heat"
+
 
 class TestDataTransformer:
     """Test simplified transformation logic with causal intelligence"""
@@ -90,30 +102,27 @@ class TestDataTransformer:
                 "ActionRequest": {
                     "action_request_number": "Action Request Number:",
                     "title": "Title",
-                    "categories": "Categories"
+                    "categories": "Categories",
                 },
-                "Problem": {
-                    "what_happened": "What happened?",
-                    "requirement": "Requirement"
-                },
+                "Problem": {"what_happened": "What happened?", "requirement": "Requirement"},
                 "RootCause": {
                     "root_cause": "Root Cause",
                     "root_cause_tail": "Root Cause",
-                    "objective_evidence": "Obj. Evidence"
-                }
+                    "objective_evidence": "Obj. Evidence",
+                },
             },
             "cascade_labeling": {
                 "ActionRequest": {
                     "label_priority": ["Title", "Action Request Number:"],
                     "required_fields": ["Action Request Number:"],
-                    "entity_type": "ActionRequest"
+                    "entity_type": "ActionRequest",
                 },
                 "RootCause": {
                     "label_priority": ["Root Cause"],
                     "required_fields": ["Root Cause"],
-                    "entity_type": "RootCause"
-                }
-            }
+                    "entity_type": "RootCause",
+                },
+            },
         }
 
         self.transformer = DataTransformer(self.sample_mappings, use_config=False)
@@ -128,9 +137,9 @@ class TestDataTransformer:
                     "Title": "Conveyor System Failure",
                     "Categories": "Mechanical",
                     "What happened?": "Belt conveyor stopped during shift",
-                    "Root Cause": "Motor bearing failure; Insufficient lubrication schedule"
+                    "Root Cause": "Motor bearing failure; Insufficient lubrication schedule",
                 }
-            ]
+            ],
         }
 
         result = self.transformer.transform_facility_data(facility_data)
@@ -153,7 +162,7 @@ class TestDataTransformer:
             "Action Request Number:": "AR-002",
             "Title": "Equipment Issue",
             "Root Cause": "Primary cause; Secondary contributing factor",
-            "Obj. Evidence": "Maintenance logs and inspection reports"
+            "Obj. Evidence": "Maintenance logs and inspection reports",
         }
 
         base_id = "test_facility_ar002"
@@ -170,7 +179,7 @@ class TestDataTransformer:
             "actionrequest_id": "ar-test001",
             "action_request_number": "AR-001",
             "title": "Equipment Malfunction",
-            "categories": "Mechanical"
+            "categories": "Mechanical",
         }
 
         label = self.transformer._apply_cascade_labeling(entity_data, "ActionRequest")
@@ -195,7 +204,7 @@ class TestDataTransformer:
         # Record with required data for RootCause
         record_with_cause = {
             "Action Request Number:": "AR-004",
-            "Root Cause": "Actual equipment failure cause"
+            "Root Cause": "Actual equipment failure cause",
         }
         assert self.transformer._has_required_data("RootCause", record_with_cause) == True
 
@@ -207,6 +216,7 @@ class TestDataTransformer:
         }
         assert self.transformer._has_required_data("RootCause", record_without_cause) == False
 
+
 class TestCausalIntelligenceWorkflow:
     """Test complete causal intelligence workflow"""
 
@@ -217,50 +227,44 @@ class TestCausalIntelligenceWorkflow:
                 "ActionRequest": {
                     "action_request_number": "Action Request Number:",
                     "title": "Title",
-                    "categories": "Categories"
+                    "categories": "Categories",
                 },
-                "Problem": {
-                    "what_happened": "What happened?"
-                },
+                "Problem": {"what_happened": "What happened?"},
                 "RootCause": {
                     "root_cause": "Root Cause",
                     "root_cause_tail": "Root Cause",
-                    "objective_evidence": "Obj. Evidence"
+                    "objective_evidence": "Obj. Evidence",
                 },
-                "ActionPlan": {
-                    "action_plan": "Action Plan"
-                },
-                "Verification": {
-                    "is_action_plan_effective": "IsActionPlanEffective"
-                }
+                "ActionPlan": {"action_plan": "Action Plan"},
+                "Verification": {"is_action_plan_effective": "IsActionPlanEffective"},
             },
             "cascade_labeling": {
                 "ActionRequest": {
                     "label_priority": ["Title"],
                     "required_fields": ["Action Request Number:"],
-                    "entity_type": "ActionRequest"
+                    "entity_type": "ActionRequest",
                 },
                 "Problem": {
                     "label_priority": ["What happened?"],
                     "required_fields": ["What happened?"],
-                    "entity_type": "Problem"
+                    "entity_type": "Problem",
                 },
                 "RootCause": {
                     "label_priority": ["Root Cause"],
                     "required_fields": ["Root Cause"],
-                    "entity_type": "RootCause"
+                    "entity_type": "RootCause",
                 },
                 "ActionPlan": {
                     "label_priority": ["Action Plan"],
                     "required_fields": ["Action Plan"],
-                    "entity_type": "ActionPlan"
+                    "entity_type": "ActionPlan",
                 },
                 "Verification": {
                     "label_priority": ["IsActionPlanEffective"],
                     "required_fields": ["IsActionPlanEffective"],
-                    "entity_type": "Verification"
-                }
-            }
+                    "entity_type": "Verification",
+                },
+            },
         }
 
     def test_complete_causal_workflow(self):
@@ -278,9 +282,9 @@ class TestCausalIntelligenceWorkflow:
                     "Root Cause": "Bearing deterioration; Inadequate maintenance frequency; Poor lubrication quality",
                     "Obj. Evidence": "Bearing inspection report and maintenance logs",
                     "Action Plan": "Replace bearings and improve maintenance schedule",
-                    "IsActionPlanEffective": "true"
+                    "IsActionPlanEffective": "true",
                 }
-            ]
+            ],
         }
 
         result = transformer.transform_facility_data(facility_data)
@@ -310,25 +314,20 @@ class TestCausalIntelligenceWorkflow:
         test_cases = [
             {
                 "input": "Single cause without delimiters",
-                "expected_tail": "Single cause without delimiters"
+                "expected_tail": "Single cause without delimiters",
             },
-            {
-                "input": "First cause, Second cause, Final cause",
-                "expected_tail": "Final cause"
-            },
+            {"input": "First cause, Second cause, Final cause", "expected_tail": "Final cause"},
             {
                 "input": "Equipment failure - maintenance issue",
-                "expected_tail": "maintenance issue"
+                "expected_tail": "maintenance issue",
             },
-            {
-                "input": "",
-                "expected_tail": "NOT_SPECIFIED"
-            }
+            {"input": "", "expected_tail": "NOT_SPECIFIED"},
         ]
 
         for test_case in test_cases:
             result = transformer._extract_tail_value(test_case["input"])
             assert result == test_case["expected_tail"]
+
 
 class TestDataQualityValidation:
     """Test data quality validation for simplified processing"""
@@ -357,6 +356,7 @@ class TestDataQualityValidation:
         assert get_field_category("What happened?") == "descriptive"
         assert get_field_category("Complete") == "boolean"
         assert get_field_category("Amount of Loss") == "quantitative"
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

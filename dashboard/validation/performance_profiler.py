@@ -4,23 +4,31 @@ Performance Profiler - Direct Performance Analysis
 Core performance measurement for adapter and component response times.
 """
 
-import time
 import logging
-from typing import Dict, List, Any
+import time
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
-from dashboard.adapters import get_data_adapter, get_workflow_adapter, get_facility_adapter, get_config_adapter
+from dashboard.adapters import (
+    get_config_adapter,
+    get_data_adapter,
+    get_facility_adapter,
+    get_workflow_adapter,
+)
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class PerformanceResult:
     """Direct performance measurement result"""
+
     operation: str
     response_time: float
     success: bool
     data_size: int
+
 
 class PerformanceProfiler:
     """Direct performance analysis for dashboard operations"""
@@ -36,21 +44,43 @@ class PerformanceProfiler:
         results = []
 
         # Portfolio operations
-        results.append(self._time_operation("portfolio_metrics", self.data_adapter.get_portfolio_metrics))
-        results.append(self._time_operation("facility_breakdown", self.data_adapter.get_facility_breakdown))
-        results.append(self._time_operation("field_distribution", self.data_adapter.get_field_distribution))
-        results.append(self._time_operation("historical_timeline", self.data_adapter.get_historical_timeline))
+        results.append(
+            self._time_operation("portfolio_metrics", self.data_adapter.get_portfolio_metrics)
+        )
+        results.append(
+            self._time_operation("facility_breakdown", self.data_adapter.get_facility_breakdown)
+        )
+        results.append(
+            self._time_operation("field_distribution", self.data_adapter.get_field_distribution)
+        )
+        results.append(
+            self._time_operation("historical_timeline", self.data_adapter.get_historical_timeline)
+        )
 
         # Workflow operations
-        results.append(self._time_operation("workflow_schema", self.workflow_adapter.get_workflow_schema_analysis))
-        results.append(self._time_operation("entity_distribution", self.workflow_adapter.get_entity_field_distribution))
-        results.append(self._time_operation("field_mapping", self.workflow_adapter.get_field_mapping_analysis))
+        results.append(
+            self._time_operation(
+                "workflow_schema", self.workflow_adapter.get_workflow_schema_analysis
+            )
+        )
+        results.append(
+            self._time_operation(
+                "entity_distribution", self.workflow_adapter.get_entity_field_distribution
+            )
+        )
+        results.append(
+            self._time_operation("field_mapping", self.workflow_adapter.get_field_mapping_analysis)
+        )
 
         # Facility operations
-        results.append(self._time_operation("facility_list", self.facility_adapter.get_facility_list))
+        results.append(
+            self._time_operation("facility_list", self.facility_adapter.get_facility_list)
+        )
 
         # Configuration operations
-        results.append(self._time_operation("styling_config", self.config_adapter.get_styling_config))
+        results.append(
+            self._time_operation("styling_config", self.config_adapter.get_styling_config)
+        )
         results.append(self._time_operation("chart_config", self.config_adapter.get_chart_config))
 
         return self._analyze_results(results)
@@ -71,24 +101,21 @@ class PerformanceProfiler:
                 operation=operation_name,
                 response_time=response_time,
                 success=True,
-                data_size=data_size
+                data_size=data_size,
             )
 
         except Exception as e:
             handle_error(logger, e, f"performance timing for {operation_name}")
             return PerformanceResult(
-                operation=operation_name,
-                response_time=0.0,
-                success=False,
-                data_size=0
+                operation=operation_name, response_time=0.0, success=False, data_size=0
             )
 
     def _calculate_data_size(self, data: Any) -> int:
         """Calculate approximate data size"""
         try:
-            if hasattr(data, '__len__'):
+            if hasattr(data, "__len__"):
                 return len(data)
-            elif hasattr(data, '__dict__'):
+            elif hasattr(data, "__dict__"):
                 return len(str(data.__dict__))
             else:
                 return len(str(data))
@@ -120,9 +147,10 @@ class PerformanceProfiler:
                     "operation": r.operation,
                     "response_time": r.response_time,
                     "success": r.success,
-                    "data_size": r.data_size
-                } for r in results
-            ]
+                    "data_size": r.data_size,
+                }
+                for r in results
+            ],
         }
 
     def _calculate_grade(self, response_times: List[float]) -> str:
@@ -147,7 +175,7 @@ class PerformanceProfiler:
             ("portfolio_overview", "dashboard.components.portfolio_overview"),
             ("workflow_analysis", "dashboard.components.workflow_analysis"),
             ("data_quality", "dashboard.components.data_quality"),
-            ("facility_detail", "dashboard.components.facility_detail")
+            ("facility_detail", "dashboard.components.facility_detail"),
         ]
 
         for component_name, module_path in components_to_test:
@@ -169,16 +197,13 @@ class PerformanceProfiler:
                 operation=f"import_{component_name}",
                 response_time=response_time,
                 success=True,
-                data_size=1
+                data_size=1,
             )
 
         except Exception as e:
             handle_error(logger, e, f"component import timing for {component_name}")
             return PerformanceResult(
-                operation=f"import_{component_name}",
-                response_time=0.0,
-                success=False,
-                data_size=0
+                operation=f"import_{component_name}", response_time=0.0, success=False, data_size=0
             )
 
     def generate_performance_report(self) -> str:
@@ -220,8 +245,8 @@ DETAILED OPERATION BREAKDOWN:
 """
 
         # Add operation details
-        for operation in core_results.get('operation_details', []):
-            status = "✅" if operation['success'] else "❌"
+        for operation in core_results.get("operation_details", []):
+            status = "✅" if operation["success"] else "❌"
             report += f"{status} {operation['operation']}: {operation['response_time']}ms\n"
 
         report += f"""
@@ -229,7 +254,7 @@ PERFORMANCE RECOMMENDATIONS:
 ----------------------------
 """
 
-        avg_time = core_results.get('average_response_time', 0)
+        avg_time = core_results.get("average_response_time", 0)
         if avg_time < 100:
             report += "Performance is excellent - no optimization needed.\n"
         elif avg_time < 500:
@@ -240,6 +265,7 @@ PERFORMANCE RECOMMENDATIONS:
             report += "Performance is slow - immediate optimization required.\n"
 
         return report
+
 
 def main():
     """Performance profiling CLI"""
@@ -270,6 +296,7 @@ def main():
         print(f"Dashboard Performance: {results['performance_grade'].upper()}")
         print(f"Success Rate: {results['successful_operations']}/{results['total_operations']}")
         print(f"Average Response: {results['average_response_time']}ms")
+
 
 if __name__ == "__main__":
     main()
