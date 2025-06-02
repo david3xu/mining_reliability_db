@@ -5,10 +5,7 @@ Centralized data access and query management.
 """
 
 from mine_core.database.db import (
-    get_causal_intelligence_summary,
     get_database,
-    optimize_performance,
-    validate_data_integrity,
 )
 
 # Legacy compatibility
@@ -57,9 +54,6 @@ __all__ = [
     "get_entity_completion_rates",
     "get_facility_action_statistics",
     # DB operations
-    "get_causal_intelligence_summary",
-    "validate_data_integrity",
-    "optimize_performance",
     # Query manager functions
     "get_entities_by_type",
     "get_relationship_data",
