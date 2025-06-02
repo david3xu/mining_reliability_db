@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Workflow Data Adapter - Pure Workflow Data Access
-Specialized adapter for workflow-specific data operations with zero business logic.
+Workflow Adapter - Process Workflow Data Access Layer
+Unified workflow data extraction with standardized interface.
 """
 
 import logging
@@ -12,6 +12,12 @@ from dashboard.adapters.interfaces import ComponentMetadata
 # Pure core layer imports
 from mine_core.business.workflow_processor import get_workflow_processor
 from mine_core.shared.common import handle_error
+
+__all__ = [
+    "WorkflowAdapter",
+    "get_workflow_adapter",
+    "reset_workflow_adapter",
+]
 
 logger = logging.getLogger(__name__)
 
@@ -192,49 +198,35 @@ class WorkflowAdapter:
 
         except Exception as e:
             handle_error(logger, e, "workflow data validation")
-            return {}
-
-    # Pure data transformation helpers
+            return {"error": True, "message": str(e)}
 
     def _transform_workflow_stages(self, workflow_stages: List) -> List[Dict[str, Any]]:
-        """Pure transformation of workflow stage objects to dictionaries"""
+        """Helper to transform workflow stages for dashboard display"""
         transformed_stages = []
-
         for stage in workflow_stages:
-            # Convert WorkflowStage dataclass to dictionary
-            stage_dict = {
-                "stage_number": getattr(stage, "stage_number", 1),
-                "entity_name": getattr(stage, "entity_name", ""),
-                "title": getattr(stage, "title", ""),
-                "field_count": getattr(stage, "field_count", 0),
-                "completion_rate": getattr(stage, "completion_rate", 0.0),
-                "source_fields": getattr(stage, "business_fields", []),
-                "complexity_level": getattr(stage, "complexity_level", "simple"),
-                # Standard workflow stage properties
-                "display_title": getattr(stage, "title", getattr(stage, "entity_name", "")),
-                "color": "#4A90E2",  # Default color - would come from config adapter
-                "card_min_height": "300px",
-                "header_bg_opacity": 0.3,
-                "show_description": False,
-            }
-
-            transformed_stages.append(stage_dict)
-
+            transformed_stages.append(
+                {
+                    "name": stage.name,
+                    "description": stage.description,
+                    "status": stage.status,
+                    "completion_rate": stage.completion_rate,
+                    "metrics": stage.metrics,
+                }
+            )
         return transformed_stages
 
     def _get_timestamp(self) -> str:
-        """Pure timestamp generation"""
+        """Get current timestamp for metadata"""
         from datetime import datetime
 
         return datetime.now().isoformat()
 
 
-# Singleton pattern
-_workflow_adapter = None
+_workflow_adapter: Optional[WorkflowAdapter] = None
 
 
 def get_workflow_adapter() -> WorkflowAdapter:
-    """Get singleton workflow adapter instance"""
+    """Singleton access to WorkflowAdapter instance"""
     global _workflow_adapter
     if _workflow_adapter is None:
         _workflow_adapter = WorkflowAdapter()
@@ -242,7 +234,7 @@ def get_workflow_adapter() -> WorkflowAdapter:
 
 
 def reset_workflow_adapter():
-    """Reset workflow adapter instance"""
+    """Reset the singleton adapter instance (for testing purposes)"""
     global _workflow_adapter
     if _workflow_adapter:
         logger.info("Resetting workflow adapter")

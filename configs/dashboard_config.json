@@ -174,17 +174,6 @@
       "context_capture": true
     }
   },
-  "feature_flags": {
-    "advanced_analytics": true,
-    "real_time_updates": false,
-    "export_functionality": true,
-    "user_preferences": false,
-    "dark_mode": false,
-    "mobile_optimization": true,
-    "accessibility_features": true,
-    "performance_monitoring": true,
-    "debug_mode": false
-  },
   "ui_configuration": {
     "default_theme": "professional",
     "responsive_design": true,

@@ -18,19 +18,19 @@ setup: ## Create environment configuration from template
 	fi
 
 schema: ## Create database schema using unified configuration
-	python scripts/create_schema.py
+	python scripts/setup/create_schema.py
 
 import: ## Import all facility data using standardized patterns
-	python scripts/import_data.py
+	python scripts/setup/import_data.py
 
 import-sample: ## Import sample facility data for testing
-	python scripts/import_data.py --facility sample
+	python scripts/setup/import_data.py --facility sample
 
 reset: ## Reset database data only (preserve schema)
-	python scripts/reset_db.py --force
+	python scripts/setup/reset_db.py --force
 
 reset-all: ## Reset database including schema constraints
-	python scripts/reset_db.py --drop-schema --force
+	python scripts/setup/reset_db.py --drop-schema --force
 
 test: ## Run complete test suite
 	python -m pytest tests/ -v

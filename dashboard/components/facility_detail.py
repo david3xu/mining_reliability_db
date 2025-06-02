@@ -13,7 +13,6 @@ from dash import dash_table, dcc, html
 from dashboard.adapters import get_config_adapter, get_facility_adapter
 from dashboard.components.micro.chart_base import create_pie_chart
 from dashboard.components.micro.metric_card import create_metric_card
-from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +21,7 @@ def create_facility_metrics_cards(facility_id: str) -> list:
     """Facility-specific metrics using adapter data"""
     try:
         facility_adapter = get_facility_adapter()
+        config_adapter = get_config_adapter()
 
         facility_analysis = facility_adapter.get_facility_performance_analysis(facility_id)
         comparison_metrics = facility_adapter.get_facility_comparison_metrics(facility_id)
@@ -55,7 +55,9 @@ def create_facility_metrics_cards(facility_id: str) -> list:
         return cards
 
     except Exception as e:
-        handle_error(logger, e, f"facility metrics cards creation for {facility_id}")
+        config_adapter.handle_error_utility(
+            logger, e, f"facility metrics cards creation for {facility_id}"
+        )
         return []
 
 
@@ -77,7 +79,9 @@ def create_facility_category_chart(facility_id: str) -> dcc.Graph:
         return create_pie_chart(labels, values, f"{facility_id} Issue Categories")
 
     except Exception as e:
-        handle_error(logger, e, f"facility category chart creation for {facility_id}")
+        config_adapter.handle_error_utility(
+            logger, e, f"facility category chart creation for {facility_id}"
+        )
         return dcc.Graph(figure={})
 
 
@@ -120,7 +124,9 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        handle_error(logger, e, f"recurring issues analysis for {facility_id}")
+        config_adapter.handle_error_utility(
+            logger, e, f"recurring issues analysis for {facility_id}"
+        )
         return dcc.Graph(figure={})
 
 
@@ -180,7 +186,9 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
         )
 
     except Exception as e:
-        handle_error(logger, e, f"operating centre table creation for {facility_id}")
+        config_adapter.handle_error_utility(
+            logger, e, f"operating centre table creation for {facility_id}"
+        )
         return dash_table.DataTable(data=[])
 
 
@@ -188,6 +196,7 @@ def create_facility_detail_layout(facility_id: str) -> html.Div:
     """Complete facility detail layout"""
     try:
         facility_adapter = get_facility_adapter()
+        config_adapter = get_config_adapter()
 
         # Validate facility exists
         validation = facility_adapter.validate_facility_data(facility_id)
@@ -271,7 +280,9 @@ def create_facility_detail_layout(facility_id: str) -> html.Div:
         )
 
     except Exception as e:
-        handle_error(logger, e, f"facility detail layout creation for {facility_id}")
+        config_adapter.handle_error_utility(
+            logger, e, f"facility detail layout creation for {facility_id}"
+        )
         return dbc.Container(
             [
                 dbc.Alert(

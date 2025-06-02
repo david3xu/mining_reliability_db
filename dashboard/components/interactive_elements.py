@@ -11,7 +11,15 @@ import plotly.graph_objects as go
 from dash import dash_table, dcc, html
 
 from dashboard.adapters import get_config_adapter
-from mine_core.shared.common import handle_error
+
+__all__ = [
+    "create_interactive_metric_card",
+    "create_interactive_pie_chart",
+    "create_interactive_bar_chart",
+    "create_interactive_data_table",
+    "create_navigation_toast",
+    "create_loading_overlay",
+]
 
 
 def create_interactive_metric_card(
@@ -98,7 +106,8 @@ def create_interactive_pie_chart(
         )
 
     except Exception as e:
-        handle_error("interactive_elements", e, "interactive pie chart creation")
+        config_adapter = get_config_adapter()
+        config_adapter.handle_error_utility(logger, e, "interactive pie chart creation")
         return dcc.Graph(figure={})
 
 
@@ -146,7 +155,8 @@ def create_interactive_bar_chart(
         )
 
     except Exception as e:
-        handle_error("interactive_elements", e, "interactive bar chart creation")
+        config_adapter = get_config_adapter()
+        config_adapter.handle_error_utility(logger, e, "interactive bar chart creation")
         return dcc.Graph(figure={})
 
 
@@ -195,7 +205,8 @@ def create_interactive_data_table(
         )
 
     except Exception as e:
-        handle_error("interactive_elements", e, "interactive data table creation")
+        config_adapter = get_config_adapter()
+        config_adapter.handle_error_utility(logger, e, "interactive data table creation")
         return dash_table.DataTable(data=[])
 
 

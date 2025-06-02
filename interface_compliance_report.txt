@@ -3,10 +3,15 @@ INTERFACE COMPLIANCE ANALYSIS REPORT
 
 Compliance Summary:
   Total Adapters: 4
-  Compliant Adapters: 4
-  Compliance Rate: 100.0%
+  Compliant Adapters: 2
+  Compliance Rate: 50.0%
 
-✓ ALL ADAPTERS ARE INTERFACE COMPLIANT
+COMPLIANCE VIOLATIONS:
+----------------------------------------
+
+data_adapter:
+
+facility_adapter:
 
 
 COMPLIANCE IMPROVEMENT RECOMMENDATIONS:
