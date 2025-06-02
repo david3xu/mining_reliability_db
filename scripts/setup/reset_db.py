@@ -5,9 +5,16 @@ Standardized configuration access and unified initialization pattern.
 """
 
 import argparse
+import logging
+import os
+import sys
+
+# Adjust path to import from parent directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from configs.environment import get_batch_size
-from mine_core.database.db import close_database, get_database
+from mine_core.database import close_database, get_database
+from mine_core.database.query_manager import get_query_manager
 from mine_core.shared.common import handle_error, setup_project_environment
 
 
