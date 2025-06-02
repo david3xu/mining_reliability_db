@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mine_core.pipelines.transformer import DataTransformer
 from mine_core.shared.field_utils import (
     clean_label,
-    extract_root_cause_tail,
+    extract_root_cause_tail_extraction,
     get_causal_intelligence_fields,
     get_missing_indicator,
     has_real_value,
@@ -53,29 +53,32 @@ class TestSimplifiedFieldUtils:
         long_text = "Very_Long_Equipment_Name_That_Exceeds_Fifty_Characters_Limit"
         assert len(clean_label(long_text)) == 50
 
-    def test_extract_root_cause_tail(self):
+    def test_extract_root_cause_tail_extraction(self):
         """Test root cause tail extraction for causal intelligence"""
         # Single cause - should return original
-        assert extract_root_cause_tail("Equipment failure") == "Equipment failure"
+        assert extract_root_cause_tail_extraction("Equipment failure") == "Equipment failure"
 
         # Multiple causes with semicolon
-        assert extract_root_cause_tail("Equipment failure; Poor maintenance") == "Poor maintenance"
+        assert (
+            extract_root_cause_tail_extraction("Equipment failure; Poor maintenance")
+            == "Poor maintenance"
+        )
 
         # Multiple causes with comma
         assert (
-            extract_root_cause_tail("Heat damage, Inadequate ventilation, Design flaw")
+            extract_root_cause_tail_extraction("Heat damage, Inadequate ventilation, Design flaw")
             == "Design flaw"
         )
 
         # Multiple causes with 'and'
         assert (
-            extract_root_cause_tail("Mechanical wear and insufficient lubrication")
+            extract_root_cause_tail_extraction("Mechanical wear and insufficient lubrication")
             == "insufficient lubrication"
         )
 
         # Empty/None cases
-        assert extract_root_cause_tail("") == "NOT_SPECIFIED"
-        assert extract_root_cause_tail(None) == "NOT_SPECIFIED"
+        assert extract_root_cause_tail_extraction("") == "NOT_SPECIFIED"
+        assert extract_root_cause_tail_extraction(None) == "NOT_SPECIFIED"
 
     def test_get_causal_intelligence_fields(self):
         """Test causal intelligence field extraction"""
@@ -107,7 +110,7 @@ class TestDataTransformer:
                 "Problem": {"what_happened": "What happened?", "requirement": "Requirement"},
                 "RootCause": {
                     "root_cause": "Root Cause",
-                    "root_cause_tail": "Root Cause",
+                    "root_cause_tail_extraction": "Root Cause (tail extraction)",
                     "objective_evidence": "Obj. Evidence",
                 },
             },
@@ -170,7 +173,7 @@ class TestDataTransformer:
 
         # Verify both primary and tail cause are captured
         assert root_cause["root_cause"] == "Primary cause; Secondary contributing factor"
-        assert root_cause["root_cause_tail"] == "Secondary contributing factor"
+        assert root_cause["root_cause_tail_extraction"] == "Secondary contributing factor"
         assert root_cause["objective_evidence"] == "Maintenance logs and inspection reports"
 
     def test_cascade_labeling_application(self):
@@ -232,7 +235,7 @@ class TestCausalIntelligenceWorkflow:
                 "Problem": {"what_happened": "What happened?"},
                 "RootCause": {
                     "root_cause": "Root Cause",
-                    "root_cause_tail": "Root Cause",
+                    "root_cause_tail_extraction": "Root Cause (tail extraction)",
                     "objective_evidence": "Obj. Evidence",
                 },
                 "ActionPlan": {"action_plan": "Action Plan"},
@@ -299,8 +302,10 @@ class TestCausalIntelligenceWorkflow:
         # Verify causal intelligence enhancement
         root_cause = result["entities"]["RootCause"][0]
         assert "root_cause" in root_cause
-        assert "root_cause_tail" in root_cause
-        assert root_cause["root_cause_tail"] == "Poor lubrication quality"  # Tail extraction
+        assert "root_cause_tail_extraction" in root_cause
+        assert (
+            root_cause["root_cause_tail_extraction"] == "Poor lubrication quality"
+        )  # Tail extraction
 
         # Verify dynamic labeling
         action_request = result["entities"]["ActionRequest"][0]

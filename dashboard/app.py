@@ -83,7 +83,7 @@ class PurifiedDashboardApp:
                         "href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
                         "rel": "stylesheet",
                     },
-                    "./assets/custom_styles.css",
+                    "/dashboard/assets/custom_styles.css",
                 ],
                 suppress_callback_exceptions=True,
                 title="Mining Reliability Database",
@@ -158,11 +158,6 @@ class PurifiedDashboardApp:
 
                 return create_workflow_analysis_layout()
 
-            elif component_name == "workflow_process_page":
-                from dashboard.components.workflow_analysis import create_workflow_process_page
-
-                return create_workflow_process_page()
-
             elif component_name == "historical_records_page":
                 from dashboard.components.portfolio_overview import create_historical_records_page
 
@@ -197,6 +192,36 @@ class PurifiedDashboardApp:
         except Exception as e:
             handle_error(logger, e, f"component loading for {component_name}")
             return self._create_error_page(f"Component {component_name} failed to load")
+
+    def _create_not_found_page(self, pathname):
+        """Create 404 page"""
+        return dbc.Container(
+            [
+                dbc.Alert(
+                    [
+                        html.H4("Page Not Found"),
+                        html.P(f"Route '{pathname}' does not exist"),
+                        dbc.Button("Return to Portfolio", href="/", color="primary"),
+                    ],
+                    color="warning",
+                )
+            ]
+        )
+
+    def _create_error_page(self, error_message):
+        """Create error page"""
+        return dbc.Container(
+            [
+                dbc.Alert(
+                    [
+                        html.H4("Application Error"),
+                        html.P(error_message),
+                        dbc.Button("Return to Portfolio", href="/", color="secondary"),
+                    ],
+                    color="danger",
+                )
+            ]
+        )
 
     def _create_facilities_summary(self):
         """Create facilities summary page"""
@@ -245,36 +270,6 @@ class PurifiedDashboardApp:
         except Exception as e:
             handle_error(logger, e, "facilities summary creation")
             return self._create_error_page("Facilities summary unavailable")
-
-    def _create_not_found_page(self, pathname):
-        """Create 404 page"""
-        return dbc.Container(
-            [
-                dbc.Alert(
-                    [
-                        html.H4("Page Not Found"),
-                        html.P(f"Route '{pathname}' does not exist"),
-                        dbc.Button("Return to Portfolio", href="/", color="primary"),
-                    ],
-                    color="warning",
-                )
-            ]
-        )
-
-    def _create_error_page(self, error_message):
-        """Create error page"""
-        return dbc.Container(
-            [
-                dbc.Alert(
-                    [
-                        html.H4("Application Error"),
-                        html.P(error_message),
-                        dbc.Button("Return to Portfolio", href="/", color="secondary"),
-                    ],
-                    color="danger",
-                )
-            ]
-        )
 
     def run_server(self, **kwargs):
         """Run dashboard server with status reporting"""

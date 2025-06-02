@@ -2,7 +2,7 @@
   "mapping_version": "2.0.0",
   "architecture_compliance": "adapter_optimized",
   "metadata": {
-    "last_updated": "2024-01-15",
+    "last_updated": "2025-06-02",
     "cache_ttl_seconds": 600,
     "validation_enabled": true,
     "workflow_processor_optimized": true,
@@ -147,7 +147,7 @@
     },
     "RootCause": {
       "root_cause": "Root Cause",
-      "root_cause_tail": "Root Cause",
+      "root_cause_tail_extraction": "Root Cause (tail extraction)",
       "objective_evidence": "Obj. Evidence"
     },
     "ActionPlan": {

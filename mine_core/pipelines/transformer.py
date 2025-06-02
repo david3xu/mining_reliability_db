@@ -11,7 +11,7 @@ from configs.environment import get_entity_names, get_mappings
 from mine_core.shared.common import handle_error
 from mine_core.shared.field_utils import (
     clean_label,
-    extract_root_cause_tail,
+    extract_root_cause_tail_extraction,
     get_missing_indicator,
     has_real_value,
     is_missing_data_indicator,
@@ -120,7 +120,9 @@ class DataTransformer:
 
         # Extract tail value for enhanced causal analysis using centralized utility
         original_cause = record.get("Root Cause", "")
-        root_cause["root_cause_tail"] = extract_root_cause_tail(original_cause)
+        root_cause["root_cause_tail_extraction"] = extract_root_cause_tail_extraction(
+            original_cause
+        )
 
         return root_cause
 
@@ -187,9 +189,9 @@ class DataTransformer:
             if source_field in record:
                 value = record[source_field]
 
-                # Special handling for root_cause_tail
-                if target_field == "root_cause_tail":
-                    entity[target_field] = extract_root_cause_tail(value)
+                # Special handling for root_cause_tail_extraction
+                if target_field == "root_cause_tail_extraction":
+                    entity[target_field] = extract_root_cause_tail_extraction(value)
                 elif has_real_value(value):
                     entity[target_field] = self._normalize_value(value)
                 else:

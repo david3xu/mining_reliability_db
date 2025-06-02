@@ -2,7 +2,7 @@
   "config_version": "2.0.0",
   "architecture_compliance": "adapter_optimized",
   "metadata": {
-    "last_updated": "2024-01-15",
+    "last_updated": "2025-06-02",
     "cache_ttl_seconds": 1800,
     "validation_enabled": true,
     "performance_monitoring": true
@@ -22,7 +22,7 @@
     "version": "2.0.0",
     "description": "Professional operational intelligence platform",
     "author": "Mining Analytics Team",
-    "favicon": "/assets/favicon.ico",
+    "favicon": "/dashboard/assets/favicon.ico",
     "theme": "professional",
     "language": "en",
     "timezone": "UTC"

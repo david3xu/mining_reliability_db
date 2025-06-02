@@ -5,281 +5,141 @@ Quality assessment components with clean adapter integration.
 """
 
 import logging
+from typing import Dict, List, Tuple
 
+import dash_core_components as dcc
+import dash_html_components as html
 import plotly.graph_objects as go
-from dash import dash_table, dcc, html
 
-from dashboard.adapters import get_config_adapter, get_data_adapter
-from dashboard.components.layout_template import create_metric_card, create_standard_layout
-from dashboard.utils.styling import (
-    get_chart_layout_template,
-    get_colors,
-    get_dashboard_styles,
-    get_fonts,
-    get_table_style,
-)
+from dashboard.adapters import get_data_adapter, get_workflow_adapter, handle_error_utility
+from dashboard.components.layout_template import create_standard_layout
+from dashboard.utils.styling import get_colors
 
 logger = logging.getLogger(__name__)
 
 
-def create_quality_metrics_cards() -> list:
-    """Quality metrics using adapter data access"""
-    try:
-        data_adapter = get_data_adapter()
-        config_adapter = get_config_adapter()
-        colors = get_colors()
-
-        portfolio_data = data_adapter.get_portfolio_metrics()
-        field_data = data_adapter.get_field_distribution()
-
-        cards = [
-            create_metric_card(
-                value=portfolio_data.facilities,
-                label="Facilities Analyzed",
-                detail="Active operational sites",
-                color=colors.get("primary_blue"),
-            ),
-            create_metric_card(
-                value=field_data.total_fields,
-                label="Total Fields",
-                detail="Data collection points",
-                color=colors.get("chart_colors", [])[1] if colors.get("chart_colors") else None,
-            ),
-            create_metric_card(
-                value=f"{portfolio_data.metadata.data_quality:.0%}",
-                label="Data Quality Score",
-                detail="Overall completeness",
-                color=colors.get("chart_colors", [])[2] if colors.get("chart_colors") else None,
-            ),
-            create_metric_card(
-                value=portfolio_data.years_coverage,
-                label="Years Coverage",
-                detail="Historical span",
-                color=colors.get("chart_colors", [])[3] if colors.get("chart_colors") else None,
-            ),
-        ]
-
-        return cards
-
-    except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "quality metrics cards creation")
-        return []
-
-
-def create_field_completeness_chart() -> dcc.Graph:
-    """Field completion analysis using adapter data"""
-    try:
-        data_adapter = get_data_adapter()
-        config_adapter = get_config_adapter()
-        colors = get_colors()
-        fonts = get_fonts()
-        layout_template = get_chart_layout_template()
-
-        field_data = data_adapter.get_field_distribution()
-
-        if not field_data.labels:
-            return dcc.Graph(figure={})
-
-        # Create completion simulation from field distribution
-        completion_rates = [
-            min(95, max(25, (v / max(field_data.values)) * 100)) for v in field_data.values
-        ]
-
-        # Color mapping based on completion
-        bar_colors = []
-        for rate in completion_rates:
-            if rate >= 80:
-                bar_colors.append(
-                    colors.get("chart_colors", [])[2] if colors.get("chart_colors") else "#7ED321"
-                )
-            elif rate >= 60:
-                bar_colors.append(
-                    colors.get("chart_colors", [])[1] if colors.get("chart_colors") else "#F5A623"
-                )
-            else:
-                bar_colors.append(
-                    colors.get("chart_colors", [])[3] if colors.get("chart_colors") else "#D32F2F"
-                )
-
-        fig = go.Figure()
-        fig.add_trace(
-            go.Bar(
-                y=field_data.labels,
-                x=completion_rates,
-                orientation="h",
-                marker=dict(color=bar_colors),
-                text=[f"{rate:.0f}%" for rate in completion_rates],
-                textposition="inside",
-            )
-        )
-
-        fig.update_layout(
-            title="Field Completion Analysis",
-            xaxis_title="Completion Rate (%)",
-            height=layout_template.get("height", 400),
-            font=layout_template.get("font", {"family": fonts.get("primary_font", "Arial")}),
-            paper_bgcolor=layout_template.get(
-                "paper_bgcolor", colors.get("background_light", "#FFFFFF")
-            ),
-        )
-
-        return dcc.Graph(figure=fig)
-
-    except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "field completeness chart creation")
-        return dcc.Graph(figure={})
-
-
-def create_facility_quality_comparison() -> dcc.Graph:
-    """Facility quality comparison using adapter data"""
-    try:
-        data_adapter = get_data_adapter()
-        config_adapter = get_config_adapter()
-        colors = get_colors()
-        fonts = get_fonts()
-        layout_template = get_chart_layout_template()
-
-        facility_data = data_adapter.get_facility_breakdown()
-
-        if not facility_data.labels:
-            return dcc.Graph(figure={})
-
-        # Quality score simulation based on record count
-        max_records = max(facility_data.values) if facility_data.values else 1
-        quality_scores = [min(100, (v / max_records) * 100) for v in facility_data.values]
-
-        fig = go.Figure()
-        fig.add_trace(
-            go.Bar(
-                x=facility_data.labels,
-                y=quality_scores,
-                marker_color=colors.get("chart_colors", [])[0]
-                if colors.get("chart_colors")
-                else "#4A90E2",
-                text=[f"{score:.0f}%" for score in quality_scores],
-                textposition="outside",
-            )
-        )
-
-        fig.update_layout(
-            title="Facility Quality Comparison",
-            xaxis_title="Facility",
-            yaxis_title="Quality Score (%)",
-            height=layout_template.get("height", 400),
-            font=layout_template.get("font", {"family": fonts.get("primary_font", "Arial")}),
-            paper_bgcolor=layout_template.get(
-                "paper_bgcolor", colors.get("background_light", "#FFFFFF")
-            ),
-        )
-
-        return dcc.Graph(figure=fig)
-
-    except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "facility quality comparison creation")
-        return dcc.Graph(figure={})
-
-
-def create_quality_summary_table() -> dash_table.DataTable:
-    """Quality summary using adapter data"""
-    try:
-        data_adapter = get_data_adapter()
-        config_adapter = get_config_adapter()
-        table_style = get_table_style()
-        colors = get_colors()
-
-        facility_data = data_adapter.get_facility_breakdown()
-
-        if not facility_data.labels:
-            return dash_table.DataTable(data=[])
-
-        # Build quality assessment table
-        table_data = []
-        for i, (facility, records, percentage) in enumerate(
-            zip(facility_data.labels, facility_data.values, facility_data.percentages)
-        ):
-            quality_score = min(100, (records / max(facility_data.values)) * 100)
-            status = (
-                "Excellent"
-                if quality_score >= 80
-                else "Good"
-                if quality_score >= 60
-                else "Needs Attention"
-            )
-
-            table_data.append(
-                {
-                    "Facility": facility,
-                    "Total Records": records,
-                    "Percentage": f"{percentage:.1f}%",
-                    "Quality Score": f"{quality_score:.0f}%",
-                    "Status": status,
-                }
-            )
-
-        return dash_table.DataTable(
-            data=table_data,
-            columns=[
-                {"name": "Facility", "id": "Facility"},
-                {"name": "Total Records", "id": "Total Records", "type": "numeric"},
-                {"name": "Percentage", "id": "Percentage"},
-                {"name": "Quality Score", "id": "Quality Score"},
-                {"name": "Status", "id": "Status"},
-            ],
-            style_cell=table_style.get("style_cell"),
-            style_header=table_style.get("style_header"),
-            style_data=table_style.get("style_data"),
-            style_table=table_style.get("style_table"),
-            conditional_formatting=[
-                {
-                    "if": {"filter_query": "{Status} = 'Excellent'"},
-                    "backgroundColor": colors.get("chart_colors", [])[2]
-                    if colors.get("chart_colors")
-                    else "#E8F5E8",
-                },
-                {
-                    "if": {"filter_query": "{Status} = 'Good'"},
-                    "backgroundColor": colors.get("chart_colors", [])[1]
-                    if colors.get("chart_colors")
-                    else "#FFF8E1",
-                },
-                {
-                    "if": {"filter_query": "{Status} = 'Needs Attention'"},
-                    "backgroundColor": colors.get("chart_colors", [])[3]
-                    if colors.get("chart_colors")
-                    else "#FFE6E6",
-                },
-            ],
-        )
-
-    except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "quality summary table creation")
-        return dash_table.DataTable(data=[])
-
-
 def create_data_quality_layout() -> html.Div:
-    """Data quality analysis page - 20 lines"""
+    """Simple 41-field completion focus"""
     try:
-        config_adapter = get_config_adapter()
+        return create_standard_layout(
+            title="Data Quality Foundation", content_cards=[create_41_field_completion_analysis()]
+        )
+    except Exception as e:
+        handle_error_utility(logger, e, "data quality layout creation")
+        return html.Div("Data quality page unavailable")
+
+
+def create_41_field_completion_analysis() -> html.Div:
+    """Direct 41 raw field completion analysis"""
+    try:
+        data_adapter = get_data_adapter()
+        colors = get_colors()
+
+        # Get raw field completion rates
+        field_completion_data = data_adapter.get_41_raw_field_completion_rates()
+
+        logger.info(
+            f"Field completion data received in component: {len(field_completion_data)} fields"
+        )
+        logger.info(f"Sample data in component: {list(field_completion_data.items())[:5]}")
+
+        if not field_completion_data:
+            return html.Div("No field completion data available")
+
+        # Separate 100% complete from incomplete fields
+        complete_fields = []
+        incomplete_fields = []
+
+        for raw_field_name, completion_rate in field_completion_data.items():
+            if completion_rate >= 99.9:
+                complete_fields.append(raw_field_name)
+            else:
+                incomplete_fields.append((raw_field_name, completion_rate))
+
+        # Sort incomplete by completion rate (lowest first)
+        incomplete_fields.sort(key=lambda x: x[1])
+
+        # Create 100% complete fields display
+        complete_section = (
+            html.Div(
+                [
+                    html.H5(
+                        f"100% Complete Fields ({len(complete_fields)} fields):",
+                        style={"color": "#7ED321", "marginBottom": "10px"},
+                    ),
+                    html.P(
+                        ", ".join(complete_fields),
+                        style={
+                            "backgroundColor": "#7ED321",
+                            "color": "white",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                        },
+                    ),
+                ]
+            )
+            if complete_fields
+            else html.Div()
+        )
+
+        # Create incomplete fields chart
+        incomplete_chart = create_raw_field_completion_chart(incomplete_fields)
+
         return html.Div(
             [
-                create_standard_layout(
-                    title="Data Quality Foundation",
-                    metric_cards=create_quality_metrics_cards(),
-                    chart_components=[
-                        create_field_completeness_chart(),
-                        create_facility_quality_comparison(),
-                    ],
-                    table_components=[create_quality_summary_table()],
-                    chart_titles=[
-                        "Field Completion Analysis",
-                        "Facility Quality Comparison",
-                    ],
-                    table_titles=["Quality Summary by Facility"],
-                )
-            ],
-            className="p-4",
-            style=get_dashboard_styles().get("main_container"),
+                html.H3("Field Completeness Analysis (41 Fields)", className="mb-4"),
+                complete_section,
+                html.H5(
+                    f"Field Completion Rates (Excluding 100% Complete Fields)",
+                    className="mt-4 mb-3",
+                ),
+                incomplete_chart,
+            ]
         )
+
     except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "data quality layout creation")
-        return dbc.Alert("Data Quality layout unavailable", color="danger")
+        handle_error_utility(logger, e, "41-field completion analysis")
+        return html.Div("Field completion analysis unavailable")
+
+
+def create_raw_field_completion_chart(incomplete_fields: List[Tuple[str, float]]) -> dcc.Graph:
+    """Chart using exact raw field names from field_mappings.json"""
+    if not incomplete_fields:
+        return html.P("All fields are 100% complete!", style={"color": "#7ED321"})
+
+    raw_field_names = [field[0] for field in incomplete_fields]
+    completion_rates = [field[1] for field in incomplete_fields]
+
+    # Color coding
+    colors_list = []
+    for rate in completion_rates:
+        if rate >= 80:
+            colors_list.append("#7ED321")  # Green
+        elif rate >= 60:
+            colors_list.append("#F5A623")  # Orange
+        else:
+            colors_list.append("#D32F2F")  # Red
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            y=raw_field_names,
+            x=completion_rates,
+            orientation="h",
+            marker=dict(color=colors_list),
+            text=[f"{rate:.1f}%" for rate in completion_rates],
+            textposition="inside",
+        )
+    )
+
+    fig.update_layout(
+        title="Raw Field Completion Rates from field_mappings.json",
+        xaxis_title="Completion Rate (%)",
+        height=max(400, len(raw_field_names) * 20),
+        font={"family": "Arial", "size": 10},
+        paper_bgcolor="#2F2F2F",
+        plot_bgcolor="#2F2F2F",
+        font_color="white",
+    )
+
+    return dcc.Graph(figure=fig)

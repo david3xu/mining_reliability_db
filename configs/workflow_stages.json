@@ -2,7 +2,7 @@
   "workflow_version": "2.0.0",
   "architecture_compliance": "workflow_processor_optimized",
   "metadata": {
-    "last_updated": "2024-01-15",
+    "last_updated": "2025-06-02",
     "cache_ttl_seconds": 1800,
     "component_optimized": true,
     "micro_component_support": true
@@ -25,11 +25,16 @@
         "show_description": true
       },
       "business_fields": [
-        "Action Request Number",
-        "Date Opened",
-        "Description",
+        "Action Request Number:",
+        "Title",
+        "Initiation Date",
+        "Action Types",
         "Categories",
-        "Facility"
+        "Requested Response Time",
+        "Past Due Status",
+        "Days Past Due",
+        "Operating Centre",
+        "Stage"
       ],
       "intelligence_config": {
         "completion_weight": 0.2,
@@ -61,10 +66,8 @@
         "show_description": true
       },
       "business_fields": [
-        "Problem Number",
-        "Problem Statement",
-        "Problem Type",
-        "Action Request Number"
+        "What happened?",
+        "Requirement"
       ],
       "intelligence_config": {
         "completion_weight": 0.25,
@@ -97,10 +100,9 @@
         "highlight_causal": true
       },
       "business_fields": [
-        "Root Cause Number",
         "Root Cause",
-        "Root Cause Tail",
-        "Problem Number"
+        "Obj. Evidence",
+        "Root Cause (tail extraction)"
       ],
       "intelligence_config": {
         "completion_weight": 0.3,
@@ -133,9 +135,17 @@
         "show_description": true
       },
       "business_fields": [
-        "Action Plan Number",
         "Action Plan",
-        "Root Cause Number"
+        "Recom.Action",
+        "Immd. Contain. Action or Comments",
+        "Due Date",
+        "Complete",
+        "Completion Date",
+        "Comments",
+        "Response Date",
+        "Response Revision Date",
+        "Did this action plan require a change to the equipment management strategy ?",
+        "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?"
       ],
       "intelligence_config": {
         "completion_weight": 0.15,
@@ -167,9 +177,10 @@
         "final_stage": true
       },
       "business_fields": [
-        "Verification Number",
-        "Verification Result",
-        "Action Plan Number"
+        "Effectiveness Verification Due Date",
+        "IsActionPlanEffective",
+        "Action Plan Eval Comment",
+        "Action Plan Verification Date:"
       ],
       "intelligence_config": {
         "completion_weight": 0.1,
@@ -299,5 +310,57 @@
     "predictive_bottleneck_detection": false,
     "interactive_stage_drilling": true,
     "workflow_performance_optimization": true
-  }
+  },
+  "supporting_entities_field_distribution": [
+    {
+      "entity_name": "Facility",
+      "business_fields": [
+        "Facility Name",
+        "Location",
+        "Active"
+      ]
+    },
+    {
+      "entity_name": "Department",
+      "business_fields": [
+        "Init. Dept.",
+        "Rec. Dept."
+      ]
+    },
+    {
+      "entity_name": "Asset",
+      "business_fields": [
+        "Asset Number(s)",
+        "Asset Activity numbers"
+      ]
+    },
+    {
+      "entity_name": "RecurringStatus",
+      "business_fields": [
+        "Recurring Problem(s)",
+        "Recurring Comment"
+      ]
+    },
+    {
+      "entity_name": "AmountOfLoss",
+      "business_fields": [
+        "Amount of Loss"
+      ]
+    },
+    {
+      "entity_name": "Review",
+      "business_fields": [
+        "Is Resp Satisfactory?",
+        "Reason if not Satisfactory",
+        "Reviewed Date:",
+        "Did this action plan require a change to the equipment management strategy ? (review)"
+      ]
+    },
+    {
+      "entity_name": "EquipmentStrategy",
+      "business_fields": [
+        "If yes, APSS Doc #"
+      ]
+    }
+  ]
 }

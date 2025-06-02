@@ -17,6 +17,7 @@ from dashboard.adapters.interfaces import (
     TimelineData,
     ValidationResult,
 )
+from dashboard.adapters.workflow_adapter import get_workflow_adapter
 from mine_core.business.intelligence_engine import IntelligenceEngine, get_intelligence_engine
 from mine_core.shared.common import handle_error
 
@@ -190,6 +191,50 @@ class PurifiedDataAdapter:
             return ValidationResult(
                 overall_status=False, component_status={}, score=0.0, error_details=str(e)
             )
+
+    def get_all_field_completion_rates(self) -> Dict[str, float]:
+        """Get completion rate for every field across all entities"""
+        try:
+            workflow_adapter = get_workflow_adapter()
+            completion_analysis = workflow_adapter.get_comprehensive_completion_analysis()
+
+            all_field_rates = {}
+
+            # Extract field completion from all entities
+            all_entities = {
+                **completion_analysis.get("workflow_completions", {}),
+                **completion_analysis.get("supporting_completions", {}),
+            }
+
+            for entity_name, entity_data in all_entities.items():
+                field_details = entity_data.get("field_details", [])
+                for field_info in field_details:
+                    field_name = field_info.get("field_name", "")
+                    completion_rate = field_info.get("completion_rate", 0.0)
+                    all_field_rates[field_name] = completion_rate
+
+            return all_field_rates
+
+        except Exception as e:
+            handle_error(logger, e, "all field completion rates")
+            return {}
+
+    def get_41_raw_field_completion_rates(self) -> Dict[str, float]:
+        """Get completion rates for all 41 raw field names"""
+        try:
+            workflow_adapter = get_workflow_adapter()
+            # Get raw field completion from workflow processor
+            raw_field_rates = (
+                workflow_adapter.workflow_processor.calculate_raw_field_completion_rates()
+            )
+
+            logger.info(
+                f"Raw field completion data from workflow processor: {len(raw_field_rates)} fields"
+            )
+            return raw_field_rates
+        except Exception as e:
+            handle_error(logger, e, "41 raw field completion rates")
+            return {}
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""

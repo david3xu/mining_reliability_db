@@ -10,9 +10,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from configs.environment import get_data_dir, get_field_mappings, get_root_cause_delimiters
+from configs.environment import (
+    get_data_dir,
+    get_field_mappings,
+    get_project_root,
+    get_root_cause_delimiters,
+)
 from mine_core.shared.common import handle_error, setup_project_environment
-from mine_core.shared.field_utils import extract_root_cause_tail, has_real_value
+from mine_core.shared.field_utils import extract_root_cause_tail_extraction, has_real_value
 
 
 def convert_list_to_string(value: Union[List, Any], delimiter: str = "; ") -> str:
@@ -39,9 +44,9 @@ def enhance_root_cause_intelligence(record: Dict[str, Any]) -> Dict[str, Any]:
             root_cause_str = str(root_cause)
 
         # Extract tail for secondary causal analysis - use default delimiters to avoid empty separator issue
-        record["Root Cause Tail"] = extract_root_cause_tail(root_cause_str)
+        record["Root Cause Tail Extraction"] = extract_root_cause_tail_extraction(root_cause_str)
     else:
-        record["Root Cause Tail"] = "NOT_SPECIFIED"
+        record["Root Cause Tail Extraction"] = "NOT_SPECIFIED"
 
     return record
 
@@ -178,7 +183,11 @@ def analyze_all_field_types(records: List[Dict[str, Any]]) -> Dict[str, Dict[str
     for record in records:
         for field_name, value in record.items():
             if field_name not in field_analysis:
-                field_analysis[field_name] = {"list_count": 0, "string_count": 0, "total_count": 0}
+                field_analysis[field_name] = {
+                    "list_count": 0,
+                    "string_count": 0,
+                    "total_count": 0,
+                }
 
             field_analysis[field_name]["total_count"] += 1
 
@@ -271,9 +280,15 @@ def preprocess_facility_data(
         records = []
         if isinstance(data, dict):
             if "sheets" in data:
-                for sheet_name, sheet_data in data["sheets"].items():
-                    if isinstance(sheet_data, dict) and "records" in sheet_data:
-                        records.extend(sheet_data["records"])
+                # Ensure 'sheets' is a dictionary before iterating over it
+                if isinstance(data["sheets"], dict):
+                    for sheet_name, sheet_data in data["sheets"].items():
+                        if isinstance(sheet_data, dict) and "records" in sheet_data:
+                            records.extend(sheet_data["records"])
+                else:
+                    logger.warning(
+                        f"Skipping sheets in {input_file.name}: Expected 'sheets' to be a dictionary, got {type(data.get('sheets', 'N/A'))}"
+                    )
             elif "records" in data:
                 records.extend(data["records"])
             else:
@@ -354,7 +369,7 @@ def preprocess_facility_data(
             "schema_conversion_enabled": enable_schema_conversion,
             "conversion_stats": conversion_stats,
             "root_cause_enhanced": sum(
-                1 for r in processed_records if has_real_value(r.get("Root Cause Tail"))
+                1 for r in processed_records if has_real_value(r.get("Root Cause Tail Extraction"))
             ),
         }
 
@@ -364,64 +379,131 @@ def preprocess_facility_data(
 
 
 def preprocess_all_facilities(
-    raw_data_dir: str = None, output_data_dir: str = None, enable_schema_conversion: bool = True
+    raw_data_dir: str = None,
+    output_data_dir: str = None,
+    enable_schema_conversion: bool = True,
 ) -> Dict[str, Any]:
-    """Preprocess all facility data files from raw_data to facility_data"""
-    # Set up directories
-    if raw_data_dir is None:
-        project_root = Path(__file__).resolve().parent.parent
-        raw_directory = project_root / "data" / "raw_data"
-    else:
-        raw_directory = Path(raw_data_dir)
+    """Preprocess all facility data files, handling directory path resolution and error reporting"""
+    project_root = (
+        Path(__file__).resolve().parents[2]
+    )  # Go up two levels from script to project root
 
-    if output_data_dir is None:
-        project_root = Path(__file__).resolve().parent.parent
-        output_directory = project_root / "data" / "facility_data"
-    else:
-        output_directory = Path(output_data_dir)
+    # Resolve data directories
+    actual_raw_data_dir = Path(raw_data_dir) if raw_data_dir else (project_root / "data/raw_data")
+    actual_output_data_dir = (
+        Path(output_data_dir) if output_data_dir else (project_root / "data/facility_data")
+    )
 
-    if not raw_directory.exists():
-        logger.error(f"Raw data directory not found: {raw_directory}")
-        return {"processed_files": 0, "total_records": 0}
+    # Initialize summary with all expected keys, including defaults for potential errors
+    summary = {
+        "files_processed": 0,
+        "total_records": 0,
+        "schema_conversion_enabled": enable_schema_conversion,
+        "facilities_data": [],
+        "error": None,
+        "all_field_analysis": {},
+        "list_fields_found": [],
+        "root_cause_enhancements": 0,
+    }
 
-    # Create output directory
-    output_directory.mkdir(parents=True, exist_ok=True)
+    # Validate raw data directory
+    if not actual_raw_data_dir.is_dir():
+        error_message = f"Raw data directory not found: {actual_raw_data_dir}"
+        logger.error(error_message)
+        summary["error"] = error_message
+        return summary  # Return initialized summary on early exit
 
-    json_files = list(raw_directory.glob("*.json"))
+    # Create output directory if it doesn't exist
+    actual_output_data_dir.mkdir(parents=True, exist_ok=True)
+
+    # Find all JSON files in the raw data directory
+    json_files = list(actual_raw_data_dir.glob("*.json"))
+    if not json_files:
+        summary["error"] = f"No JSON files found in raw data directory: {actual_raw_data_dir}"
+        logger.warning(summary["error"])
+        return summary  # Return initialized summary on early exit
+
     logger.info(f"Found {len(json_files)} raw files to preprocess")
     logger.info(f"Schema type conversion: {'enabled' if enable_schema_conversion else 'disabled'}")
 
-    summary = {
-        "processed_files": 0,
-        "total_records": 0,
-        "all_field_analysis": {},
-        "list_fields_found": set(),
-        "root_cause_enhancements": 0,
-        "schema_conversion_enabled": enable_schema_conversion,
-    }
+    all_records = []
+    for input_file in json_files:
+        try:
+            with open(input_file, "r") as f:
+                file_content = json.load(f)
+                if isinstance(file_content, dict):
+                    # If it's a dictionary, assume it's a single record or has a 'records' key
+                    if "records" in file_content and isinstance(file_content["records"], list):
+                        all_records.extend(file_content["records"])
+                    elif "sheets" in file_content:
+                        # Handle multi-sheet structure similar to preprocess_facility_data
+                        # Ensure 'sheets' is a dictionary before iterating over it
+                        if isinstance(file_content["sheets"], dict):
+                            for sheet_name, sheet_data in file_content["sheets"].items():
+                                if isinstance(sheet_data, dict) and "records" in sheet_data:
+                                    all_records.extend(sheet_data["records"])
+                                else:
+                                    logger.warning(
+                                        f"Skipping sheet '{sheet_name}' in {input_file.name}: Expected dict with 'records' key, got {type(sheet_data)}"
+                                    )
+                        else:
+                            logger.warning(
+                                f"Skipping sheets in {input_file.name}: Expected 'sheets' to be a dictionary, got {type(file_content['sheets'])}"
+                            )
+                    else:
+                        # Assume it's a single record dictionary
+                        all_records.append(file_content)
+                elif isinstance(file_content, list):
+                    # If it's a list, assume it's a list of records
+                    all_records.extend(file_content)
+                else:
+                    logger.warning(
+                        f"Skipping {input_file.name}: Expected JSON object or array, got {type(file_content)}"
+                    )
+        except Exception as e:
+            logger.warning(f"Could not load records from {input_file.name}: {e}")
+            # Do not return, try to process other files, but log the error
+            if not summary["error"]:
+                summary[
+                    "error"
+                ] = f"Error loading records from {input_file.name}: {e}"  # Store first loading error
 
-    for json_file in json_files:
-        output_file = output_directory / json_file.name  # Same filename in output directory
+    if not all_records:
+        summary["error"] = "No valid records found across all raw data files."
+        logger.error(summary["error"])
+        return summary  # Return initialized summary on early exit
 
-        result = preprocess_facility_data(json_file, output_file, enable_schema_conversion)
+    # Perform comprehensive field analysis on all records
+    total_field_analysis = analyze_all_field_types(all_records)
+    list_fields_to_convert = identify_list_fields(total_field_analysis)
 
-        if result.get("processed", 0) > 0:
-            summary["processed_files"] += 1
-            summary["total_records"] += result["processed"]
-            summary["list_fields_found"].update(result.get("list_fields", []))
-            summary["root_cause_enhancements"] += result.get("root_cause_enhanced", 0)
+    summary["all_field_analysis"] = total_field_analysis
+    summary["list_fields_found"] = list_fields_to_convert
 
-            # Aggregate field analysis
-            for field_name, stats in result.get("field_analysis", {}).items():
-                if field_name not in summary["all_field_analysis"]:
-                    summary["all_field_analysis"][field_name] = {"list_count": 0, "total_count": 0}
-                summary["all_field_analysis"][field_name]["list_count"] += stats["list_count"]
-                summary["all_field_analysis"][field_name]["total_count"] += stats["total_count"]
+    logger.info(f"Identified {len(list_fields_to_convert)} fields for list-to-string conversion")
 
-    # Convert set to list for JSON serialization
-    summary["list_fields_found"] = list(summary["list_fields_found"])
+    # Process each facility file
+    for input_file in json_files:
+        try:
+            # Preprocess facility data
+            output_file = (
+                actual_output_data_dir / input_file.name
+            )  # Same filename in output directory
+            result = preprocess_facility_data(input_file, output_file, enable_schema_conversion)
 
-    logger.info(f"Preprocessing complete: {summary}")
+            if result.get("processed", 0) > 0:
+                summary["files_processed"] += 1
+                summary["total_records"] += result["processed"]
+                summary["facilities_data"].append(result)
+                summary["root_cause_enhancements"] += result.get("root_cause_enhanced", 0)
+
+        except Exception as e:
+            error_message = f"Error processing file {input_file.name}: {e}"
+            logger.error(error_message)
+            if not summary["error"]:
+                summary["error"] = error_message
+
+    logger.info("Data preprocessing complete.")
     return summary
 
 
@@ -432,7 +514,9 @@ def main():
     )
     parser.add_argument("--facility", type=str, help="Process specific facility file")
     parser.add_argument(
-        "--raw-data-dir", type=str, help="Raw data directory path (default: data/raw_data)"
+        "--raw-data-dir",
+        type=str,
+        help="Raw data directory path (default: data/raw_data)",
     )
     parser.add_argument(
         "--output-data-dir",
@@ -440,7 +524,9 @@ def main():
         help="Output data directory path (default: data/facility_data)",
     )
     parser.add_argument(
-        "--no-schema-conversion", action="store_true", help="Disable schema-aware type conversion"
+        "--no-schema-conversion",
+        action="store_true",
+        help="Disable schema-aware type conversion",
     )
     parser.add_argument("--log-level", type=str, help="Logging level")
 
@@ -454,23 +540,17 @@ def main():
     enable_schema_conversion = not args.no_schema_conversion
 
     try:
-        # Set up directories
-        if args.raw_data_dir:
-            raw_data_dir = args.raw_data_dir
-        else:
-            project_root = Path(__file__).resolve().parent.parent
-            raw_data_dir = str(project_root / "data" / "raw_data")
+        # Set up directories, relative to project root using get_project_root
+        project_root = get_project_root()
 
-        if args.output_data_dir:
-            output_data_dir = args.output_data_dir
-        else:
-            project_root = Path(__file__).resolve().parent.parent
-            output_data_dir = str(project_root / "data" / "facility_data")
+        # Convert paths to absolute strings before passing to preprocess_all_facilities
+        raw_data_dir_abs = str(project_root / (args.raw_data_dir or "data/raw_data"))
+        output_data_dir_abs = str(project_root / (args.output_data_dir or "data/facility_data"))
 
         if args.facility:
             # Process specific facility
-            input_file = Path(raw_data_dir) / f"{args.facility}.json"
-            output_file = Path(output_data_dir) / f"{args.facility}.json"
+            input_file = Path(raw_data_dir_abs) / f"{args.facility}.json"
+            output_file = Path(output_data_dir_abs) / f"{args.facility}.json"
 
             if not input_file.exists():
                 logger.error(f"Facility file not found: {input_file}")
@@ -484,7 +564,8 @@ def main():
             if result.get("processed", 0) > 0:
                 print(f"Successfully preprocessed {args.facility}")
                 print(f"Records processed: {result['processed']}")
-                print(f"List fields converted: {result['list_fields']}")
+                # Ensure 'list_fields' and 'root_cause_enhanced' are always present
+                print(f"List fields converted: {result.get('list_fields', [])}")
                 print(
                     f"Schema conversion: {'enabled' if result.get('schema_conversion_enabled') else 'disabled'}"
                 )
@@ -496,30 +577,38 @@ def main():
                 print(f"Preprocessing failed for {args.facility}")
                 return 1
         else:
-            # Process all facilities
+            # Process all facilities, passing absolute paths
             summary = preprocess_all_facilities(
-                raw_data_dir, output_data_dir, enable_schema_conversion
+                raw_data_dir_abs, output_data_dir_abs, enable_schema_conversion
             )
+
+            # Ensure summary keys exist before printing
+            files_processed = summary.get("files_processed", 0)
+            total_records = summary.get("total_records", 0)
+            schema_conversion_enabled = summary.get("schema_conversion_enabled", False)
+            list_fields_found = summary.get("list_fields_found", [])
+            root_cause_enhancements = summary.get("root_cause_enhancements", 0)
+            all_field_analysis = summary.get("all_field_analysis", {})
 
             print("Preprocessing Summary:")
-            print(f"Files processed: {summary['processed_files']}")
-            print(f"Total records: {summary['total_records']}")
-            print(
-                f"Schema conversion: {'enabled' if summary.get('schema_conversion_enabled') else 'disabled'}"
-            )
-            print(f"List fields found: {summary['list_fields_found']}")
-            print(f"Root cause enhancements: {summary['root_cause_enhancements']}")
+            print(f"Files processed: {files_processed}")
+            print(f"Total records: {total_records}")
+            print(f"Schema conversion: {'enabled' if schema_conversion_enabled else 'disabled'}")
+            print(f"List fields found: {list_fields_found}")
+            print(f"Root cause enhancements: {root_cause_enhancements}")
+            if summary["error"]:
+                print(f"Error: {summary['error']}")
 
             # Print field analysis summary
-            if summary.get("all_field_analysis"):
+            if all_field_analysis:
                 print("\nField Analysis Summary:")
-                for field_name, stats in summary["all_field_analysis"].items():
+                for field_name, stats in all_field_analysis.items():
                     if stats["list_count"] > 0:
                         print(
                             f"  {field_name}: {stats['list_count']}/{stats['total_count']} were lists"
                         )
 
-            return 0 if summary["processed_files"] > 0 else 1
+            return 0 if files_processed > 0 else 1
 
     except Exception as e:
         handle_error(logger, e, "data preprocessing")

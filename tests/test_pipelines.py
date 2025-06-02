@@ -35,7 +35,7 @@ class TestSimplifiedETLPipeline:
                 "Problem": {"what_happened": "What happened?", "requirement": "Requirement"},
                 "RootCause": {
                     "root_cause": "Root Cause",
-                    "root_cause_tail": "Root Cause",
+                    "root_cause_tail_extraction": "Root Cause (tail extraction)",
                     "objective_evidence": "Obj. Evidence",
                 },
                 "ActionPlan": {"action_plan": "Action Plan", "complete": "Complete"},
@@ -131,12 +131,14 @@ class TestSimplifiedETLPipeline:
         # Verify causal intelligence - first record has complex root cause
         root_cause_1 = transformed["entities"]["RootCause"][0]
         assert root_cause_1["root_cause"] == "Material fatigue; Excessive load; Poor maintenance"
-        assert root_cause_1["root_cause_tail"] == "Poor maintenance"  # Tail extraction
+        assert root_cause_1["root_cause_tail_extraction"] == "Poor maintenance"  # Tail extraction
 
         # Verify causal intelligence - second record has simple root cause
         root_cause_2 = transformed["entities"]["RootCause"][1]
         assert root_cause_2["root_cause"] == "Circuit breaker malfunction"
-        assert root_cause_2["root_cause_tail"] == "Circuit breaker malfunction"  # Same as primary
+        assert (
+            root_cause_2["root_cause_tail_extraction"] == "Circuit breaker malfunction"
+        )  # Same as primary
 
         # Verify dynamic labeling
         ar1 = transformed["entities"]["ActionRequest"][0]
@@ -225,11 +227,11 @@ class TestSimplifiedETLPipeline:
         # Verify causal intelligence preservation
         root_cause = transformed["entities"]["RootCause"][0]
         assert "root_cause" in root_cause
-        assert "root_cause_tail" in root_cause
+        assert "root_cause_tail_extraction" in root_cause
         assert "objective_evidence" in root_cause
 
         # Verify tail extraction logic
-        assert root_cause["root_cause_tail"] == "Tertiary operator error"
+        assert root_cause["root_cause_tail_extraction"] == "Tertiary operator error"
         assert "Primary hardware failure" in root_cause["root_cause"]
 
     def test_missing_data_handling_in_pipeline(self):
@@ -289,9 +291,9 @@ class TestSimplifiedETLPipeline:
         # Verify causal intelligence processing for all records
         for root_cause in transformed["entities"]["RootCause"]:
             assert "root_cause" in root_cause
-            assert "root_cause_tail" in root_cause
+            assert "root_cause_tail_extraction" in root_cause
             # Tail should be extracted properly
-            assert "Secondary factor" in root_cause["root_cause_tail"]
+            assert "Secondary factor" in root_cause["root_cause_tail_extraction"]
 
 
 class TestCausalIntelligenceIntegration:
@@ -310,7 +312,10 @@ class TestCausalIntelligenceIntegration:
 
         config = {
             "entity_mappings": {
-                "RootCause": {"root_cause": "Root Cause", "root_cause_tail": "Root Cause"}
+                "RootCause": {
+                    "root_cause": "Root Cause",
+                    "root_cause_tail_extraction": "Root Cause",
+                }
             },
             "cascade_labeling": {
                 "RootCause": {
@@ -365,7 +370,7 @@ class TestCausalIntelligenceIntegration:
                 "Problem": {"what_happened": "What happened?"},
                 "RootCause": {
                     "root_cause": "Root Cause",
-                    "root_cause_tail": "Root Cause",
+                    "root_cause_tail_extraction": "Root Cause",
                     "objective_evidence": "Obj. Evidence",
                 },
                 "ActionPlan": {"action_plan": "Action Plan", "complete": "Complete"},
@@ -415,7 +420,7 @@ class TestCausalIntelligenceIntegration:
         action_plan = result["entities"]["ActionPlan"][0]
         verification = result["entities"]["Verification"][0]
 
-        assert root_cause["root_cause_tail"] == "Inadequate preventive maintenance"
+        assert root_cause["root_cause_tail_extraction"] == "Inadequate preventive maintenance"
         assert action_plan["complete"] == "true"
         assert verification["is_action_plan_effective"] == "true"
 

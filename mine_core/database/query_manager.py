@@ -48,26 +48,16 @@ class QueryManager:
             handle_error(logger, e, "query execution")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
-    def get_entity_count(self, entity_type: str, filters: Dict[str, Any] = None) -> int:
-        """Get count of entities with optional filtering"""
+    def get_entity_count(self, entity_type: str) -> int:
+        """Return integer count, not QueryResult object"""
         try:
-            filter_clause = self._build_filter_clause(filters) if filters else ""
-            # Exclude template nodes from the count
-            template_exclude_clause = "WHERE NOT '_SchemaTemplate' IN labels(n)"
-            if filter_clause:
-                # If there are existing filters, combine with AND
-                query = f"MATCH (n:{entity_type}) {filter_clause} AND {template_exclude_clause[6:]} RETURN count(n) AS count"
-            else:
-                # If no existing filters, use template_exclude_clause directly as WHERE
-                query = (
-                    f"MATCH (n:{entity_type}) {template_exclude_clause} RETURN count(n) AS count"
-                )
+            filter_clause = "WHERE NOT '_SchemaTemplate' IN labels(n)"
+            query = f"MATCH (n:{entity_type}) {filter_clause} RETURN count(n) AS count"
 
-            result = self.execute_query(query, filters or {})
-            count_value = result.data[0]["count"] if result.success and result.data else 0
-            logger.info(f"Query get_entity_count for {entity_type} results: {count_value}")
-            return count_value
-
+            result = self.execute_query(query)
+            if result.success and result.data:
+                return result.data[0]["count"]  # Extract integer from QueryResult
+            return 0
         except Exception as e:
             handle_error(logger, e, f"entity count for {entity_type}")
             return 0
@@ -159,10 +149,11 @@ class QueryManager:
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
     def get_workflow_completion_rates(self) -> QueryResult:
-        """Get completion rates for workflow entities"""
+        """Enhanced workflow completion rates with proper validation"""
         try:
             query = """
             MATCH (ar:ActionRequest)
+            WHERE NOT '_SchemaTemplate' IN labels(ar)
             OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
             OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
             OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan)
@@ -175,12 +166,29 @@ class QueryManager:
                    count(v) AS plans_verified
             """
 
-            results = self.execute_query(query)
-            logger.info(f"Query get_workflow_completion_rates results: {results}")
-            return results
+            result = self.execute_query(query)
+            if result.success and result.data:
+                logger.info(f"Workflow completion query successful: {result.data[0]}")
+                return result
+            else:
+                logger.warning("Workflow completion query returned no data")
+                return QueryResult(
+                    data=[
+                        {
+                            "total_requests": 0,
+                            "problems_defined": 0,
+                            "causes_analyzed": 0,
+                            "plans_developed": 0,
+                            "plans_verified": 0,
+                        }
+                    ],
+                    count=1,
+                    success=True,
+                    metadata={"fallback": True},
+                )
 
         except Exception as e:
-            handle_error(logger, e, "workflow completion rates")
+            handle_error(logger, e, "workflow completion rates query")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
     def get_causal_intelligence_data(self, facility_id: str = None) -> QueryResult:
@@ -195,7 +203,7 @@ class QueryManager:
             MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)
             WHERE rc.root_cause IS NOT NULL AND rc.root_cause <> 'DATA_NOT_AVAILABLE'
             WITH rc.root_cause AS primary_cause,
-                 rc.root_cause_tail AS secondary_cause,
+                 rc.root_cause_tail_extraction AS secondary_cause,
                  ar.categories AS category,
                  count(*) AS frequency
             RETURN primary_cause, secondary_cause, category, frequency
@@ -268,6 +276,15 @@ class QueryManager:
                 conditions.append(f"n.{key} = ${key}")
 
         return f"WHERE {' AND '.join(conditions)}" if conditions else ""
+
+    def test_workflow_entities(self):
+        """Tests the existence and count of core workflow entities in Neo4j."""
+        entities = ["ActionRequest", "Problem", "RootCause", "ActionPlan", "Verification"]
+        logger.info("--- Testing Workflow Entities --- ")
+        for entity in entities:
+            count = self.get_entity_count(entity)
+            logger.info(f"{entity}: {count} records")
+        logger.info("--- Workflow Entity Test Complete ---")
 
 
 # Singleton pattern

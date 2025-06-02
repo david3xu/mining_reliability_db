@@ -4,10 +4,15 @@ Micro-Component: Facility Card - Facility Summary Display
 18-line atomic component for facility overview.
 """
 
+from typing import List
+
 import dash_bootstrap_components as dbc
 from dash import html
 
 from dashboard.adapters import get_config_adapter
+from mine_core.shared.common import get_logger, handle_error
+
+logger = get_logger(__name__)
 
 
 def create_facility_summary_card(facility_data: dict) -> dbc.Card:
@@ -44,4 +49,50 @@ def create_facility_summary_card(facility_data: dict) -> dbc.Card:
             )
         ],
         style={"minHeight": "160px", "textAlign": "center"},
+    )
+
+
+def create_small_supporting_card(entity_data: dict) -> dbc.Card:
+    """Compact supporting entity card with field details"""
+    config = get_config_adapter().get_styling_config()
+    entity_name = entity_data.get("name", "Unknown")
+    description = entity_data.get("description", "")
+
+    # Get actual field names from adapter
+    fields = entity_data.get("field_names", [])  # Now comes from adapter
+    field_count = len(fields)
+
+    return dbc.Card(
+        [
+            dbc.CardBody(
+                [
+                    html.H6(
+                        entity_name,
+                        className="card-title",
+                        style={"fontSize": "12px", "fontWeight": "bold", "margin": "0 0 5px 0"},
+                    ),
+                    html.P(
+                        f"{field_count} Fields",
+                        style={"fontSize": "10px", "margin": "0 0 5px 0", "color": "#666"},
+                    ),
+                    html.Div(
+                        [
+                            html.P(
+                                field, style={"fontSize": "9px", "margin": "1px 0", "color": "#555"}
+                            )
+                            for field in fields
+                        ]
+                    ),
+                    html.Small(description, className="text-muted", style={"fontSize": "9px"}),
+                ]
+            )
+        ],
+        style={
+            "minHeight": "100px",  # Reduced height
+            "textAlign": "left",
+            "backgroundColor": "#F8F9FA",
+            "border": "1px solid #E5E5E5",
+            "borderRadius": "6px",
+            "padding": "8px",
+        },
     )
