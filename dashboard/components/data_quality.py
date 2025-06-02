@@ -11,6 +11,13 @@ from dash import dash_table, dcc, html
 
 from dashboard.adapters import get_config_adapter, get_data_adapter
 from dashboard.components.layout_template import create_metric_card, create_standard_layout
+from dashboard.utils.styling import (
+    get_chart_layout_template,
+    get_colors,
+    get_dashboard_styles,
+    get_fonts,
+    get_table_style,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +27,7 @@ def create_quality_metrics_cards() -> list:
     try:
         data_adapter = get_data_adapter()
         config_adapter = get_config_adapter()
+        colors = get_colors()
 
         portfolio_data = data_adapter.get_portfolio_metrics()
         field_data = data_adapter.get_field_distribution()
@@ -29,25 +37,25 @@ def create_quality_metrics_cards() -> list:
                 value=portfolio_data.facilities,
                 label="Facilities Analyzed",
                 detail="Active operational sites",
-                color="#4A90E2",
+                color=colors.get("primary_blue"),
             ),
             create_metric_card(
                 value=field_data.total_fields,
                 label="Total Fields",
                 detail="Data collection points",
-                color="#F5A623",
+                color=colors.get("chart_colors", [])[1] if colors.get("chart_colors") else None,
             ),
             create_metric_card(
                 value=f"{portfolio_data.metadata.data_quality:.0%}",
                 label="Data Quality Score",
                 detail="Overall completeness",
-                color="#7ED321",
+                color=colors.get("chart_colors", [])[2] if colors.get("chart_colors") else None,
             ),
             create_metric_card(
                 value=portfolio_data.years_coverage,
                 label="Years Coverage",
                 detail="Historical span",
-                color="#B57EDC",
+                color=colors.get("chart_colors", [])[3] if colors.get("chart_colors") else None,
             ),
         ]
 
@@ -63,9 +71,11 @@ def create_field_completeness_chart() -> dcc.Graph:
     try:
         data_adapter = get_data_adapter()
         config_adapter = get_config_adapter()
+        colors = get_colors()
+        fonts = get_fonts()
+        layout_template = get_chart_layout_template()
 
         field_data = data_adapter.get_field_distribution()
-        chart_config = config_adapter.get_chart_styling_template()
 
         if not field_data.labels:
             return dcc.Graph(figure={})
@@ -76,14 +86,20 @@ def create_field_completeness_chart() -> dcc.Graph:
         ]
 
         # Color mapping based on completion
-        colors = []
+        bar_colors = []
         for rate in completion_rates:
             if rate >= 80:
-                colors.append("#7ED321")
+                bar_colors.append(
+                    colors.get("chart_colors", [])[2] if colors.get("chart_colors") else "#7ED321"
+                )
             elif rate >= 60:
-                colors.append("#F5A623")
+                bar_colors.append(
+                    colors.get("chart_colors", [])[1] if colors.get("chart_colors") else "#F5A623"
+                )
             else:
-                colors.append("#D32F2F")
+                bar_colors.append(
+                    colors.get("chart_colors", [])[3] if colors.get("chart_colors") else "#D32F2F"
+                )
 
         fig = go.Figure()
         fig.add_trace(
@@ -91,7 +107,7 @@ def create_field_completeness_chart() -> dcc.Graph:
                 y=field_data.labels,
                 x=completion_rates,
                 orientation="h",
-                marker=dict(color=colors),
+                marker=dict(color=bar_colors),
                 text=[f"{rate:.0f}%" for rate in completion_rates],
                 textposition="inside",
             )
@@ -100,9 +116,11 @@ def create_field_completeness_chart() -> dcc.Graph:
         fig.update_layout(
             title="Field Completion Analysis",
             xaxis_title="Completion Rate (%)",
-            height=chart_config.get("height", 400),
-            font={"family": chart_config.get("font_family", "Arial")},
-            paper_bgcolor=chart_config.get("background", "#FFFFFF"),
+            height=layout_template.get("height", 400),
+            font=layout_template.get("font", {"family": fonts.get("primary_font", "Arial")}),
+            paper_bgcolor=layout_template.get(
+                "paper_bgcolor", colors.get("background_light", "#FFFFFF")
+            ),
         )
 
         return dcc.Graph(figure=fig)
@@ -117,9 +135,11 @@ def create_facility_quality_comparison() -> dcc.Graph:
     try:
         data_adapter = get_data_adapter()
         config_adapter = get_config_adapter()
+        colors = get_colors()
+        fonts = get_fonts()
+        layout_template = get_chart_layout_template()
 
         facility_data = data_adapter.get_facility_breakdown()
-        chart_config = config_adapter.get_chart_styling_template()
 
         if not facility_data.labels:
             return dcc.Graph(figure={})
@@ -133,7 +153,9 @@ def create_facility_quality_comparison() -> dcc.Graph:
             go.Bar(
                 x=facility_data.labels,
                 y=quality_scores,
-                marker_color=chart_config.get("colors", ["#4A90E2"])[0],
+                marker_color=colors.get("chart_colors", [])[0]
+                if colors.get("chart_colors")
+                else "#4A90E2",
                 text=[f"{score:.0f}%" for score in quality_scores],
                 textposition="outside",
             )
@@ -143,9 +165,11 @@ def create_facility_quality_comparison() -> dcc.Graph:
             title="Facility Quality Comparison",
             xaxis_title="Facility",
             yaxis_title="Quality Score (%)",
-            height=chart_config.get("height", 400),
-            font={"family": chart_config.get("font_family", "Arial")},
-            paper_bgcolor=chart_config.get("background", "#FFFFFF"),
+            height=layout_template.get("height", 400),
+            font=layout_template.get("font", {"family": fonts.get("primary_font", "Arial")}),
+            paper_bgcolor=layout_template.get(
+                "paper_bgcolor", colors.get("background_light", "#FFFFFF")
+            ),
         )
 
         return dcc.Graph(figure=fig)
@@ -160,9 +184,10 @@ def create_quality_summary_table() -> dash_table.DataTable:
     try:
         data_adapter = get_data_adapter()
         config_adapter = get_config_adapter()
+        table_style = get_table_style()
+        colors = get_colors()
 
         facility_data = data_adapter.get_facility_breakdown()
-        styling = config_adapter.get_styling_config()
 
         if not facility_data.labels:
             return dash_table.DataTable(data=[])
@@ -200,23 +225,28 @@ def create_quality_summary_table() -> dash_table.DataTable:
                 {"name": "Quality Score", "id": "Quality Score"},
                 {"name": "Status", "id": "Status"},
             ],
-            style_cell={"textAlign": "center", "padding": "12px"},
-            style_header={
-                "backgroundColor": styling.get("primary_color", "#4A90E2"),
-                "color": "white",
-                "fontWeight": "bold",
-            },
-            style_data={"backgroundColor": "white"},
-            style_data_conditional=[
+            style_cell=table_style.get("style_cell"),
+            style_header=table_style.get("style_header"),
+            style_data=table_style.get("style_data"),
+            style_table=table_style.get("style_table"),
+            conditional_formatting=[
                 {
-                    "if": {"filter_query": "{Status} = Excellent"},
-                    "backgroundColor": "#E8F5E8",
-                    "color": "black",
+                    "if": {"filter_query": "{Status} = 'Excellent'"},
+                    "backgroundColor": colors.get("chart_colors", [])[2]
+                    if colors.get("chart_colors")
+                    else "#E8F5E8",
                 },
                 {
-                    "if": {"filter_query": "{Status} = Needs Attention"},
-                    "backgroundColor": "#FFE6E6",
-                    "color": "black",
+                    "if": {"filter_query": "{Status} = 'Good'"},
+                    "backgroundColor": colors.get("chart_colors", [])[1]
+                    if colors.get("chart_colors")
+                    else "#FFF8E1",
+                },
+                {
+                    "if": {"filter_query": "{Status} = 'Needs Attention'"},
+                    "backgroundColor": colors.get("chart_colors", [])[3]
+                    if colors.get("chart_colors")
+                    else "#FFE6E6",
                 },
             ],
         )
@@ -227,23 +257,29 @@ def create_quality_summary_table() -> dash_table.DataTable:
 
 
 def create_data_quality_layout() -> html.Div:
-    """Complete data quality layout using adapter pattern"""
+    """Data quality analysis page - 20 lines"""
     try:
         config_adapter = get_config_adapter()
-        return create_standard_layout(
-            tab_id="quality",
-            metric_cards=create_quality_metrics_cards(),
-            left_component=create_field_completeness_chart(),
-            right_component=create_facility_quality_comparison(),
-            summary_component=create_quality_summary_table(),
-            summary_title="Data Quality Assessment",
-        )
-
-    except Exception as e:
-        config_adapter.handle_error_utility(logger, e, "data quality layout creation")
         return html.Div(
             [
-                html.H3("Data Quality Analysis Error"),
-                html.P("Failed to load quality assessment data"),
-            ]
+                create_standard_layout(
+                    title="Data Quality Foundation",
+                    metric_cards=create_quality_metrics_cards(),
+                    chart_components=[
+                        create_field_completeness_chart(),
+                        create_facility_quality_comparison(),
+                    ],
+                    table_components=[create_quality_summary_table()],
+                    chart_titles=[
+                        "Field Completion Analysis",
+                        "Facility Quality Comparison",
+                    ],
+                    table_titles=["Quality Summary by Facility"],
+                )
+            ],
+            className="p-4",
+            style=get_dashboard_styles().get("main_container"),
         )
+    except Exception as e:
+        config_adapter.handle_error_utility(logger, e, "data quality layout creation")
+        return dbc.Alert("Data Quality layout unavailable", color="danger")

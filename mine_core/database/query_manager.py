@@ -52,10 +52,21 @@ class QueryManager:
         """Get count of entities with optional filtering"""
         try:
             filter_clause = self._build_filter_clause(filters) if filters else ""
-            query = f"MATCH (n:{entity_type}) {filter_clause} RETURN count(n) AS count"
+            # Exclude template nodes from the count
+            template_exclude_clause = "WHERE NOT '_SchemaTemplate' IN labels(n)"
+            if filter_clause:
+                # If there are existing filters, combine with AND
+                query = f"MATCH (n:{entity_type}) {filter_clause} AND {template_exclude_clause[6:]} RETURN count(n) AS count"
+            else:
+                # If no existing filters, use template_exclude_clause directly as WHERE
+                query = (
+                    f"MATCH (n:{entity_type}) {template_exclude_clause} RETURN count(n) AS count"
+                )
 
             result = self.execute_query(query, filters or {})
-            return result.data[0]["count"] if result.success and result.data else 0
+            count_value = result.data[0]["count"] if result.success and result.data else 0
+            logger.info(f"Query get_entity_count for {entity_type} results: {count_value}")
+            return count_value
 
         except Exception as e:
             handle_error(logger, e, f"entity count for {entity_type}")
@@ -131,7 +142,7 @@ class QueryManager:
 
             query = f"""
             MATCH (f:Facility)
-            {facility_filter}
+            WHERE NOT '_SchemaTemplate' IN labels(f) {facility_filter}
             OPTIONAL MATCH (f)<-[:BELONGS_TO]-(ar:ActionRequest)
             WITH f, count(ar) AS incident_count
             RETURN f.facility_id AS facility_id,
@@ -164,7 +175,9 @@ class QueryManager:
                    count(v) AS plans_verified
             """
 
-            return self.execute_query(query)
+            results = self.execute_query(query)
+            logger.info(f"Query get_workflow_completion_rates results: {results}")
+            return results
 
         except Exception as e:
             handle_error(logger, e, "workflow completion rates")
@@ -215,12 +228,12 @@ class QueryManager:
             date_field = date_fields[0]  # Use first date field
 
             query = f"""
-            MATCH (n:{entity_type})
-            WHERE n.{date_field} IS NOT NULL
-            WITH substring(n.{date_field}, 0, 4) AS year, count(n) AS count
+            MATCH (n:{entity_type})-[:BELONGS_TO]->(f:Facility)
+            WHERE n.{date_field} IS NOT NULL AND f.facility_id IS NOT NULL AND NOT '_SchemaTemplate' IN labels(n)
+            WITH f.facility_id AS facility_id, substring(n.{date_field}, 0, 4) AS year, count(n) AS incident_count
             WHERE year IS NOT NULL
-            RETURN year, count
-            ORDER BY year
+            RETURN facility_id, year, incident_count
+            ORDER BY year, facility_id
             """
 
             return self.execute_query(query)
@@ -245,7 +258,9 @@ class QueryManager:
 
         conditions = []
         for key, value in filters.items():
-            if isinstance(value, str):
+            if value == "__IS_NOT_NULL__":
+                conditions.append(f"n.{key} IS NOT NULL")
+            elif isinstance(value, str):
                 conditions.append(f"n.{key} = ${key}")
             elif isinstance(value, list):
                 conditions.append(f"n.{key} IN ${key}")

@@ -5,7 +5,7 @@ Graph-based system for analyzing mining incident data.
 
 __version__ = "0.1.0"
 
-from mine_core.analytics import PatternDiscovery, QualityAnalyzer, WorkflowAnalyzer
+from mine_core.analytics import PatternDiscovery, WorkflowAnalyzer
 from mine_core.database import (
     get_action_requests,
     get_assets,
@@ -59,5 +59,4 @@ __all__ = [
     # Analytics classes
     "WorkflowAnalyzer",
     "PatternDiscovery",
-    "QualityAnalyzer",
 ]

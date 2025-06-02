@@ -7,7 +7,14 @@ Unified workflow data extraction with standardized interface.
 import logging
 from typing import Any, Dict, List, Optional
 
-from dashboard.adapters.interfaces import ComponentMetadata
+from dashboard.adapters.interfaces import (
+    CompleteWorkflowAnalysis,
+    ComponentMetadata,
+    EntityFieldDistribution,
+    FieldMappingAnalysis,
+    FieldMappingCounts,
+    WorkflowSchemaAnalysis,
+)
 
 # Pure core layer imports
 from mine_core.business.workflow_processor import get_workflow_processor
@@ -29,32 +36,37 @@ class WorkflowAdapter:
         """Initialize with core workflow processor connection"""
         self.workflow_processor = get_workflow_processor()
 
-    def get_workflow_schema_analysis(self) -> Dict[str, Any]:
+    def get_workflow_schema_analysis(self) -> WorkflowSchemaAnalysis:
         """Pure data access for workflow schema structure"""
         try:
             logger.info("Workflow Adapter: Fetching schema analysis from core")
 
             # Call core business logic
-            schema_analysis = self.workflow_processor.analyze_workflow_schema()
+            schema_analysis_data = self.workflow_processor.analyze_workflow_schema()
 
-            if not schema_analysis:
-                return {}
+            if not schema_analysis_data:
+                return self._create_empty_workflow_schema_analysis()
 
             # Pure data pass-through with metadata
-            return {
-                **schema_analysis,
-                "metadata": ComponentMetadata(
+            return WorkflowSchemaAnalysis(
+                workflow_entities=schema_analysis_data.get("workflow_entities", []),
+                total_entities=schema_analysis_data.get("total_entities", 0),
+                total_fields=schema_analysis_data.get("total_fields", 0),
+                analytical_dimensions=schema_analysis_data.get("analytical_dimensions", 0),
+                field_categories=schema_analysis_data.get("field_categories", 0),
+                entity_complexity=schema_analysis_data.get("entity_complexity", {}),
+                metadata=ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
-                    data_quality=1.0 if schema_analysis.get("total_entities", 0) > 0 else 0.0,
-                ).__dict__,
-            }
+                    data_quality=1.0 if schema_analysis_data.get("total_entities", 0) > 0 else 0.0,
+                ),
+            )
 
         except Exception as e:
             handle_error(logger, e, "workflow schema analysis data access")
-            return {}
+            return self._create_empty_workflow_schema_analysis()
 
-    def get_entity_field_distribution(self) -> Dict[str, Any]:
+    def get_entity_field_distribution(self) -> EntityFieldDistribution:
         """Pure data access for entity field distribution"""
         try:
             logger.info("Workflow Adapter: Fetching entity field distribution from core")
@@ -63,23 +75,26 @@ class WorkflowAdapter:
             distribution_data = self.workflow_processor.analyze_entity_field_distribution()
 
             if not distribution_data:
-                return {}
+                return self._create_empty_entity_field_distribution()
 
             # Pure data pass-through
-            return {
-                **distribution_data,
-                "metadata": ComponentMetadata(
+            return EntityFieldDistribution(
+                entity_names=distribution_data.get("entity_names", []),
+                field_counts=distribution_data.get("field_counts", []),
+                total_entities=distribution_data.get("total_entities", 0),
+                field_distribution=distribution_data.get("field_distribution", {}),
+                metadata=ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
                     data_quality=1.0 if distribution_data.get("total_entities", 0) > 0 else 0.0,
-                ).__dict__,
-            }
+                ),
+            )
 
         except Exception as e:
             handle_error(logger, e, "entity field distribution data access")
-            return {}
+            return self._create_empty_entity_field_distribution()
 
-    def get_field_mapping_analysis(self) -> Dict[str, Any]:
+    def get_field_mapping_analysis(self) -> FieldMappingAnalysis:
         """Pure data access for field mapping patterns"""
         try:
             logger.info("Workflow Adapter: Fetching field mapping analysis from core")
@@ -88,21 +103,26 @@ class WorkflowAdapter:
             mapping_data = self.workflow_processor.analyze_field_mappings()
 
             if not mapping_data:
-                return {}
+                return self._create_empty_field_mapping_analysis()
 
             # Pure data pass-through
-            return {
-                **mapping_data,
-                "metadata": ComponentMetadata(
+            return FieldMappingAnalysis(
+                mappings=mapping_data.get("mappings", []),
+                total_mappings=mapping_data.get("total_mappings", 0),
+                entities_covered=mapping_data.get("entities_covered", 0),
+                categories_found=mapping_data.get("categories_found", 0),
+                critical_fields=mapping_data.get("critical_fields", 0),
+                mapping_patterns=mapping_data.get("mapping_patterns", {}),
+                metadata=ComponentMetadata(
                     source="core.workflow_processor",
                     generated_at=self._get_timestamp(),
                     data_quality=1.0 if mapping_data.get("total_mappings", 0) > 0 else 0.0,
-                ).__dict__,
-            }
+                ),
+            )
 
         except Exception as e:
             handle_error(logger, e, "field mapping analysis data access")
-            return {}
+            return self._create_empty_field_mapping_analysis()
 
     def get_workflow_business_analysis_neo4j(self) -> Dict[str, Any]:
         """Pure data access for Neo4j-driven workflow business analysis"""
@@ -134,22 +154,35 @@ class WorkflowAdapter:
             handle_error(logger, e, "Neo4j workflow business analysis data access")
             return {}
 
-    def get_field_mapping_counts(self) -> Dict[str, Any]:
+    def get_field_mapping_counts(self) -> FieldMappingCounts:
         """Pure data access for field mapping statistics"""
         try:
             logger.info("Workflow Adapter: Fetching field mapping counts from core")
 
             # Call core business logic
-            mapping_counts = self.workflow_processor.calculate_field_mapping_counts()
+            mapping_counts_data = self.workflow_processor.calculate_field_mapping_counts()
+
+            if not mapping_counts_data:
+                return self._create_empty_field_mapping_counts()
 
             # Pure data pass-through
-            return mapping_counts
+            return FieldMappingCounts(
+                total_fields=mapping_counts_data.get("total_fields", 0),
+                entity_mappings=mapping_counts_data.get("entity_mappings", {}),
+                source_fields=mapping_counts_data.get("source_fields", []),
+                mapping_coverage=mapping_counts_data.get("mapping_coverage", {}),
+                metadata=ComponentMetadata(
+                    source="core.workflow_processor",
+                    generated_at=self._get_timestamp(),
+                    data_quality=1.0 if mapping_counts_data.get("total_fields", 0) > 0 else 0.0,
+                ),
+            )
 
         except Exception as e:
             handle_error(logger, e, "field mapping counts data access")
-            return {"total_fields": 0, "entity_mappings": {}, "source_fields": []}
+            return self._create_empty_field_mapping_counts()
 
-    def get_complete_workflow_analysis(self) -> Dict[str, Any]:
+    def get_complete_workflow_analysis(self) -> CompleteWorkflowAnalysis:
         """Pure data access for complete workflow visualization data"""
         try:
             logger.info("Workflow Adapter: Fetching complete workflow visualization from core")
@@ -158,21 +191,25 @@ class WorkflowAdapter:
             complete_data = self.workflow_processor.process_complete_workflow_visualization()
 
             if not complete_data:
-                return {}
+                return self._create_empty_complete_workflow_analysis()
 
             # Pure data pass-through
-            return {
-                **complete_data,
-                "metadata": ComponentMetadata(
+            return CompleteWorkflowAnalysis(
+                workflow_stages=complete_data.get("workflow_stages", []),
+                supporting_entities=complete_data.get("supporting_entities", []),
+                layout_config=complete_data.get("layout_config", {}),
+                connection_config=complete_data.get("connection_config", {}),
+                display_config=complete_data.get("display_config", {}),
+                metadata=ComponentMetadata(
                     source="core.workflow_processor.complete",
                     generated_at=self._get_timestamp(),
                     data_quality=1.0 if complete_data.get("workflow_stages") else 0.0,
-                ).__dict__,
-            }
+                ),
+            )
 
         except Exception as e:
             handle_error(logger, e, "complete workflow analysis data access")
-            return {}
+            return self._create_empty_complete_workflow_analysis()
 
     def validate_workflow_data(self) -> Dict[str, bool]:
         """Pure validation check for workflow data availability"""
@@ -220,6 +257,66 @@ class WorkflowAdapter:
         from datetime import datetime
 
         return datetime.now().isoformat()
+
+    def _create_empty_workflow_schema_analysis(self) -> WorkflowSchemaAnalysis:
+        return WorkflowSchemaAnalysis(
+            workflow_entities=[],
+            total_entities=0,
+            total_fields=0,
+            analytical_dimensions=0,
+            field_categories=0,
+            entity_complexity={},
+            metadata=ComponentMetadata(
+                source="empty", generated_at=self._get_timestamp(), data_quality=0.0
+            ),
+        )
+
+    def _create_empty_entity_field_distribution(self) -> EntityFieldDistribution:
+        return EntityFieldDistribution(
+            entity_names=[],
+            field_counts=[],
+            total_entities=0,
+            field_distribution={},
+            metadata=ComponentMetadata(
+                source="empty", generated_at=self._get_timestamp(), data_quality=0.0
+            ),
+        )
+
+    def _create_empty_field_mapping_analysis(self) -> FieldMappingAnalysis:
+        return FieldMappingAnalysis(
+            mappings=[],
+            total_mappings=0,
+            entities_covered=0,
+            categories_found=0,
+            critical_fields=0,
+            mapping_patterns={},
+            metadata=ComponentMetadata(
+                source="empty", generated_at=self._get_timestamp(), data_quality=0.0
+            ),
+        )
+
+    def _create_empty_field_mapping_counts(self) -> FieldMappingCounts:
+        return FieldMappingCounts(
+            total_fields=0,
+            entity_mappings={},
+            source_fields=[],
+            mapping_coverage={},
+            metadata=ComponentMetadata(
+                source="empty", generated_at=self._get_timestamp(), data_quality=0.0
+            ),
+        )
+
+    def _create_empty_complete_workflow_analysis(self) -> CompleteWorkflowAnalysis:
+        return CompleteWorkflowAnalysis(
+            workflow_stages=[],
+            supporting_entities=[],
+            layout_config={},
+            connection_config={},
+            display_config={},
+            metadata=ComponentMetadata(
+                source="empty", generated_at=self._get_timestamp(), data_quality=0.0
+            ),
+        )
 
 
 _workflow_adapter: Optional[WorkflowAdapter] = None

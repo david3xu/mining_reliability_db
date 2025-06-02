@@ -180,7 +180,18 @@
     "animation_enabled": true,
     "loading_indicators": true,
     "error_boundaries": true,
-    "accessibility_compliance": true
+    "accessibility_compliance": true,
+    "styling": {
+      "primary_color": "#4A90E2",
+      "light_blue": "#7BB3F0",
+      "dark_blue": "#2E5C8A",
+      "chart_colors": ["#0A2A57", "#1A4B8F", "#2B6CC7", "#3D8EFF", "#6DAAFF", "#9DD6FF"],
+      "background_light": "#FFFFFF",
+      "background_dark": "#1E1E1E",
+      "text_primary": "#333333",
+      "text_secondary": "#666666",
+      "text_light": "#FFFFFF"
+    }
   },
   "data_export": {
     "enabled": true,

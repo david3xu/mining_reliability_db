@@ -21,6 +21,7 @@ from configs.environment import (
     get_entity_names,
     get_entity_primary_key,
     get_field_analysis_config,
+    get_field_category_display_mapping,
     get_mappings,
     get_max_retries,
     get_schema,
@@ -50,6 +51,7 @@ __all__ = [
     "get_chart_display_config",
     "get_entity_names",
     "handle_error_utility",
+    "get_dashboard_chart_config",
 ]
 
 logger = logging.getLogger(__name__)
@@ -185,6 +187,18 @@ class ConfigAdapter:
             self.handle_error_utility(logger, e, "dashboard configuration access")
             return {}
 
+    def get_dashboard_chart_config(self) -> Dict[str, Any]:
+        """Pure access to dashboard chart configuration"""
+        try:
+            return get_dashboard_chart_config()
+        except Exception as e:
+            self.handle_error_utility(logger, e, "dashboard chart configuration access")
+            return {
+                "font_family": "Arial, sans-serif",
+                "title_font_size": 18,
+                "default_height": 400,
+            }
+
     def get_styling_config(self) -> Dict[str, Any]:
         """Pure access to dashboard styling configuration"""
         try:
@@ -196,18 +210,6 @@ class ConfigAdapter:
                 "chart_colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
                 "background_light": "#FFFFFF",
                 "text_primary": "#333333",
-            }
-
-    def get_dashboard_chart_config(self) -> Dict[str, Any]:
-        """Pure access to dashboard chart configuration"""
-        try:
-            return get_dashboard_chart_config()
-        except Exception as e:
-            self.handle_error_utility(logger, e, "chart configuration access")
-            return {
-                "font_family": "Arial, sans-serif",
-                "default_height": 400,
-                "title_font_size": 18,
             }
 
     def get_server_config(self) -> Dict[str, Any]:
@@ -274,6 +276,14 @@ class ConfigAdapter:
             return get_field_analysis_config()
         except Exception as e:
             self.handle_error_utility(logger, e, "field analysis configuration access")
+            return {}
+
+    def get_field_category_display_mapping(self) -> Dict[str, Any]:
+        """Pure access to field category display mapping"""
+        try:
+            return get_field_category_display_mapping()
+        except Exception as e:
+            self.handle_error_utility(logger, e, "field category display mapping access")
             return {}
 
     def get_completion_thresholds(self) -> Dict[str, int]:

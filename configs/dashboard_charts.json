@@ -15,6 +15,7 @@
   "body_font_size": 14,
   "caption_font_size": 12,
   "micro_component_configs": {
+    "component_margin": "15px",
     "metric_card": {
       "adapter_config": "config_adapter.get_metric_card_styling",
       "dimensions": {

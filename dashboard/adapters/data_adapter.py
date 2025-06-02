@@ -118,6 +118,8 @@ class PurifiedDataAdapter:
                 values=field_data.get("values", []),
                 percentages=field_data.get("percentages", []),
                 total_fields=field_data.get("total_fields", 0),
+                category_counts=field_data.get("category_counts", {}),
+                detailed_field_names=field_data.get("detailed_field_names", {}),
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,
@@ -159,6 +161,35 @@ class PurifiedDataAdapter:
         except Exception as e:
             handle_error(logger, e, "historical timeline data access")
             return self._create_empty_timeline_data()
+
+    def get_data_quality_validation(self) -> ValidationResult:
+        """Pure data access for data quality validation results"""
+        try:
+            logger.info("Adapter: Fetching data quality validation from core")
+
+            # Call core business logic for data quality analysis
+            analysis_result = self.intelligence_engine.analyze_data_quality()
+
+            # Extract component status from entity_completeness for ValidationResult
+            component_status = {
+                entity: data.get("is_complete", False)
+                for entity, data in analysis_result.data.get("entity_completeness", {}).items()
+            }
+
+            return ValidationResult(
+                overall_status=analysis_result.data.get("workflow_completeness", {}).get(
+                    "overall_status", False
+                ),
+                component_status=component_status,
+                score=analysis_result.quality_score,
+                error_details=analysis_result.data.get("details", None),
+            )
+
+        except Exception as e:
+            handle_error(logger, e, "data quality validation access")
+            return ValidationResult(
+                overall_status=False, component_status={}, score=0.0, error_details=str(e)
+            )
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""
