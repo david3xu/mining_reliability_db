@@ -6,6 +6,7 @@ Centralized data access and query management.
 
 from mine_core.database.db import (
     get_database,
+    close_database
 )
 
 # Legacy compatibility
@@ -30,9 +31,7 @@ from mine_core.database.queries import (  # Legacy function aliases
 )
 from mine_core.database.query_manager import (
     QueryManager,
-    get_entities_by_type,
     get_query_manager,
-    get_relationship_data,
 )
 
 __all__ = [
@@ -40,6 +39,7 @@ __all__ = [
     "QueryManager",
     "get_query_manager",
     "get_database",
+    "close_database",
     # Core Query Functions
     "get_facilities",
     "get_facility",
@@ -55,8 +55,6 @@ __all__ = [
     "get_facility_action_statistics",
     # DB operations
     # Query manager functions
-    "get_entities_by_type",
-    "get_relationship_data",
     # Legacy function aliases for backward compatibility
     "get_assets",
     "get_department",
