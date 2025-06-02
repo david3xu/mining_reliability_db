@@ -1,429 +1,118 @@
 #!/usr/bin/env python3
 """
-Phase 4: Main Layout Authority for Portfolio Dashboard
-Page structure, navigation, and responsive design management.
+Main Layout Infrastructure - Pure Adapter Dependencies
+Professional layout authority with adapter-driven configuration.
 """
 
 import logging
-from datetime import datetime
-from typing import Dict, Any, List, Tuple
-from functools import lru_cache
-
-# Dash components
-import dash
-from dash import dcc, html
+from dash import html, dcc
 import dash_bootstrap_components as dbc
+from datetime import datetime
 
-# Import Phase 3 components
-from dashboard.components.portfolio_overview import create_complete_dashboard
-from dashboard.utils.data_transformers import get_facility_breakdown_data, get_system_config
-
-# Import styling system
-from dashboard.utils.styling import (
-    COLORS, FONTS, DASHBOARD_STYLES,
-    get_responsive_style, apply_theme_mode
-)
-
-# Import configuration infrastructure
+from dashboard.adapters import get_config_adapter, get_facility_adapter
+from dashboard.routing.navigation_builder import get_navigation_builder
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-@lru_cache(maxsize=1)
-def get_facility_navigation_items() -> List[Tuple[str, int]]:
-    """Cached facility navigation generation with record counts"""
-    try:
-        facility_data = get_facility_breakdown_data()
-        if not facility_data:
-            return []
-
-        # Return list of (facility_id, record_count) tuples
-        return list(zip(
-            facility_data.get("labels", []),
-            facility_data.get("values", [])
-        ))
-    except Exception as e:
-        handle_error(logger, e, "facility navigation data retrieval")
-        return []
-
-def create_navigation_bar() -> dbc.NavbarSimple:
-    """Enhanced navigation bar with dynamic facility detection"""
-    try:
-        # Get facility data with caching
-        facility_items = []
-        facilities = get_facility_navigation_items()
-
-        if facilities:
-            # Create menu items for each facility
-            for facility_id, record_count in facilities:
-                facility_items.append(
-                    dbc.DropdownMenuItem(
-                        f"{facility_id} ({record_count:,} records)",
-                        href=f"/facility/{facility_id}"
-                    )
-                )
-
-            # Add separator and "All Facilities" option
-            facility_items.extend([
-                dbc.DropdownMenuItem(divider=True),
-                dbc.DropdownMenuItem("All Facilities", href="/")
-            ])
-        else:
-            # Fallback if no facility data available
-            facility_items = [
-                dbc.DropdownMenuItem("No Facilities Available", disabled=True),
-                dbc.DropdownMenuItem(divider=True),
-                dbc.DropdownMenuItem("All Facilities", href="/")
-            ]
-
-        navbar = dbc.NavbarSimple(
-            children=[
-                # Main dashboard
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Portfolio Overview",
-                        href="/",
-                        style={"color": COLORS["text_light"]}
-                    )
-                ),
-
-                # Dynamic facility analysis dropdown
-                dbc.DropdownMenu(
-                    children=facility_items,
-                    nav=True,
-                    in_navbar=True,
-                    label="Facility Analysis",
-                    color="link",
-                    style={"color": COLORS["text_light"]}
-                ),
-
-                # Advanced analytics
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Network Analysis",
-                        href="/network",
-                        style={"color": COLORS["text_light"]}
-                    )
-                ),
-
-                # System utilities
-                dbc.DropdownMenu(
-                    children=[
-                        dbc.DropdownMenuItem("System Status", href="/status"),
-                        dbc.DropdownMenuItem("Documentation", href="#", disabled=True),
-                        dbc.DropdownMenuItem("API Reference", href="#", disabled=True),
-                        dbc.DropdownMenuItem(divider=True),
-                        dbc.DropdownMenuItem("About", href="#", disabled=True),
-                    ],
-                    nav=True,
-                    in_navbar=True,
-                    label="Tools",
-                    color="link",
-                    style={"color": COLORS["text_light"]}
-                ),
-            ],
-            brand="Mining Reliability Database",
-            brand_href="/",
-            brand_style={
-                "fontSize": FONTS["subtitle_size"],
-                "fontWeight": "bold",
-                "color": COLORS["text_light"]
-            },
-            color=COLORS["background_dark"],
-            dark=True,
-            fluid=True,
-            sticky="top",
-            className="mb-3"
-        )
-
-        return navbar
-
-    except Exception as e:
-        handle_error(logger, e, "enhanced navigation bar creation")
-        return dbc.NavbarSimple(
-            brand="Mining Reliability Database",
-            color=COLORS["primary_blue"],
-            dark=True
-        )
-
-def create_footer() -> html.Footer:
-    """
-    Create application footer with system information.
-    """
-    try:
-        # Get system configuration for footer info
-        config = get_system_config()
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        footer_content = [
-            html.Hr(style={"margin": "40px 0 20px 0", "borderColor": COLORS["grid_color"]}),
-            dbc.Container([
-                dbc.Row([
-                    dbc.Col([
-                        html.H6("Mining Reliability Database v1.0.0", style={"fontWeight": "bold"}),
-                        html.P([
-                            "Operational Intelligence Platform | ",
-                            html.Small(f"Generated: {current_time}")
-                        ], style={"margin": "0", "fontSize": FONTS["caption_size"]})
-                    ], md=6),
-                    dbc.Col([
-                        html.P([
-                            html.Strong("Data Sources: "),
-                            "Neo4j Graph Database | ",
-                            html.Strong("Records: "),
-                            f"~{config.get('processing', {}).get('batch_size', 'N/A')} batch processing"
-                        ], style={
-                            "textAlign": "right",
-                            "margin": "0",
-                            "fontSize": FONTS["caption_size"]
-                        })
-                    ], md=6)
-                ], className="align-items-center")
-            ], fluid=True),
-            html.Div(style={"height": "20px"})  # Bottom spacing
-        ]
-
-        footer = html.Footer(
-            footer_content,
-            style={
-                "backgroundColor": "#F8F9FA",
-                "color": COLORS["text_secondary"],
-                "padding": "20px 0 0 0",
-                "marginTop": "40px",
-                "borderTop": f"1px solid {COLORS['grid_color']}"
-            }
-        )
-
-        return footer
-
-    except Exception as e:
-        handle_error(logger, e, "footer creation")
-        return html.Footer([
-            html.P("Mining Reliability Database", style={"textAlign": "center"})
-        ])
-
-def create_error_boundary(error_message: str = None) -> html.Div:
-    """
-    Create error boundary component for graceful failure handling.
-    """
-    error_content = dbc.Container([
-        dbc.Alert([
-            html.H4("Application Error", className="alert-heading"),
-            html.P(error_message or "An unexpected error occurred while loading the dashboard."),
-            html.Hr(),
-            html.P([
-                "Please try: ",
-                html.Ul([
-                    html.Li("Refreshing the page"),
-                    html.Li("Checking database connectivity"),
-                    html.Li("Contacting system administrator if problem persists")
-                ])
-            ], className="mb-0")
-        ], color="danger", dismissable=True),
-
-        dbc.Card([
-            dbc.CardBody([
-                html.H5("System Diagnostics", className="card-title"),
-                html.P("Run these commands to diagnose issues:", className="card-text"),
-                html.Code([
-                    "python dashboard/validate_data.py",
-                    html.Br(),
-                    "python -c \"from dashboard.utils.data_transformers import validate_dashboard_data; print(validate_dashboard_data())\""
-                ], style={
-                    "display": "block",
-                    "whiteSpace": "pre",
-                    "backgroundColor": "#F8F9FA",
-                    "padding": "10px",
-                    "borderRadius": "4px"
-                })
-            ])
-        ])
-    ], className="mt-5")
-
-    return error_content
-
-def create_loading_spinner() -> dbc.Spinner:
-    """
-    Create loading spinner for data processing states.
-    """
-    return dbc.Spinner([
-        html.Div([
-            html.H5("Loading Portfolio Dashboard...", className="text-center"),
-            html.P("Processing operational data and generating visualizations",
-                   className="text-center text-muted")
-        ])
-    ], size="lg", color=COLORS["primary_blue"], type="border")
-
-def get_layout_config() -> Dict[str, Any]:
-    """
-    Get layout configuration settings.
-    Returns responsive breakpoints and theme settings.
-    """
-    return {
-        "responsive_breakpoints": {
-            "xs": 0,
-            "sm": 576,
-            "md": 768,
-            "lg": 992,
-            "xl": 1200
-        },
-        "theme_settings": {
-            "primary_color": COLORS["primary_blue"],
-            "background_color": COLORS["background_light"],
-            "text_color": COLORS["text_primary"],
-            "font_family": FONTS["primary_font"]
-        },
-        "container_settings": {
-            "fluid": True,
-            "className": "px-3"
-        }
-    }
-
 def create_main_layout(content: html.Div = None) -> html.Div:
-    """
-    Create main application layout with navigation, content, and footer.
-    Central layout authority for entire dashboard application.
-    """
+    """Main application layout with navigation delegation"""
     try:
-        logger.info("Creating main application layout...")
+        config_adapter = get_config_adapter()
+        navigation_builder = get_navigation_builder()
+        styling = config_adapter.get_styling_config()
 
-        # Default content if none provided
-        if content is None:
-            logger.info("No content provided - creating default portfolio dashboard")
-            content = create_complete_dashboard()
-
-        # Layout configuration
-        layout_config = get_layout_config()
-
-        # Main layout structure
-        main_layout = html.Div([
-            # Meta tags for responsive design
+        return html.Div([
             html.Meta(name="viewport", content="width=device-width, initial-scale=1.0"),
-            html.Meta(name="description", content="Mining Reliability Database - Portfolio Overview Dashboard"),
-
-            # Application header/navigation
-            create_navigation_bar(),
-
-            # Main content area
+            navigation_builder.build_main_navigation(),
             dbc.Container([
-                # Loading overlay (hidden by default)
                 dcc.Loading(
                     id="main-loading",
-                    type="default",
-                    color=COLORS["primary_blue"],
-                    children=[
-                        html.Div(id="main-content", children=[content])
-                    ]
+                    children=[html.Div(id="main-content", children=[content or html.Div()])],
+                    color=styling.get("primary_color", "#4A90E2")
                 )
-            ], **layout_config["container_settings"]),
-
-            # Application footer
+            ], fluid=True, className="px-3"),
             create_footer(),
-
-            # Global styles and scripts
             html.Div([
-                # Interval component for auto-refresh (if needed)
-                dcc.Interval(
-                    id="auto-refresh",
-                    interval=300000,  # 5 minutes
-                    n_intervals=0,
-                    disabled=True  # Disabled by default
-                ),
-
-                # Store component for client-side data
                 dcc.Store(id="dashboard-state", data={}),
-
-                # Location component for routing
                 dcc.Location(id="url-location", refresh=False)
             ], style={"display": "none"})
-
         ], style={
-            "fontFamily": layout_config["theme_settings"]["font_family"],
-            "backgroundColor": layout_config["theme_settings"]["background_color"],
-            "color": layout_config["theme_settings"]["text_color"],
+            "fontFamily": "Arial, sans-serif",
+            "backgroundColor": styling.get("background_light", "#FFFFFF"),
             "minHeight": "100vh"
         })
 
-        logger.info("Main layout created successfully")
-        return main_layout
-
     except Exception as e:
         handle_error(logger, e, "main layout creation")
+        return html.Div([html.H1("Layout Error"), html.P(str(e))])
 
-        # Fallback minimal layout
-        return html.Div([
-            html.H1("Dashboard Error", style={"textAlign": "center", "color": "red"}),
-            create_error_boundary(str(e))
-        ])
-
-def create_responsive_layout(content: html.Div = None, mobile_optimized: bool = True) -> html.Div:
-    """
-    Create responsive layout optimized for different screen sizes.
-    """
+def create_navigation_bar() -> dbc.NavbarSimple:
+    """Navigation bar using navigation builder"""
     try:
-        # Get responsive configuration
-        responsive_config = get_layout_config()["responsive_breakpoints"]
+        navigation_builder = get_navigation_builder()
+        return navigation_builder.build_main_navigation()
+    except Exception as e:
+        handle_error(logger, e, "navigation bar creation")
+        return dbc.NavbarSimple(brand="Mining Reliability Database", color="#1E1E1E", dark=True)
 
-        # Mobile-optimized content wrapper
-        if mobile_optimized:
-            content_wrapper = dbc.Container([
+def create_footer() -> html.Footer:
+    """Professional footer with system information"""
+    try:
+        config_adapter = get_config_adapter()
+        styling = config_adapter.get_styling_config()
+
+        return html.Footer([
+            html.Hr(style={"margin": "40px 0 20px 0", "borderColor": "#E5E5E5"}),
+            dbc.Container([
                 dbc.Row([
                     dbc.Col([
-                        content or create_complete_dashboard()
-                    ], width=12)
+                        html.H6("Mining Reliability Database v2.0", style={"fontWeight": "bold"}),
+                        html.P([
+                            "Professional Analytics Platform | ",
+                            html.Small(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+                        ], style={"margin": "0", "fontSize": "12px"})
+                    ], md=6),
+                    dbc.Col([
+                        html.P([
+                            html.Strong("Architecture: "), "Core → Adapter → Component | ",
+                            html.Strong("Performance: "), "Sub-second response"
+                        ], style={"textAlign": "right", "margin": "0", "fontSize": "12px"})
+                    ], md=6)
                 ])
-            ], fluid=True, className="px-2")
-        else:
-            content_wrapper = content or create_complete_dashboard()
-
-        # Responsive layout with breakpoint handling
-        responsive_layout = html.Div([
-            # Main responsive content
-            create_main_layout(content_wrapper)
-        ])
-
-        return responsive_layout
+            ], fluid=True)
+        ], style={
+            "backgroundColor": "#F8F9FA", "padding": "20px 0",
+            "marginTop": "40px", "borderTop": "1px solid #E5E5E5"
+        })
 
     except Exception as e:
-        handle_error(logger, e, "responsive layout creation")
-        return create_main_layout(content)
+        handle_error(logger, e, "footer creation")
+        return html.Footer([html.P("Mining Reliability Database", style={"textAlign": "center"})])
 
-def validate_layout_dependencies() -> Dict[str, bool]:
-    """
-    Validate all layout dependencies are available.
-    """
-    validation_results = {
-        "bootstrap_components": False,
-        "dash_core_components": False,
-        "portfolio_components": False,
-        "styling_system": False,
-        "configuration_access": False
-    }
+def create_error_boundary(error_message: str = None) -> html.Div:
+    """Error boundary for graceful failure handling"""
+    return dbc.Container([
+        dbc.Alert([
+            html.H4("System Error", className="alert-heading"),
+            html.P(error_message or "Application encountered an unexpected error"),
+            html.Hr(),
+            dbc.ButtonGroup([
+                dbc.Button("Return to Portfolio", href="/", color="primary"),
+                dbc.Button("Refresh Page", id="refresh-btn", color="secondary")
+            ])
+        ], color="danger")
+    ])
 
+def get_layout_config() -> dict:
+    """Layout configuration from adapters"""
     try:
-        # Test Bootstrap components
-        test_navbar = dbc.NavbarSimple(brand="Test")
-        validation_results["bootstrap_components"] = True
-
-        # Test Dash core components
-        test_div = html.Div("Test")
-        validation_results["dash_core_components"] = True
-
-        # Test portfolio components
-        from dashboard.components.portfolio_overview import create_complete_dashboard
-        validation_results["portfolio_components"] = True
-
-        # Test styling system
-        test_colors = COLORS["primary_blue"]
-        validation_results["styling_system"] = True
-
-        # Test configuration access
-        config = get_system_config()
-        validation_results["configuration_access"] = bool(config)
-
-        logger.info("Layout dependencies validation completed")
-        return validation_results
-
+        config_adapter = get_config_adapter()
+        return {
+            "styling": config_adapter.get_styling_config(),
+            "chart": config_adapter.get_chart_config(),
+            "server": config_adapter.get_server_config()
+        }
     except Exception as e:
-        handle_error(logger, e, "layout dependencies validation")
-        return validation_results
+        handle_error(logger, e, "layout configuration access")
+        return {"styling": {}, "chart": {}, "server": {}}

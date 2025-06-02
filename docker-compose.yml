@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  # Neo4j Database
+  neo4j:
+    image: neo4j:5.13-community
+    container_name: mining-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/mining123
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - ./data/imports:/var/lib/neo4j/import
+    networks:
+      - mining_network
+
+  # Dashboard Application
+  dashboard:
+    build: .
+    container_name: mining-dashboard
+    ports:
+      - "8050:8050"
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: mining123
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: 8050
+      LOG_LEVEL: INFO
+    depends_on:
+      - neo4j
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./logs:/app/logs
+      - ./data/exports:/app/data/exports
+    networks:
+      - mining_network
+    restart: unless-stopped
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: mining-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mining_network
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  redis_data:
+
+networks:
+  mining_network:
+    driver: bridge

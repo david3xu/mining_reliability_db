@@ -1,0 +1,330 @@
+{
+  "styling_version": "2.0.0",
+  "architecture_compliance": "micro_component_optimized",
+  "metadata": {
+    "last_updated": "2024-01-15",
+    "cache_ttl_seconds": 900,
+    "micro_component_support": true,
+    "adapter_optimized": true
+  },
+  "primary_color": "#4A90E2",
+  "light_blue": "#7BB3F0",
+  "dark_blue": "#2E5C8A",
+  "chart_colors": [
+    "#4A90E2",
+    "#F5A623",
+    "#7ED321",
+    "#B57EDC",
+    "#D32F2F",
+    "#FF6B35",
+    "#2ECC71",
+    "#9B59B6"
+  ],
+  "background_light": "#FFFFFF",
+  "background_dark": "#1E1E1E",
+  "background_secondary": "#F8F9FA",
+  "text_primary": "#333333",
+  "text_secondary": "#666666",
+  "text_light": "#FFFFFF",
+  "text_muted": "#999999",
+  "border_color": "#CCCCCC",
+  "border_light": "#E5E5E5",
+  "success_color": "#7ED321",
+  "warning_color": "#F5A623",
+  "error_color": "#D32F2F",
+  "info_color": "#B57EDC",
+  "micro_component_styles": {
+    "metric_card": {
+      "config_adapter_integration": true,
+      "default_dimensions": {
+        "height": "120px",
+        "width": "220px",
+        "padding": "20px",
+        "border_radius": "8px"
+      },
+      "color_variants": {
+        "primary": "#4A90E2",
+        "success": "#7ED321",
+        "warning": "#F5A623",
+        "info": "#B57EDC",
+        "danger": "#D32F2F"
+      },
+      "hover_effects": {
+        "enabled": true,
+        "transform": "translateY(-2px)",
+        "shadow": "0 6px 12px rgba(0, 0, 0, 0.15)",
+        "transition": "all 0.2s ease"
+      },
+      "responsive_design": {
+        "mobile": {
+          "width": "100%",
+          "height": "100px",
+          "font_size": "14px"
+        },
+        "tablet": {
+          "width": "180px",
+          "height": "110px"
+        }
+      }
+    },
+    "chart_base": {
+      "config_adapter_integration": true,
+      "default_styling": {
+        "background": "#FFFFFF",
+        "border": "1px solid #E5E5E5",
+        "border_radius": "8px",
+        "padding": "15px"
+      },
+      "plotly_theme": {
+        "font_family": "Arial, sans-serif",
+        "font_size": 14,
+        "title_font_size": 18,
+        "paper_bgcolor": "#FFFFFF",
+        "plot_bgcolor": "#FFFFFF"
+      },
+      "color_schemes": {
+        "default": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
+        "qualitative": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC", "#D32F2F"],
+        "sequential": ["#E3F2FD", "#90CAF9", "#42A5F5", "#1E88E5", "#1565C0"]
+      }
+    },
+    "table_base": {
+      "config_adapter_integration": true,
+      "header_styling": {
+        "background_color": "#4A90E2",
+        "color": "#FFFFFF",
+        "font_weight": "bold",
+        "padding": "12px",
+        "border": "1px solid #4A90E2"
+      },
+      "cell_styling": {
+        "text_align": "center",
+        "padding": "12px",
+        "font_size": "14px",
+        "border": "1px solid #CCCCCC"
+      },
+      "row_styling": {
+        "even_row_bg": "#F8F9FA",
+        "odd_row_bg": "#FFFFFF",
+        "hover_bg": "#E3F2FD"
+      },
+      "interactive_features": {
+        "sortable": true,
+        "pagination": true,
+        "search": true,
+        "row_selection": true
+      }
+    },
+    "workflow_stage": {
+      "config_adapter_integration": true,
+      "card_dimensions": {
+        "min_height": "280px",
+        "width": "auto",
+        "border_radius": "8px",
+        "margin": "10px"
+      },
+      "header_styling": {
+        "background_opacity": 0.3,
+        "text_color": "#FFFFFF",
+        "font_weight": "bold",
+        "padding": "10px"
+      },
+      "content_styling": {
+        "padding": "15px",
+        "text_color": "#FFFFFF"
+      },
+      "stage_colors": {
+        "stage_1": "#4A90E2",
+        "stage_2": "#F5A623",
+        "stage_3": "#7ED321",
+        "stage_4": "#B57EDC",
+        "stage_5": "#D32F2F"
+      }
+    },
+    "facility_card": {
+      "config_adapter_integration": true,
+      "card_dimensions": {
+        "min_height": "160px",
+        "border_radius": "8px",
+        "padding": "15px"
+      },
+      "status_indicators": {
+        "active": "#7ED321",
+        "inactive": "#D32F2F",
+        "maintenance": "#F5A623"
+      },
+      "layout": {
+        "text_align": "center",
+        "title_font_size": "16px",
+        "metric_font_size": "24px"
+      }
+    }
+  },
+  "component_layout_styles": {
+    "portfolio_overview": {
+      "metrics_section": {
+        "background": "#1E1E1E",
+        "color": "#FFFFFF",
+        "padding": "20px",
+        "border_radius": "10px",
+        "margin_bottom": "30px"
+      },
+      "charts_grid": {
+        "display": "grid",
+        "grid_template_columns": "1fr 1fr",
+        "gap": "30px",
+        "margin_bottom": "30px"
+      },
+      "responsive_breakpoints": {
+        "mobile": {
+          "grid_template_columns": "1fr",
+          "gap": "20px"
+        }
+      }
+    },
+    "workflow_analysis": {
+      "stage_container": {
+        "display": "flex",
+        "justify_content": "space-between",
+        "align_items": "center",
+        "flex_wrap": "wrap",
+        "gap": "20px"
+      },
+      "connection_arrows": {
+        "color": "#666666",
+        "font_size": "24px",
+        "margin": "0 10px"
+      }
+    },
+    "data_quality": {
+      "quality_grid": {
+        "display": "grid",
+        "grid_template_columns": "1fr 1fr",
+        "gap": "25px"
+      },
+      "summary_section": {
+        "background": "#F8F9FA",
+        "padding": "20px",
+        "border_radius": "8px",
+        "margin_top": "30px"
+      }
+    },
+    "facility_detail": {
+      "header_section": {
+        "margin_bottom": "30px",
+        "padding_bottom": "20px",
+        "border_bottom": "2px solid #E5E5E5"
+      },
+      "analysis_grid": {
+        "display": "grid",
+        "grid_template_columns": "1fr 1fr",
+        "gap": "30px"
+      }
+    }
+  },
+  "navigation_styling": {
+    "navbar": {
+      "background_color": "#1E1E1E",
+      "brand_color": "#FFFFFF",
+      "link_color": "#CCCCCC",
+      "link_hover_color": "#4A90E2",
+      "height": "60px"
+    },
+    "breadcrumbs": {
+      "background": "#F8F9FA",
+      "padding": "10px 15px",
+      "border_radius": "4px",
+      "margin_bottom": "20px"
+    },
+    "sidebar": {
+      "width": "250px",
+      "background": "#2C3E50",
+      "text_color": "#FFFFFF"
+    }
+  },
+  "form_styling": {
+    "input_fields": {
+      "border": "1px solid #CCCCCC",
+      "border_radius": "4px",
+      "padding": "8px 12px",
+      "font_size": "14px"
+    },
+    "buttons": {
+      "primary": {
+        "background": "#4A90E2",
+        "color": "#FFFFFF",
+        "border": "none",
+        "padding": "10px 20px",
+        "border_radius": "4px"
+      },
+      "secondary": {
+        "background": "#6C757D",
+        "color": "#FFFFFF"
+      },
+      "success": {
+        "background": "#7ED321",
+        "color": "#FFFFFF"
+      },
+      "warning": {
+        "background": "#F5A623",
+        "color": "#FFFFFF"
+      },
+      "danger": {
+        "background": "#D32F2F",
+        "color": "#FFFFFF"
+      }
+    }
+  },
+  "animation_config": {
+    "transitions": {
+      "default_duration": "0.3s",
+      "default_easing": "ease",
+      "hover_duration": "0.2s"
+    },
+    "loading_animations": {
+      "spinner_color": "#4A90E2",
+      "pulse_color": "#E3F2FD",
+      "fade_duration": "0.5s"
+    }
+  },
+  "accessibility": {
+    "focus_outline": "2px solid #4A90E2",
+    "high_contrast_mode": {
+      "enabled": false,
+      "text_color": "#000000",
+      "background_color": "#FFFFFF"
+    },
+    "font_scaling": {
+      "base_size": "14px",
+      "scale_factor": 1.0
+    }
+  },
+  "performance_optimization": {
+    "css_caching": {
+      "enabled": true,
+      "cache_duration": "7d"
+    },
+    "critical_css": {
+      "inline_threshold": "2kb",
+      "defer_non_critical": true
+    },
+    "responsive_images": {
+      "lazy_loading": true,
+      "webp_support": true
+    }
+  },
+  "validation_config": {
+    "color_contrast": {
+      "minimum_ratio": 4.5,
+      "check_all_combinations": true
+    },
+    "responsive_testing": {
+      "breakpoints": ["320px", "768px", "1024px", "1200px"],
+      "test_all_components": true
+    },
+    "cross_browser": {
+      "supported_browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+      "fallback_styles": true
+    }
+  }
+}

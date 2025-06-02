@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-URL Builders - Dynamic URL Generation Utilities
-Clean URL management for dashboard navigation.
+URL Builders Utility - Clean URL Generation
+Complementary URL building functions for component navigation.
 """
 
 import re
@@ -9,32 +9,38 @@ from typing import Optional, Dict, Any, List
 from urllib.parse import quote, urlencode
 
 def sanitize_url_component(component: str) -> str:
-    """Sanitize component for URL safety"""
+    """Direct URL component sanitization"""
     if not component:
         return "unknown"
 
-    # Convert to string and sanitize
     sanitized = str(component).strip()
-    # Replace special characters with hyphens
     sanitized = re.sub(r'[^a-zA-Z0-9_-]', '-', sanitized)
-    # Remove multiple consecutive hyphens
     sanitized = re.sub(r'-+', '-', sanitized)
-    # Remove leading/trailing hyphens
     sanitized = sanitized.strip('-')
 
     return sanitized if sanitized else "unknown"
 
 def build_facility_url(facility_id: str) -> str:
     """Build facility detail URL"""
-    sanitized_id = sanitize_url_component(facility_id)
-    return f"/facility/{sanitized_id}"
+    clean_id = sanitize_url_component(facility_id)
+    return f"/facility/{clean_id}"
+
+def build_analysis_url(analysis_type: str, target_id: Optional[str] = None) -> str:
+    """Build analysis page URL"""
+    clean_type = sanitize_url_component(analysis_type)
+
+    if target_id:
+        clean_target = sanitize_url_component(target_id)
+        return f"/analysis/{clean_type}/{clean_target}"
+
+    return f"/analysis/{clean_type}"
 
 def build_detail_url(category: str, detail_type: str, params: Optional[Dict[str, Any]] = None) -> str:
-    """Build detail page URL with optional parameters"""
-    sanitized_category = sanitize_url_component(category)
-    sanitized_type = sanitize_url_component(detail_type)
+    """Build detail page URL with parameters"""
+    clean_category = sanitize_url_component(category)
+    clean_type = sanitize_url_component(detail_type)
 
-    base_url = f"/detail/{sanitized_category}/{sanitized_type}"
+    base_url = f"/detail/{clean_category}/{clean_type}"
 
     if params:
         query_string = urlencode(params)
@@ -42,25 +48,12 @@ def build_detail_url(category: str, detail_type: str, params: Optional[Dict[str,
 
     return base_url
 
-def build_analysis_url(analysis_type: str, target_id: Optional[str] = None) -> str:
-    """Build analysis page URL"""
-    sanitized_type = sanitize_url_component(analysis_type)
-
-    if target_id:
-        sanitized_target = sanitize_url_component(target_id)
-        return f"/analysis/{sanitized_type}/{sanitized_target}"
-
-    return f"/analysis/{sanitized_type}"
-
 def build_filter_url(base_path: str, filters: Dict[str, Any]) -> str:
     """Build filtered URL with query parameters"""
     if not filters:
         return base_path
 
-    query_params = {}
-    for key, value in filters.items():
-        if value is not None:
-            query_params[key] = str(value)
+    query_params = {key: str(value) for key, value in filters.items() if value is not None}
 
     if query_params:
         query_string = urlencode(query_params)
@@ -84,21 +77,17 @@ def parse_detail_url(pathname: str) -> Optional[Dict[str, str]]:
     parts = pathname.replace('/detail/', '').split('/')
 
     if len(parts) >= 2:
-        return {
-            'category': parts[0],
-            'detail_type': parts[1]
-        }
+        return {'category': parts[0], 'detail_type': parts[1]}
 
     return None
 
 def create_breadcrumb_data(pathname: str) -> List[Dict[str, str]]:
-    """Generate breadcrumb navigation data from URL"""
+    """Generate breadcrumb navigation from URL"""
     breadcrumbs = [{'label': 'Portfolio Overview', 'url': '/'}]
 
     if not pathname or pathname == '/':
         return breadcrumbs
 
-    # Facility pages
     if pathname.startswith('/facility/'):
         facility_id = parse_facility_url(pathname)
         if facility_id:
@@ -106,8 +95,6 @@ def create_breadcrumb_data(pathname: str) -> List[Dict[str, str]]:
                 'label': f'Facility: {facility_id}',
                 'url': pathname
             })
-
-    # Detail pages
     elif pathname.startswith('/detail/'):
         detail_data = parse_detail_url(pathname)
         if detail_data:
@@ -115,10 +102,13 @@ def create_breadcrumb_data(pathname: str) -> List[Dict[str, str]]:
                 {'label': detail_data['category'].title(), 'url': f"/detail/{detail_data['category']}"},
                 {'label': detail_data['detail_type'].title(), 'url': pathname}
             ])
-
-    # Network analysis
-    elif pathname.startswith('/network'):
-        breadcrumbs.append({'label': 'Network Analysis', 'url': '/network'})
+    elif pathname.startswith('/workflow'):
+        breadcrumbs.append({'label': 'Workflow Analysis', 'url': pathname})
+    elif pathname.startswith('/data-quality'):
+        breadcrumbs.append({'label': 'Data Quality', 'url': pathname})
+    else:
+        page_name = pathname.replace('/', '').replace('-', ' ').title()
+        breadcrumbs.append({'label': page_name, 'url': pathname})
 
     return breadcrumbs
 
@@ -131,22 +121,21 @@ def get_navigation_context(pathname: str) -> Dict[str, Any]:
         'breadcrumbs': create_breadcrumb_data(pathname)
     }
 
-    if pathname.startswith('/facility/'):
+    if pathname and pathname.startswith('/facility/'):
         context['current_page'] = 'facility'
         context['facility_id'] = parse_facility_url(pathname)
-
-    elif pathname.startswith('/detail/'):
+    elif pathname and pathname.startswith('/detail/'):
         context['current_page'] = 'detail'
         detail_data = parse_detail_url(pathname)
         if detail_data:
             context['detail_category'] = detail_data['category']
-
-    elif pathname.startswith('/network'):
-        context['current_page'] = 'network'
+    elif pathname and pathname.startswith('/workflow'):
+        context['current_page'] = 'workflow'
+    elif pathname and pathname.startswith('/data-quality'):
+        context['current_page'] = 'data_quality'
 
     return context
 
-# URL validation utilities
 def is_valid_facility_url(pathname: str) -> bool:
     """Validate facility URL format"""
     if not pathname or not pathname.startswith('/facility/'):
@@ -161,11 +150,34 @@ def is_dashboard_url(pathname: str) -> bool:
         return False
 
     dashboard_patterns = [
-        r'^/$',  # Home
-        r'^/facility/.+$',  # Facility pages
-        r'^/detail/.+/.+$',  # Detail pages
-        r'^/network/?$',  # Network analysis
-        r'^/analysis/.+$'  # Analysis pages
+        r'^/$',
+        r'^/facility/.+$',
+        r'^/detail/.+/.+$',
+        r'^/workflow/?.*$',
+        r'^/data-quality/?$',
+        r'^/analysis/.+$'
     ]
 
     return any(re.match(pattern, pathname) for pattern in dashboard_patterns)
+
+def get_page_title(pathname: str) -> str:
+    """Get page title for current route"""
+    title_mapping = {
+        '/': 'Portfolio Overview',
+        '/data-quality': 'Data Quality Foundation',
+        '/workflow': 'Workflow Understanding',
+        '/workflow-process': 'Workflow Process Analysis',
+        '/summary': 'Four Facilities Summary',
+        '/historical-records': 'Historical Records',
+        '/facilities-distribution': 'Facilities Distribution',
+        '/data-types-distribution': 'Data Types Distribution'
+    }
+
+    if pathname in title_mapping:
+        return title_mapping[pathname]
+
+    if pathname and pathname.startswith('/facility/'):
+        facility_id = parse_facility_url(pathname)
+        return f'{facility_id.title()} Facility Analysis' if facility_id else 'Facility Analysis'
+
+    return 'Mining Reliability Database'

@@ -1,266 +1,146 @@
 #!/usr/bin/env python3
 """
-Dashboard Interaction Handlers - Core Callback Logic
-Centralized interaction management for dashboard components.
+Interaction Handlers Adapter - Pure Callback Management
+Clean interaction logic with adapter-driven URL generation.
 """
 
 import logging
-import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from dash import Input, Output, State, callback, ctx
 from dash.exceptions import PreventUpdate
 
-from dashboard.adapters import get_data_adapter
-from dashboard.utils.url_builders import build_facility_url, build_detail_url
+from dashboard.adapters import get_facility_adapter
+from dashboard.routing.url_manager import get_url_manager
 from mine_core.shared.common import handle_error
 
 logger = logging.getLogger(__name__)
 
-class InteractionManager:
-    """Centralized interaction handling for dashboard components"""
+class InteractionHandlers:
+    """Pure interaction handling with adapter integration"""
 
     def __init__(self):
-        self.adapter = get_data_adapter()
+        self.facility_adapter = get_facility_adapter()
+        self.url_manager = get_url_manager()
 
-    def register_callbacks(self, app):
-        """Register all interaction callbacks with the Dash app"""
-        self._register_chart_interactions(app)
-        self._register_table_interactions(app)
-        self._register_card_interactions(app)
-        self._register_navigation_interactions(app)
-
-    def _register_chart_interactions(self, app):
-        """Register chart click interactions"""
+    def register_chart_interactions(self, app):
+        """Register chart click callbacks"""
 
         @app.callback(
-            Output('chart-interaction-store', 'data'),
+            Output('url-location', 'pathname'),
             Input('facility-pie-chart', 'clickData'),
             prevent_initial_call=True
         )
-        def handle_pie_chart_click(click_data):
-            """Handle pie chart slice clicks for facility navigation"""
+        def handle_facility_chart_click(click_data):
+            """Direct facility navigation from pie chart"""
             try:
                 if not click_data:
                     raise PreventUpdate
 
-                # Extract facility from clicked slice
-                point = click_data['points'][0]
-                facility_name = point['label']
+                facility_name = click_data['points'][0]['label']
+                logger.info(f"Chart interaction: {facility_name}")
 
-                logger.info(f"Pie chart clicked: {facility_name}")
+                # Validate facility exists
+                if self.url_manager.validate_route(f"/facility/{facility_name}"):
+                    return f"/facility/{facility_name}"
 
-                return {
-                    'action': 'navigate_facility',
-                    'facility_id': facility_name,
-                    'url': build_facility_url(facility_name),
-                    'timestamp': ctx.triggered[0]['prop_id']
-                }
+                raise PreventUpdate
 
             except Exception as e:
-                handle_error(logger, e, "pie chart click handling")
+                handle_error(logger, e, "facility chart interaction")
                 raise PreventUpdate
 
         @app.callback(
-            Output('chart-interaction-store', 'data', allow_duplicate=True),
+            Output('url-location', 'pathname', allow_duplicate=True),
             Input('field-bar-chart', 'clickData'),
             prevent_initial_call=True
         )
-        def handle_bar_chart_click(click_data):
-            """Handle bar chart clicks for field type exploration"""
+        def handle_field_chart_click(click_data):
+            """Direct field analysis navigation"""
             try:
                 if not click_data:
                     raise PreventUpdate
 
-                point = click_data['points'][0]
-                field_type = point['x']
-                field_count = point['y']
+                field_type = click_data['points'][0]['x']
+                logger.info(f"Field chart interaction: {field_type}")
 
-                logger.info(f"Bar chart clicked: {field_type}")
-
-                return {
-                    'action': 'explore_field_type',
-                    'field_type': field_type,
-                    'count': field_count,
-                    'url': build_detail_url('fields', field_type),
-                    'timestamp': ctx.triggered[0]['prop_id']
-                }
+                return "/data-types-distribution"
 
             except Exception as e:
-                handle_error(logger, e, "bar chart click handling")
+                handle_error(logger, e, "field chart interaction")
                 raise PreventUpdate
 
-    def _register_table_interactions(self, app):
-        """Register table row click interactions"""
+    def register_table_interactions(self, app):
+        """Register table click callbacks"""
 
         @app.callback(
-            Output('table-interaction-store', 'data'),
-            Input('historical-timeline-table', 'active_cell'),
+            Output('url-location', 'pathname', allow_duplicate=True),
+            Input('timeline-table', 'active_cell'),
             prevent_initial_call=True
         )
-        def handle_table_cell_click(active_cell):
-            """Handle table cell clicks for facility navigation"""
+        def handle_table_interaction(active_cell):
+            """Direct facility navigation from table"""
             try:
                 if not active_cell:
                     raise PreventUpdate
 
-                # Get table data to identify clicked facility
-                timeline_data = self.adapter.get_historical_timeline()
+                # Get table data through adapter
+                timeline_data = self.facility_adapter.get_facility_list()
 
-                row_index = active_cell['row']
-                column_id = active_cell['column_id']
+                if active_cell['row'] < len(timeline_data):
+                    facility_id = timeline_data[active_cell['row']]['facility_id']
+                    logger.info(f"Table interaction: {facility_id}")
 
-                if row_index < len(timeline_data.rows):
-                    clicked_row = timeline_data.rows[row_index]
-                    facility_id = clicked_row.get('facility')
-
-                    if facility_id and facility_id != 'Total':
-                        logger.info(f"Table clicked: {facility_id}, column: {column_id}")
-
-                        return {
-                            'action': 'navigate_facility',
-                            'facility_id': facility_id,
-                            'column': column_id,
-                            'url': build_facility_url(facility_id),
-                            'timestamp': ctx.triggered[0]['prop_id']
-                        }
+                    return f"/facility/{facility_id}"
 
                 raise PreventUpdate
 
             except Exception as e:
-                handle_error(logger, e, "table click handling")
+                handle_error(logger, e, "table interaction")
                 raise PreventUpdate
 
-    def _register_card_interactions(self, app):
-        """Register metric card click interactions"""
+    def register_navigation_interactions(self, app):
+        """Register navigation state management"""
 
         @app.callback(
-            Output('card-interaction-store', 'data'),
-            [Input('total-records-card', 'n_clicks'),
-             Input('data-fields-card', 'n_clicks'),
-             Input('facilities-card', 'n_clicks'),
-             Input('years-card', 'n_clicks')],
+            Output('dashboard-state', 'data'),
+            Input('url-location', 'pathname'),
             prevent_initial_call=True
         )
-        def handle_metric_card_clicks(records_clicks, fields_clicks,
-                                    facilities_clicks, years_clicks):
-            """Handle metric card clicks for detailed exploration"""
+        def update_navigation_state(pathname):
+            """Track navigation state for breadcrumbs"""
             try:
-                if not any([records_clicks, fields_clicks, facilities_clicks, years_clicks]):
-                    raise PreventUpdate
+                breadcrumbs = self.url_manager.get_breadcrumbs(pathname)
 
-                # Determine which card was clicked
-                triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
-                card_actions = {
-                    'total-records-card': {
-                        'action': 'explore_records',
-                        'detail_type': 'records',
-                        'url': build_detail_url('records', 'all')
-                    },
-                    'data-fields-card': {
-                        'action': 'explore_fields',
-                        'detail_type': 'fields',
-                        'url': build_detail_url('fields', 'distribution')
-                    },
-                    'facilities-card': {
-                        'action': 'explore_facilities',
-                        'detail_type': 'facilities',
-                        'url': build_detail_url('facilities', 'overview')
-                    },
-                    'years-card': {
-                        'action': 'explore_timeline',
-                        'detail_type': 'timeline',
-                        'url': build_detail_url('timeline', 'analysis')
-                    }
+                return {
+                    'current_path': pathname,
+                    'breadcrumbs': breadcrumbs,
+                    'timestamp': ctx.triggered[0]['prop_id']
                 }
 
-                if triggered_id in card_actions:
-                    action_data = card_actions[triggered_id]
-                    logger.info(f"Metric card clicked: {triggered_id}")
-
-                    return {
-                        **action_data,
-                        'timestamp': ctx.triggered[0]['prop_id']
-                    }
-
-                raise PreventUpdate
-
             except Exception as e:
-                handle_error(logger, e, "metric card click handling")
-                raise PreventUpdate
+                handle_error(logger, e, "navigation state update")
+                return {}
 
-    def _register_navigation_interactions(self, app):
-        """Register navigation callback for interaction results"""
-
-        @app.callback(
-            Output('url-location', 'pathname'),
-            [Input('chart-interaction-store', 'data'),
-             Input('table-interaction-store', 'data'),
-             Input('card-interaction-store', 'data')],
-            prevent_initial_call=True
-        )
-        def handle_navigation_from_interactions(chart_data, table_data, card_data):
-            """Navigate based on interaction data"""
-            try:
-                # Get the triggered interaction
-                interaction_data = None
-
-                if ctx.triggered:
-                    trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
-                    if trigger_id == 'chart-interaction-store' and chart_data:
-                        interaction_data = chart_data
-                    elif trigger_id == 'table-interaction-store' and table_data:
-                        interaction_data = table_data
-                    elif trigger_id == 'card-interaction-store' and card_data:
-                        interaction_data = card_data
-
-                if interaction_data and interaction_data.get('url'):
-                    target_url = interaction_data['url']
-                    logger.info(f"Navigating to: {target_url}")
-                    return target_url
-
-                raise PreventUpdate
-
-            except Exception as e:
-                handle_error(logger, e, "navigation from interactions")
-                raise PreventUpdate
-
-def get_enhanced_chart_config():
-    """Get chart configuration with interaction support"""
-    return {
-        'displayModeBar': True,
-        'modeBarButtonsToRemove': ['pan2d', 'lasso2d', 'select2d'],
-        'displaylogo': False,
-        'toImageButtonOptions': {
-            'format': 'png',
-            'filename': 'mining_reliability_chart',
-            'height': 500,
-            'width': 700,
-            'scale': 1
+    def get_chart_config(self) -> Dict[str, Any]:
+        """Chart interaction configuration"""
+        return {
+            'displayModeBar': True,
+            'modeBarButtonsToRemove': ['pan2d', 'lasso2d'],
+            'displaylogo': False,
+            'toImageButtonOptions': {
+                'format': 'png',
+                'filename': 'mining_chart',
+                'height': 500,
+                'width': 700
+            }
         }
-    }
 
-def get_enhanced_table_config():
-    """Get table configuration with interaction support"""
-    return {
-        'row_selectable': 'single',
-        'selected_rows': [],
-        'cell_selectable': True,
-        'sort_action': 'native',
-        'filter_action': 'native'
-    }
+# Singleton pattern
+_interaction_handlers = None
 
-def create_interaction_tooltip(component_type: str, data: Dict[str, Any]) -> str:
-    """Generate interaction tooltips for components"""
-    tooltips = {
-        'pie_slice': f"Click to explore {data.get('facility_name', 'facility')} details",
-        'bar_segment': f"Click to analyze {data.get('field_type', 'field')} distribution",
-        'metric_card': f"Click for detailed {data.get('metric_type', 'metric')} breakdown",
-        'table_row': f"Click to view {data.get('facility_name', 'facility')} analysis"
-    }
-
-    return tooltips.get(component_type, "Click for more details")
-
-# Export interaction manager instance
-interaction_manager = InteractionManager()
+def get_interaction_handlers():
+    """Get singleton interaction handlers instance"""
+    global _interaction_handlers
+    if _interaction_handlers is None:
+        _interaction_handlers = InteractionHandlers()
+    return _interaction_handlers

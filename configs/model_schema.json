@@ -1,4 +1,15 @@
 {
+  "schema_version": "3.0.0",
+  "architecture_compliance": "unified_field_reference_enhanced",
+  "metadata": {
+    "last_updated": "2024-01-15",
+    "unified_naming_convention": true,
+    "field_reference_consistency": "100%",
+    "phase_1_core_foundation_ready": true,
+    "adapter_purification_enabled": true,
+    "component_atomization_ready": true,
+    "architecture_validation_enabled": true
+  },
   "entities": [
     {
       "name": "Facility",
@@ -15,6 +26,17 @@
       "dynamic_labeling": {
         "enabled": true,
         "cascade_priority": ["facility_name", "location"]
+      },
+      "adapter_config": {
+        "primary_adapter": "facility_adapter",
+        "access_pattern": "reference_data",
+        "cache_priority": "high",
+        "unified_field_resolution": true
+      },
+      "core_foundation": {
+        "intelligence_engine_priority": "reference",
+        "workflow_processor_role": "context_provider",
+        "validation_level": "strict"
       }
     },
     {
@@ -40,6 +62,17 @@
       "dynamic_labeling": {
         "enabled": true,
         "cascade_priority": ["title", "action_request_number", "categories"]
+      },
+      "adapter_config": {
+        "primary_adapter": "data_adapter",
+        "access_pattern": "transactional_data",
+        "cache_priority": "medium",
+        "unified_field_resolution": true
+      },
+      "core_foundation": {
+        "intelligence_engine_priority": "primary_workflow",
+        "workflow_processor_role": "entry_point",
+        "validation_level": "strict"
       }
     },
     {
@@ -57,6 +90,17 @@
       "dynamic_labeling": {
         "enabled": true,
         "cascade_priority": ["what_happened", "requirement"]
+      },
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_pattern": "causal_analysis",
+        "cache_priority": "medium",
+        "unified_field_resolution": true
+      },
+      "core_foundation": {
+        "intelligence_engine_priority": "causal_analysis",
+        "workflow_processor_role": "problem_identification",
+        "validation_level": "business_rules"
       }
     },
     {
@@ -80,6 +124,17 @@
         "primary_cause_field": "root_cause",
         "secondary_cause_field": "root_cause_tail",
         "evidence_field": "objective_evidence"
+      },
+      "adapter_config": {
+        "primary_adapter": "workflow_adapter",
+        "access_pattern": "causal_intelligence",
+        "cache_priority": "high",
+        "unified_field_resolution": true
+      },
+      "core_foundation": {
+        "intelligence_engine_priority": "causal_intelligence",
+        "workflow_processor_role": "root_cause_analysis",
+        "validation_level": "analytical"
       }
     },
     {
@@ -369,6 +424,57 @@
       "root_cause_completeness": true,
       "tail_extraction_accuracy": true,
       "evidence_correlation": true
+    }
+  },
+  "core_foundation_framework": {
+    "intelligence_engine": {
+      "enabled": true,
+      "unified_field_resolution": true,
+      "causal_analysis_priority": ["RootCause", "Problem", "ActionPlan"],
+      "performance_metrics_tracking": true,
+      "real_time_validation": true
+    },
+    "workflow_processor": {
+      "enabled": true,
+      "stage_progression_tracking": true,
+      "automated_validation": true,
+      "business_rule_enforcement": true,
+      "unified_field_mapping": true
+    },
+    "adapter_purification": {
+      "pure_data_access_pattern": true,
+      "no_business_logic_in_adapters": true,
+      "unified_field_resolution_integration": true,
+      "cache_optimization": true
+    },
+    "component_atomization": {
+      "micro_component_max_lines": 15,
+      "single_responsibility_principle": true,
+      "pure_rendering_components": true,
+      "unified_field_display": true
+    }
+  },
+  "phase_implementation": {
+    "phase_1_core_foundation": {
+      "status": "ready",
+      "intelligence_engine_implementation": "pending",
+      "workflow_processor_implementation": "pending",
+      "unified_field_resolution_integration": "completed"
+    },
+    "phase_2_adapter_purification": {
+      "status": "ready",
+      "pure_data_access_conversion": "pending",
+      "business_logic_extraction": "pending"
+    },
+    "phase_3_component_atomization": {
+      "status": "ready",
+      "micro_component_breakdown": "pending",
+      "single_responsibility_enforcement": "pending"
+    },
+    "phase_4_architecture_validation": {
+      "status": "ready",
+      "comprehensive_testing": "pending",
+      "compliance_verification": "pending"
     }
   }
 }

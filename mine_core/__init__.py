@@ -17,7 +17,7 @@ from mine_core.database import (
     get_root_cause_frequency,
     get_effectiveness_stats,
     get_root_cause_intelligence_summary,
-    get_operational_performance_dashboard,
+    get_operational_performance_metrics,
     get_predictive_intelligence_indicators,
     get_missing_data_quality_intelligence,
     get_causal_correlation_matrix
@@ -34,7 +34,7 @@ __all__ = [
     'get_incident_chain', 'get_department', 'get_assets',
     'get_incident_counts_by_category', 'get_root_cause_frequency',
     'get_effectiveness_stats', 'get_root_cause_intelligence_summary',
-    'get_operational_performance_dashboard', 'get_predictive_intelligence_indicators',
+    'get_operational_performance_metrics', 'get_predictive_intelligence_indicators',
     'get_missing_data_quality_intelligence', 'get_causal_correlation_matrix',
 
     # Pipeline classes

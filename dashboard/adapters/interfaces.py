@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Dashboard Data Interfaces - Type-Safe Data Contracts
-Defines standardized data structures for adapter-component communication.
+Adapter Data Interfaces - Type-Safe Data Contracts
+Clean data structures for adapter-component communication.
 """
 
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ from datetime import datetime
 
 @dataclass
 class ComponentMetadata:
-    """Metadata for all dashboard data components."""
+    """Metadata for all dashboard data components"""
     source: str
     generated_at: str
     data_quality: float
@@ -19,7 +19,7 @@ class ComponentMetadata:
 
 @dataclass
 class ValidationResult:
-    """Validation status for data components."""
+    """Validation status for data components"""
     is_valid: bool
     component_status: Dict[str, bool]
     error_details: Optional[str]
@@ -27,7 +27,7 @@ class ValidationResult:
 
 @dataclass
 class PortfolioData:
-    """Portfolio metrics for header cards."""
+    """Portfolio metrics for header cards"""
     total_records: int
     data_fields: int
     facilities: int
@@ -37,7 +37,7 @@ class PortfolioData:
 
 @dataclass
 class FacilityData:
-    """Facility breakdown for pie chart visualization."""
+    """Facility breakdown for pie chart visualization"""
     labels: List[str]
     values: List[int]
     percentages: List[float]
@@ -46,7 +46,7 @@ class FacilityData:
 
 @dataclass
 class FieldData:
-    """Field distribution for bar chart visualization."""
+    """Field distribution for bar chart visualization"""
     labels: List[str]
     values: List[int]
     percentages: List[float]
@@ -55,7 +55,7 @@ class FieldData:
 
 @dataclass
 class TimelineData:
-    """Historical timeline for table visualization."""
+    """Historical timeline for table visualization"""
     columns: List[str]
     rows: List[Dict[str, Any]]
     year_range: List[int]
@@ -65,7 +65,7 @@ class TimelineData:
 
 @dataclass
 class ChartConfig:
-    """Configuration for chart components."""
+    """Configuration for chart components"""
     height: int
     width: Optional[int]
     colors: List[str]
@@ -74,7 +74,7 @@ class ChartConfig:
 
 @dataclass
 class DashboardConfig:
-    """Complete dashboard configuration."""
+    """Complete dashboard configuration"""
     server_host: str
     server_port: int
     auto_refresh_interval: int

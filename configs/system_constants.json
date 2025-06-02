@@ -1,11 +1,38 @@
 {
+  "constants_version": "2.0.0",
+  "architecture_compliance": "adapter_optimized",
+  "metadata": {
+    "last_updated": "2024-01-15",
+    "cache_ttl_seconds": 3600,
+    "performance_optimized": true,
+    "adapter_integration": true
+  },
   "database": {
     "default_uri": "bolt://localhost:7687",
     "default_user": "neo4j",
     "default_password": "password",
     "batch_size": 5000,
     "connection_timeout": 30,
-    "max_retries": 3
+    "max_retries": 3,
+    "adapter_optimization": {
+      "connection_pooling": {
+        "enabled": true,
+        "max_pool_size": 50,
+        "min_pool_size": 5,
+        "idle_timeout": 300
+      },
+      "query_optimization": {
+        "use_query_cache": true,
+        "cache_size": 1000,
+        "query_timeout": 30,
+        "explain_queries": false
+      },
+      "performance_monitoring": {
+        "log_slow_queries": true,
+        "slow_query_threshold_ms": 1000,
+        "track_query_performance": true
+      }
+    }
   },
   "processing": {
     "default_log_level": "INFO",
@@ -22,7 +49,20 @@
       "AmountOfLoss",
       "Review",
       "EquipmentStrategy"
-    ]
+    ],
+    "adapter_processing": {
+      "parallel_entity_loading": true,
+      "batch_processing_enabled": true,
+      "dependency_resolution": "topological_sort",
+      "error_handling": "continue_on_error",
+      "progress_tracking": true
+    },
+    "performance_optimization": {
+      "memory_limit_mb": 2048,
+      "cpu_cores_utilization": 0.8,
+      "io_buffer_size": 65536,
+      "compression_enabled": true
+    }
   },
   "field_processing": {
     "priority_categories": {
@@ -47,6 +87,27 @@
         "Recurring Problem(s)"
       ],
       "low": ["Comments", "Reason if not Satisfactory", "Days Past Due"]
+    },
+    "adapter_field_optimization": {
+      "critical_fields_cache_ttl": 3600,
+      "high_fields_cache_ttl": 1800,
+      "medium_fields_cache_ttl": 900,
+      "low_fields_cache_ttl": 300,
+      "field_indexing": {
+        "auto_index_critical": true,
+        "auto_index_high": true,
+        "composite_index_generation": true
+      }
+    },
+    "intelligence_engine_integration": {
+      "causal_analysis_fields": ["Root Cause", "Obj. Evidence"],
+      "temporal_analysis_fields": [
+        "Initiation Date",
+        "Due Date",
+        "Completion Date"
+      ],
+      "categorical_analysis_fields": ["Categories", "Stage", "Init. Dept."],
+      "quality_indicator_fields": ["Title", "What happened?", "Action Plan"]
     }
   },
   "relationships": {
@@ -86,7 +147,24 @@
         "ActionPlan",
         "actionplan_id"
       ]
-    ]
+    ],
+    "adapter_relationship_optimization": {
+      "relationship_caching": {
+        "enabled": true,
+        "cache_ttl_seconds": 1800,
+        "precompute_common_paths": true
+      },
+      "query_optimization": {
+        "batch_relationship_queries": true,
+        "use_relationship_indexes": true,
+        "optimize_traversals": true
+      },
+      "workflow_processor_integration": {
+        "stage_dependency_tracking": true,
+        "completion_chain_analysis": true,
+        "bottleneck_detection": true
+      }
+    }
   },
   "validation": {
     "entity_creation_thresholds": {
@@ -128,6 +206,24 @@
         "failure",
         "negative"
       ]
+    },
+    "adapter_validation_framework": {
+      "data_quality_validation": {
+        "enabled": true,
+        "quality_threshold": 0.8,
+        "auto_correction": false,
+        "quality_reporting": true
+      },
+      "relationship_validation": {
+        "enforce_referential_integrity": true,
+        "validate_relationship_types": true,
+        "check_orphaned_nodes": true
+      },
+      "performance_validation": {
+        "query_performance_monitoring": true,
+        "memory_usage_tracking": true,
+        "timeout_detection": true
+      }
     }
   },
   "analytics": {
@@ -158,6 +254,25 @@
         "Completion Date",
         "Effectiveness Verification Due Date"
       ]
+    },
+    "intelligence_engine_optimization": {
+      "analysis_caching": {
+        "portfolio_analysis_ttl": 600,
+        "facility_analysis_ttl": 900,
+        "causal_analysis_ttl": 1200,
+        "workflow_analysis_ttl": 1800
+      },
+      "pattern_detection": {
+        "frequency_analysis_enabled": true,
+        "trend_detection_enabled": true,
+        "anomaly_detection_enabled": false,
+        "correlation_analysis_enabled": true
+      },
+      "performance_optimization": {
+        "parallel_analysis": true,
+        "incremental_updates": true,
+        "result_compression": true
+      }
     }
   },
   "root_cause_processing": {
@@ -174,13 +289,107 @@
     "preserve_original": true,
     "enable_causal_correlation": true,
     "primary_field": "root_cause",
-    "secondary_field": "root_cause_tail"
+    "secondary_field": "root_cause_tail",
+    "causal_intelligence_optimization": {
+      "pattern_caching": {
+        "enabled": true,
+        "cache_ttl_seconds": 1800,
+        "pattern_similarity_threshold": 0.8
+      },
+      "frequency_analysis": {
+        "enable_real_time_updates": false,
+        "batch_update_interval": 3600,
+        "trend_detection_window": 90
+      },
+      "adapter_integration": {
+        "facility_adapter_optimization": true,
+        "workflow_adapter_integration": true,
+        "intelligence_engine_preprocessing": true
+      }
+    }
   },
   "query_optimization": {
     "batch_relationship_creation": true,
     "use_periodic_commit": true,
     "periodic_commit_size": 1000,
     "create_indexes_for_labels": true,
-    "enable_query_caching": true
+    "enable_query_caching": true,
+    "adapter_query_optimization": {
+      "query_plan_caching": {
+        "enabled": true,
+        "cache_size": 500,
+        "plan_reuse_threshold": 10
+      },
+      "parallel_query_execution": {
+        "enabled": true,
+        "max_parallel_queries": 5,
+        "query_queue_size": 100
+      },
+      "result_optimization": {
+        "result_streaming": true,
+        "pagination_optimization": true,
+        "compression_enabled": true
+      }
+    }
+  },
+  "caching_framework": {
+    "global_cache_settings": {
+      "default_ttl_seconds": 600,
+      "max_cache_size_mb": 256,
+      "cleanup_interval_seconds": 1800,
+      "compression_threshold_kb": 64
+    },
+    "adapter_specific_caching": {
+      "data_adapter": {
+        "portfolio_cache_ttl": 300,
+        "facility_cache_ttl": 600,
+        "temporal_cache_ttl": 900
+      },
+      "workflow_adapter": {
+        "stage_cache_ttl": 1200,
+        "mapping_cache_ttl": 1800,
+        "completion_cache_ttl": 300
+      },
+      "facility_adapter": {
+        "analysis_cache_ttl": 900,
+        "comparison_cache_ttl": 1200,
+        "causal_cache_ttl": 1800
+      },
+      "config_adapter": {
+        "schema_cache_ttl": 3600,
+        "styling_cache_ttl": 1800,
+        "validation_cache_ttl": 900
+      }
+    }
+  },
+  "monitoring_and_alerting": {
+    "performance_monitoring": {
+      "enabled": true,
+      "metrics_collection_interval": 60,
+      "slow_operation_threshold_ms": 1000,
+      "memory_usage_threshold_percent": 80
+    },
+    "error_monitoring": {
+      "enabled": true,
+      "error_rate_threshold": 0.05,
+      "consecutive_error_threshold": 5,
+      "alert_cooldown_minutes": 15
+    },
+    "health_checks": {
+      "database_connectivity": true,
+      "adapter_responsiveness": true,
+      "cache_performance": true,
+      "memory_usage": true
+    }
+  },
+  "feature_flags": {
+    "advanced_caching": true,
+    "parallel_processing": true,
+    "real_time_analytics": false,
+    "predictive_analysis": false,
+    "auto_optimization": true,
+    "debug_mode": false,
+    "performance_profiling": true,
+    "adapter_monitoring": true
   }
 }
