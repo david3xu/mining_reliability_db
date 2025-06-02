@@ -211,7 +211,7 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
         if not facility_data or facility_data.get("error"):
             return html.Div(
                 html.P(
-                    f"Could not load data for facility: {facility_name}. {facility_data.get("error", "")}"
+                    f'Could not load data for facility: {facility_name}. {facility_data.get("error", "")}'
                 ),
                 className="alert alert-warning",
             )
