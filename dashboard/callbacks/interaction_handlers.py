@@ -159,8 +159,8 @@ class InteractionHandlers:
             State("search-input", "value"),
             prevent_initial_call=True,
         )
-        def debug_search_test(n_clicks, search_value):
-            """Debug callback to verify search execution"""
+        def update_search_placeholder(n_clicks, search_value):
+            """Update placeholder to show last searched term"""
             if search_value:
                 return f"Last searched: {search_value}"
             return "Enter search term"
@@ -217,15 +217,11 @@ class InteractionHandlers:
 
                 table_data.append(
                     {
-                        "Problem": problem_desc[:100] + "..."
-                        if len(problem_desc) > 100
-                        else problem_desc,
-                        "Root Cause": root_cause[:80] + "..."
-                        if len(root_cause) > 80
-                        else root_cause,
+                        "Problem": problem_desc,
+                        "Root Cause": root_cause,
                         "Facility": result.get("facility_id", "Unknown"),
                         "Date": initiation_date[:10] if initiation_date != "N/A" else "N/A",
-                        "Status": result.get("stage", "Unknown"),
+                        "Status": result.get("status", "Unknown"),
                     }
                 )
 
@@ -236,22 +232,77 @@ class InteractionHandlers:
                     html.H5(f"Search Results ({len(results)} incidents)", className="mb-3"),
                     dash_table.DataTable(
                         data=table_data,
-                        columns=[{"name": col, "id": col} for col in columns],
+                        columns=[
+                            {"name": "Problem", "id": "Problem", "type": "text"},
+                            {"name": "Root Cause", "id": "Root Cause", "type": "text"},
+                            {"name": "Facility", "id": "Facility", "type": "text"},
+                            {"name": "Date", "id": "Date", "type": "text"},
+                            {"name": "Status", "id": "Status", "type": "text"},
+                        ],
                         style_cell={
                             "textAlign": "left",
                             "padding": "10px",
                             "fontFamily": "Arial",
                             "fontSize": "14px",
+                            "whiteSpace": "normal",
+                            "height": "auto",
+                            "overflow": "visible",
                         },
+                        style_cell_conditional=[
+                            {
+                                "if": {"column_id": "Problem"},
+                                "minWidth": "300px",
+                                "whiteSpace": "normal",
+                                "height": "auto",
+                            },
+                            {
+                                "if": {"column_id": "Root Cause"},
+                                "minWidth": "250px",
+                                "whiteSpace": "normal",
+                                "height": "auto",
+                            },
+                            {
+                                "if": {"column_id": "Facility"},
+                                "minWidth": "120px",
+                                "textAlign": "center",
+                            },
+                            {
+                                "if": {"column_id": "Date"},
+                                "minWidth": "110px",
+                                "textAlign": "center",
+                            },
+                            {
+                                "if": {"column_id": "Status"},
+                                "minWidth": "130px",
+                                "textAlign": "center",
+                            },
+                        ],
                         style_header={
                             "backgroundColor": "rgb(230, 230, 230)",
                             "fontWeight": "bold",
+                            "textAlign": "center",
                         },
                         style_data={
                             "backgroundColor": "rgb(248, 248, 248)",
                             "whiteSpace": "normal",
                             "height": "auto",
+                            "lineHeight": "1.4",
+                            "wordWrap": "break-word",
                         },
+                        css=[
+                            {
+                                "selector": ".dash-table-tooltip",
+                                "rule": "background-color: white; font-family: Arial; border: 1px solid grey; border-radius: 5px; padding: 10px; max-width: 500px",
+                            }
+                        ],
+                        tooltip_data=[
+                            {
+                                column: {"value": str(row[column]), "type": "markdown"}
+                                for column in ["Problem", "Root Cause", "Status"]
+                            }
+                            for row in table_data
+                        ],
+                        tooltip_duration=None,
                         page_size=10,
                         sort_action="native",
                     ),

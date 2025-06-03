@@ -66,6 +66,10 @@ class PurifiedDashboardApp:
             else:
                 logger.warning("⚠️ Adapter validation issues detected")
 
+            # Call the debug method
+            debug_info = data_adapter.debug_search_data_structure()
+            print("Debug Search Data Structure:", debug_info)
+
         except Exception as e:
             handle_error(logger, e, "adapter validation")
 
@@ -158,7 +162,7 @@ class PurifiedDashboardApp:
             logger.info("✅ All callbacks registered through interaction handlers")
 
             # Also ensure incident search component callbacks are imported
-            import dashboard.components.incident_search
+            # import dashboard.components.incident_search # Removed redundant import
 
             logger.info("✅ Search component callbacks imported")
 

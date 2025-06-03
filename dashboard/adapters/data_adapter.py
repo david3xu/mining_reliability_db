@@ -237,34 +237,25 @@ class PurifiedDataAdapter:
             return {}
 
     def search_problems_and_causes(self, search_text: str) -> List[Dict[str, Any]]:
-        """Search problems and return connected root causes (direct Neo4j query)"""
+        """Schema-driven search through core layer"""
         try:
-            logger.info(f"Adapter: Searching incidents for '{search_text}' (direct DB query)")
+            logger.info(f"Adapter: Schema-driven search for '{search_text}'")
 
-            # Direct Neo4j query for immediate results
-            query = """
-            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
-            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
-            WHERE toLower(p.what_happened) CONTAINS toLower($search_text)
-               OR toLower(ar.title) CONTAINS toLower($search_text)
-            RETURN ar.action_request_number AS request_number,
-                   ar.title AS title,
-                   ar.initiation_date AS initiation_date,
-                   p.what_happened AS problem_description,
-                   rc.root_cause AS root_cause,
-                   f.facility_id AS facility_id
-            ORDER BY ar.initiation_date DESC
-            LIMIT 20
-            """
-            from mine_core.database.db import get_database
+            from mine_core.database.query_manager import get_query_manager
+            query_manager = get_query_manager()
 
-            db = get_database()
-            results = db.execute_query(query, search_text=search_text)
-            logger.info(f"Search found {len(results)} results for '{search_text}'")
-            return results
+            # Use schema-driven method
+            search_result = query_manager.search_using_schema_configuration(search_text)
+
+            if not search_result.success:
+                logger.warning(f"Schema search failed: {search_result.metadata}")
+                return []
+
+            logger.info(f"Schema search found {search_result.count} results")
+            return search_result.data
+
         except Exception as e:
-            handle_error(logger, e, f"incident search for '{search_text}' (direct DB query)")
+            handle_error(logger, e, f"schema-driven search adapter for '{search_text}'")
             return []
 
     def get_action_request_facility_summary(self) -> Dict[str, Any]:
@@ -317,6 +308,47 @@ class PurifiedDataAdapter:
                     "data_quality": 0.0,
                 },
             }
+
+    def debug_search_data_structure(self) -> Dict[str, Any]:
+        """Debug method to understand search data structure"""
+        try:
+            logger.info("Adapter: Debugging search data structure")
+
+            from mine_core.database.query_manager import get_query_manager
+
+            query_manager = get_query_manager()
+
+            discovery_result = query_manager.discover_search_data_structure()
+
+            if not discovery_result.success:
+                return {"error": "Discovery failed", "details": discovery_result.metadata}
+
+            # Organize discovery results by type
+            findings = {}
+            for result in discovery_result.data:
+                discovery_type = result.get("discovery_type")
+                findings[discovery_type] = result.get("findings")
+
+            logger.info(f"Database structure discovery: {findings}")
+            return findings
+
+        except Exception as e:
+            handle_error(logger, e, "search structure debugging")
+            return {"error": str(e)}
+
+    def get_core_workflow_labels(self) -> List[str]:
+        """Get core workflow entity labels only"""
+        try:
+            from mine_core.database.query_manager import get_query_manager
+
+            query_manager = get_query_manager()
+
+            result = query_manager.get_core_workflow_labels()
+            return [row["label"] for row in result.data] if result.success else []
+
+        except Exception as e:
+            handle_error(logger, e, "core workflow labels access")
+            return []
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""

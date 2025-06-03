@@ -19,6 +19,13 @@ def create_data_table(
     table_columns = []
     for col in columns:
         col_def = {"name": col, "id": col}
+
+        # Set column width based on content type
+        if col == "Problem Description":
+            col_def["style"] = {"width": "40%", "textAlign": "left"}
+        elif col == "Root Cause":
+            col_def["style"] = {"width": "35%", "textAlign": "left"}
+
         if col == link_column:
             col_def["presentation"] = "markdown"
         table_columns.append(col_def)
@@ -41,18 +48,23 @@ def create_data_table(
         data=data,
         columns=table_columns,
         style_cell={
-            "textAlign": "center",
+            "textAlign": "left",  # Left align for readability
             "padding": "12px",
             "fontFamily": "Arial, sans-serif",
             "fontSize": "14px",
             "border": f"1px solid {config.get('border_color', '#CCCCCC')}",
+            "whiteSpace": "normal",  # Allow text wrapping
+            "height": "auto",       # Auto height for full content
+        },
+        style_data={
+            "whiteSpace": "normal",
+            "height": "auto",
         },
         style_header={
             "backgroundColor": config.get("primary_color", "#4A90E2"),
             "color": "#FFFFFF",
             "fontWeight": "bold",
         },
-        style_data={"backgroundColor": "#FFFFFF"},
         sort_action="native",
         page_size=10,
         markdown_options={"link_target": "_self"},

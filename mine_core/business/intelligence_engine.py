@@ -549,7 +549,18 @@ class IntelligenceEngine:
         if not temporal_data:
             return "Unknown"
 
-        years = [int(item["year"]) for item in temporal_data if item.get("year")]
+        years = []
+        for item in temporal_data:
+            year_str = item.get("year")
+            if year_str:
+                try:
+                    year = int(year_str)
+                    if 1900 <= year <= 2100:  # Reasonable year range
+                        years.append(year)
+                except (ValueError, TypeError):
+                    # Skip invalid year values like "Nove"
+                    continue
+
         if not years:
             return "Unknown"
 
@@ -593,8 +604,31 @@ class IntelligenceEngine:
         self, facilities: List[Dict], temporal_data: List[Dict]
     ) -> Dict[str, Any]:
         """Build timeline matrix from facility and temporal data"""
-        # Extract years
-        years = sorted(list(set([int(item["year"]) for item in temporal_data if item.get("year")])))
+        # Extract years with validation
+        valid_years = []
+        for item in temporal_data:
+            year_str = item.get("year")
+            if year_str:
+                try:
+                    # Ensure year is a valid 4-digit integer
+                    year = int(year_str)
+                    if 1900 <= year <= 2100:  # Reasonable year range
+                        valid_years.append(year)
+                except (ValueError, TypeError):
+                    # Skip invalid year values like "Nove"
+                    continue
+
+        years = sorted(list(set(valid_years)))
+
+        if not years:
+            # Return empty structure if no valid years found
+            return {
+                "columns": ["facility", "total"],
+                "rows": [],
+                "year_range": [],
+                "total_records": 0,
+                "facilities_count": 0,
+            }
 
         # Build matrix structure (simplified for core logic)
         facility_names = [f.get("facility_id", "Unknown") for f in facilities]

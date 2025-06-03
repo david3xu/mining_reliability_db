@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from configs.environment import get_entity_primary_key, get_schema
+from configs.environment import get_entity_primary_key, get_schema, get_mappings, get_entity_connections
 from mine_core.database.db import get_database
 from mine_core.shared.common import handle_error
 
@@ -238,8 +238,14 @@ class QueryManager:
             query = f"""
             MATCH (n:{entity_type})-[:BELONGS_TO]->(f:Facility)
             WHERE n.{date_field} IS NOT NULL AND f.facility_id IS NOT NULL AND NOT '_SchemaTemplate' IN labels(n)
-            WITH f.facility_id AS facility_id, substring(n.{date_field}, 0, 4) AS year, count(n) AS incident_count
-            WHERE year IS NOT NULL
+            WITH f.facility_id AS facility_id,
+                 CASE
+                     WHEN n.{date_field} =~ '^\\d{{4}}-\\d{{2}}-\\d{{2}}.*' THEN substring(n.{date_field}, 0, 4)
+                     WHEN n.{date_field} =~ '^\\d{{4}}' THEN substring(n.{date_field}, 0, 4)
+                     ELSE NULL
+                 END AS year,
+                 count(n) AS incident_count
+            WHERE year IS NOT NULL AND year =~ '^\\d{{4}}$'
             RETURN facility_id, year, incident_count
             ORDER BY year, facility_id
             """
@@ -250,45 +256,151 @@ class QueryManager:
             handle_error(logger, e, f"temporal analysis for {entity_type}")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
-    def search_incident_patterns(self, search_text: str) -> QueryResult:
-        """Search problem descriptions and return connected root causes"""
+    def discover_search_data_structure(self) -> QueryResult:
+        """Discover actual database structure for search functionality"""
         try:
-            # Split search text into keywords
-            keywords = [k.strip() for k in search_text.lower().split() if len(k.strip()) > 2]
+            structure_query = """
+            // Check what relationships actually exist between Problem and RootCause
+            MATCH (p:Problem)-[r]-(rc:RootCause)
+            WITH type(r) AS relationship_type, count(*) AS count
+            RETURN "relationships" AS discovery_type,
+                   collect({type: relationship_type, count: count}) AS findings
 
-            if not keywords:
-                return QueryResult(
-                    data=[], count=0, success=False, metadata={"error": "No valid keywords"}
-                )
+            UNION ALL
 
-            # Build CONTAINS clauses for each keyword
-            where_conditions = []
-            for keyword in keywords:
-                where_conditions.append(f"toLower(p.what_happened) CONTAINS '{keyword}'")
+            // Check actual properties on RootCause nodes
+            MATCH (rc:RootCause)
+            WITH keys(rc) AS rc_properties LIMIT 1
+            RETURN "rootcause_properties" AS discovery_type, rc_properties AS findings
 
-            where_clause = " AND ".join(where_conditions)
+            UNION ALL
 
-            query = f"""
-            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
-            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
-            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
-            WHERE {where_clause}
-            RETURN ar.action_request_number AS request_number,
-                   ar.title AS title,
-                   ar.initiation_date AS initiation_date,
-                   ar.stage AS stage,
-                   p.what_happened AS problem_description,
-                   rc.root_cause AS root_cause,
-                   f.facility_id AS facility_id
-            ORDER BY ar.initiation_date DESC
-            LIMIT 50
+            // Check actual properties on Problem nodes
+            MATCH (p:Problem)
+            WITH keys(p) AS p_properties LIMIT 1
+            RETURN "problem_properties" AS discovery_type, p_properties AS findings
+
+            UNION ALL
+
+            // Sample actual data to verify content
+            MATCH (p:Problem)-[r]-(rc:RootCause)
+            RETURN "sample_data" AS discovery_type,
+                   {problem_props: properties(p),
+                    relationship: type(r),
+                    rootcause_props: properties(rc)} AS findings
+            LIMIT 3
             """
 
-            return self.execute_query(query)
+            return self.execute_query(structure_query)
 
         except Exception as e:
-            handle_error(logger, e, f"incident pattern search for '{search_text}'")
+            handle_error(logger, e, "search data structure discovery")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def get_core_workflow_labels(self) -> QueryResult:
+        """Get only the 5 core workflow node labels"""
+        try:
+            core_labels_query = """
+            CALL db.labels() YIELD label
+            WHERE label IN ['ActionRequest', 'Problem', 'RootCause', 'ActionPlan', 'Verification', 'Facility']
+            RETURN label
+            ORDER BY
+                CASE label
+                    WHEN 'ActionRequest' THEN 1
+                    WHEN 'Problem' THEN 2
+                    WHEN 'RootCause' THEN 3
+                    WHEN 'ActionPlan' THEN 4
+                    WHEN 'Verification' THEN 5
+                    WHEN 'Facility' THEN 6
+                END
+            """
+
+            return self.execute_query(core_labels_query)
+
+        except Exception as e:
+            handle_error(logger, e, "core workflow labels discovery")
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def search_incident_patterns(self, search_text: str) -> QueryResult:
+        """Fixed search with correct relationship pattern"""
+        try:
+            # Test multiple relationship patterns
+            corrected_query = """
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            OPTIONAL MATCH (p)-[r]-(rc:RootCause)
+            WHERE toLower(toString(p.name)) CONTAINS toLower($search_text)
+               OR toLower(toString(ar.name)) CONTAINS toLower($search_text)
+
+            RETURN ar.action_request_number AS request_number,
+                   ar.name AS title,
+                   ar.initiation_date AS initiation_date,
+                   p.name AS problem_description,
+                   coalesce(rc.name, 'No root cause analysis') AS root_cause,
+                   f.facility_id AS facility_id,
+                   coalesce(ar.stage, 'Unknown') AS status
+            ORDER BY ar.initiation_date DESC
+            LIMIT 20
+            """
+
+            # Correct parameter syntax
+            return self.execute_query(corrected_query, {"search_text": search_text})
+
+        except Exception as e:
+            handle_error(logger, e, f"search execution for '{search_text}'")
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def search_using_schema_configuration(self, search_text: str) -> QueryResult:
+        """Schema-driven search using field_mappings.json"""
+        try:
+            # Get actual field mappings
+            # NOTE: We need the schema to get the *internal* Neo4j property names, not just display names
+            schema_config = get_schema()
+            connections_config = get_entity_connections()
+
+            # Extract search properties using their actual internal Neo4j names
+            problem_search_field = "what_happened"
+            ar_search_field = "title"
+            rc_result_field = "root_cause"
+
+            # Get relationship types from schema
+            problem_to_ar = self._get_relationship_type(connections_config, "Problem", "ActionRequest", "IDENTIFIED_IN")
+            rc_to_problem = self._get_relationship_type(connections_config, "RootCause", "Problem", "ANALYZES")
+
+            # Build schema-driven query using internal property names (no backticks needed)
+            schema_query = f"""
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            MATCH (p:Problem)-[:{problem_to_ar}]->(ar)
+            MATCH (rc:RootCause)-[r]-(p:Problem)
+            WHERE toLower(toString(p.{problem_search_field})) CONTAINS toLower($search_text)
+               OR toLower(toString(ar.{ar_search_field})) CONTAINS toLower($search_text)
+
+            RETURN ar.action_request_number AS request_number,
+                   ar.{ar_search_field} AS title,
+                   ar.initiation_date AS initiation_date,
+                   p.problem_id AS problem_id,
+                   p.{problem_search_field} AS problem_description,
+                   coalesce(rc.root_cause, 'No analysis') AS root_cause,
+                   f.facility_id AS facility_id,
+                   coalesce(ar.stage, 'Unknown') AS status
+            ORDER BY ar.initiation_date DESC
+            LIMIT 20
+            """
+
+            query_result = self.execute_query(query=schema_query, params={"search_text": search_text})
+            logger.info(f"Raw schema search results: {query_result.data}")
+            return query_result
+
+        except Exception as e:
+            handle_error(logger, e, f"schema-driven search for '{search_text}'")
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def _get_relationship_type(self, connections_config: Dict[str, Any], from_entity: str, to_entity: str, default_relation: str) -> str:
+        """Helper to get relationship type from connections_config"""
+        for conn in connections_config.get("workflow_connections", {}).get("primary_workflow_flow", []):
+            if conn.get("from") == from_entity and conn.get("to") == to_entity:
+                return conn.get("relationship", default_relation)
+        return default_relation
 
     def _get_entity_definition(self, entity_type: str) -> Dict[str, Any]:
         """Get entity definition from schema with caching"""
