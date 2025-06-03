@@ -242,6 +242,7 @@ class PurifiedDataAdapter:
             logger.info(f"Adapter: Schema-driven search for '{search_text}'")
 
             from mine_core.database.query_manager import get_query_manager
+
             query_manager = get_query_manager()
 
             # Use schema-driven method
