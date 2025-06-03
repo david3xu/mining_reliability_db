@@ -250,6 +250,46 @@ class QueryManager:
             handle_error(logger, e, f"temporal analysis for {entity_type}")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
+    def search_incident_patterns(self, search_text: str) -> QueryResult:
+        """Search problem descriptions and return connected root causes"""
+        try:
+            # Split search text into keywords
+            keywords = [k.strip() for k in search_text.lower().split() if len(k.strip()) > 2]
+
+            if not keywords:
+                return QueryResult(
+                    data=[], count=0, success=False, metadata={"error": "No valid keywords"}
+                )
+
+            # Build CONTAINS clauses for each keyword
+            where_conditions = []
+            for keyword in keywords:
+                where_conditions.append(f"toLower(p.what_happened) CONTAINS '{keyword}'")
+
+            where_clause = " AND ".join(where_conditions)
+
+            query = f"""
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
+            WHERE {where_clause}
+            RETURN ar.action_request_number AS request_number,
+                   ar.title AS title,
+                   ar.initiation_date AS initiation_date,
+                   ar.stage AS stage,
+                   p.what_happened AS problem_description,
+                   rc.root_cause AS root_cause,
+                   f.facility_id AS facility_id
+            ORDER BY ar.initiation_date DESC
+            LIMIT 50
+            """
+
+            return self.execute_query(query)
+
+        except Exception as e:
+            handle_error(logger, e, f"incident pattern search for '{search_text}'")
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
     def _get_entity_definition(self, entity_type: str) -> Dict[str, Any]:
         """Get entity definition from schema with caching"""
         if entity_type not in self._entity_cache:

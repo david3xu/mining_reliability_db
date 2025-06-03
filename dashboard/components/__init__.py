@@ -16,6 +16,9 @@ from dashboard.components.facility_detail import (
     create_recurring_issues_analysis,
 )
 
+# Incident Search Components
+from dashboard.components.incident_search import create_incident_search_layout
+
 # Interactive Elements
 from dashboard.components.interactive_elements import (
     create_interactive_bar_chart,
@@ -86,6 +89,8 @@ __all__ = [
     "create_workflow_metrics",
     # Data Quality Components
     "create_data_quality_layout",
+    # Incident Search Components
+    "create_incident_search_layout",
     # Facility Detail Components
     "create_facility_detail_layout",
     "create_facility_metrics_cards",

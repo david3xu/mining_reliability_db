@@ -439,6 +439,10 @@ class ConfigAdapter:
         """Get schema configuration (convenience method)"""
         return self.get_schema_config()
 
+    def get_entity_classification(self) -> Dict[str, Any]:
+        """Get entity classification configuration (convenience method for workflow analysis)"""
+        return self.get_entity_classification_config()
+
 
 # Singleton pattern
 _config_adapter: Optional[ConfigAdapter] = None

@@ -7,10 +7,10 @@ Clean interaction logic with adapter-driven URL generation.
 import logging
 from typing import Any, Dict, Optional
 
-from dash import Input, Output, State, callback, ctx
+from dash import Input, Output, State, callback, ctx, html
 from dash.exceptions import PreventUpdate
 
-from dashboard.adapters import get_facility_adapter
+from dashboard.adapters import get_data_adapter, get_facility_adapter
 from dashboard.routing.url_manager import get_url_manager
 from mine_core.shared.common import handle_error
 
@@ -22,6 +22,7 @@ class InteractionHandlers:
 
     def __init__(self):
         self.facility_adapter = get_facility_adapter()
+        self.data_adapter = get_data_adapter()
         self.url_manager = get_url_manager()
 
     def register_chart_interactions(self, app):
@@ -122,6 +123,156 @@ class InteractionHandlers:
             except Exception as e:
                 handle_error(logger, e, "navigation state update")
                 return {}
+
+    def register_search_interactions(self, app):
+        """Register search functionality callbacks"""
+
+        @app.callback(
+            [Output("search-results", "children"), Output("search-status", "children")],
+            [Input("search-button", "n_clicks"), Input("clear-button", "n_clicks")],
+            [State("search-input", "value")],
+            prevent_initial_call=True,
+        )
+        def handle_search_interaction(search_clicks, clear_clicks, search_text):
+            """Process search requests and display results"""
+            try:
+                if not ctx.triggered:
+                    raise PreventUpdate
+
+                trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+                if trigger_id == "clear-button":
+                    return html.Div(), html.Div()
+
+                if trigger_id == "search-button" and search_text:
+                    return self._perform_search(search_text.strip())
+
+                raise PreventUpdate
+
+            except Exception as e:
+                handle_error(logger, e, "search interaction")
+                return html.Div("Search error occurred"), self._create_error_status("Search failed")
+
+        @app.callback(
+            Output("search-input", "placeholder"),
+            Input("search-button", "n_clicks"),
+            State("search-input", "value"),
+            prevent_initial_call=True,
+        )
+        def debug_search_test(n_clicks, search_value):
+            """Debug callback to verify search execution"""
+            if search_value:
+                return f"Last searched: {search_value}"
+            return "Enter search term"
+
+    def _perform_search(self, search_text: str) -> tuple:
+        """Execute search and format results"""
+        try:
+            if len(search_text) < 3:
+                return html.Div(), self._create_status_message(
+                    "Enter at least 3 characters", "warning"
+                )
+
+            # Execute search through data adapter
+            results = self.data_adapter.search_problems_and_causes(search_text)
+
+            if not results:
+                no_results = html.Div(
+                    [
+                        html.P(f"No matching incidents found for '{search_text}'"),
+                        html.P("Try different keywords or check spelling"),
+                    ]
+                )
+                return no_results, self._create_status_message("No results found", "info")
+
+            # Create results table
+            results_table = self._create_search_results_table(results)
+            status = self._create_status_message(
+                f"Found {len(results)} incidents matching '{search_text}'", "success"
+            )
+
+            return results_table, status
+
+        except Exception as e:
+            error_display = html.Div(
+                [
+                    html.P(f"Search error: {str(e)}", style={"color": "red"}),
+                    html.P(f"Search term: {search_text}", style={"color": "yellow"}),
+                ]
+            )
+            return error_display, self._create_error_status("Search failed")
+
+    def _create_search_results_table(self, results):
+        """Format search results as table"""
+        try:
+            from dash import dash_table
+
+            # Transform results for table display
+            table_data = []
+            for result in results:
+                # Safely handle None values for string operations
+                problem_desc = result.get("problem_description") or "N/A"
+                root_cause = result.get("root_cause") or "N/A"
+                initiation_date = result.get("initiation_date") or "N/A"
+
+                table_data.append(
+                    {
+                        "Problem": problem_desc[:100] + "..."
+                        if len(problem_desc) > 100
+                        else problem_desc,
+                        "Root Cause": root_cause[:80] + "..."
+                        if len(root_cause) > 80
+                        else root_cause,
+                        "Facility": result.get("facility_id", "Unknown"),
+                        "Date": initiation_date[:10] if initiation_date != "N/A" else "N/A",
+                        "Status": result.get("stage", "Unknown"),
+                    }
+                )
+
+            columns = ["Problem", "Root Cause", "Facility", "Date", "Status"]
+
+            return html.Div(
+                [
+                    html.H5(f"Search Results ({len(results)} incidents)", className="mb-3"),
+                    dash_table.DataTable(
+                        data=table_data,
+                        columns=[{"name": col, "id": col} for col in columns],
+                        style_cell={
+                            "textAlign": "left",
+                            "padding": "10px",
+                            "fontFamily": "Arial",
+                            "fontSize": "14px",
+                        },
+                        style_header={
+                            "backgroundColor": "rgb(230, 230, 230)",
+                            "fontWeight": "bold",
+                        },
+                        style_data={
+                            "backgroundColor": "rgb(248, 248, 248)",
+                            "whiteSpace": "normal",
+                            "height": "auto",
+                        },
+                        page_size=10,
+                        sort_action="native",
+                    ),
+                ]
+            )
+
+        except Exception as e:
+            handle_error(logger, e, "search results table creation")
+            return html.Div(f"Error displaying results: {str(e)}")
+
+    def _create_status_message(self, message: str, alert_type: str):
+        """Create status message with appropriate styling"""
+        import dash_bootstrap_components as dbc
+
+        return dbc.Alert(message, color=alert_type, dismissable=True, className="mb-2")
+
+    def _create_error_status(self, message: str):
+        """Create error status message"""
+        import dash_bootstrap_components as dbc
+
+        return dbc.Alert(message, color="danger", dismissable=True, className="mb-2")
 
     def get_chart_config(self) -> Dict[str, Any]:
         """Chart interaction configuration"""

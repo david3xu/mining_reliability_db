@@ -236,6 +236,88 @@ class PurifiedDataAdapter:
             handle_error(logger, e, "41 raw field completion rates")
             return {}
 
+    def search_problems_and_causes(self, search_text: str) -> List[Dict[str, Any]]:
+        """Search problems and return connected root causes (direct Neo4j query)"""
+        try:
+            logger.info(f"Adapter: Searching incidents for '{search_text}' (direct DB query)")
+
+            # Direct Neo4j query for immediate results
+            query = """
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
+            WHERE toLower(p.what_happened) CONTAINS toLower($search_text)
+               OR toLower(ar.title) CONTAINS toLower($search_text)
+            RETURN ar.action_request_number AS request_number,
+                   ar.title AS title,
+                   ar.initiation_date AS initiation_date,
+                   p.what_happened AS problem_description,
+                   rc.root_cause AS root_cause,
+                   f.facility_id AS facility_id
+            ORDER BY ar.initiation_date DESC
+            LIMIT 20
+            """
+            from mine_core.database.db import get_database
+
+            db = get_database()
+            results = db.execute_query(query, search_text=search_text)
+            logger.info(f"Search found {len(results)} results for '{search_text}'")
+            return results
+        except Exception as e:
+            handle_error(logger, e, f"incident search for '{search_text}' (direct DB query)")
+            return []
+
+    def get_action_request_facility_summary(self) -> Dict[str, Any]:
+        """Pure data access for ActionRequest facility statistics summary"""
+        try:
+            logger.info("Adapter: Fetching ActionRequest facility summary from core")
+
+            # Call core business logic
+            analysis_result = self.intelligence_engine.analyze_action_request_facility_statistics()
+
+            if not analysis_result.data:
+                return {
+                    "facility_statistics": [],
+                    "summary_totals": {
+                        "total_records": 0,
+                        "total_unique_actions": 0,
+                        "average_records_per_action": 0.0,
+                    },
+                    "metadata": {
+                        "source": "empty",
+                        "generated_at": self._get_timestamp(),
+                        "data_quality": 0.0,
+                    },
+                }
+
+            # Pure data transformation
+            return {
+                "facility_statistics": analysis_result.data.get("facility_statistics", []),
+                "summary_totals": analysis_result.data.get("summary_totals", {}),
+                "metadata": {
+                    "source": "core.intelligence_engine",
+                    "generated_at": analysis_result.generated_at,
+                    "data_quality": analysis_result.quality_score,
+                    "facilities_analyzed": analysis_result.metadata.get("facilities_analyzed", 0),
+                },
+            }
+
+        except Exception as e:
+            handle_error(logger, e, "ActionRequest facility summary data access")
+            return {
+                "facility_statistics": [],
+                "summary_totals": {
+                    "total_records": 0,
+                    "total_unique_actions": 0,
+                    "average_records_per_action": 0.0,
+                },
+                "metadata": {
+                    "source": "error",
+                    "generated_at": self._get_timestamp(),
+                    "data_quality": 0.0,
+                },
+            }
+
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""
         return datetime.now().isoformat()
