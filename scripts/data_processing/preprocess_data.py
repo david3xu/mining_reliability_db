@@ -19,6 +19,9 @@ from configs.environment import (
 from mine_core.shared.common import handle_error, setup_project_environment
 from mine_core.shared.field_utils import extract_root_cause_tail_extraction, has_real_value
 
+# Initialize logger
+logger = None
+
 
 def convert_list_to_string(value: Union[List, Any], delimiter: str = "; ") -> str:
     """Convert list field to string using consistent delimiter"""
@@ -220,6 +223,11 @@ def preprocess_record(
     """Preprocess single record: convert lists, enhance intelligence, and apply schema type conversion"""
     processed_record = record.copy()
 
+    # Remove 'Column 42' field if it exists
+    if "Column 42" in processed_record:
+        del processed_record["Column 42"]
+        logger.debug("Removed 'Column 42' field from record")
+
     # Convert identified list fields to strings
     for field_name in list_fields:
         if field_name in processed_record:
@@ -318,10 +326,13 @@ def preprocess_facility_data(
 
         # Preprocess all records
         processed_records = []
-        conversion_stats = {"converted_records": 0, "conversion_errors": 0}
+        conversion_stats = {"converted_records": 0, "conversion_errors": 0, "column_42_removed": 0}
 
         for record in records:
             try:
+                # Check if 'Column 42' exists before preprocessing
+                had_column_42 = "Column 42" in record
+
                 processed_record = preprocess_record(
                     record,
                     list_fields,
@@ -330,6 +341,11 @@ def preprocess_facility_data(
                 )
                 processed_records.append(processed_record)
                 conversion_stats["converted_records"] += 1
+
+                # Count removals
+                if had_column_42:
+                    conversion_stats["column_42_removed"] += 1
+
             except Exception as e:
                 logger.error(f"Failed to preprocess record: {e}")
                 # Add original record to maintain data integrity
@@ -360,6 +376,10 @@ def preprocess_facility_data(
         logger.info(
             f"Schema type conversion: {conversion_stats['converted_records']} successful, {conversion_stats['conversion_errors']} errors"
         )
+        if conversion_stats["column_42_removed"] > 0:
+            logger.info(f"Removed 'Column 42' field from {conversion_stats['column_42_removed']} records")
+        else:
+            logger.info("No 'Column 42' fields found to remove")
         logger.info(f"Output saved to {output_file}")
 
         return {
@@ -368,6 +388,7 @@ def preprocess_facility_data(
             "list_fields": list_fields,
             "schema_conversion_enabled": enable_schema_conversion,
             "conversion_stats": conversion_stats,
+            "column_42_removed": conversion_stats["column_42_removed"],
             "root_cause_enhanced": sum(
                 1 for r in processed_records if has_real_value(r.get("Root Cause Tail Extraction"))
             ),
@@ -404,6 +425,7 @@ def preprocess_all_facilities(
         "all_field_analysis": {},
         "list_fields_found": [],
         "root_cause_enhancements": 0,
+        "total_column_42_removed": 0,
     }
 
     # Validate raw data directory
@@ -496,6 +518,7 @@ def preprocess_all_facilities(
                 summary["total_records"] += result["processed"]
                 summary["facilities_data"].append(result)
                 summary["root_cause_enhancements"] += result.get("root_cause_enhanced", 0)
+                summary["total_column_42_removed"] += result.get("column_42_removed", 0)
 
         except Exception as e:
             error_message = f"Error processing file {input_file.name}: {e}"
@@ -504,6 +527,10 @@ def preprocess_all_facilities(
                 summary["error"] = error_message
 
     logger.info("Data preprocessing complete.")
+    if summary["total_column_42_removed"] > 0:
+        logger.info(f"Total 'Column 42' fields removed across all files: {summary['total_column_42_removed']}")
+    else:
+        logger.info("No 'Column 42' fields found in any files")
     return summary
 
 
