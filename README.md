@@ -18,6 +18,9 @@ git clone <repository>
 cd mining-reliability-dashboard
 pip install -r requirements.txt
 
+
+git commit --no-verify -m "cypher search works - investigating architecture compliance"
+
 # Configure environment
 cp .env.example .env
 # Edit .env with your database credentials

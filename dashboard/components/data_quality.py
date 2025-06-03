@@ -10,11 +10,7 @@ from typing import Dict, List, Tuple
 import plotly.graph_objects as go
 from dash import dash_table, dcc, html
 
-from dashboard.adapters import (
-    get_data_adapter,
-    get_workflow_adapter,
-    handle_error_utility,
-)
+from dashboard.adapters import get_data_adapter, get_workflow_adapter, handle_error_utility
 from dashboard.components.layout_template import create_standard_layout
 from dashboard.utils.styling import get_colors
 
@@ -51,9 +47,7 @@ def create_41_field_completion_analysis() -> html.Div:
         logger.info(
             f"Field completion data received in component: {len(field_completion_data)} fields"
         )
-        logger.info(
-            f"Sample data in component: {list(field_completion_data.items())[:5]}"
-        )
+        logger.info(f"Sample data in component: {list(field_completion_data.items())[:5]}")
 
         if not field_completion_data:
             return html.Div("No field completion data available")
@@ -219,9 +213,7 @@ def create_action_request_facility_table() -> html.Div:
             [
                 html.Div(
                     [
-                        html.H6(
-                            "Total Records", style={"color": "#7ED321", "margin": "0"}
-                        ),
+                        html.H6("Total Records", style={"color": "#7ED321", "margin": "0"}),
                         html.H4(
                             f"{summary_totals.get('total_records', 0):,}",
                             style={"color": "white", "margin": "5px 0"},
@@ -238,9 +230,7 @@ def create_action_request_facility_table() -> html.Div:
                 ),
                 html.Div(
                     [
-                        html.H6(
-                            "Unique Actions", style={"color": "#F5A623", "margin": "0"}
-                        ),
+                        html.H6("Unique Actions", style={"color": "#F5A623", "margin": "0"}),
                         html.H4(
                             f"{summary_totals.get('total_unique_actions', 0):,}",
                             style={"color": "white", "margin": "5px 0"},
