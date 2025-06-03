@@ -458,6 +458,71 @@ class IntelligenceEngine:
             handle_error(logger, e, "missing data impact analysis")
             return self._create_empty_result("missing_data_impact")
 
+    def analyze_action_request_facility_statistics(self) -> IntelligenceResult:
+        """Analyze ActionRequest statistics by facility"""
+        try:
+            # Get ActionRequest data per facility
+            facility_stats_query = """
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            WHERE NOT '_SchemaTemplate' IN labels(ar)
+            WITH f.facility_id AS facility_id,
+                 count(ar) AS total_records,
+                 count(DISTINCT ar.action_request_number) AS unique_actions,
+                 collect(ar.action_request_number) AS action_numbers
+            WITH facility_id, total_records, unique_actions, action_numbers,
+                 toFloat(total_records) / unique_actions AS records_per_action
+
+            // Calculate max records per action number
+            UNWIND action_numbers AS action_num
+            WITH facility_id, total_records, unique_actions, records_per_action, action_num
+            MATCH (ar:ActionRequest {action_request_number: action_num})
+            WITH facility_id, total_records, unique_actions, records_per_action,
+                 action_num, count(ar) AS records_for_action
+            WITH facility_id, total_records, unique_actions, records_per_action,
+                 max(records_for_action) AS max_records_per_action
+
+            RETURN facility_id, total_records, unique_actions,
+                   round(records_per_action, 1) AS records_per_action,
+                   max_records_per_action
+            ORDER BY facility_id
+            """
+
+            result = self.query_manager.execute_query(facility_stats_query)
+
+            if not result or not result.data:
+                return self._create_empty_result("action_request_statistics")
+
+            # Extract the actual data from QueryResult
+            facility_data = result.data
+
+            # Calculate totals
+            total_records = sum(row["total_records"] for row in facility_data)
+            total_unique_actions = sum(row["unique_actions"] for row in facility_data)
+            average_records_per_action = (
+                total_records / total_unique_actions if total_unique_actions > 0 else 0
+            )
+
+            analysis_data = {
+                "facility_statistics": facility_data,
+                "summary_totals": {
+                    "total_records": total_records,
+                    "total_unique_actions": total_unique_actions,
+                    "average_records_per_action": round(average_records_per_action, 1),
+                },
+            }
+
+            return IntelligenceResult(
+                analysis_type="action_request_statistics",
+                data=analysis_data,
+                metadata={"facilities_analyzed": len(facility_data)},
+                quality_score=1.0 if facility_data else 0.0,
+                generated_at=datetime.now().isoformat(),
+            )
+
+        except Exception as e:
+            handle_error(logger, e, "action request facility statistics analysis")
+            return self._create_empty_result("action_request_statistics")
+
     # Private analysis methods
 
     def _analyze_field_coverage(self) -> Dict[str, Any]:

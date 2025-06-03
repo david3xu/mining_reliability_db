@@ -3,12 +3,8 @@ Callbacks Package - Interaction Handlers
 Dashboard interaction callbacks and event handlers.
 """
 
-from dashboard.callbacks.interaction_handlers import (
-    register_chart_interactions,
-    register_table_interactions,
-)
+from dashboard.callbacks.interaction_handlers import get_interaction_handlers
 
 __all__ = [
-    "register_chart_interactions",
-    "register_table_interactions",
+    "get_interaction_handlers",
 ]

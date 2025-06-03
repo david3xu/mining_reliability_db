@@ -90,6 +90,7 @@ class NavigationBuilder:
                     dbc.DropdownMenuItem(
                         "Data Types Distribution", href="/data-types-distribution"
                     ),
+                    dbc.DropdownMenuItem("Incident Search", href="/search"),
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Data Quality", href="/data-quality"),
                     dbc.DropdownMenuItem("Workflow Analysis", href="/workflow"),
@@ -183,6 +184,7 @@ class NavigationBuilder:
             "/historical-records": "Historical Records Analysis",
             "/facilities-distribution": "Facilities Distribution",
             "/data-types-distribution": "Data Types Distribution",
+            "/search": "Incident Search",
         }
 
         if pathname in title_mapping:

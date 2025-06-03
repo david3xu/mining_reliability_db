@@ -34,6 +34,7 @@ class URLManager:
             "/historical-records",
             "/facilities-distribution",
             "/data-types-distribution",
+            "/search",
         ]
 
         # Add dynamic facility routes
@@ -73,6 +74,9 @@ class URLManager:
         if pathname == "/data-types-distribution":
             return {"page": "data_types", "component": "data_types_distribution_page"}
 
+        if pathname == "/search":
+            return {"page": "incident_search", "component": "incident_search_layout"}
+
         if pathname.startswith("/facility/"):
             facility_id = pathname.replace("/facility/", "")
             return {
@@ -111,7 +115,12 @@ class URLManager:
             breadcrumbs.append({"label": f"Facility: {facility_id}", "url": pathname})
         elif page_type in ["data_quality", "workflow", "summary"]:
             breadcrumbs.append({"label": page_type.replace("_", " ").title(), "url": pathname})
-        elif page_type in ["historical_records", "facilities_distribution", "data_types"]:
+        elif page_type in [
+            "historical_records",
+            "facilities_distribution",
+            "data_types",
+            "incident_search",
+        ]:
             breadcrumbs.append({"label": "Analysis", "url": pathname})
 
         return breadcrumbs
@@ -126,6 +135,7 @@ class URLManager:
             "/historical-records": "Historical Records Analysis",
             "/facilities-distribution": "Facilities Distribution",
             "/data-types-distribution": "Data Types Distribution",
+            "/search": "Incident Search",
         }
 
         if pathname in title_mapping:

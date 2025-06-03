@@ -119,7 +119,10 @@ class PurifiedDashboardApp:
         )
 
     def _setup_routing(self):
-        """Setup routing through URL manager"""
+        """Setup routing through URL manager and register all callbacks"""
+        # Import all components with callbacks to ensure they're registered
+        self._register_all_callbacks()
+
         url_manager = get_url_manager()
 
         @self.app.callback(
@@ -137,6 +140,36 @@ class PurifiedDashboardApp:
             except Exception as e:
                 handle_error(logger, e, f"routing for {pathname}")
                 return self._create_error_page(str(e))
+
+    def _register_all_callbacks(self):
+        """Register all application callbacks through interaction handlers"""
+        try:
+            # Register interaction handlers
+            from dashboard.callbacks.interaction_handlers import get_interaction_handlers
+
+            interaction_handlers = get_interaction_handlers()
+
+            # Register all callback types
+            interaction_handlers.register_chart_interactions(self.app)
+            interaction_handlers.register_table_interactions(self.app)
+            interaction_handlers.register_navigation_interactions(self.app)
+            interaction_handlers.register_search_interactions(self.app)
+
+            logger.info("✅ All callbacks registered through interaction handlers")
+
+            # Also ensure incident search component callbacks are imported
+            import dashboard.components.incident_search
+
+            logger.info("✅ Search component callbacks imported")
+
+        except Exception as e:
+            handle_error(logger, e, "callback registration")
+            logger.warning("⚠️ Some callbacks may not be registered properly")
+            # import dashboard.components.other_component_with_callbacks
+
+        except Exception as e:
+            handle_error(logger, e, "callback registration")
+            logger.warning("⚠️ Some callbacks may not be registered")
 
     def _load_page_component(self, route_config: dict):
         """Load page component based on route configuration"""
@@ -176,6 +209,11 @@ class PurifiedDashboardApp:
                 )
 
                 return create_data_types_distribution_page()
+
+            elif component_name == "incident_search_layout":
+                from dashboard.components.incident_search import create_incident_search_layout
+
+                return create_incident_search_layout()
 
             elif component_name == "facility_detail_layout":
                 facility_id = route_config.get("facility_id")
@@ -288,6 +326,7 @@ class PurifiedDashboardApp:
             print("   📋 Portfolio Overview (/)")
             print("   🔍 Data Quality (/data-quality)")
             print("   🔄 Workflow Analysis (/workflow)")
+            print("   🔎 Incident Search (/search)")
             print("   📊 Summary (/summary)")
             print("   🏭 Facility Analysis (dynamic)")
             print("=" * 60)

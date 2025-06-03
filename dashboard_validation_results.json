@@ -134,51 +134,135 @@
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 68,
+      "line": 71,
       "color": "#7ED321",
       "context": "style={\"color\": \"#7ED321\", \"marginBottom\": \"10px\"},"
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 73,
+      "line": 76,
       "color": "#7ED321",
       "context": "\"backgroundColor\": \"#7ED321\","
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 108,
+      "line": 111,
       "color": "#7ED321",
       "context": "return html.P(\"All fields are 100% complete!\", style={\"color\": \"#7ED321\"})"
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 117,
+      "line": 120,
       "color": "#7ED321",
       "context": "colors_list.append(\"#7ED321\")  # Green"
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 119,
+      "line": 122,
       "color": "#F5A623",
       "context": "colors_list.append(\"#F5A623\")  # Orange"
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 121,
+      "line": 124,
       "color": "#D32F2F",
       "context": "colors_list.append(\"#D32F2F\")  # Red"
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 140,
+      "line": 143,
       "color": "#2F2F2F",
       "context": "paper_bgcolor=\"#2F2F2F\","
     },
     {
       "file": "dashboard/components/data_quality.py",
-      "line": 141,
+      "line": 144,
       "color": "#2F2F2F",
       "context": "plot_bgcolor=\"#2F2F2F\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 170,
+      "color": "#F5A623",
+      "context": "style={\"color\": \"#F5A623\", \"fontStyle\": \"italic\"},"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 207,
+      "color": "#7ED321",
+      "context": "html.H6(\"Total Records\", style={\"color\": \"#7ED321\", \"margin\": \"0\"}),"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 217,
+      "color": "#444",
+      "context": "\"backgroundColor\": \"#444\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 224,
+      "color": "#F5A623",
+      "context": "html.H6(\"Unique Actions\", style={\"color\": \"#F5A623\", \"margin\": \"0\"}),"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 234,
+      "color": "#444",
+      "context": "\"backgroundColor\": \"#444\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 242,
+      "color": "#50E3C2",
+      "context": "\"Average Records/Action\", style={\"color\": \"#50E3C2\", \"margin\": \"0\"}"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 253,
+      "color": "#444",
+      "context": "\"backgroundColor\": \"#444\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 269,
+      "color": "#2F2F2F",
+      "context": "\"backgroundColor\": \"#2F2F2F\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 273,
+      "color": "#444",
+      "context": "\"border\": \"1px solid #444\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 276,
+      "color": "#444",
+      "context": "\"backgroundColor\": \"#444\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 277,
+      "color": "#7ED321",
+      "context": "\"color\": \"#7ED321\","
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 282,
+      "color": "#3A3A3A",
+      "context": "{\"if\": {\"row_index\": \"odd\"}, \"backgroundColor\": \"#3A3A3A\"},"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 304,
+      "color": "#888",
+      "context": "style={\"color\": \"#888\", \"fontSize\": \"12px\", \"marginTop\": \"10px\"},"
+    },
+    {
+      "file": "dashboard/components/data_quality.py",
+      "line": 325,
+      "color": "#D32F2F",
+      "context": "style={\"color\": \"#D32F2F\", \"fontStyle\": \"italic\"},"
     },
     {
       "file": "dashboard/components/workflow_analysis.py",
@@ -370,6 +454,12 @@
   "direct_mine_core_imports": [],
   "adapter_compliance": [
     {
+      "file": "dashboard/components/incident_search.py",
+      "has_adapter_import": false,
+      "uses_adapter_pattern": false,
+      "compliant": false
+    },
+    {
       "file": "dashboard/components/portfolio_overview.py",
       "has_adapter_import": true,
       "uses_adapter_pattern": true,
@@ -419,6 +509,13 @@
     }
   ],
   "configuration_usage": [
+    {
+      "file": "dashboard/components/incident_search.py",
+      "uses_styling_config": false,
+      "uses_chart_config": false,
+      "uses_env_config": false,
+      "config_driven": false
+    },
     {
       "file": "dashboard/components/portfolio_overview.py",
       "uses_styling_config": false,
@@ -476,5 +573,5 @@
       "config_driven": false
     }
   ],
-  "data_accuracy_score": 18.8
+  "data_accuracy_score": 16.7
 }
