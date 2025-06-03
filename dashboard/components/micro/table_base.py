@@ -54,7 +54,7 @@ def create_data_table(
             "fontSize": "14px",
             "border": f"1px solid {config.get('border_color', '#CCCCCC')}",
             "whiteSpace": "normal",  # Allow text wrapping
-            "height": "auto",       # Auto height for full content
+            "height": "auto",  # Auto height for full content
         },
         style_data={
             "whiteSpace": "normal",

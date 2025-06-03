@@ -7,7 +7,7 @@ Search interface layout without callbacks (callbacks handled by interaction_hand
 import logging
 
 import dash_bootstrap_components as dbc
-from dash import html, callback, Input, Output, State
+from dash import Input, Output, State, callback, html
 
 from dashboard.components.layout_template import create_standard_layout
 from dashboard.utils.styling import get_colors
@@ -99,20 +99,26 @@ def create_search_results_table(results: list) -> html.Div:
         # Show FULL content, no truncation
         table_data = []
         for result in results:
-            table_data.append({
-                "Problem Description": result.get("problem_description", "N/A"),  # Full content
-                "Root Cause": result.get("root_cause", "No analysis available"),  # Full content
-                "Facility": result.get("facility_id", "Unknown"),
-                "Date": result.get("initiation_date", "N/A")[:10] if result.get("initiation_date") else "N/A",
-                "Status": result.get("status", "Unknown")
-            })
+            table_data.append(
+                {
+                    "Problem Description": result.get("problem_description", "N/A"),  # Full content
+                    "Root Cause": result.get("root_cause", "No analysis available"),  # Full content
+                    "Facility": result.get("facility_id", "Unknown"),
+                    "Date": result.get("initiation_date", "N/A")[:10]
+                    if result.get("initiation_date")
+                    else "N/A",
+                    "Status": result.get("status", "Unknown"),
+                }
+            )
 
         columns = ["Problem Description", "Root Cause", "Facility", "Date", "Status"]
 
-        return html.Div([
-            html.H5(f"Search Results ({len(results)} incidents)", className="mb-3"),
-            create_data_table(table_data, columns, "search-results-table")
-        ])
+        return html.Div(
+            [
+                html.H5(f"Search Results ({len(results)} incidents)", className="mb-3"),
+                create_data_table(table_data, columns, "search-results-table"),
+            ]
+        )
 
     except Exception as e:
         logger.error(f"Error creating search results table: {e}")

@@ -377,7 +377,9 @@ def preprocess_facility_data(
             f"Schema type conversion: {conversion_stats['converted_records']} successful, {conversion_stats['conversion_errors']} errors"
         )
         if conversion_stats["column_42_removed"] > 0:
-            logger.info(f"Removed 'Column 42' field from {conversion_stats['column_42_removed']} records")
+            logger.info(
+                f"Removed 'Column 42' field from {conversion_stats['column_42_removed']} records"
+            )
         else:
             logger.info("No 'Column 42' fields found to remove")
         logger.info(f"Output saved to {output_file}")
@@ -528,7 +530,9 @@ def preprocess_all_facilities(
 
     logger.info("Data preprocessing complete.")
     if summary["total_column_42_removed"] > 0:
-        logger.info(f"Total 'Column 42' fields removed across all files: {summary['total_column_42_removed']}")
+        logger.info(
+            f"Total 'Column 42' fields removed across all files: {summary['total_column_42_removed']}"
+        )
     else:
         logger.info("No 'Column 42' fields found in any files")
     return summary

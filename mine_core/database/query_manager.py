@@ -9,7 +9,12 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from configs.environment import get_entity_primary_key, get_schema, get_mappings, get_entity_connections
+from configs.environment import (
+    get_entity_connections,
+    get_entity_primary_key,
+    get_mappings,
+    get_schema,
+)
 from mine_core.database.db import get_database
 from mine_core.shared.common import handle_error
 
@@ -364,8 +369,12 @@ class QueryManager:
             rc_result_field = "root_cause"
 
             # Get relationship types from schema
-            problem_to_ar = self._get_relationship_type(connections_config, "Problem", "ActionRequest", "IDENTIFIED_IN")
-            rc_to_problem = self._get_relationship_type(connections_config, "RootCause", "Problem", "ANALYZES")
+            problem_to_ar = self._get_relationship_type(
+                connections_config, "Problem", "ActionRequest", "IDENTIFIED_IN"
+            )
+            rc_to_problem = self._get_relationship_type(
+                connections_config, "RootCause", "Problem", "ANALYZES"
+            )
 
             # Build schema-driven query using internal property names (no backticks needed)
             schema_query = f"""
@@ -387,7 +396,9 @@ class QueryManager:
             LIMIT 20
             """
 
-            query_result = self.execute_query(query=schema_query, params={"search_text": search_text})
+            query_result = self.execute_query(
+                query=schema_query, params={"search_text": search_text}
+            )
             logger.info(f"Raw schema search results: {query_result.data}")
             return query_result
 
@@ -395,9 +406,17 @@ class QueryManager:
             handle_error(logger, e, f"schema-driven search for '{search_text}'")
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
-    def _get_relationship_type(self, connections_config: Dict[str, Any], from_entity: str, to_entity: str, default_relation: str) -> str:
+    def _get_relationship_type(
+        self,
+        connections_config: Dict[str, Any],
+        from_entity: str,
+        to_entity: str,
+        default_relation: str,
+    ) -> str:
         """Helper to get relationship type from connections_config"""
-        for conn in connections_config.get("workflow_connections", {}).get("primary_workflow_flow", []):
+        for conn in connections_config.get("workflow_connections", {}).get(
+            "primary_workflow_flow", []
+        ):
             if conn.get("from") == from_entity and conn.get("to") == to_entity:
                 return conn.get("relationship", default_relation)
         return default_relation
