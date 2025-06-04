@@ -240,7 +240,7 @@ def main():
     """Main function with command line interface."""
     parser = argparse.ArgumentParser(description="Simple record merger by Action Request Number")
     parser.add_argument("--input-dir", default="data/inter_data", help="Input directory")
-    parser.add_argument("--output-dir", default="data/merged_data", help="Output directory")
+    parser.add_argument("--output-dir", default="data/facility_data", help="Output directory")
     parser.add_argument("--input-file", help="Process single file")
 
     args = parser.parse_args()
