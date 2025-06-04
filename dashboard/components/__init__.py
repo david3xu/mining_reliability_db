@@ -62,6 +62,14 @@ from dashboard.components.solution_sequence_case_study import (
     create_solution_sequence_case_study_layout,
 )
 
+# Stakeholder Questions Components
+from dashboard.components.stakeholder_questions import (
+    create_stakeholder_questions_overview,
+    create_question_category_card,
+    create_question_detail_view,
+    get_question_category_metrics,
+)
+
 # Navigation Components
 from dashboard.components.tab_navigation import (
     create_breadcrumb_navigation,
@@ -129,4 +137,9 @@ __all__ = [
     "create_workflow_stage_card",
     "create_facility_summary_card",
     "create_solution_sequence_case_study_layout",
+    # Stakeholder Questions Components
+    "create_stakeholder_questions_overview",
+    "create_question_category_card",
+    "create_question_detail_view",
+    "get_question_category_metrics",
 ]

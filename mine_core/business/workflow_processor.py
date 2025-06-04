@@ -329,7 +329,7 @@ class WorkflowProcessor:
             }
 
     def analyze_all_entity_completions(self) -> Dict[str, Any]:
-        """Calculate comprehensive completion for all workflow entities and supporting entities based on raw field averages"""
+        """Calculate comprehensive completion for all workflow entities and supporting entities using field-level averaging from workflow stages"""
         entity_names = ["ActionRequest", "Problem", "RootCause", "ActionPlan", "Verification"]
         supporting_entities = [
             "Facility",
@@ -359,6 +359,10 @@ class WorkflowProcessor:
             )
             return {"workflow_entities": {}, "supporting_entities": {}}
 
+        # Get workflow stages configuration to use business fields for consistency with frontend
+        workflow_config = get_workflow_stages_config()
+        stage_configs = workflow_config.get("workflow_stages", [])
+
         # Helper to get raw field names for a given entity
         def _get_raw_fields_for_entity(entity_name_to_map: str) -> List[str]:
             entity_raw_fields = []
@@ -368,31 +372,63 @@ class WorkflowProcessor:
                     entity_raw_fields.append(raw_field)
             return entity_raw_fields
 
-        # Calculate completeness for workflow entities
+        # Calculate completeness for workflow entities using the same logic as _process_workflow_stages
         for entity in entity_names:
+            # Find the stage configuration for this entity
+            stage_config = next((stage for stage in stage_configs if stage.get("entity_name") == entity), None)
+
             if entity == "ActionRequest":
-                # ActionRequest is the base, so it's 100% if records exist
+                # Use the same field-level completion calculation as _process_workflow_stages for consistency
                 ar_count = self.query_manager.get_entity_count("ActionRequest")
-                completion_rate = 100.0 if ar_count > 0 else 0.0
-                total_fields = len(_get_raw_fields_for_entity(entity))
+                
+                if stage_config:
+                    business_fields = stage_config.get("business_fields", [])
+                    completion_rate = self._calculate_stage_field_completion(
+                        entity, business_fields, raw_field_completion_rates
+                    )
+                    total_fields = len(business_fields)
+                else:
+                    # Fallback to raw field averaging if no stage config found
+                    entity_raw_fields = _get_raw_fields_for_entity(entity)
+                    relevant_field_rates = [
+                        raw_field_completion_rates.get(field, 0.0)
+                        for field in entity_raw_fields
+                    ]
+                    completion_rate = (
+                        sum(relevant_field_rates) / len(relevant_field_rates)
+                        if relevant_field_rates
+                        else 0.0
+                    )
+                    total_fields = len(entity_raw_fields)
+
                 workflow_completions[entity] = {
                     "entity_name": entity,
-                    "completion_rate": completion_rate,
+                    "completion_rate": round(completion_rate, 1),
                     "field_count": total_fields,
-                    "total_records": ar_count,  # Use actual AR count here
+                    "total_records": ar_count,
                 }
             else:
-                entity_raw_fields = _get_raw_fields_for_entity(entity)
-                relevant_field_rates = [
-                    raw_field_completion_rates.get(field, 0.0)  # Get rate from 41-field analysis
-                    for field in entity_raw_fields
-                ]
-                completion_rate = (
-                    sum(relevant_field_rates) / len(relevant_field_rates)
-                    if relevant_field_rates
-                    else 0.0
-                )
-                total_fields = len(entity_raw_fields)
+                # Use the same field-level completion calculation as _process_workflow_stages
+                if stage_config:
+                    business_fields = stage_config.get("business_fields", [])
+                    completion_rate = self._calculate_stage_field_completion(
+                        entity, business_fields, raw_field_completion_rates
+                    )
+                    total_fields = len(business_fields)
+                else:
+                    # Fallback to raw field averaging if no stage config found
+                    entity_raw_fields = _get_raw_fields_for_entity(entity)
+                    relevant_field_rates = [
+                        raw_field_completion_rates.get(field, 0.0)
+                        for field in entity_raw_fields
+                    ]
+                    completion_rate = (
+                        sum(relevant_field_rates) / len(relevant_field_rates)
+                        if relevant_field_rates
+                        else 0.0
+                    )
+                    total_fields = len(entity_raw_fields)
+
                 workflow_completions[entity] = {
                     "entity_name": entity,
                     "completion_rate": round(completion_rate, 1),
@@ -562,20 +598,24 @@ class WorkflowProcessor:
     def _process_workflow_stages(
         self, workflow_config: Dict, completion_data: Dict
     ) -> List[WorkflowStage]:
-        """Process workflow stages with completion rates"""
+        """Process workflow stages with completion rates calculated by averaging field completion rates"""
         stage_configs = workflow_config.get("workflow_stages", [])
+
+        # Get raw field completion rates from the accurate 41-field calculation
+        raw_field_completion_rates = self.calculate_raw_field_completion_rates()
 
         stages = []
         for stage_config in stage_configs:
             entity_name = stage_config.get("entity_name", "")
+            business_fields = stage_config.get("business_fields", [])
 
-            # Get completion rate from Neo4j data
-            completion_rate = 0.0
-            if entity_name in completion_data:
-                completion_rate = completion_data[entity_name].get("completion_rate", 0.0)
+            # Calculate stage completion by averaging the completion rates of fields belonging to this stage
+            completion_rate = self._calculate_stage_field_completion(
+                entity_name, business_fields, raw_field_completion_rates
+            )
 
             # Calculate complexity
-            field_count = len(stage_config.get("business_fields", []))
+            field_count = len(business_fields)
             complexity = (
                 "complex" if field_count >= 6 else "moderate" if field_count >= 3 else "simple"
             )
@@ -586,7 +626,7 @@ class WorkflowProcessor:
                 title=stage_config.get("title", entity_name),
                 field_count=field_count,
                 completion_rate=completion_rate,
-                business_fields=stage_config.get("business_fields", []),
+                business_fields=business_fields,
                 complexity_level=complexity,
             )
 
@@ -896,6 +936,68 @@ class WorkflowProcessor:
 
         except Exception as e:
             handle_error(logger, e, f"completion calculation for {entity_name}")
+            return 0.0
+
+    def _calculate_stage_field_completion(
+        self, entity_name: str, business_fields: List[str], raw_field_completion_rates: Dict[str, float]
+    ) -> float:
+        """Calculate stage completion by averaging completion rates of fields belonging to the stage"""
+        try:
+            if not business_fields or not raw_field_completion_rates:
+                return 0.0
+
+            # Map business fields to raw field names using field mappings
+            entity_mappings = self.mappings.get("entity_mappings", {}).get(entity_name, {})
+
+            # Create reverse mapping: raw field name -> internal field name
+            reverse_mapping = {raw_field: internal_field for internal_field, raw_field in entity_mappings.items()}
+
+            # Find completion rates for stage fields
+            stage_field_rates = []
+
+            for business_field in business_fields:
+                # Try to find the raw field completion rate
+                # First try direct lookup (business field == raw field)
+                if business_field in raw_field_completion_rates:
+                    stage_field_rates.append(raw_field_completion_rates[business_field])
+                else:
+                    # Try to find through entity mappings
+                    # Look for internal field that matches business field name pattern
+                    internal_field = None
+                    for internal, raw in entity_mappings.items():
+                        if raw == business_field or internal == business_field:
+                            internal_field = internal
+                            break
+
+                    if internal_field:
+                        # Get the raw field name and its completion rate
+                        raw_field = entity_mappings.get(internal_field)
+                        if raw_field and raw_field in raw_field_completion_rates:
+                            stage_field_rates.append(raw_field_completion_rates[raw_field])
+                        else:
+                            logger.warning(
+                                f"Raw field '{raw_field}' for business field '{business_field}' not found in completion rates for entity '{entity_name}'"
+                            )
+                    else:
+                        logger.warning(
+                            f"Could not map business field '{business_field}' to raw field for entity '{entity_name}'"
+                        )
+
+            # Calculate average completion rate for the stage
+            if stage_field_rates:
+                average_completion = sum(stage_field_rates) / len(stage_field_rates)
+                logger.info(
+                    f"Stage completion for '{entity_name}': {average_completion:.1f}% (averaged from {len(stage_field_rates)} fields)"
+                )
+                return round(average_completion, 1)
+            else:
+                logger.warning(
+                    f"No valid field completion rates found for stage '{entity_name}' with {len(business_fields)} business fields"
+                )
+                return 0.0
+
+        except Exception as e:
+            handle_error(logger, e, f"stage field completion calculation for {entity_name}")
             return 0.0
 
 

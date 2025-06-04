@@ -103,14 +103,15 @@ def create_41_field_completion_analysis() -> html.Div:
                             "color": colors.get("text_light"),
                             "padding": "10px",
                             "borderRadius": "5px",
+                            "fontSize": "18px",  # Increased font size again
                         },
                     ),
                 ],
                 className="mb-4 p-3 rounded",  # Added some padding and rounded corners
                 style={
-                    "backgroundColor": colors.get(
-                        "success_darker"
-                    ),  # Using a darker green for contrast
+                    "backgroundColor": colors.get("success_darker"),
+                    "width": "700px",  # Reduced width again
+                    "margin": "auto",  # Center the section
                 },
             )
             if complete_fields
@@ -126,6 +127,7 @@ def create_41_field_completion_analysis() -> html.Div:
                         style={
                             "color": colors.get("primary_color"),
                             "margin": "0",
+                            "fontSize": "16px", # Increased font size
                         },
                     ),
                     html.H4(
@@ -133,6 +135,7 @@ def create_41_field_completion_analysis() -> html.Div:
                         style={
                             "color": colors.get("text_light"),
                             "margin": "5px 0",
+                            "fontSize": "24px", # Increased font size
                         },
                     ),
                 ],
@@ -153,11 +156,11 @@ def create_41_field_completion_analysis() -> html.Div:
                 [
                     html.H6(
                         "Total Data Fields",
-                        style={"color": colors.get("primary_color"), "margin": "0"},
+                        style={"color": colors.get("primary_color"), "margin": "0", "fontSize": "16px"},
                     ),
                     html.H4(
                         f"{len(field_completion_data)}",
-                        style={"color": colors.get("text_light"), "margin": "5px 0"},
+                        style={"color": colors.get("text_light"), "margin": "5px 0", "fontSize": "24px"},
                     ),
                 ],
                 style={
@@ -171,6 +174,25 @@ def create_41_field_completion_analysis() -> html.Div:
             width=6,  # Adjusted width for two cards in a row
         )
 
+        # Wrap the two cards in a single dbc.Card
+        summary_cards_container = dbc.Card(
+            dbc.Row(
+                [
+                    average_completeness_card,
+                    total_fields_card,
+                ],
+                justify="center",
+                className="g-0",  # Use g-0 to remove gutter between cols if desired
+            ),
+            className="mb-4 p-3 rounded", # Add padding and rounded corners to the card
+            style={
+                "backgroundColor": colors.get("background_secondary"),
+                "border": f"1px solid {colors.get('border_color')}",
+                "width": "700px", # Set a fixed width for the combined card
+                "margin": "auto", # Center the combined card
+            }
+        )
+
         # Create incomplete fields chart
         incomplete_chart = create_raw_field_completion_chart(
             list(zip(chart_display_names, [field[1] for field in incomplete_fields]))
@@ -180,14 +202,7 @@ def create_41_field_completion_analysis() -> html.Div:
             [
                 html.H3("Field Completeness Analysis (41 Fields)", className="mb-4"),
                 complete_section,  # Place the original 100% complete section here
-                dbc.Row(
-                    [
-                        average_completeness_card,  # Smaller average completeness card
-                        total_fields_card,  # Smaller total data fields card
-                    ],
-                    justify="center",
-                    className="mb-4",
-                ),
+                summary_cards_container, # Use the new combined card container
                 html.H5(
                     f"Field Completion Rates (Excluding 100% Complete Fields)",
                     className="mt-4 mb-3",
@@ -249,22 +264,37 @@ def create_raw_field_completion_chart(
     )
 
     fig.update_layout(
+        title="""<b>Field Completion Rates (Excluding 100% Complete)</b>""",
         xaxis_title="Completion Rate (%)",
-        xaxis=dict(
-            tickvals=[0, 20, 40, 60, 70, 80, 90, 100],  # Add tick values for 70 and 90
-            gridcolor=colors.get("border_color"),  # Use a color from config for gridlines
+        yaxis_title="",
+        # Set chart size and margins
+        height=len(raw_field_names) * 30 + 150,  # Dynamic height based on number of bars
+        margin=dict(l=150, r=20, t=70, b=70),  # Adjust left margin for y-axis labels
+        # Update template and font for a cleaner, more professional look
+        template="plotly_dark",
+        font=dict(family="Arial, sans-serif", size=12, color=colors.get("text_primary")),
+        paper_bgcolor=colors.get("background_color"),
+        plot_bgcolor=colors.get("background_color"),
+        xaxis=dict(gridcolor=colors.get("grid_color"), zerolinecolor=colors.get("grid_color")),
+        yaxis=dict(
+            gridcolor=colors.get("grid_color"),
+            zerolinecolor=colors.get("grid_color"),
+            tickfont=dict(size=14),  # Increase y-axis label font size
         ),
-        height=max(400, len(raw_field_names) * 20),
-        font={"family": "Arial", "size": 10},
-        paper_bgcolor=colors.get("background_dark"),
-        plot_bgcolor=colors.get("background_dark"),
-        font_color=colors.get("text_light"),
+        hovermode="closest",
+        # Add dynamic width based on the number of bars, keeping it within reasonable bounds
+        # and not full screen width
+        width=800,  # Fixed width for the chart
+        # To center the chart, it usually requires adjusting the parent Div or container.
+        # For dcc.Graph, setting 'width' directly within layout only controls the graph's width.
+        # The positioning within the Dash app layout needs to be handled by its parent container.
+        # For now, we'll set the width of the graph itself.
     )
 
-    return dcc.Graph(figure=fig)
+    return dcc.Graph(figure=fig, style={'width': 'fit-content', 'margin': 'auto'}) # Center the graph
 
 
-def _shorten_field_name(field_name: str, max_length: int = 35) -> str:
+def _shorten_field_name(field_name: str, max_length: int = 20) -> str:
     """Shorten field names for display if they exceed max_length."""
     if len(field_name) > max_length:
         return field_name[: max_length - 3] + "..."

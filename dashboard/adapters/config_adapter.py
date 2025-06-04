@@ -292,6 +292,10 @@ class ConfigAdapter:
             handle_error_utility(logger, e, "metric card styling configuration access")
             return {}
 
+    def get_metric_card_styling(self) -> Dict[str, Any]:
+        """Alias for get_dashboard_metric_card_styling() for component compatibility"""
+        return self.get_dashboard_metric_card_styling()
+
     def get_dashboard_chart_styling_template(self) -> Dict[str, Any]:
         """Get dashboard chart styling template for adapters"""
         try:
