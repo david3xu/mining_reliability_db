@@ -539,6 +539,7 @@ class QueryManager:
                    f.facility_name AS facility,
                    p.what_happened AS problem_description,
                    rc.root_cause AS root_cause,
+                   rc.root_cause_tail_extraction AS root_cause_tail_extraction,
                    ap.actionplan_id AS action_plan_id,
                    ap.action_plan AS action_description,
                    ap.due_date AS due_date,

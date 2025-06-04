@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from configs.environment import (
     get_all_config,
     get_batch_size,
+    get_case_study_config,
     get_connection_timeout,
     get_dashboard_chart_config,
     get_dashboard_config,
@@ -442,6 +443,14 @@ class ConfigAdapter:
     def get_entity_classification(self) -> Dict[str, Any]:
         """Get entity classification configuration (convenience method for workflow analysis)"""
         return self.get_entity_classification_config()
+
+    def get_case_study_config(self) -> Dict[str, Any]:
+        """Pure access to case study configuration"""
+        try:
+            return get_case_study_config()
+        except Exception as e:
+            handle_error_utility(logger, e, "case study configuration access")
+            return {}
 
 
 # Singleton pattern
