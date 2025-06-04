@@ -23,32 +23,65 @@ def create_facility_summary_card(facility_data: dict) -> dbc.Card:
     total_records = facility_data.get("total_records", 0)
     active_status = facility_data.get("active", True)
 
-    status_color = config.get("chart_colors", ["#7ED321"])[0] if active_status else "#D32F2F"
+    status_colors = (
+        config.get("micro_component_styles", {})
+        .get("facility_card", {})
+        .get("status_indicators", {})
+    )
+    status_color = status_colors.get("active") if active_status else status_colors.get("inactive")
 
     return dbc.Card(
         [
             dbc.CardBody(
                 [
-                    html.H5(facility_id, className="card-title"),
+                    html.H5(
+                        facility_id,
+                        className="card-title",
+                        style={"color": config.get("text_primary")},
+                    ),
                     html.H3(
                         f"{total_records:,}",
-                        style={"color": config.get("primary_color", "#4A90E2")},
+                        style={"color": config.get("primary_color")},
                     ),
-                    html.P("Total Records", className="text-muted"),
+                    html.P(
+                        "Total Records",
+                        className="text-muted",
+                        style={"color": config.get("text_muted")},
+                    ),
                     html.Span(
                         "Active" if active_status else "Inactive",
                         style={
                             "padding": "4px 8px",
                             "borderRadius": "4px",
                             "backgroundColor": status_color,
-                            "color": "#FFFFFF",
+                            "color": config.get("text_light"),
                             "fontSize": "12px",
                         },
                     ),
                 ]
             )
         ],
-        style={"minHeight": "160px", "textAlign": "center"},
+        style={
+            "minHeight": config.get("micro_component_styles", {})
+            .get("facility_card", {})
+            .get("card_dimensions", {})
+            .get("min_height", "160px"),
+            "textAlign": config.get("micro_component_styles", {})
+            .get("facility_card", {})
+            .get("layout", {})
+            .get("text_align", "center"),
+            "backgroundColor": config.get("background_light"),
+            "boxShadow": config.get("shadow_light"),
+            "borderRadius": config.get("micro_component_styles", {})
+            .get("facility_card", {})
+            .get("card_dimensions", {})
+            .get("border_radius", "8px"),
+            "padding": config.get("micro_component_styles", {})
+            .get("facility_card", {})
+            .get("card_dimensions", {})
+            .get("padding", "15px"),
+            "border": f"1px solid {config.get('border_color')}",
+        },
     )
 
 

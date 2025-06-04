@@ -22,27 +22,63 @@ __all__ = [
 
 def create_tab_navigation(active_tab: str = "portfolio") -> dbc.Tabs:
     """Professional tab navigation interface"""
+    config_adapter = get_config_adapter()
+    styling = config_adapter.get_styling_config()
     return dbc.Tabs(
         [
             dbc.Tab(
                 label="Portfolio Overview",
                 tab_id="portfolio",
-                active_tab_class_name="fw-bold text-primary",
+                active_tab_class_name="fw-bold",
+                className="nav-item",
+                active_label_style={"color": styling.get("primary_color")},
+                style={
+                    "backgroundColor": styling.get("background_dark"),
+                    "color": styling.get("text_muted"),
+                    "border": f"1px solid {styling.get('border_color')}",
+                    "borderRadius": "4px 4px 0 0",
+                    "marginRight": "5px",
+                    "padding": "10px 15px",
+                },
             ),
             dbc.Tab(
                 label="Data Quality Foundation",
                 tab_id="quality",
-                active_tab_class_name="fw-bold text-primary",
+                active_tab_class_name="fw-bold",
+                className="nav-item",
+                active_label_style={"color": styling.get("primary_color")},
+                style={
+                    "backgroundColor": styling.get("background_dark"),
+                    "color": styling.get("text_muted"),
+                    "border": f"1px solid {styling.get('border_color')}",
+                    "borderRadius": "4px 4px 0 0",
+                    "marginRight": "5px",
+                    "padding": "10px 15px",
+                },
             ),
             dbc.Tab(
                 label="Workflow Understanding",
                 tab_id="workflow",
-                active_tab_class_name="fw-bold text-primary",
+                active_tab_class_name="fw-bold",
+                className="nav-item",
+                active_label_style={"color": styling.get("primary_color")},
+                style={
+                    "backgroundColor": styling.get("background_dark"),
+                    "color": styling.get("text_muted"),
+                    "border": f"1px solid {styling.get('border_color')}",
+                    "borderRadius": "4px 4px 0 0",
+                    "marginRight": "5px",
+                    "padding": "10px 15px",
+                },
             ),
         ],
         id="main-tabs",
         active_tab=active_tab,
         className="mb-4",
+        style={
+            "borderBottom": f"1px solid {styling.get('border_color')}",
+            "backgroundColor": styling.get("background_dark"),
+        },
     )
 
 

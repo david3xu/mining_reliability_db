@@ -217,11 +217,15 @@ def identify_list_fields(field_analysis: Dict[str, Dict[str, int]]) -> List[str]
 def preprocess_record(
     record: Dict[str, Any],
     list_fields: List[str],
+    facility_name: str,
     field_mappings: Dict[str, Any] = None,
     schema_data: Dict[str, Any] = None,
 ) -> Dict[str, Any]:
     """Preprocess single record: convert lists, enhance intelligence, and apply schema type conversion"""
     processed_record = record.copy()
+
+    # Add facility name field
+    processed_record["_facility_name"] = facility_name
 
     # Remove 'Column 42' field if it exists
     if "Column 42" in processed_record:
@@ -256,6 +260,9 @@ def preprocess_facility_data(
 ) -> Dict[str, Any]:
     """Preprocess facility data file with comprehensive field analysis and schema-aware type conversion"""
     logger.info(f"Preprocessing {input_file}")
+
+    # Extract facility name from input file path
+    facility_name = input_file.stem
 
     try:
         # Load configuration files for schema-aware type conversion
@@ -355,6 +362,7 @@ def preprocess_facility_data(
                             processed_record = preprocess_record(
                                 record,
                                 list_fields,
+                                facility_name,
                                 field_mappings if enable_schema_conversion else None,
                                 schema_data if enable_schema_conversion else None,
                             )
@@ -393,6 +401,7 @@ def preprocess_facility_data(
                     processed_record = preprocess_record(
                         record,
                         list_fields,
+                        facility_name,
                         field_mappings if enable_schema_conversion else None,
                         schema_data if enable_schema_conversion else None,
                     )
@@ -422,6 +431,7 @@ def preprocess_facility_data(
                     processed_record = preprocess_record(
                         record,
                         list_fields,
+                        facility_name,
                         field_mappings if enable_schema_conversion else None,
                         schema_data if enable_schema_conversion else None,
                     )
@@ -447,6 +457,7 @@ def preprocess_facility_data(
                 processed_data = preprocess_record(
                     data,
                     list_fields,
+                    facility_name,
                     field_mappings if enable_schema_conversion else None,
                     schema_data if enable_schema_conversion else None,
                 )
@@ -506,7 +517,7 @@ def preprocess_all_facilities(
     # Resolve data directories
     actual_raw_data_dir = Path(raw_data_dir) if raw_data_dir else (project_root / "data/raw_data")
     actual_output_data_dir = (
-        Path(output_data_dir) if output_data_dir else (project_root / "data/facility_data")
+        Path(output_data_dir) if output_data_dir else (project_root / "data/inter_data")
     )
 
     # Initialize summary with all expected keys, including defaults for potential errors
@@ -647,7 +658,7 @@ def main():
     parser.add_argument(
         "--output-data-dir",
         type=str,
-        help="Output data directory path (default: data/facility_data)",
+        help="Output data directory path (default: data/inter_data)",
     )
     parser.add_argument(
         "--no-schema-conversion",
@@ -671,7 +682,7 @@ def main():
 
         # Convert paths to absolute strings before passing to preprocess_all_facilities
         raw_data_dir_abs = str(project_root / (args.raw_data_dir or "data/raw_data"))
-        output_data_dir_abs = str(project_root / (args.output_data_dir or "data/facility_data"))
+        output_data_dir_abs = str(project_root / (args.output_data_dir or "data/inter_data"))
 
         if args.facility:
             # Process specific facility

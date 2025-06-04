@@ -68,19 +68,30 @@ def create_case_study_header(case_data: Dict[str, Any]) -> html.Div:
                         [
                             html.H2(
                                 f"Case Study: Action Request {action_request_number}",
-                                style={"color": colors["primary"], "marginBottom": "20px"},
+                                style={
+                                    "color": colors.get("primary_color"),
+                                    "marginBottom": "20px",
+                                },
                             ),
                             html.P(
                                 f"Action Request: {action_request_number}",
-                                style={"fontSize": "16px", "fontWeight": "bold"},
+                                style={
+                                    "fontSize": "16px",
+                                    "fontWeight": "bold",
+                                    "color": colors.get("text_primary"),
+                                },
                             ),
-                            html.P(f"Facility: {facility}", style={"fontSize": "16px"}),
+                            html.P(
+                                f"Facility: {facility}",
+                                style={"fontSize": "16px", "color": colors.get("text_secondary")},
+                            ),
                             html.P(
                                 f"Solution Sequences: {total_sequences}",
-                                style={"fontSize": "16px", "color": colors["accent"]},
+                                style={"fontSize": "16px", "color": colors.get("info_color")},
                             ),
                             html.P(
-                                f"Total Action Steps: {total_actions}", style={"fontSize": "16px"}
+                                f"Total Action Steps: {total_actions}",
+                                style={"fontSize": "16px", "color": colors.get("text_primary")},
                             ),
                         ]
                     )
@@ -88,7 +99,7 @@ def create_case_study_header(case_data: Dict[str, Any]) -> html.Div:
             )
         ],
         style={
-            "backgroundColor": colors["card_background"],
+            "backgroundColor": colors.get("background_secondary"),
             "padding": "20px",
             "borderRadius": "8px",
             "marginBottom": "20px",

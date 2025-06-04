@@ -34,13 +34,23 @@ def create_incident_search_layout() -> html.Div:
                                             id="search-input",
                                             placeholder="Search problems (e.g., 'pump failure', 'vibration', 'equipment')",
                                             type="text",
-                                            style={"fontSize": "16px"},
+                                            style={
+                                                "fontSize": "16px",
+                                                "backgroundColor": colors.get("background_light"),
+                                                "color": colors.get("text_primary"),
+                                                "border": f"1px solid {colors.get('border_color')}",
+                                            },
                                         ),
                                         dbc.Button(
                                             "Search",
                                             id="search-button",
                                             color="primary",
                                             n_clicks=0,
+                                            style={
+                                                "backgroundColor": colors.get("primary_color"),
+                                                "color": colors.get("text_light"),
+                                                "border": "none",
+                                            },
                                         ),
                                     ],
                                     className="mb-3",
@@ -56,13 +66,22 @@ def create_incident_search_layout() -> html.Div:
                                     color="secondary",
                                     n_clicks=0,
                                     className="ms-2",
+                                    style={
+                                        "backgroundColor": colors.get("background_secondary"),
+                                        "color": colors.get("text_primary"),
+                                        "border": "none",
+                                    },
                                 ),
                             ],
                             md=4,
                         ),
                     ]
                 ),
-                html.Div(id="search-status", className="mb-3"),
+                html.Div(
+                    id="search-status",
+                    className="mb-3",
+                    style={"color": colors.get("text_primary")},
+                ),
                 html.Div(id="search-results"),
             ]
         )

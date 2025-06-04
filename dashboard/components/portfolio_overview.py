@@ -38,6 +38,7 @@ def create_facility_temporal_chart() -> dcc.Graph:
     """Line chart showing facility trends over time"""
     try:
         data_adapter = get_data_adapter()
+        colors = get_colors()
         timeline_data = data_adapter.get_historical_timeline()
 
         # Extract temporal matrix data directly from dataclass attributes
@@ -78,9 +79,9 @@ def create_facility_temporal_chart() -> dcc.Graph:
             height=500,
             font={"family": "Arial", "size": 12},
             legend=dict(x=0, y=1),
-            paper_bgcolor="#2F2F2F",
-            plot_bgcolor="#2F2F2F",
-            font_color="white",
+            paper_bgcolor=colors.get("background_dark"),
+            plot_bgcolor=colors.get("background_dark"),
+            font_color=colors.get("text_light"),
         )
 
         return dcc.Graph(figure=fig)

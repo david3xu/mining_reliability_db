@@ -68,6 +68,11 @@ make schema
 # Import facility data
 make import
 # or: python scripts/import_data.py
+
+
+
+# Process a directory
+python scripts/data_processing/merge_records.py --input-dir data/inter_data/ --output-dir data/facility_data/
 ```
 
 ## Dashboard
