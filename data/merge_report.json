@@ -1,0 +1,101 @@
+{
+  "timestamp": "2025-06-04T15:24:57.727532",
+  "files_processed": 4,
+  "summary": {
+    "total_original_records": 1009,
+    "total_final_records": 1003,
+    "total_records_reduced": 6
+  },
+  "file_details": [
+    {
+      "original_records": 3,
+      "unique_action_requests": 3,
+      "duplicates_found": 0,
+      "duplicates_merged": 0,
+      "final_records": 3,
+      "complexity_distribution": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "total_differing_fields": 0,
+      "high_risk_merges": 0,
+      "merge_strategies_used": {},
+      "validation_warnings": [],
+      "input_file": "test_incremental_fab16f86.json",
+      "output_file": "test_incremental_fab16f86.json"
+    },
+    {
+      "original_records": 500,
+      "unique_action_requests": 497,
+      "duplicates_found": 3,
+      "duplicates_merged": 3,
+      "final_records": 497,
+      "complexity_distribution": {
+        "low": 0,
+        "medium": 0,
+        "high": 3
+      },
+      "total_differing_fields": 95,
+      "high_risk_merges": 3,
+      "merge_strategies_used": {
+        "first_non_null": 47,
+        "metadata": 3,
+        "prioritize_yes": 7,
+        "latest_date": 15,
+        "merge_lists": 9,
+        "max_numeric": 4,
+        "concatenate_strings": 6,
+        "prioritize_status": 4
+      },
+      "validation_warnings": [],
+      "input_file": "mining_maintenance_nested.json",
+      "output_file": "mining_maintenance_nested.json"
+    },
+    {
+      "original_records": 500,
+      "unique_action_requests": 497,
+      "duplicates_found": 3,
+      "duplicates_merged": 3,
+      "final_records": 497,
+      "complexity_distribution": {
+        "low": 0,
+        "medium": 0,
+        "high": 3
+      },
+      "total_differing_fields": 95,
+      "high_risk_merges": 3,
+      "merge_strategies_used": {
+        "first_non_null": 47,
+        "metadata": 3,
+        "prioritize_yes": 7,
+        "latest_date": 15,
+        "merge_lists": 9,
+        "max_numeric": 4,
+        "concatenate_strings": 6,
+        "prioritize_status": 4
+      },
+      "validation_warnings": [],
+      "input_file": "fab16f86-faa9-44d9-b9d7-cfbbb47061da.json",
+      "output_file": "fab16f86-faa9-44d9-b9d7-cfbbb47061da.json"
+    },
+    {
+      "original_records": 6,
+      "unique_action_requests": 6,
+      "duplicates_found": 0,
+      "duplicates_merged": 0,
+      "final_records": 6,
+      "complexity_distribution": {
+        "low": 0,
+        "medium": 0,
+        "high": 0
+      },
+      "total_differing_fields": 0,
+      "high_risk_merges": 0,
+      "merge_strategies_used": {},
+      "validation_warnings": [],
+      "input_file": "sample_5_fab16f86-faa9-44d9-b9d7-cfbbb47061da.json",
+      "output_file": "sample_5_fab16f86-faa9-44d9-b9d7-cfbbb47061da.json"
+    }
+  ]
+}

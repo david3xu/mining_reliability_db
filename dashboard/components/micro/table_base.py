@@ -57,12 +57,12 @@ def create_data_table(
             "height": "auto",  # Auto height for full content
         },
         style_data={
-            "whiteSpace": "normal",
-            "height": "auto",
+            "backgroundColor": config.get("background_light"),
+            "color": config.get("text_primary"),
         },
         style_header={
-            "backgroundColor": config.get("primary_color", "#4A90E2"),
-            "color": "#FFFFFF",
+            "backgroundColor": config.get("primary_color"),
+            "color": config.get("text_light"),
             "fontWeight": "bold",
         },
         sort_action="native",

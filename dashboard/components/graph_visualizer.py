@@ -113,7 +113,7 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
                             ),
                         ],
                         style={
-                            "border": f"2px dashed {colors.get('grid_color', '#E5E5E5')}",
+                            "border": f"2px dashed {colors.get('border_color')}",
                             "padding": "20px",
                             "borderRadius": "8px",
                             "textAlign": "center",
@@ -122,7 +122,7 @@ def create_causal_network_graph(facility_id: str = None) -> html.Div:
                             "alignItems": "center",
                             "justifyContent": "center",
                             "flexDirection": "column",
-                            "backgroundColor": colors.get("background_light"),
+                            "backgroundColor": colors.get("background_secondary"),
                             "color": colors.get("text_primary"),
                         },
                     ),

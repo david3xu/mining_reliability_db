@@ -32,36 +32,51 @@ def create_workflow_stage_card(stage_data: dict) -> html.Div:
             html.H4(title, style={"fontSize": "18px", "margin": "5px 0 0 0"}),
         ],
         style={
-            "backgroundColor": "rgba(0,0,0,0.3)",
-            "padding": "10px",
+            "backgroundColor": config.get("header_styling", {}).get(
+                "background_color", "rgba(0,0,0,0.3)"
+            ),
+            "padding": config.get("header_styling", {}).get("padding", "10px"),
             "borderRadius": "8px 8px 0 0",
+            "color": config.get("header_styling", {}).get("text_color", "#FFFFFF"),
         },
     )
 
     content = html.Div(
         [
-            html.P(f"{field_count} Fields", style={"fontSize": "14px", "fontWeight": "bold"}),
+            html.P(
+                f"{field_count} Fields",
+                style={
+                    "fontSize": "14px",
+                    "fontWeight": "bold",
+                    "color": config.get("content_styling", {}).get("text_color", "#FFFFFF"),
+                },
+            ),
             html.Span(
                 f"{completion_rate}% Complete",
                 style={
                     "padding": "5px 10px",
                     "borderRadius": "10px",
-                    "backgroundColor": "rgba(255,255,255,0.2)",
+                    "backgroundColor": config.get("header_styling", {}).get(
+                        "background_color", "rgba(255,255,255,0.2)"
+                    ),
+                    "color": config.get("content_styling", {}).get("text_color", "#FFFFFF"),
                 },
             ),
         ],
-        style={"padding": "15px"},
+        style={"padding": config.get("content_styling", {}).get("padding", "15px")},
     )
 
     return html.Div(
         [header, content],
         style={
             "backgroundColor": color,
-            "color": "#FFFFFF",
-            "borderRadius": "8px",
-            "minHeight": "280px",
-            "margin": "10px",
-            "boxShadow": "0 4px 6px rgba(0,0,0,0.1)",
+            "color": config.get("card_dimensions", {}).get("text_color", "#FFFFFF"),
+            "borderRadius": config.get("card_dimensions", {}).get("border_radius", "8px"),
+            "minHeight": config.get("card_dimensions", {}).get("min_height", "280px"),
+            "margin": config.get("card_dimensions", {}).get("margin", "10px"),
+            "boxShadow": config.get("card_dimensions", {}).get(
+                "box_shadow", "0 4px 6px rgba(0,0,0,0.1)"
+            ),
         },
     )
 

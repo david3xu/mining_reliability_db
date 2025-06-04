@@ -62,9 +62,7 @@ def create_facility_metrics_cards(facility_id: str) -> list:
         return cards
 
     except Exception as e:
-        handle_error_utility(
-            logger, e, f"facility metrics cards creation for {facility_id}"
-        )
+        handle_error_utility(logger, e, f"facility metrics cards creation for {facility_id}")
         return []
 
 
@@ -86,9 +84,7 @@ def create_facility_category_chart(facility_id: str) -> dcc.Graph:
         return create_pie_chart(labels, values, f"{facility_id} Issue Categories")
 
     except Exception as e:
-        handle_error_utility(
-            logger, e, f"facility category chart creation for {facility_id}"
-        )
+        handle_error_utility(logger, e, f"facility category chart creation for {facility_id}")
         return dcc.Graph(figure={})
 
 
@@ -97,6 +93,7 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
     try:
         facility_adapter = get_facility_adapter()
         config_adapter = get_config_adapter()
+        colors = get_colors()
 
         causal_data = facility_adapter.get_facility_causal_intelligence(facility_id)
         chart_config = config_adapter.get_chart_styling_template()
@@ -115,7 +112,7 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
                 x=frequencies,
                 y=causes,
                 orientation="h",
-                marker_color=chart_config.get("colors", ["#4A90E2"])[0],
+                marker_color=colors.get("primary_color"),
             )
         )
 
@@ -124,16 +121,18 @@ def create_recurring_issues_analysis(facility_id: str) -> dcc.Graph:
             xaxis_title="Frequency",
             yaxis_title="Root Cause",
             height=chart_config.get("height", 400),
-            font={"family": chart_config.get("font_family", "Arial")},
-            paper_bgcolor=chart_config.get("background", "#FFFFFF"),
+            font={
+                "family": chart_config.get("font_family", "Arial"),
+                "color": colors.get("text_light"),
+            },
+            paper_bgcolor=colors.get("background_dark"),
+            plot_bgcolor=colors.get("background_dark"),
         )
 
         return dcc.Graph(figure=fig)
 
     except Exception as e:
-        handle_error_utility(
-            logger, e, f"recurring issues analysis for {facility_id}"
-        )
+        handle_error_utility(logger, e, f"recurring issues analysis for {facility_id}")
         return dcc.Graph(figure={})
 
 
@@ -177,25 +176,46 @@ def create_operating_centre_table(facility_id: str) -> dash_table.DataTable:
                 {"name": "Frequency", "id": "Frequency", "type": "numeric"},
                 {"name": "Impact", "id": "Impact"},
             ],
-            style_cell={"textAlign": "left", "padding": "12px"},
-            style_header={
-                "backgroundColor": styling.get("primary_color", "#4A90E2"),
-                "color": "white",
-                "fontWeight": "bold",
+            style_cell={
+                "textAlign": "left",
+                "padding": "12px",
+                "backgroundColor": styling.get("background_light"),
+                "color": styling.get("text_primary"),
+                "border": f"1px solid {styling.get('border_color')}",
             },
-            style_data={"backgroundColor": "white"},
+            style_header={
+                "backgroundColor": styling.get("primary_color"),
+                "color": styling.get("text_light"),
+                "fontWeight": "bold",
+                "border": f"1px solid {styling.get('primary_color')}",
+            },
+            style_data={
+                "backgroundColor": styling.get("background_light"),
+                "color": styling.get("text_primary"),
+            },
             style_data_conditional=[
-                {"if": {"filter_query": "{Impact} = High"}, "backgroundColor": "#FFE6E6"},
-                {"if": {"filter_query": "{Impact} = Low"}, "backgroundColor": "#E6F7FF"},
+                {
+                    "if": {"filter_query": "{Impact} = High"},
+                    "backgroundColor": styling.get("error_color"),
+                    "color": styling.get("text_light"),
+                },
+                {
+                    "if": {"filter_query": "{Impact} = Low"},
+                    "backgroundColor": styling.get("info_color"),
+                    "color": styling.get("text_light"),
+                },
+                {
+                    "if": {"filter_query": "{Impact} = Medium"},
+                    "backgroundColor": styling.get("warning_color"),
+                    "color": styling.get("text_primary"),
+                },
             ],
             sort_action="native",
             page_size=10,
         )
 
     except Exception as e:
-        handle_error_utility(
-            logger, e, f"operating centre table creation for {facility_id}"
-        )
+        handle_error_utility(logger, e, f"operating centre table creation for {facility_id}")
         return dash_table.DataTable(data=[])
 
 
@@ -219,13 +239,15 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
         # Data quality metrics for the facility
         quality_metrics = facility_data.get("completeness_metrics", {})
         entity_completeness = quality_metrics.get("entity_completeness", {})
-        incident_summary = facility_data.get("total_action_requests", 0) # This is a placeholder as incident_summary is not directly available
-        action_summary = {} # This is a placeholder as action_summary is not directly available
+        incident_summary = facility_data.get(
+            "total_action_requests", 0
+        )  # This is a placeholder as incident_summary is not directly available
+        action_summary = {}  # This is a placeholder as action_summary is not directly available
 
         # Extract relevant metrics for cards
         overall_score = quality_metrics.get("overall_score", 0.0)
         total_incidents = incident_summary
-        open_actions = 0 # This is a placeholder
+        open_actions = 0  # This is a placeholder
 
         metrics = [
             create_metric_card(f"{overall_score:.1f}%", "Overall Quality Score"),
@@ -251,7 +273,7 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
                 go.Bar(
                     x=entity_names,
                     y=completeness_scores,
-                    marker_color=[colors.get("primary_color")] * len(entity_names),
+                    marker_color=colors.get("primary_color"),
                 )
             ]
         )
@@ -260,20 +282,37 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
             title_text="Entity Completeness",
             xaxis_title="Entity",
             yaxis_title="Completeness (%)",
-            font=get_fonts()
+            font=get_fonts(),
+            paper_bgcolor=colors.get("background_dark"),
+            plot_bgcolor=colors.get("background_dark"),
         )
 
         # Incident status table - adapting to available data
         incident_table_data = [
-            {"Category": "Total Incidents", "Count": total_incidents, "Color": colors.get("table_header_bg")}
+            {
+                "Category": "Total Incidents",
+                "Count": total_incidents,
+                "Color": colors.get("primary_color"),
+            }
         ]
         incident_table = dash_table.DataTable(
             id="incident-status-table",
             columns=[{"name": i, "id": i} for i in incident_table_data[0].keys()],
             data=incident_table_data,
-            style_header=get_table_style().get("header", {}),
-            style_data=get_table_style().get("data", {}),
-            style_table=get_table_style().get("table", {}),
+            style_header={
+                "backgroundColor": colors.get("primary_color"),
+                "color": colors.get("text_light"),
+                "fontWeight": "bold",
+            },
+            style_data={
+                "backgroundColor": colors.get("background_light"),
+                "color": colors.get("text_primary"),
+            },
+            style_table={
+                "overflowX": "auto",
+                "border": f"1px solid {colors.get('border_color')}",
+                "borderRadius": "8px",
+            },
         )
 
         # Action status table - currently no direct equivalent in facility_statistics_analysis
@@ -281,9 +320,20 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
             id="action-status-table",
             columns=[{"name": "Category", "id": "Category"}, {"name": "Count", "id": "Count"}],
             data=[{"Category": "Open Actions", "Count": open_actions}],
-            style_header=get_table_style().get("header", {}),
-            style_data=get_table_style().get("data", {}),
-            style_table=get_table_style().get("table", {}),
+            style_header={
+                "backgroundColor": colors.get("primary_color"),
+                "color": colors.get("text_light"),
+                "fontWeight": "bold",
+            },
+            style_data={
+                "backgroundColor": colors.get("background_light"),
+                "color": colors.get("text_primary"),
+            },
+            style_table={
+                "overflowX": "auto",
+                "border": f"1px solid {colors.get('border_color')}",
+                "borderRadius": "8px",
+            },
         )
 
         return create_standard_layout(
@@ -301,30 +351,36 @@ def create_facility_detail_layout(facility_name: str) -> html.Div:
                 ),
                 html.Div(
                     [
-                        dcc.Graph(
-                            id="entity-completeness-chart", figure=entity_completeness_chart
-                        ),
+                        dcc.Graph(id="entity-completeness-chart", figure=entity_completeness_chart),
                         html.Div(
                             [
-                                html.H4("Incident Status", className="text-center"),
+                                html.H4(
+                                    "Incident Status",
+                                    className="text-center",
+                                    style={"color": colors.get("text_primary")},
+                                ),
                                 incident_table,
-                                html.H4("Action Status", className="text-center mt-4"),
+                                html.H4(
+                                    "Action Status",
+                                    className="text-center mt-4",
+                                    style={"color": colors.get("text_primary")},
+                                ),
                                 action_table,
                             ],
                             className="p-4",
                             style={
-                                "backgroundColor": colors.get("background_dark"),
+                                "backgroundColor": colors.get("background_secondary"),
                                 "padding": "20px",
                                 "borderRadius": "8px",
-                                "color": colors.get("text_light"),
+                                "color": colors.get("text_primary"),
                             },
                         ),
                     ],
-                    className="row", # This is hardcoded to be row
+                    className="row",  # This is hardcoded to be row
                     style={
                         "backgroundColor": colors.get("background_dark"),
                         "color": colors.get("text_light"),
-                    }
+                    },
                 ),
             ],
         )

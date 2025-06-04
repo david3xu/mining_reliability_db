@@ -52,9 +52,17 @@ def create_main_grid(left_component: Any, right_component: Any) -> dbc.Row:
 
 def create_summary_section(summary_component: Any, title: str = "Analysis Summary") -> html.Div:
     """Standard bottom summary section"""
+    colors = get_colors()
     return html.Div(
-        [html.H3(title, className="mb-3 text-secondary"), summary_component],
-        className="bg-light rounded p-4",
+        [
+            html.H3(title, className="mb-3", style={"color": colors.get("text_secondary")}),
+            summary_component,
+        ],
+        className="rounded p-4",
+        style={
+            "backgroundColor": colors.get("background_secondary"),
+            "boxShadow": colors.get("shadow_light"),
+        },
     )
 
 
@@ -72,7 +80,7 @@ def create_standard_layout(
                 title,
                 className="text-center mb-4",
                 style={
-                    "color": colors.get("text_light"),
+                    "color": colors.get("text_primary"),
                     "fontSize": dashboard_styles.get("title_font_size", "2.5rem"),
                 },
             ),
@@ -80,7 +88,7 @@ def create_standard_layout(
         ],
         className="container-fluid p-4",
         style={
-            "backgroundColor": colors.get("background_main"),
+            "backgroundColor": colors.get("background_dark"),
             "minHeight": "100vh",
         },
     )

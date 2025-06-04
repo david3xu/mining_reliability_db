@@ -188,7 +188,7 @@ def create_config_driven_stage_card(stage_data: dict) -> html.Div:
     field_count = stage_data.get("field_count", 0)
     field_names = stage_data.get("business_fields", [])
     completion_rate = stage_data.get("completion_rate", 0.0)
-    color = stage_data.get("card_color", "#4A90E2")
+    color = stage_data.get("card_color", get_colors().get("primary_color"))
 
     content = html.Div(
         [
@@ -200,6 +200,7 @@ def create_config_driven_stage_card(stage_data: dict) -> html.Div:
                     "fontWeight": "bold",
                     "margin": "10px 0 8px 0",
                     "textAlign": "center",
+                    "color": get_colors().get("text_primary"),
                 },
             ),
             # Truncated field names list
@@ -212,6 +213,7 @@ def create_config_driven_stage_card(stage_data: dict) -> html.Div:
                             "margin": "1px 0",
                             "opacity": "0.8",
                             "textAlign": "left",
+                            "color": get_colors().get("text_secondary"),
                         },
                     )
                     for field in field_names
@@ -226,8 +228,9 @@ def create_config_driven_stage_card(stage_data: dict) -> html.Div:
                         style={
                             "padding": "6px 12px",
                             "borderRadius": "12px",
-                            "backgroundColor": "rgba(255,255,255,0.2)",
+                            "backgroundColor": "rgba(30, 30, 30, 0.4)",
                             "fontSize": "12px",
+                            "color": get_colors().get("text_light"),
                         },
                     )
                 ],
@@ -244,17 +247,23 @@ def create_config_driven_stage_card(stage_data: dict) -> html.Div:
                     html.H5(f"STAGE {stage_number}", style={"fontSize": "16px", "margin": "0"}),
                     html.H3(title, style={"fontSize": "18px", "margin": "8px 0"}),
                 ],
-                style={"backgroundColor": color, "color": "#FFFFFF", "padding": "12px"},
+                style={
+                    "backgroundColor": color,
+                    "color": get_colors().get("text_light"),
+                    "padding": "12px",
+                },
             ),
             content,
         ],
         style={
-            "backgroundColor": color,
-            "color": "#FFFFFF",
+            "backgroundColor": get_colors().get("background_light"),
             "borderRadius": "8px",
-            "minHeight": "400px",
-            "width": "220px",
-            "margin": "10px",
+            "boxShadow": get_colors().get("shadow_dark"),
+            "minHeight": get_colors().get("card_dimensions", {}).get("min_height", "280px"),
+            "width": get_colors().get("card_dimensions", {}).get("width", "auto"),
+            "margin": get_colors().get("card_dimensions", {}).get("margin", "10px"),
+            "display": "inline-block",
+            "verticalAlign": "top",
         },
     )
 

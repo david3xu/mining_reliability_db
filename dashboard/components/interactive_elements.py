@@ -34,22 +34,32 @@ def create_interactive_metric_card(
     card_content = [
         html.H2(
             display_value,
-            style={"fontSize": "32px", "fontWeight": "bold", "margin": "0", "color": "#FFFFFF"},
+            style={
+                "fontSize": "32px",
+                "fontWeight": "bold",
+                "margin": "0",
+                "color": styling.get("text_light"),
+            },
         ),
         html.P(
             label,
-            style={"fontSize": "14px", "margin": "5px 0 0 0", "color": "#FFFFFF", "opacity": "0.9"},
+            style={
+                "fontSize": "14px",
+                "margin": "5px 0 0 0",
+                "color": styling.get("text_light"),
+                "opacity": "0.9",
+            },
         ),
     ]
 
     card_style = {
-        "backgroundColor": styling.get("primary_color", "#4A90E2"),
+        "backgroundColor": styling.get("primary_color"),
         "padding": "20px",
         "borderRadius": "8px",
         "textAlign": "center",
         "height": f"{styling.get('card_height', 120)}px",
         "width": f"{styling.get('card_width', 220)}px",
-        "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.1)",
+        "boxShadow": styling.get("shadow_dark"),
         "textDecoration": "none",
         "cursor": "pointer",
         "transition": "transform 0.2s ease, box-shadow 0.2s ease",
@@ -70,6 +80,7 @@ def create_interactive_pie_chart(
     try:
         config_adapter = get_config_adapter()
         chart_config = config_adapter.get_chart_styling_template()
+        styling = config_adapter.get_styling_config()
 
         fig = go.Figure()
 
@@ -80,8 +91,8 @@ def create_interactive_pie_chart(
                 textinfo="label+percent",
                 textposition="auto",
                 marker=dict(
-                    colors=chart_config.get("colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
-                    line=dict(color="#FFFFFF", width=2),
+                    colors=chart_config.get("chart_colors"),
+                    line=dict(color=styling.get("border_light"), width=2),
                 ),
                 hovertemplate="<b>%{label}</b><br>Records: %{value}<br>Click to explore<extra></extra>",
             )
@@ -90,8 +101,13 @@ def create_interactive_pie_chart(
         fig.update_layout(
             title="Facility Distribution (Click to Navigate)",
             height=chart_config.get("height", 400),
-            font={"family": chart_config.get("font_family", "Arial"), "size": 14},
-            paper_bgcolor=chart_config.get("background", "#FFFFFF"),
+            font={
+                "family": chart_config.get("font_family", "Arial"),
+                "size": 14,
+                "color": styling.get("text_primary"),
+            },
+            paper_bgcolor=styling.get("background_dark"),
+            plot_bgcolor=styling.get("background_dark"),
             showlegend=True,
         )
 
@@ -118,6 +134,7 @@ def create_interactive_bar_chart(
     try:
         config_adapter = get_config_adapter()
         chart_config = config_adapter.get_chart_styling_template()
+        styling = config_adapter.get_styling_config()
 
         fig = go.Figure()
 
@@ -128,8 +145,8 @@ def create_interactive_bar_chart(
                 text=[f"{p}%" for p in data.get("percentages", [])],
                 textposition="outside",
                 marker=dict(
-                    color=chart_config.get("colors", ["#4A90E2"])[0],
-                    line=dict(color="#CCCCCC", width=1),
+                    color=chart_config.get("chart_colors", ["#64B5F6"])[0],
+                    line=dict(color=styling.get("border_light"), width=1),
                 ),
                 hovertemplate="<b>%{x}</b><br>Count: %{y}<br>Click for analysis<extra></extra>",
             )
@@ -140,8 +157,13 @@ def create_interactive_bar_chart(
             xaxis_title="Field Type",
             yaxis_title="Count",
             height=chart_config.get("height", 400),
-            font={"family": chart_config.get("font_family", "Arial"), "size": 14},
-            paper_bgcolor=chart_config.get("background", "#FFFFFF"),
+            font={
+                "family": chart_config.get("font_family", "Arial"),
+                "size": 14,
+                "color": styling.get("text_primary"),
+            },
+            paper_bgcolor=styling.get("background_dark"),
+            plot_bgcolor=styling.get("background_dark"),
         )
 
         return dcc.Graph(
@@ -183,19 +205,19 @@ def create_interactive_data_table(
                 "cursor": "pointer",
             },
             style_header={
-                "backgroundColor": styling.get("primary_color", "#4A90E2"),
-                "color": "#FFFFFF",
+                "backgroundColor": styling.get("primary_color"),
+                "color": styling.get("text_light"),
                 "fontWeight": "bold",
             },
             style_data={
-                "backgroundColor": "#FFFFFF",
-                "color": styling.get("text_primary", "#333333"),
+                "backgroundColor": styling.get("background_light"),
+                "color": styling.get("text_primary"),
             },
             style_data_conditional=[
                 {
                     "if": {"state": "active"},
-                    "backgroundColor": "#E3F2FD",
-                    "border": f"2px solid {styling.get('primary_color', '#4A90E2')}",
+                    "backgroundColor": styling.get("background_secondary"),
+                    "border": f"2px solid {styling.get('primary_color')}",
                 }
             ],
             sort_action="native",

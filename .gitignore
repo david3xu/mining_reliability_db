@@ -65,6 +65,8 @@ data/exports/
 *.csv
 *.xlsx
 *.json.backup
+data/inter_data/mining_maintenance_nested.json
+data/inter_data/fab16f86-faa9-44d9-b9d7-cfbbb47061da.json
 
 # OS
 .DS_Store

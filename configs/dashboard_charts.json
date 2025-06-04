@@ -56,12 +56,12 @@
       },
       "layout_template": {
         "margin": { "l": 60, "r": 30, "t": 60, "b": 60 },
-        "paper_bgcolor": "#FFFFFF",
-        "plot_bgcolor": "#FFFFFF",
+        "paper_bgcolor": "rgba(30, 30, 30, 0.8)",
+        "plot_bgcolor": "rgba(30, 30, 30, 0.8)",
         "font": {
           "family": "Arial, sans-serif",
           "size": 14,
-          "color": "#333333"
+          "color": "#E0E0E0"
         }
       }
     },
@@ -85,7 +85,7 @@
       "title": "Facility Distribution",
       "config": {
         "height": 400,
-        "colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
+        "colors": ["#64B5F6", "#FFB74D", "#A5D6A7", "#CE93D8"],
         "text_info": "label+percent",
         "hover_info": "label+value+percent"
       },
@@ -102,7 +102,7 @@
       "config": {
         "height": 400,
         "orientation": "vertical",
-        "color": "#4A90E2",
+        "color": "#64B5F6",
         "show_values": true
       },
       "interactivity": {
@@ -117,7 +117,7 @@
       "config": {
         "height": 400,
         "orientation": "horizontal",
-        "colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC", "#D32F2F"]
+        "colors": ["#64B5F6", "#FFB74D", "#A5D6A7", "#CE93D8", "#EF9A9A"]
       }
     },
     "facility_quality_comparison": {
@@ -126,7 +126,7 @@
       "title": "Facility Quality Comparison",
       "config": {
         "height": 400,
-        "color": "#7ED321",
+        "color": "#A5D6A7",
         "show_values": true
       }
     },
@@ -137,7 +137,7 @@
       "config": {
         "height": 400,
         "orientation": "horizontal",
-        "color": "#F5A623",
+        "color": "#FFB74D",
         "top_n": 10
       }
     }

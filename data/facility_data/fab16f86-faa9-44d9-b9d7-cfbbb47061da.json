@@ -45,6 +45,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 2,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in transmission assembly"
   },
   {
@@ -93,6 +94,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 3,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "crusher jaw weakened by fatigue"
   },
   {
@@ -141,6 +143,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 4,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for chute"
   },
   {
@@ -189,6 +192,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 5,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in conveyor belt assembly"
   },
   {
@@ -237,6 +241,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 6,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for primary crusher"
   },
   {
@@ -285,6 +290,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 7,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for drum box"
   },
   {
@@ -333,6 +339,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 8,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on apron feeder"
   },
   {
@@ -381,6 +388,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 9,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in crusher house"
   },
   {
@@ -429,6 +437,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 10,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for drum box"
   },
   {
@@ -477,6 +486,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 11,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on swing motor"
   },
   {
@@ -525,6 +535,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 12,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for inspection"
   },
   {
@@ -573,6 +584,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 13,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in filter assembly"
   },
   {
@@ -621,6 +633,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 14,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on transfer station"
   },
   {
@@ -669,6 +682,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 15,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in brake system"
   },
   {
@@ -717,55 +731,57 @@
     "_sheet_name": "Synthetic",
     "_line_number": 16,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect testing procedures followed"
   },
   {
-    "Action Request Number:": "2021-06400",
-    "Title": "contamination of drum box in stackers at processing plant",
-    "Initiation Date": "2022-10-09T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Environmental",
-    "Requested Response Time": 14,
-    "Past Due Status": "N/A",
-    "Days Past Due": null,
-    "Operating Centre": "HUN",
-    "Stage": "Open - Receiver Proposing Action Plan",
-    "Init. Dept.": "HUN Mobile Plant",
-    "Rec. Dept.": "Reliability",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "The compressor at processing plant experienced performance degradation due to conveyor belt corrosion.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": null,
     "Recom.Action": null,
-    "Asset Number(s)": "ASSET-2882",
-    "Amount of Loss": 9406,
-    "Immd. Contain. Action or Comments": null,
-    "Root Cause": "Undersized bolts for PLC assembly; Fatigue and wear of drum box",
-    "Action Plan": "Update inspection checklist to include drive system condition; Add brake system inspection to routine maintenance tasks; Standardize work instructions for cleaning of drum box",
-    "Due Date": "2023-12-22T00:00:00",
-    "Complete": "Yes",
-    "Completion Date": "2023-03-21T00:00:00",
-    "Comments": "Kind degree list top somebody college. Exist professional people behavior. Pull different current agency each.",
-    "Response Date": "2024-06-28T00:00:00",
-    "Response Revision Date": null,
-    "Did this action plan require a change to the equipment management strategy ?": "Yes",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "No",
-    "Is Resp Satisfactory?": "No",
-    "Reason if not Satisfactory": null,
-    "Reviewed Date:": "2023-09-21T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ? (review)": null,
-    "If yes, APSS Doc #": null,
-    "Asset Activity numbers": null,
-    "Effectiveness Verification Due Date": "2022-12-19T00:00:00",
-    "IsActionPlanEffective": "No",
-    "Action Plan Eval Comment": "Sure authority increase picture create recent manager during.",
-    "Action Plan Verification Date:": null,
+    "Did this action plan require a change to the equipment management strategy ? (review)": "Yes",
+    "Root Cause Tail Extraction": "Fatigue and wear of drum box | Inadequate clearance for mounting bracket",
+    "Reviewed Date:": "2023-09-21T00:00:00 | 2024-05-21T00:00:00",
+    "Days Past Due": null,
+    "Reason if not Satisfactory": "Two traditional special opportunity serious game.",
+    "Action Types": "Reliability Action Request",
+    "Title": "contamination of drum box in stackers at processing plant | belt feeder PLC breakdown",
+    "Due Date": "2023-12-22T00:00:00 | 2024-09-13T00:00:00",
     "_source_file": "synthetic_data_generation.py",
     "_sheet_name": "Synthetic",
-    "_line_number": 17,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "Fatigue and wear of drum box"
+    "Comments": "Kind degree list top somebody college. Exist professional people behavior. Pull different current agency each. | Still be everything particular manager. His and day continue issue appear. All several visit travel senior.",
+    "Recurring Problem(s)": "No",
+    "Is Resp Satisfactory?": "No | Yes",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
+    "What happened?": "The compressor at processing plant experienced performance degradation due to conveyor belt corrosion. | A leak was discovered in the shaft of the pump station causing premature wear and operational issues.",
+    "Past Due Status": "N/A | Not Due",
+    "Effectiveness Verification Due Date": "2022-12-19T00:00:00 | 2024-11-15T00:00:00",
+    "Response Revision Date": null,
+    "Did this action plan require a change to the equipment management strategy ?": "Yes | No",
+    "Rec. Dept.": "Reliability | HUN Mobile Plant",
+    "Asset Number(s)": "ASSET-2882",
+    "Completion Date": "2023-03-21T00:00:00 | 2024-05-18T00:00:00",
+    "IsActionPlanEffective": "No | Yes",
+    "Obj. Evidence": "Main bad treatment success minute figure need but. Along dog key share.",
+    "Asset Activity numbers": "ACT-4607",
+    "Action Plan Verification Date:": "2024-12-22T00:00:00",
+    "Stage": "Open - Receiver Proposing Action Plan | Action Plan Implemented - Actions Effective - Closed",
+    "Amount of Loss": "9406",
+    "Requested Response Time": "14 | 2",
+    "Complete": "Yes",
+    "Categories": "Environmental | Production",
+    "Action Plan Eval Comment": "Sure authority increase picture create recent manager during. | Tend site up sell southern network.",
+    "Response Date": "2024-06-28T00:00:00 | 2023-12-16T00:00:00",
+    "_line_number": "17 | 387",
+    "Init. Dept.": "HUN Mobile Plant | Reliability",
+    "Action Plan": "Update inspection checklist to include drive system condition; Add brake system inspection to routine maintenance tasks; Standardize work instructions for cleaning of drum box | Standardize work instructions for lubrication of pump",
+    "If yes, APSS Doc #": null,
+    "Root Cause": "Undersized bolts for PLC assembly; Fatigue and wear of drum box | Inadequate clearance for shaft; Inadequate clearance for mounting bracket",
+    "Recurring Comment": null,
+    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
+    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "No",
+    "Operating Centre": "HUN | KWN",
+    "Immd. Contain. Action or Comments": "Material almost everyone.",
+    "Action Request Number:": "2021-06400",
+    "Initiation Date": "2022-10-09T00:00:00 | 2023-12-15T00:00:00"
   },
   {
     "Action Request Number:": "2022-01693",
@@ -813,6 +829,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 18,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in valve assembly"
   },
   {
@@ -861,6 +878,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 19,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of crusher jaw"
   },
   {
@@ -909,6 +927,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 20,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on shaft"
   },
   {
@@ -957,6 +976,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 21,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of PLC"
   },
   {
@@ -1005,6 +1025,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 22,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in bolt assembly"
   },
   {
@@ -1053,6 +1074,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 23,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in belt"
   },
   {
@@ -1101,6 +1123,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 24,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of seal"
   },
   {
@@ -1149,6 +1172,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 25,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in drive system"
   },
   {
@@ -1197,6 +1221,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 26,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in swing motor assembly"
   },
   {
@@ -1245,6 +1270,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 27,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in mine face"
   },
   {
@@ -1293,6 +1319,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 28,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to wear plate assembly"
   },
   {
@@ -1341,6 +1368,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 29,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for drum box assembly"
   },
   {
@@ -1389,6 +1417,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 30,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for brake system"
   },
   {
@@ -1437,6 +1466,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 31,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in valve assembly"
   },
   {
@@ -1485,6 +1515,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 32,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -1533,6 +1564,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 33,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on transfer station"
   },
   {
@@ -1581,6 +1613,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 34,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to junction box assembly"
   },
   {
@@ -1629,6 +1662,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 35,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in apron feeder assembly"
   },
   {
@@ -1677,6 +1711,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 36,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in mounting bracket"
   },
   {
@@ -1725,6 +1760,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 37,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "conveyor roller weakened by fatigue"
   },
   {
@@ -1773,6 +1809,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 38,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -1821,6 +1858,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 39,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of belt"
   },
   {
@@ -1869,6 +1907,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 40,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect retrofit procedures followed"
   },
   {
@@ -1917,6 +1956,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 41,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "control system weakened by fatigue"
   },
   {
@@ -1965,6 +2005,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 42,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on junction box"
   },
   {
@@ -2013,6 +2054,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 43,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to chute assembly"
   },
   {
@@ -2061,6 +2103,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 44,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for brake system assembly"
   },
   {
@@ -2109,6 +2152,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 45,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in pump"
   },
   {
@@ -2157,6 +2201,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 46,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in crusher house"
   },
   {
@@ -2205,6 +2250,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 47,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in hydraulic hose"
   },
   {
@@ -2253,6 +2299,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 48,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting filter"
   },
   {
@@ -2301,6 +2348,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 49,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of crusher jaw"
   },
   {
@@ -2349,6 +2397,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 50,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in crusher jaw"
   },
   {
@@ -2397,6 +2446,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 51,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -2445,6 +2495,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 52,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on loader"
   },
   {
@@ -2493,6 +2544,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 53,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting shaft"
   },
   {
@@ -2541,6 +2593,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 54,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect commissioning procedures followed"
   },
   {
@@ -2589,6 +2642,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 55,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in electrical system"
   },
   {
@@ -2637,6 +2691,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 56,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for primary crusher"
   },
   {
@@ -2685,6 +2740,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 57,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect maintenance procedures followed"
   },
   {
@@ -2733,6 +2789,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 58,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to control system assembly"
   },
   {
@@ -2781,6 +2838,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 59,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -2829,6 +2887,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 60,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for junction box"
   },
   {
@@ -2877,6 +2936,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 61,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on secondary crusher"
   },
   {
@@ -2925,6 +2985,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 62,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on seal"
   },
   {
@@ -2973,6 +3034,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 63,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of electrical system"
   },
   {
@@ -3021,6 +3083,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 64,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for stackers"
   },
   {
@@ -3069,6 +3132,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 65,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of hydraulic hose"
   },
   {
@@ -3117,6 +3181,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 66,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect commissioning procedures followed"
   },
   {
@@ -3165,6 +3230,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 67,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for commissioning"
   },
   {
@@ -3213,6 +3279,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 68,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in motor"
   },
   {
@@ -3261,6 +3328,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 69,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for shutdown"
   },
   {
@@ -3309,6 +3377,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 70,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in apron feeder"
   },
   {
@@ -3357,6 +3426,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 71,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for compressor"
   },
   {
@@ -3405,6 +3475,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 72,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for crusher"
   },
   {
@@ -3453,6 +3524,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 73,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of conveyor belt"
   },
   {
@@ -3501,6 +3573,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 74,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for belt feeder"
   },
   {
@@ -3549,6 +3622,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 75,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "drum box weakened by fatigue"
   },
   {
@@ -3597,6 +3671,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 76,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for control system"
   },
   {
@@ -3645,6 +3720,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 77,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in conveyor belt"
   },
   {
@@ -3693,6 +3769,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 78,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear of chute"
   },
   {
@@ -3741,6 +3818,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 79,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for monitoring"
   },
   {
@@ -3789,6 +3867,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 80,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in switch room"
   },
   {
@@ -3837,6 +3916,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 81,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in coupling"
   },
   {
@@ -3885,6 +3965,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 82,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on screening plant"
   },
   {
@@ -3933,6 +4014,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 83,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in drive system"
   },
   {
@@ -3981,6 +4063,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 84,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for primary crusher"
   },
   {
@@ -4029,6 +4112,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 85,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on drum box"
   },
   {
@@ -4077,6 +4161,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 86,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -4125,6 +4210,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 87,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in brake system"
   },
   {
@@ -4173,6 +4259,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 88,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in junction box"
   },
   {
@@ -4221,6 +4308,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 89,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in transmission"
   },
   {
@@ -4269,6 +4357,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 90,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for bearing"
   },
   {
@@ -4317,6 +4406,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 91,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "seal weakened by fatigue"
   },
   {
@@ -4365,6 +4455,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 92,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in PLC"
   },
   {
@@ -4413,6 +4504,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 93,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for conveyor belt"
   },
   {
@@ -4461,6 +4553,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 94,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for swing motor assembly"
   },
   {
@@ -4509,6 +4602,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 95,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for installation"
   },
   {
@@ -4557,6 +4651,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 96,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in skirt rubber"
   },
   {
@@ -4605,6 +4700,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 97,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on pump station"
   },
   {
@@ -4653,6 +4749,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 98,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on generator"
   },
   {
@@ -4701,6 +4798,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 99,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on loader"
   },
   {
@@ -4749,6 +4847,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 100,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on filter"
   },
   {
@@ -4797,6 +4896,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 101,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on junction box"
   },
   {
@@ -4845,6 +4945,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 102,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in crusher jaw assembly"
   },
   {
@@ -4893,6 +4994,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 103,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on wear plate"
   },
   {
@@ -4941,6 +5043,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 104,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in shaft"
   },
   {
@@ -4989,6 +5092,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 105,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for skirt rubber"
   },
   {
@@ -5037,6 +5141,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 106,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on generator"
   },
   {
@@ -5085,6 +5190,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 107,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in switch room"
   },
   {
@@ -5133,6 +5239,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 108,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -5181,6 +5288,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 109,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "impact plate weakened by fatigue"
   },
   {
@@ -5229,6 +5337,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 110,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for transmission"
   },
   {
@@ -5277,6 +5386,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 111,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in crusher jaw"
   },
   {
@@ -5325,6 +5435,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 112,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for valve"
   },
   {
@@ -5373,6 +5484,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 113,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in bolt assembly"
   },
   {
@@ -5421,6 +5533,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 114,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of filter"
   },
   {
@@ -5469,6 +5582,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 115,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in brake system"
   },
   {
@@ -5517,6 +5631,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 116,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in bearing"
   },
   {
@@ -5565,6 +5680,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 117,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for apron feeder"
   },
   {
@@ -5613,6 +5729,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 118,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for conveyor belt"
   },
   {
@@ -5661,6 +5778,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 119,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in valve"
   },
   {
@@ -5709,6 +5827,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 120,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in apron feeder"
   },
   {
@@ -5757,6 +5876,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 121,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on transfer station"
   },
   {
@@ -5805,6 +5925,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 122,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for valve"
   },
   {
@@ -5853,6 +5974,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 123,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -5901,6 +6023,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 124,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of brake system"
   },
   {
@@ -5949,6 +6072,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 125,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for crusher"
   },
   {
@@ -5997,6 +6121,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 126,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in hydraulic hose"
   },
   {
@@ -6045,6 +6170,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 127,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting brake system"
   },
   {
@@ -6093,6 +6219,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 128,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on stackers"
   },
   {
@@ -6141,6 +6268,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 129,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for monitoring"
   },
   {
@@ -6189,6 +6317,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 130,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in electrical system assembly"
   },
   {
@@ -6237,6 +6366,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 131,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in gear assembly"
   },
   {
@@ -6285,6 +6415,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 132,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect start-up procedures followed"
   },
   {
@@ -6333,6 +6464,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 133,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in workshop"
   },
   {
@@ -6381,6 +6513,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 134,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for skirt rubber assembly"
   },
   {
@@ -6429,6 +6562,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 135,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on impact plate"
   },
   {
@@ -6477,6 +6611,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 136,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "gear weakened by fatigue"
   },
   {
@@ -6525,6 +6660,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 137,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for conveyor belt"
   },
   {
@@ -6573,6 +6709,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 138,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in valve"
   },
   {
@@ -6621,6 +6758,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 139,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on crusher jaw"
   },
   {
@@ -6669,6 +6807,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 140,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on conveyor belt"
   },
   {
@@ -6717,6 +6856,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 141,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of bearing"
   },
   {
@@ -6765,6 +6905,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 142,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in drive system assembly"
   },
   {
@@ -6813,6 +6954,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 143,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for impact plate"
   },
   {
@@ -6861,6 +7003,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 144,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on skirt rubber"
   },
   {
@@ -6909,6 +7052,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 145,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -6957,6 +7101,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 146,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -7005,6 +7150,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 147,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of bolt assembly"
   },
   {
@@ -7053,6 +7199,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 148,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect shutdown procedures followed"
   },
   {
@@ -7101,6 +7248,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 149,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on compressor"
   },
   {
@@ -7149,6 +7297,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 150,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on crusher"
   },
   {
@@ -7197,6 +7346,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 151,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting pump"
   },
   {
@@ -7245,6 +7395,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 152,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for PLC"
   },
   {
@@ -7293,6 +7444,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 153,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of mounting bracket"
   },
   {
@@ -7341,6 +7493,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 154,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on tertiary crusher"
   },
   {
@@ -7389,6 +7542,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 155,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in swing motor"
   },
   {
@@ -7437,6 +7591,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 156,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in electrical system assembly"
   },
   {
@@ -7485,6 +7640,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 157,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on wear plate"
   },
   {
@@ -7533,6 +7689,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 158,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to conveyor roller assembly"
   },
   {
@@ -7581,6 +7738,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 159,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for brake system"
   },
   {
@@ -7629,6 +7787,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 160,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in filter"
   },
   {
@@ -7677,6 +7836,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 161,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for start-up"
   },
   {
@@ -7725,6 +7885,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 162,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "skirt rubber weakened by fatigue"
   },
   {
@@ -7773,6 +7934,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 163,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to junction box assembly"
   },
   {
@@ -7821,6 +7983,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 164,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of brake system"
   },
   {
@@ -7869,6 +8032,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 165,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in PLC"
   },
   {
@@ -7917,6 +8081,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 166,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in electrical substation"
   },
   {
@@ -7965,6 +8130,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 167,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in swing motor"
   },
   {
@@ -8013,6 +8179,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 168,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -8061,6 +8228,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 169,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for brake system"
   },
   {
@@ -8109,6 +8277,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 170,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in filter"
   },
   {
@@ -8157,6 +8326,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 171,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in mine face"
   },
   {
@@ -8205,6 +8375,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 172,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on belt"
   },
   {
@@ -8253,6 +8424,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 173,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of conveyor roller"
   },
   {
@@ -8301,6 +8473,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 174,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for hydraulic hose"
   },
   {
@@ -8349,6 +8522,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 175,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for shaft assembly"
   },
   {
@@ -8397,6 +8571,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 176,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in drum box assembly"
   },
   {
@@ -8445,6 +8620,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 177,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for hydraulic hose"
   },
   {
@@ -8493,6 +8669,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 178,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for monitoring"
   },
   {
@@ -8541,6 +8718,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 179,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in belt"
   },
   {
@@ -8589,6 +8767,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 180,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in seal"
   },
   {
@@ -8637,6 +8816,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 181,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in valve"
   },
   {
@@ -8685,6 +8865,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 182,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on crusher jaw"
   },
   {
@@ -8733,6 +8914,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 183,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for impact plate"
   },
   {
@@ -8781,6 +8963,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 184,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for bolt assembly"
   },
   {
@@ -8829,6 +9012,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 185,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of bolt assembly"
   },
   {
@@ -8877,6 +9061,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 186,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of drive system"
   },
   {
@@ -8925,6 +9110,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 187,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "skirt rubber weakened by fatigue"
   },
   {
@@ -8973,55 +9159,57 @@
     "_sheet_name": "Synthetic",
     "_line_number": 188,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for control system assembly"
   },
   {
-    "Action Request Number:": "2023-02031",
-    "Title": "Unexpected fatigue of crusher jaw",
-    "Initiation Date": "2023-03-20T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Production",
-    "Requested Response Time": 2,
-    "Past Due Status": "Past Due",
-    "Days Past Due": 34,
-    "Operating Centre": "YRN",
-    "Stage": "Action Plan Proposed - Waiting on Action Plan Implementation",
-    "Init. Dept.": "Reliability",
-    "Rec. Dept.": "Reliability",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "Operators reported unusual noise from the apron feeder which investigation revealed was due to electrical system corrosion.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": "Hold share while couple keep this similar.",
-    "Recom.Action": null,
-    "Asset Number(s)": "ASSET-3281",
-    "Amount of Loss": 4833,
-    "Immd. Contain. Action or Comments": null,
-    "Root Cause": "Harsh operating environment for belt feeder; Foreign material in filter",
-    "Action Plan": "Review and revise PM schedule for conveyor",
-    "Due Date": "2024-03-24T00:00:00",
-    "Complete": "Yes",
-    "Completion Date": "2023-07-18T00:00:00",
-    "Comments": "Coach family try ready tough less position. Reveal both single visit.",
-    "Response Date": "2023-08-31T00:00:00",
-    "Response Revision Date": null,
-    "Did this action plan require a change to the equipment management strategy ?": "No",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "Yes",
-    "Is Resp Satisfactory?": "Yes",
+    "Recom.Action": "Agent safe work play sing cost.",
+    "Did this action plan require a change to the equipment management strategy ? (review)": "No",
+    "Root Cause Tail Extraction": "Foreign material in filter | Excessive wear on brake system",
+    "Reviewed Date:": "2024-06-25T00:00:00",
+    "Days Past Due": "34",
     "Reason if not Satisfactory": null,
-    "Reviewed Date:": null,
-    "Did this action plan require a change to the equipment management strategy ? (review)": null,
-    "If yes, APSS Doc #": null,
-    "Asset Activity numbers": "ACT-6527",
-    "Effectiveness Verification Due Date": null,
-    "IsActionPlanEffective": "Yes",
-    "Action Plan Eval Comment": "Hotel food agent law.",
-    "Action Plan Verification Date:": null,
+    "Action Types": "Reliability Action Request",
+    "Title": "Unexpected fatigue of crusher jaw | overheating of apron feeder in loader at pit floor",
+    "Due Date": "2024-03-24T00:00:00 | 2023-08-01T00:00:00",
     "_source_file": "synthetic_data_generation.py",
     "_sheet_name": "Synthetic",
-    "_line_number": 189,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "Foreign material in filter"
+    "Comments": "Coach family try ready tough less position. Reveal both single visit.",
+    "Recurring Problem(s)": "No",
+    "Is Resp Satisfactory?": "Yes",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
+    "What happened?": "Operators reported unusual noise from the apron feeder which investigation revealed was due to electrical system corrosion. | While conducting a routine inspection, a significant corrosion was identified in the electrical system of the conveyor.",
+    "Past Due Status": "Past Due | N/A",
+    "Effectiveness Verification Due Date": "2022-10-23T00:00:00",
+    "Response Revision Date": "2023-10-08T00:00:00",
+    "Did this action plan require a change to the equipment management strategy ?": "No | Yes",
+    "Rec. Dept.": "Reliability | HUN Fixed Plant",
+    "Asset Number(s)": "ASSET-3281 | ASSET-5028",
+    "Completion Date": "2023-07-18T00:00:00 | 2022-12-31T00:00:00",
+    "IsActionPlanEffective": "Yes",
+    "Obj. Evidence": "Hold share while couple keep this similar. | True study city follow behavior agent activity show. Agreement remain turn bad.",
+    "Asset Activity numbers": "ACT-6527",
+    "Action Plan Verification Date:": null,
+    "Stage": "Action Plan Proposed - Waiting on Action Plan Implementation | Action Plan Implemented - Actions Effective - Closed",
+    "Amount of Loss": "4833 | 8144",
+    "Requested Response Time": "2 | 7",
+    "Complete": "Yes",
+    "Categories": "Production | Safety",
+    "Action Plan Eval Comment": "Hotel food agent law. | Create subject risk southern her.",
+    "Response Date": "2023-08-31T00:00:00 | 2022-12-08T00:00:00",
+    "_line_number": "189 | 358",
+    "Init. Dept.": "Reliability | HUN Mobile Plant",
+    "Action Plan": "Review and revise PM schedule for conveyor | Investigate alternative design for mounting bracket to prevent overheating",
+    "If yes, APSS Doc #": "APPS-10331",
+    "Root Cause": "Harsh operating environment for belt feeder; Foreign material in filter | Excessive wear on brake system",
+    "Recurring Comment": null,
+    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
+    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "Yes",
+    "Operating Centre": "YRN | KWN",
+    "Immd. Contain. Action or Comments": null,
+    "Action Request Number:": "2023-02031",
+    "Initiation Date": "2023-03-20T00:00:00 | 2022-09-08T00:00:00"
   },
   {
     "Action Request Number:": "2022-03087",
@@ -9069,6 +9257,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 190,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in transfer station"
   },
   {
@@ -9117,6 +9306,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 191,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for lubrication"
   },
   {
@@ -9165,6 +9355,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 192,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for impact plate assembly"
   },
   {
@@ -9213,6 +9404,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 193,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on excavator"
   },
   {
@@ -9261,6 +9453,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 194,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of drive system"
   },
   {
@@ -9309,6 +9502,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 195,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for drum box"
   },
   {
@@ -9357,6 +9551,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 196,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of belt"
   },
   {
@@ -9405,6 +9600,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 197,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in skirt rubber"
   },
   {
@@ -9453,6 +9649,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 198,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for shutdown"
   },
   {
@@ -9501,6 +9698,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 199,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in wear plate assembly"
   },
   {
@@ -9549,6 +9747,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 200,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in brake system"
   },
   {
@@ -9597,6 +9796,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 201,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for seal assembly"
   },
   {
@@ -9645,6 +9845,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 202,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in mine face"
   },
   {
@@ -9693,6 +9894,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 203,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for cleaning"
   },
   {
@@ -9741,6 +9943,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 204,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for impact plate"
   },
   {
@@ -9789,6 +9992,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 205,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in stockpile"
   },
   {
@@ -9837,6 +10041,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 206,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of shaft"
   },
   {
@@ -9885,6 +10090,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 207,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for motor"
   },
   {
@@ -9933,6 +10139,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 208,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for pump"
   },
   {
@@ -9981,6 +10188,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 209,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on wear plate"
   },
   {
@@ -10029,6 +10237,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 210,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on drum box"
   },
   {
@@ -10077,6 +10286,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 211,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in belt"
   },
   {
@@ -10125,6 +10335,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 212,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of motor"
   },
   {
@@ -10173,6 +10384,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 213,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of motor"
   },
   {
@@ -10221,6 +10433,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 214,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in skirt rubber"
   },
   {
@@ -10269,6 +10482,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 215,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of drive system"
   },
   {
@@ -10317,6 +10531,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 216,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -10365,6 +10580,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 217,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in hydraulic hose"
   },
   {
@@ -10413,6 +10629,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 218,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on electrical system"
   },
   {
@@ -10461,6 +10678,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 219,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to belt assembly"
   },
   {
@@ -10509,6 +10727,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 220,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for hydraulic hose"
   },
   {
@@ -10557,6 +10776,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 221,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in skirt rubber"
   },
   {
@@ -10605,6 +10825,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 222,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for tertiary crusher"
   },
   {
@@ -10653,6 +10874,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 223,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in drum box"
   },
   {
@@ -10701,6 +10923,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 224,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of hydraulic hose"
   },
   {
@@ -10749,6 +10972,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 225,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on chute"
   },
   {
@@ -10797,6 +11021,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 226,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for inspection"
   },
   {
@@ -10845,6 +11070,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 227,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to junction box assembly"
   },
   {
@@ -10893,6 +11119,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 228,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on gear"
   },
   {
@@ -10941,6 +11168,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 229,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to filter assembly"
   },
   {
@@ -10989,6 +11217,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 230,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting filter"
   },
   {
@@ -11037,6 +11266,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 231,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of valve"
   },
   {
@@ -11085,6 +11315,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 232,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on brake system"
   },
   {
@@ -11133,6 +11364,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 233,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect replacement procedures followed"
   },
   {
@@ -11181,6 +11413,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 234,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on reclaimers"
   },
   {
@@ -11229,6 +11462,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 235,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for impact plate"
   },
   {
@@ -11277,6 +11511,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 236,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on valve"
   },
   {
@@ -11325,6 +11560,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 237,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of electrical system"
   },
   {
@@ -11373,6 +11609,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 238,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect retrofit procedures followed"
   },
   {
@@ -11421,6 +11658,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 239,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in filter"
   },
   {
@@ -11469,6 +11707,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 240,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting transmission"
   },
   {
@@ -11517,6 +11756,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 241,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of swing motor"
   },
   {
@@ -11565,6 +11805,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 242,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in crusher jaw"
   },
   {
@@ -11613,6 +11854,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 243,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in gear assembly"
   },
   {
@@ -11661,6 +11903,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 244,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of wear plate"
   },
   {
@@ -11709,6 +11952,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 245,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in chute assembly"
   },
   {
@@ -11757,6 +12001,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 246,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on wear plate"
   },
   {
@@ -11805,6 +12050,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 247,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on secondary crusher"
   },
   {
@@ -11853,6 +12099,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 248,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in crusher jaw assembly"
   },
   {
@@ -11901,6 +12148,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 249,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for retrofit"
   },
   {
@@ -11949,6 +12197,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 250,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for filter"
   },
   {
@@ -11997,6 +12246,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 251,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for valve"
   },
   {
@@ -12045,6 +12295,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 252,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "brake system weakened by fatigue"
   },
   {
@@ -12093,6 +12344,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 253,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of filter"
   },
   {
@@ -12141,6 +12393,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 254,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for conveyor roller"
   },
   {
@@ -12189,6 +12442,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 255,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in swing motor"
   },
   {
@@ -12237,6 +12491,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 256,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for filter"
   },
   {
@@ -12285,6 +12540,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 257,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect start-up procedures followed"
   },
   {
@@ -12333,6 +12589,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 258,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in motor assembly"
   },
   {
@@ -12381,6 +12638,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 259,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for repair"
   },
   {
@@ -12429,6 +12687,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 260,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on belt"
   },
   {
@@ -12477,6 +12736,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 261,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for junction box"
   },
   {
@@ -12525,6 +12785,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 262,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for swing motor"
   },
   {
@@ -12573,6 +12834,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 263,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for conveyor belt"
   },
   {
@@ -12621,6 +12883,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 264,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -12669,6 +12932,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 265,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for shutdown"
   },
   {
@@ -12717,6 +12981,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 266,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on motor"
   },
   {
@@ -12765,6 +13030,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 267,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in conveyor belt"
   },
   {
@@ -12813,6 +13079,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 268,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in pump assembly"
   },
   {
@@ -12861,6 +13128,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 269,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of chute"
   },
   {
@@ -12909,6 +13177,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 270,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in switch room"
   },
   {
@@ -12957,6 +13226,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 271,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of gear"
   },
   {
@@ -13005,6 +13275,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 272,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for pump"
   },
   {
@@ -13053,6 +13324,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 273,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on compressor"
   },
   {
@@ -13101,6 +13373,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 274,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for repair"
   },
   {
@@ -13149,6 +13422,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 275,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of crusher jaw"
   },
   {
@@ -13197,6 +13471,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 276,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in chute"
   },
   {
@@ -13245,6 +13520,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 277,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of bearing"
   },
   {
@@ -13293,6 +13569,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 278,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of shaft"
   },
   {
@@ -13341,6 +13618,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 279,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for skirt rubber"
   },
   {
@@ -13389,6 +13667,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 280,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in bolt assembly"
   },
   {
@@ -13437,6 +13716,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 281,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of PLC"
   },
   {
@@ -13485,6 +13765,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 282,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in drive system"
   },
   {
@@ -13533,6 +13814,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 283,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on transmission"
   },
   {
@@ -13581,6 +13863,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 284,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "control system weakened by fatigue"
   },
   {
@@ -13629,6 +13912,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 285,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in coupling"
   },
   {
@@ -13677,6 +13961,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 286,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for screening plant"
   },
   {
@@ -13725,6 +14010,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 287,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in wear plate"
   },
   {
@@ -13773,6 +14059,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 288,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in brake system"
   },
   {
@@ -13821,6 +14108,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 289,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for commissioning"
   },
   {
@@ -13869,6 +14157,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 290,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for stackers"
   },
   {
@@ -13917,6 +14206,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 291,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on loader"
   },
   {
@@ -13965,6 +14255,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 292,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in electrical substation"
   },
   {
@@ -14013,6 +14304,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 293,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on skirt rubber"
   },
   {
@@ -14061,6 +14353,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 294,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to bearing assembly"
   },
   {
@@ -14109,6 +14402,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 295,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in seal"
   },
   {
@@ -14157,6 +14451,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 296,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in electrical system"
   },
   {
@@ -14205,6 +14500,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 297,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on belt feeder"
   },
   {
@@ -14253,6 +14549,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 298,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for primary crusher"
   },
   {
@@ -14301,55 +14598,57 @@
     "_sheet_name": "Synthetic",
     "_line_number": 299,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for coupling"
   },
   {
-    "Action Request Number:": "2023-05713",
-    "Title": "overheating of brake system in conveyor at mine face",
-    "Initiation Date": "2023-03-19T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Safety",
-    "Requested Response Time": 7,
-    "Past Due Status": "Due Today",
+    "Recom.Action": "Operation couple hold interest.",
+    "Did this action plan require a change to the equipment management strategy ? (review)": "Yes",
+    "Root Cause Tail Extraction": "Excessive wear on apron feeder | wear plate weakened by fatigue",
+    "Reviewed Date:": "2023-05-30T00:00:00 | 2023-03-16T00:00:00",
     "Days Past Due": null,
-    "Operating Centre": "HUN",
-    "Stage": "Action Plan Implemented - Actions Effective - Closed",
-    "Init. Dept.": "Reliability",
-    "Rec. Dept.": "Reliability",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "A leak was discovered in the skirt rubber of the stackers causing vibration and operational issues.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": "Party special compare eat tonight run.",
-    "Recom.Action": null,
-    "Asset Number(s)": "ASSET-8040",
-    "Amount of Loss": 225,
-    "Immd. Contain. Action or Comments": "Treat contain notice hour watch dream.",
-    "Root Cause": "impact plate weakened by fatigue; Excessive wear on apron feeder",
-    "Action Plan": "Replace conveyor roller with upgraded design to prevent corrosion; Increase frequency of visual inspection on reclaimers",
-    "Due Date": "2023-11-24T00:00:00",
-    "Complete": "No",
-    "Completion Date": null,
-    "Comments": "Think Mrs project at risk.",
-    "Response Date": "2024-05-04T00:00:00",
-    "Response Revision Date": null,
-    "Did this action plan require a change to the equipment management strategy ?": "No",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "No",
-    "Is Resp Satisfactory?": "Yes",
     "Reason if not Satisfactory": null,
-    "Reviewed Date:": "2023-05-30T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ? (review)": null,
-    "If yes, APSS Doc #": null,
-    "Asset Activity numbers": null,
-    "Effectiveness Verification Due Date": "2024-11-08T00:00:00",
-    "IsActionPlanEffective": "Yes",
-    "Action Plan Eval Comment": "In seven building hard sense mean single.",
-    "Action Plan Verification Date:": null,
+    "Action Types": "Reliability Action Request",
+    "Title": "overheating of brake system in conveyor at mine face | Recurring premature wear issues with apron feeder valve",
+    "Due Date": "2023-11-24T00:00:00 | 2023-07-04T00:00:00",
     "_source_file": "synthetic_data_generation.py",
     "_sheet_name": "Synthetic",
-    "_line_number": 300,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "Excessive wear on apron feeder"
+    "Comments": "Think Mrs project at risk.",
+    "Recurring Problem(s)": "No",
+    "Is Resp Satisfactory?": "Yes",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
+    "What happened?": "A leak was discovered in the skirt rubber of the stackers causing vibration and operational issues. | During scheduled maintenance, skirt rubber was found to have excessive contamination requiring immediate replacement.",
+    "Past Due Status": "Due Today | Not Due",
+    "Effectiveness Verification Due Date": "2024-11-08T00:00:00",
+    "Response Revision Date": null,
+    "Did this action plan require a change to the equipment management strategy ?": "No",
+    "Rec. Dept.": "Reliability | HUN Fixed Plant",
+    "Asset Number(s)": "ASSET-8040 | ASSET-2392",
+    "Completion Date": "2023-03-25T00:00:00",
+    "IsActionPlanEffective": "Yes",
+    "Obj. Evidence": "Party special compare eat tonight run. | Whom join do else fact born future. Visit seat break happy table west officer ability.",
+    "Asset Activity numbers": "ACT-8284",
+    "Action Plan Verification Date:": "2024-07-20T00:00:00",
+    "Stage": "Action Plan Implemented - Actions Effective - Closed | Open - Waiting on Receiver to document Root Cause/Action Plan",
+    "Amount of Loss": "225 | 9100",
+    "Requested Response Time": "7 | 2",
+    "Complete": "No | Yes",
+    "Categories": "Safety | Production",
+    "Action Plan Eval Comment": "In seven building hard sense mean single.",
+    "Response Date": "2024-05-04T00:00:00 | 2023-07-03T00:00:00",
+    "_line_number": "300 | 319",
+    "Init. Dept.": "Reliability",
+    "Action Plan": "Replace conveyor roller with upgraded design to prevent corrosion; Increase frequency of visual inspection on reclaimers | Replace coupling with upgraded design to prevent fatigue; Increase frequency of thermography on conveyor",
+    "If yes, APSS Doc #": null,
+    "Root Cause": "impact plate weakened by fatigue; Excessive wear on apron feeder | wear plate weakened by fatigue",
+    "Recurring Comment": null,
+    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
+    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "No | Yes",
+    "Operating Centre": "HUN | PNJ",
+    "Immd. Contain. Action or Comments": "Treat contain notice hour watch dream. | Mind own develop house.",
+    "Action Request Number:": "2023-05713",
+    "Initiation Date": "2023-03-19T00:00:00 | 2022-11-18T00:00:00"
   },
   {
     "Action Request Number:": "2021-04163",
@@ -14397,6 +14696,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 301,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of belt"
   },
   {
@@ -14445,6 +14745,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 302,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear of drum box"
   },
   {
@@ -14493,6 +14794,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 303,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of skirt rubber"
   },
   {
@@ -14541,6 +14843,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 304,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for filter"
   },
   {
@@ -14589,6 +14892,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 305,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of control system"
   },
   {
@@ -14637,6 +14941,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 306,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in bearing"
   },
   {
@@ -14685,6 +14990,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 307,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of impact plate"
   },
   {
@@ -14733,6 +15039,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 308,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for junction box"
   },
   {
@@ -14781,6 +15088,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 309,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on brake system"
   },
   {
@@ -14829,6 +15137,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 310,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting PLC"
   },
   {
@@ -14877,6 +15186,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 311,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in PLC assembly"
   },
   {
@@ -14925,6 +15235,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 312,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for cleaning"
   },
   {
@@ -14973,6 +15284,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 313,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for wear plate assembly"
   },
   {
@@ -15021,6 +15333,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 314,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in transmission"
   },
   {
@@ -15069,6 +15382,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 315,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on seal"
   },
   {
@@ -15117,6 +15431,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 316,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in gear"
   },
   {
@@ -15165,6 +15480,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 317,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for skirt rubber"
   },
   {
@@ -15213,55 +15529,8 @@
     "_sheet_name": "Synthetic",
     "_line_number": 318,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for control system"
-  },
-  {
-    "Action Request Number:": "2023-05713",
-    "Title": "Recurring premature wear issues with apron feeder valve",
-    "Initiation Date": "2022-11-18T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Production",
-    "Requested Response Time": 2,
-    "Past Due Status": "Not Due",
-    "Days Past Due": null,
-    "Operating Centre": "PNJ",
-    "Stage": "Open - Waiting on Receiver to document Root Cause/Action Plan",
-    "Init. Dept.": "Reliability",
-    "Rec. Dept.": "HUN Fixed Plant",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "During scheduled maintenance, skirt rubber was found to have excessive contamination requiring immediate replacement.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": "Whom join do else fact born future. Visit seat break happy table west officer ability.",
-    "Recom.Action": "Operation couple hold interest.",
-    "Asset Number(s)": "ASSET-2392",
-    "Amount of Loss": 9100,
-    "Immd. Contain. Action or Comments": "Mind own develop house.",
-    "Root Cause": "wear plate weakened by fatigue",
-    "Action Plan": "Replace coupling with upgraded design to prevent fatigue; Increase frequency of thermography on conveyor",
-    "Due Date": "2023-07-04T00:00:00",
-    "Complete": "Yes",
-    "Completion Date": "2023-03-25T00:00:00",
-    "Comments": null,
-    "Response Date": "2023-07-03T00:00:00",
-    "Response Revision Date": null,
-    "Did this action plan require a change to the equipment management strategy ?": "No",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": "Yes",
-    "Is Resp Satisfactory?": "Yes",
-    "Reason if not Satisfactory": null,
-    "Reviewed Date:": "2023-03-16T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ? (review)": "Yes",
-    "If yes, APSS Doc #": null,
-    "Asset Activity numbers": "ACT-8284",
-    "Effectiveness Verification Due Date": null,
-    "IsActionPlanEffective": "Yes",
-    "Action Plan Eval Comment": null,
-    "Action Plan Verification Date:": "2024-07-20T00:00:00",
-    "_source_file": "synthetic_data_generation.py",
-    "_sheet_name": "Synthetic",
-    "_line_number": 319,
-    "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "wear plate weakened by fatigue"
   },
   {
     "Action Request Number:": "2021-02359",
@@ -15309,6 +15578,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 320,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in drum box"
   },
   {
@@ -15357,6 +15627,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 321,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for filter assembly"
   },
   {
@@ -15405,6 +15676,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 322,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in bearing assembly"
   },
   {
@@ -15453,6 +15725,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 323,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on crusher jaw"
   },
   {
@@ -15501,6 +15774,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 324,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear of filter"
   },
   {
@@ -15549,6 +15823,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 325,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on stackers"
   },
   {
@@ -15597,6 +15872,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 326,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in filter"
   },
   {
@@ -15645,6 +15921,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 327,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of seal"
   },
   {
@@ -15693,6 +15970,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 328,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for tertiary crusher"
   },
   {
@@ -15741,6 +16019,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 329,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for compressor"
   },
   {
@@ -15789,6 +16068,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 330,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of belt"
   },
   {
@@ -15837,6 +16117,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 331,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -15885,6 +16166,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 332,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in brake system"
   },
   {
@@ -15933,6 +16215,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 333,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on secondary crusher"
   },
   {
@@ -15981,6 +16264,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 334,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of coupling"
   },
   {
@@ -16029,6 +16313,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 335,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on skirt rubber"
   },
   {
@@ -16077,6 +16362,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 336,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of apron feeder"
   },
   {
@@ -16125,6 +16411,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 337,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "filter weakened by fatigue"
   },
   {
@@ -16173,6 +16460,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 338,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on drive system"
   },
   {
@@ -16221,6 +16509,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 339,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on bearing"
   },
   {
@@ -16269,6 +16558,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 340,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of seal"
   },
   {
@@ -16317,6 +16607,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 341,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -16365,6 +16656,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 342,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in conveyor roller assembly"
   },
   {
@@ -16413,6 +16705,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 343,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on bolt assembly"
   },
   {
@@ -16461,6 +16754,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 344,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for drive system"
   },
   {
@@ -16509,6 +16803,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 345,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to junction box assembly"
   },
   {
@@ -16557,6 +16852,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 346,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for belt assembly"
   },
   {
@@ -16605,6 +16901,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 347,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of junction box"
   },
   {
@@ -16653,6 +16950,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 348,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in shaft"
   },
   {
@@ -16701,6 +16999,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 349,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in motor"
   },
   {
@@ -16749,6 +17048,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 350,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on conveyor belt"
   },
   {
@@ -16797,6 +17097,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 351,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for shutdown"
   },
   {
@@ -16845,6 +17146,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 352,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on wear plate"
   },
   {
@@ -16893,6 +17195,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 353,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for gear"
   },
   {
@@ -16941,6 +17244,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 354,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in control system"
   },
   {
@@ -16989,6 +17293,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 355,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for tertiary crusher"
   },
   {
@@ -17037,6 +17342,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 356,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in hydraulic hose"
   },
   {
@@ -17085,55 +17391,8 @@
     "_sheet_name": "Synthetic",
     "_line_number": 357,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear of filter"
-  },
-  {
-    "Action Request Number:": "2023-02031",
-    "Title": "overheating of apron feeder in loader at pit floor",
-    "Initiation Date": "2022-09-08T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Safety",
-    "Requested Response Time": 7,
-    "Past Due Status": "N/A",
-    "Days Past Due": null,
-    "Operating Centre": "KWN",
-    "Stage": "Action Plan Implemented - Actions Effective - Closed",
-    "Init. Dept.": "HUN Mobile Plant",
-    "Rec. Dept.": "HUN Fixed Plant",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "While conducting a routine inspection, a significant corrosion was identified in the electrical system of the conveyor.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": "True study city follow behavior agent activity show. Agreement remain turn bad.",
-    "Recom.Action": "Agent safe work play sing cost.",
-    "Asset Number(s)": "ASSET-5028",
-    "Amount of Loss": 8144,
-    "Immd. Contain. Action or Comments": null,
-    "Root Cause": "Excessive wear on brake system",
-    "Action Plan": "Investigate alternative design for mounting bracket to prevent overheating",
-    "Due Date": "2023-08-01T00:00:00",
-    "Complete": "Yes",
-    "Completion Date": "2022-12-31T00:00:00",
-    "Comments": null,
-    "Response Date": "2022-12-08T00:00:00",
-    "Response Revision Date": "2023-10-08T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ?": "Yes",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": null,
-    "Is Resp Satisfactory?": "Yes",
-    "Reason if not Satisfactory": null,
-    "Reviewed Date:": "2024-06-25T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ? (review)": "No",
-    "If yes, APSS Doc #": "APPS-10331",
-    "Asset Activity numbers": null,
-    "Effectiveness Verification Due Date": "2022-10-23T00:00:00",
-    "IsActionPlanEffective": "Yes",
-    "Action Plan Eval Comment": "Create subject risk southern her.",
-    "Action Plan Verification Date:": null,
-    "_source_file": "synthetic_data_generation.py",
-    "_sheet_name": "Synthetic",
-    "_line_number": 358,
-    "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "Excessive wear on brake system"
   },
   {
     "Action Request Number:": "2023-03913",
@@ -17181,6 +17440,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 359,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in filter"
   },
   {
@@ -17229,6 +17489,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 360,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for mounting bracket"
   },
   {
@@ -17277,6 +17538,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 361,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of junction box"
   },
   {
@@ -17325,6 +17587,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 362,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in drum box assembly"
   },
   {
@@ -17373,6 +17636,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 363,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in seal"
   },
   {
@@ -17421,6 +17685,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 364,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of gear"
   },
   {
@@ -17469,6 +17734,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 365,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for compressor"
   },
   {
@@ -17517,6 +17783,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 366,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on belt feeder"
   },
   {
@@ -17565,6 +17832,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 367,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in chute"
   },
   {
@@ -17613,6 +17881,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 368,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on electrical system"
   },
   {
@@ -17661,6 +17930,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 369,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for cleaning"
   },
   {
@@ -17709,6 +17979,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 370,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of coupling"
   },
   {
@@ -17757,6 +18028,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 371,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on transfer station"
   },
   {
@@ -17805,6 +18077,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 372,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of filter"
   },
   {
@@ -17853,6 +18126,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 373,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "valve weakened by fatigue"
   },
   {
@@ -17901,6 +18175,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 374,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of bolt assembly"
   },
   {
@@ -17949,6 +18224,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 375,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to crusher jaw assembly"
   },
   {
@@ -17997,6 +18273,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 376,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in skirt rubber"
   },
   {
@@ -18045,6 +18322,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 377,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in chute"
   },
   {
@@ -18093,6 +18371,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 378,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in drive system"
   },
   {
@@ -18141,6 +18420,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 379,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on conveyor"
   },
   {
@@ -18189,6 +18469,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 380,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -18237,6 +18518,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 381,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in pump"
   },
   {
@@ -18285,6 +18567,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 382,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of control system"
   },
   {
@@ -18333,6 +18616,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 383,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting PLC"
   },
   {
@@ -18381,6 +18665,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 384,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on chute"
   },
   {
@@ -18429,6 +18714,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 385,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in reclaimer yard"
   },
   {
@@ -18477,55 +18763,8 @@
     "_sheet_name": "Synthetic",
     "_line_number": 386,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for maintenance"
-  },
-  {
-    "Action Request Number:": "2021-06400",
-    "Title": "belt feeder PLC breakdown",
-    "Initiation Date": "2023-12-15T00:00:00",
-    "Action Types": "Reliability Action Request",
-    "Categories": "Production",
-    "Requested Response Time": 2,
-    "Past Due Status": "Not Due",
-    "Days Past Due": null,
-    "Operating Centre": "KWN",
-    "Stage": "Action Plan Implemented - Actions Effective - Closed",
-    "Init. Dept.": "Reliability",
-    "Rec. Dept.": "HUN Mobile Plant",
-    "Recurring Problem(s)": "No",
-    "Recurring Comment": null,
-    "What happened?": "A leak was discovered in the shaft of the pump station causing premature wear and operational issues.",
-    "Requirement": "Perform root cause analysis and implement corrective actions to prevent recurrence.",
-    "Obj. Evidence": "Main bad treatment success minute figure need but. Along dog key share.",
-    "Recom.Action": null,
-    "Asset Number(s)": null,
-    "Amount of Loss": null,
-    "Immd. Contain. Action or Comments": "Material almost everyone.",
-    "Root Cause": "Inadequate clearance for shaft; Inadequate clearance for mounting bracket",
-    "Action Plan": "Standardize work instructions for lubrication of pump",
-    "Due Date": "2024-09-13T00:00:00",
-    "Complete": "Yes",
-    "Completion Date": "2024-05-18T00:00:00",
-    "Comments": "Still be everything particular manager. His and day continue issue appear. All several visit travel senior.",
-    "Response Date": "2023-12-16T00:00:00",
-    "Response Revision Date": null,
-    "Did this action plan require a change to the equipment management strategy ?": "No",
-    "If yes, are there any corrective actions to update the strategy in APSS, eAM, ASM and BOM as required ?": null,
-    "Is Resp Satisfactory?": "Yes",
-    "Reason if not Satisfactory": "Two traditional special opportunity serious game.",
-    "Reviewed Date:": "2024-05-21T00:00:00",
-    "Did this action plan require a change to the equipment management strategy ? (review)": "Yes",
-    "If yes, APSS Doc #": null,
-    "Asset Activity numbers": "ACT-4607",
-    "Effectiveness Verification Due Date": "2024-11-15T00:00:00",
-    "IsActionPlanEffective": "Yes",
-    "Action Plan Eval Comment": "Tend site up sell southern network.",
-    "Action Plan Verification Date:": "2024-12-22T00:00:00",
-    "_source_file": "synthetic_data_generation.py",
-    "_sheet_name": "Synthetic",
-    "_line_number": 387,
-    "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
-    "Root Cause Tail Extraction": "Inadequate clearance for mounting bracket"
   },
   {
     "Action Request Number:": "2023-06843",
@@ -18573,6 +18812,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 388,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in gear assembly"
   },
   {
@@ -18621,6 +18861,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 389,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in mounting bracket"
   },
   {
@@ -18669,6 +18910,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 390,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No preventive maintenance for drum box"
   },
   {
@@ -18717,6 +18959,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 391,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of pump"
   },
   {
@@ -18765,6 +19008,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 392,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of coupling"
   },
   {
@@ -18813,6 +19057,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 393,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in coupling"
   },
   {
@@ -18861,6 +19106,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 394,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of skirt rubber"
   },
   {
@@ -18909,6 +19155,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 395,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in gear assembly"
   },
   {
@@ -18957,6 +19204,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 396,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for maintenance"
   },
   {
@@ -19005,6 +19253,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 397,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect hose routing on pump station"
   },
   {
@@ -19053,6 +19302,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 398,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for tertiary crusher"
   },
   {
@@ -19101,6 +19351,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 399,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in pit floor"
   },
   {
@@ -19149,6 +19400,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 400,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for transfer station"
   },
   {
@@ -19197,6 +19449,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 401,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on skirt rubber"
   },
   {
@@ -19245,6 +19498,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 402,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for wear plate"
   },
   {
@@ -19293,6 +19547,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 403,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incomplete documentation for repair"
   },
   {
@@ -19341,6 +19596,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 404,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on apron feeder"
   },
   {
@@ -19389,6 +19645,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 405,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for retrofit"
   },
   {
@@ -19437,6 +19694,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 406,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in motor"
   },
   {
@@ -19485,6 +19743,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 407,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in bearing"
   },
   {
@@ -19533,6 +19792,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 408,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of motor"
   },
   {
@@ -19581,6 +19841,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 409,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "motor weakened by fatigue"
   },
   {
@@ -19629,6 +19890,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 410,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "No lubrication of skirt rubber"
   },
   {
@@ -19677,6 +19939,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 411,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect lubrication procedures followed"
   },
   {
@@ -19725,6 +19988,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 412,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for coupling"
   },
   {
@@ -19773,6 +20037,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 413,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in electrical substation"
   },
   {
@@ -19821,6 +20086,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 414,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect repair procedures followed"
   },
   {
@@ -19869,6 +20135,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 415,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect calibration procedures followed"
   },
   {
@@ -19917,6 +20184,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 416,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for belt feeder"
   },
   {
@@ -19965,6 +20233,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 417,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in wear plate"
   },
   {
@@ -20013,6 +20282,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 418,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in conveyor belt"
   },
   {
@@ -20061,6 +20331,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 419,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "control system weakened by fatigue"
   },
   {
@@ -20109,6 +20380,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 420,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in hydraulic hose"
   },
   {
@@ -20157,6 +20429,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 421,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on PLC"
   },
   {
@@ -20205,6 +20478,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 422,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Undersized bolts for wear plate assembly"
   },
   {
@@ -20253,6 +20527,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 423,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "control system weakened by fatigue"
   },
   {
@@ -20301,6 +20576,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 424,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of valve"
   },
   {
@@ -20349,6 +20625,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 425,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in chute assembly"
   },
   {
@@ -20397,6 +20674,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 426,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for hydraulic hose"
   },
   {
@@ -20445,6 +20723,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 427,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in motor assembly"
   },
   {
@@ -20493,6 +20772,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 428,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on mounting bracket"
   },
   {
@@ -20541,6 +20821,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 429,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in control system assembly"
   },
   {
@@ -20589,6 +20870,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 430,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate maintenance schedule for shaft"
   },
   {
@@ -20637,6 +20919,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 431,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in gear"
   },
   {
@@ -20685,6 +20968,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 432,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in coupling"
   },
   {
@@ -20733,6 +21017,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 433,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect cleaning procedures followed"
   },
   {
@@ -20781,6 +21066,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 434,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect start-up procedures followed"
   },
   {
@@ -20829,6 +21115,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 435,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in swing motor assembly"
   },
   {
@@ -20877,6 +21164,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 436,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of shaft"
   },
   {
@@ -20925,6 +21213,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 437,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of filter"
   },
   {
@@ -20973,6 +21262,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 438,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of valve"
   },
   {
@@ -21021,6 +21311,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 439,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in apron feeder"
   },
   {
@@ -21069,6 +21360,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 440,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of chute"
   },
   {
@@ -21117,6 +21409,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 441,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in gear"
   },
   {
@@ -21165,6 +21458,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 442,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in seal assembly"
   },
   {
@@ -21213,6 +21507,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 443,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of conveyor belt"
   },
   {
@@ -21261,6 +21556,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 444,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on transmission"
   },
   {
@@ -21309,6 +21605,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 445,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Design flaw in belt"
   },
   {
@@ -21357,6 +21654,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 446,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of crusher jaw"
   },
   {
@@ -21405,6 +21703,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 447,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of bolt assembly"
   },
   {
@@ -21453,6 +21752,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 448,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for conveyor roller"
   },
   {
@@ -21501,6 +21801,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 449,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for bearing"
   },
   {
@@ -21549,6 +21850,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 450,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "motor weakened by fatigue"
   },
   {
@@ -21597,6 +21899,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 451,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for replacement"
   },
   {
@@ -21645,6 +21948,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 452,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in transfer station"
   },
   {
@@ -21693,6 +21997,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 453,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in transmission"
   },
   {
@@ -21741,6 +22046,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 454,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for reclaimers"
   },
   {
@@ -21789,6 +22095,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 455,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "swing motor weakened by fatigue"
   },
   {
@@ -21837,6 +22144,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 456,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in drive system"
   },
   {
@@ -21885,6 +22193,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 457,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for screening plant"
   },
   {
@@ -21933,6 +22242,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 458,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear of electrical system"
   },
   {
@@ -21981,6 +22291,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 459,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "wear plate weakened by fatigue"
   },
   {
@@ -22029,6 +22340,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 460,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Foreign material in conveyor roller"
   },
   {
@@ -22077,6 +22389,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 461,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of bolt assembly"
   },
   {
@@ -22125,6 +22438,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 462,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to drum box assembly"
   },
   {
@@ -22173,6 +22487,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 463,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -22221,6 +22536,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 464,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Dust accumulation in conveyor roller assembly"
   },
   {
@@ -22269,6 +22585,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 465,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in drum box"
   },
   {
@@ -22317,6 +22634,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 466,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for pump station"
   },
   {
@@ -22365,6 +22683,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 467,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in apron feeder"
   },
   {
@@ -22413,6 +22732,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 468,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on seal"
   },
   {
@@ -22461,6 +22781,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 469,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Communication gap between shifts"
   },
   {
@@ -22509,6 +22830,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 470,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate clearance for PLC"
   },
   {
@@ -22557,6 +22879,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 471,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Fatigue and wear of crusher jaw"
   },
   {
@@ -22605,6 +22928,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 472,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on shaft"
   },
   {
@@ -22653,6 +22977,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 473,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Stress-induced failure of conveyor belt"
   },
   {
@@ -22701,6 +23026,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 474,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate support brackets for junction box"
   },
   {
@@ -22749,6 +23075,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 475,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "End-dated PM tasks for compressor"
   },
   {
@@ -22797,6 +23124,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 476,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of brake system"
   },
   {
@@ -22845,6 +23173,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 477,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Moisture exposure to drive system assembly"
   },
   {
@@ -22893,6 +23222,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 478,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for calibration"
   },
   {
@@ -22941,6 +23271,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 479,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for calibration"
   },
   {
@@ -22989,6 +23320,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 480,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Debris in swing motor"
   },
   {
@@ -23037,6 +23369,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 481,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Incorrect installation procedures followed"
   },
   {
@@ -23085,6 +23418,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 482,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for loader"
   },
   {
@@ -23133,6 +23467,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 483,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Inadequate training for retrofit"
   },
   {
@@ -23181,6 +23516,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 484,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in mounting bracket"
   },
   {
@@ -23229,6 +23565,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 485,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in electrical system assembly"
   },
   {
@@ -23277,6 +23614,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 486,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "conveyor belt weakened by fatigue"
   },
   {
@@ -23325,6 +23663,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 487,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Oil contamination in PLC"
   },
   {
@@ -23373,6 +23712,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 488,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Water ingress in valve assembly"
   },
   {
@@ -23421,6 +23761,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 489,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive vibration affecting crusher jaw"
   },
   {
@@ -23469,6 +23810,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 490,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspection of bolt assembly"
   },
   {
@@ -23517,6 +23859,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 491,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Corrosion of pump"
   },
   {
@@ -23565,6 +23908,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 492,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Harsh operating environment for compressor"
   },
   {
@@ -23613,6 +23957,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 493,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Poor bracket support on generator"
   },
   {
@@ -23661,6 +24006,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 494,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Lack of inspection in conveyor gallery"
   },
   {
@@ -23709,6 +24055,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 495,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on seal"
   },
   {
@@ -23757,6 +24104,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 496,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Missed inspections on shaft"
   },
   {
@@ -23805,6 +24153,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 497,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Material fatigue in gear"
   },
   {
@@ -23853,6 +24202,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 498,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "apron feeder weakened by fatigue"
   },
   {
@@ -23901,6 +24251,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 499,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on control system"
   },
   {
@@ -23949,6 +24300,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 500,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "Excessive wear on shaft"
   },
   {
@@ -23997,6 +24349,7 @@
     "_sheet_name": "Synthetic",
     "_line_number": 501,
     "_source_path": "/home/291928k/uwa/alcoa/mining_data_quality/scripts/generate_records.py",
+    "_facility_name": "fab16f86-faa9-44d9-b9d7-cfbbb47061da",
     "Root Cause Tail Extraction": "High temperature impact on bearing"
   }
 ]

@@ -25,6 +25,7 @@ def create_metric_card(
                 "fontWeight": "bold",
                 "margin": "0",
                 "textDecoration": "none",
+                "color": card_style.get("text_color"),
             },
         ),
         html.P(
@@ -34,6 +35,7 @@ def create_metric_card(
                 "margin": "5px 0 0 0",
                 "opacity": "0.9",
                 "textDecoration": "none",
+                "color": card_style.get("text_color"),
             },
         ),
     ]

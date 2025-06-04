@@ -182,14 +182,14 @@
     "error_boundaries": true,
     "accessibility_compliance": true,
     "styling": {
-      "primary_color": "#4A90E2",
-      "light_blue": "#7BB3F0",
-      "dark_blue": "#2E5C8A",
-      "chart_colors": ["#0A2A57", "#1A4B8F", "#2B6CC7", "#3D8EFF", "#6DAAFF", "#9DD6FF"],
-      "background_light": "#FFFFFF",
+      "primary_color": "#64B5F6",
+      "light_blue": "#90CAF9",
+      "dark_blue": "#1976D2",
+      "chart_colors": ["#64B5F6", "#FFB74D", "#A5D6A7", "#CE93D8", "#EF9A9A", "#FFCDD2"],
+      "background_light": "#2C2C2C",
       "background_dark": "#1E1E1E",
-      "text_primary": "#333333",
-      "text_secondary": "#666666",
+      "text_primary": "#E0E0E0",
+      "text_secondary": "#B0B0B0",
       "text_light": "#FFFFFF"
     }
   },
