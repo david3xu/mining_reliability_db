@@ -37,6 +37,7 @@ __all__ = [
     # Utility functions
     "ensure_directory",
     "get_project_root",
+    "get_case_study_config",
 ]
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,7 @@ class ConfigurationManager:
         self._dashboard_styling_cache: Optional[Dict[str, Any]] = None
         self._dashboard_charts_cache: Optional[Dict[str, Any]] = None
         self._field_category_display_cache: Optional[Dict[str, Any]] = None
+        self._case_study_cache: Optional[Dict[str, Any]] = None
         self._lock = threading.Lock()
 
     def get_system_constants(self) -> Dict[str, Any]:
@@ -153,6 +155,14 @@ class ConfigurationManager:
                     )
         return self._field_category_display_cache
 
+    def get_case_study_config(self) -> Dict[str, Any]:
+        """Load case study configuration with thread-safe caching"""
+        if self._case_study_cache is None:
+            with self._lock:
+                if self._case_study_cache is None:
+                    self._case_study_cache = self._load_json_config("case_study_schema.json")
+        return self._case_study_cache
+
     def clear_cache(self):
         """Clear configuration cache (useful for testing)"""
         with self._lock:
@@ -167,6 +177,7 @@ class ConfigurationManager:
             self._dashboard_styling_cache = None
             self._dashboard_charts_cache = None
             self._field_category_display_cache = None
+            self._case_study_cache = None
 
     def _load_json_config(self, filename: str) -> Dict[str, Any]:
         """Load JSON configuration file with error handling"""
@@ -360,6 +371,11 @@ def get_field_analysis_config() -> Dict[str, Any]:
 def get_field_category_display_mapping() -> Dict[str, Any]:
     """Load field category display mapping with optimized caching"""
     return _config_manager.get_field_category_display_mapping()
+
+
+def get_case_study_config() -> Dict[str, Any]:
+    """Load case study configuration with optimized caching"""
+    return _config_manager.get_case_study_config()
 
 
 def get_entity_names() -> List[str]:

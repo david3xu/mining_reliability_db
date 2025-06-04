@@ -35,6 +35,7 @@ class URLManager:
             "/facilities-distribution",
             "/data-types-distribution",
             "/search",
+            "/case-study-solution-sequence",
         ]
 
         # Add dynamic facility routes
@@ -75,7 +76,10 @@ class URLManager:
             return {"page": "data_types", "component": "data_types_distribution_page"}
 
         if pathname == "/search":
-            return {"page": "incident_search", "component": "incident_search_layout"}
+            return {"page": "search", "component": "incident_search_layout"}
+
+        if pathname == "/case-study-solution-sequence":
+            return {"page": "case_study", "component": "solution_sequence_case_study_layout"}
 
         if pathname.startswith("/facility/"):
             facility_id = pathname.replace("/facility/", "")

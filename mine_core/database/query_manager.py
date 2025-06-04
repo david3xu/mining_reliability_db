@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from configs.environment import (
+    get_case_study_config,
     get_entity_connections,
     get_entity_primary_key,
     get_mappings,
@@ -448,6 +449,23 @@ class QueryManager:
 
         return f"WHERE {' AND '.join(conditions)}" if conditions else ""
 
+    def _validate_input(self, value: Any, validation_config: Dict[str, Any]) -> bool:
+        """Validate input against schema definition"""
+        if validation_config.get("required") and value is None:
+            return False
+
+        if validation_config.get("type") == "string":
+            if not isinstance(value, str):
+                return False
+            if validation_config.get("validation"):  # Regex validation
+                import re
+
+                if not re.match(validation_config["validation"], value):
+                    return False
+        # Add other type validations as needed (e.g., integer, boolean)
+
+        return True
+
     def test_workflow_entities(self):
         """Tests the existence and count of core workflow entities in Neo4j."""
         entities = ["ActionRequest", "Problem", "RootCause", "ActionPlan", "Verification"]
@@ -456,6 +474,91 @@ class QueryManager:
             count = self.get_entity_count(entity)
             logger.info(f"{entity}: {count} records")
         logger.info("--- Workflow Entity Test Complete ---")
+
+    def get_case_study_solution_sequence(
+        self, action_request_number: str, facility_name: str = None
+    ) -> QueryResult:
+        """Schema-driven case study data extraction with facility scoping"""
+        try:
+            from configs.environment import (
+                get_case_study_config,
+                get_entity_connections,
+                get_mappings,
+            )
+
+            # Load case study schema definition
+            case_study_config = get_case_study_config()
+            study_def = case_study_config["case_study_definitions"]["solution_sequence_analysis"]
+
+            # Validate input parameters against schema
+            input_validation = study_def["input_parameters"]["action_request_number"]
+            if not self._validate_input(action_request_number, input_validation):
+                return QueryResult(
+                    data=[],
+                    count=0,
+                    success=False,
+                    metadata={"error": "Invalid action request format"},
+                )
+
+            # Use default facility if not provided
+            if not facility_name:
+                facility_name = study_def["input_parameters"]["facility_name"]["default"]
+
+            # Get actual field mappings from configuration
+            mappings = get_mappings()
+            connections = get_entity_connections()
+
+            # Extract schema-defined field names
+            ar_fields = mappings.get("entity_mappings", {}).get("ActionRequest", {})
+            problem_fields = mappings.get("entity_mappings", {}).get("Problem", {})
+            rc_fields = mappings.get("entity_mappings", {}).get("RootCause", {})
+            ap_fields = mappings.get("entity_mappings", {}).get("ActionPlan", {})
+
+            # Extract schema-defined relationship types
+            problem_to_ar = self._get_relationship_type(
+                connections, "Problem", "ActionRequest", "IDENTIFIED_IN"
+            )
+            rc_to_problem = self._get_relationship_type(
+                connections, "RootCause", "Problem", "ANALYZES"
+            )
+            ap_to_rc = self._get_relationship_type(
+                connections, "ActionPlan", "RootCause", "RESOLVES"
+            )
+
+            # Build schema-driven query with facility scoping - return multiple solution sequences
+            query = f"""
+            MATCH (ar:ActionRequest {{action_request_number: $action_number}})-[:BELONGS_TO]->(f:Facility {{facility_name: $facility_name}})
+            OPTIONAL MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)
+            OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan)
+            OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
+
+            RETURN ar.action_request_number AS action_number,
+                   ar.title AS action_title,
+                   ar.actionrequest_id AS sequence_id,
+                   f.facility_name AS facility,
+                   p.what_happened AS problem_description,
+                   rc.root_cause AS root_cause,
+                   ap.actionplan_id AS action_plan_id,
+                   ap.action_plan AS action_description,
+                   ap.due_date AS due_date,
+                   ap.complete AS complete,
+                   ap.completion_date AS completion_date,
+                   v.is_action_plan_effective AS verification_status
+            ORDER BY ar.actionrequest_id, ap.due_date ASC
+            """
+
+            params = {"action_number": action_request_number, "facility_name": facility_name}
+
+            return self.execute_query(query=query, params=params)
+
+        except Exception as e:
+            handle_error(
+                logger,
+                e,
+                f"schema-driven case study for {action_request_number} in facility {facility_name}",
+            )
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
 
 
 # Singleton pattern

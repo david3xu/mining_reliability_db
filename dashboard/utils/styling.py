@@ -14,8 +14,11 @@ def get_colors() -> Dict[str, str]:
     config_adapter = get_config_adapter()
     styling = config_adapter.get_styling_config()
 
+    primary_color = styling.get("primary_color", "#4A90E2")
+
     return {
-        "primary_blue": styling.get("primary_color", "#4A90E2"),
+        # Original keys
+        "primary_blue": primary_color,
         "light_blue": styling.get("light_blue", "#7BB3F0"),
         "dark_blue": styling.get("dark_blue", "#2E5C8A"),
         "chart_colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
@@ -26,6 +29,14 @@ def get_colors() -> Dict[str, str]:
         "text_light": styling.get("text_light", "#FFFFFF"),
         "grid_color": "#E5E5E5",
         "border_color": "#CCCCCC",
+        # Missing keys that components expect
+        "primary": primary_color,  # Fix for KeyError: 'primary'
+        "accent": styling.get("light_blue", "#7BB3F0"),
+        "card_background": styling.get("background_light", "#FFFFFF"),
+        "success": styling.get("success_color", "#7ED321"),
+        "warning": styling.get("warning_color", "#F5A623"),
+        "error": styling.get("error_color", "#D32F2F"),
+        "info": styling.get("info_color", "#B57EDC"),
     }
 
 

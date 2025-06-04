@@ -58,6 +58,9 @@ from dashboard.components.portfolio_overview import (
     create_metrics_section,
     create_timeline_table,
 )
+from dashboard.components.solution_sequence_case_study import (
+    create_solution_sequence_case_study_layout,
+)
 
 # Navigation Components
 from dashboard.components.tab_navigation import (
@@ -125,4 +128,5 @@ __all__ = [
     "create_data_table",
     "create_workflow_stage_card",
     "create_facility_summary_card",
+    "create_solution_sequence_case_study_layout",
 ]

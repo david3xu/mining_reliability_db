@@ -59,7 +59,22 @@ class IntelligenceEngine:
 
             # Calculate temporal coverage
             temporal_result = self.query_manager.get_temporal_analysis_data()
-            year_coverage = len(temporal_result.data) if temporal_result.success else 0
+
+            # Extract unique years for years_coverage calculation
+            valid_years = []
+            if temporal_result.success:
+                for item in temporal_result.data:
+                    year_str = item.get("year")
+                    if year_str:
+                        try:
+                            year = int(year_str)
+                            if 1900 <= year <= 2100:  # Reasonable year range
+                                valid_years.append(year)
+                        except (ValueError, TypeError):
+                            continue
+
+            years = sorted(list(set(valid_years)))
+            years_coverage = len(years)
 
             # Generate year detail
             year_detail = self._calculate_year_span(temporal_result.data)
@@ -68,7 +83,7 @@ class IntelligenceEngine:
                 "total_records": total_records,
                 "data_fields": field_analysis["total_fields"],
                 "facilities": len(facilities),
-                "years_coverage": year_coverage,
+                "years_coverage": years_coverage,
                 "year_detail": year_detail,
                 "facilities_data": facilities,
             }
@@ -526,22 +541,31 @@ class IntelligenceEngine:
     # Private analysis methods
 
     def _analyze_field_coverage(self) -> Dict[str, Any]:
-        """Analyze field coverage from schema, excluding Facility entity and underscore-prefixed fields."""
+        """Analyze field coverage based on field_mappings.json"""
+        total_fields = 0
+        populated_fields = 0  # This would require actual data checks, not just schema
+        missing_fields = []  # This would require actual data checks
+
+        # Use entity_mappings from field_mappings.json for the count
         entity_mappings = self.mappings.get("entity_mappings", {})
-        unique_fields = set()
 
         for entity_name, field_map in entity_mappings.items():
-            if entity_name == "Facility":
-                continue  # Exclude Facility entity
+            if entity_name == "Facility":  # Exclude Facility entity
+                continue
 
-            # Filter out fields that start with an underscore
-            filtered_fields = [field for field in field_map.values() if not field.startswith("_")]
-            unique_fields.update(filtered_fields)
+            for internal_field_name in field_map.keys():
+                if internal_field_name == "root_cause_tail_extraction":  # Exclude derived field
+                    continue
+                total_fields += 1
+
+        # NOTE: populated_fields and missing_fields cannot be accurately calculated
+        # from just schema/mappings. They would require querying actual data.
+        # For the purpose of this card, we focus on the defined fields count.
 
         return {
-            "total_fields": len(unique_fields),
-            "entities_mapped": len(entity_mappings) - (1 if "Facility" in entity_mappings else 0),
-            "field_list": sorted(list(unique_fields)),
+            "total_fields": total_fields,
+            "populated_fields": populated_fields,
+            "missing_fields": missing_fields,
         }
 
     def _calculate_year_span(self, temporal_data: List[Dict[str, Any]]) -> str:

@@ -284,35 +284,39 @@ def preprocess_facility_data(
         with open(input_file, "r") as f:
             data = json.load(f)
 
-        # Extract records from data structure
-        records = []
+        # Extract records from data structure for field analysis
+        all_records_for_analysis = []
         if isinstance(data, dict):
             if "sheets" in data:
-                # Ensure 'sheets' is a dictionary before iterating over it
+                # For multi-sheet files, only analyze the first sheet for consistency
                 if isinstance(data["sheets"], dict):
-                    for sheet_name, sheet_data in data["sheets"].items():
-                        if isinstance(sheet_data, dict) and "records" in sheet_data:
-                            records.extend(sheet_data["records"])
+                    first_sheet_name = next(iter(data["sheets"]))
+                    first_sheet_data = data["sheets"][first_sheet_name]
+                    if isinstance(first_sheet_data, dict) and "records" in first_sheet_data:
+                        all_records_for_analysis.extend(first_sheet_data["records"])
+                        logger.info(f"Analyzing records from first sheet: '{first_sheet_name}'")
                 else:
                     logger.warning(
                         f"Skipping sheets in {input_file.name}: Expected 'sheets' to be a dictionary, got {type(data.get('sheets', 'N/A'))}"
                     )
             elif "records" in data:
-                records.extend(data["records"])
+                all_records_for_analysis.extend(data["records"])
             else:
-                records.append(data)
+                all_records_for_analysis.append(data)
         elif isinstance(data, list):
-            records.extend(data)
+            all_records_for_analysis.extend(data)
 
-        if not records:
+        if not all_records_for_analysis:
             logger.warning(f"No records found in {input_file}")
             return {"processed": 0, "field_analysis": {}}
 
-        # Comprehensive field analysis
-        field_analysis = analyze_all_field_types(records)
+        # Comprehensive field analysis on all records
+        field_analysis = analyze_all_field_types(all_records_for_analysis)
         list_fields = identify_list_fields(field_analysis)
 
-        logger.info(f"Analyzed {len(field_analysis)} fields across {len(records)} records")
+        logger.info(
+            f"Analyzed {len(field_analysis)} fields across {len(all_records_for_analysis)} records"
+        )
         logger.info(f"Fields requiring list conversion: {list_fields}")
         if enable_schema_conversion:
             logger.info("Schema-aware type conversion enabled")
@@ -324,49 +328,137 @@ def preprocess_facility_data(
                     f"Field '{field_name}': {stats['list_count']}/{stats['total_count']} are lists"
                 )
 
-        # Preprocess all records
-        processed_records = []
+        # Initialize conversion stats
         conversion_stats = {"converted_records": 0, "conversion_errors": 0, "column_42_removed": 0}
-
-        for record in records:
-            try:
-                # Check if 'Column 42' exists before preprocessing
-                had_column_42 = "Column 42" in record
-
-                processed_record = preprocess_record(
-                    record,
-                    list_fields,
-                    field_mappings if enable_schema_conversion else None,
-                    schema_data if enable_schema_conversion else None,
-                )
-                processed_records.append(processed_record)
-                conversion_stats["converted_records"] += 1
-
-                # Count removals
-                if had_column_42:
-                    conversion_stats["column_42_removed"] += 1
-
-            except Exception as e:
-                logger.error(f"Failed to preprocess record: {e}")
-                # Add original record to maintain data integrity
-                processed_records.append(record)
-                conversion_stats["conversion_errors"] += 1
 
         # Create output directory if needed
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Reconstruct data structure
+        # Process data structure based on type
         if isinstance(data, dict) and "sheets" in data:
-            # Multi-sheet structure
-            processed_data = {"sheets": {}}
-            for sheet_name, sheet_data in data["sheets"].items():
-                processed_data["sheets"][sheet_name] = {"records": processed_records}
+            # Multi-sheet structure - use only the first sheet
+            if isinstance(data["sheets"], dict):
+                first_sheet_name = next(iter(data["sheets"]))
+                first_sheet_data = data["sheets"][first_sheet_name]
+
+                logger.info(f"Using first sheet '{first_sheet_name}' from multi-sheet structure")
+
+                if isinstance(first_sheet_data, dict) and "records" in first_sheet_data:
+                    records = first_sheet_data["records"]
+                    processed_records = []
+
+                    for record in records:
+                        try:
+                            # Check if 'Column 42' exists before preprocessing
+                            had_column_42 = "Column 42" in record
+
+                            processed_record = preprocess_record(
+                                record,
+                                list_fields,
+                                field_mappings if enable_schema_conversion else None,
+                                schema_data if enable_schema_conversion else None,
+                            )
+                            processed_records.append(processed_record)
+                            conversion_stats["converted_records"] += 1
+
+                            # Count removals
+                            if had_column_42:
+                                conversion_stats["column_42_removed"] += 1
+
+                        except Exception as e:
+                            logger.error(f"Failed to preprocess record: {e}")
+                            # Add original record to maintain data integrity
+                            processed_records.append(record)
+                            conversion_stats["conversion_errors"] += 1
+
+                    processed_data = {"records": processed_records}
+                else:
+                    logger.warning(
+                        f"First sheet '{first_sheet_name}' does not contain valid records"
+                    )
+                    processed_data = {"records": []}
+            else:
+                logger.warning("Invalid sheets structure, processing as single record")
+                processed_data = data
         elif isinstance(data, dict) and "records" in data:
             # Single records structure
+            records = data["records"]
+            processed_records = []
+
+            for record in records:
+                try:
+                    # Check if 'Column 42' exists before preprocessing
+                    had_column_42 = "Column 42" in record
+
+                    processed_record = preprocess_record(
+                        record,
+                        list_fields,
+                        field_mappings if enable_schema_conversion else None,
+                        schema_data if enable_schema_conversion else None,
+                    )
+                    processed_records.append(processed_record)
+                    conversion_stats["converted_records"] += 1
+
+                    # Count removals
+                    if had_column_42:
+                        conversion_stats["column_42_removed"] += 1
+
+                except Exception as e:
+                    logger.error(f"Failed to preprocess record: {e}")
+                    # Add original record to maintain data integrity
+                    processed_records.append(record)
+                    conversion_stats["conversion_errors"] += 1
+
             processed_data = {"records": processed_records}
-        else:
+        elif isinstance(data, list):
             # Direct list
+            processed_records = []
+
+            for record in data:
+                try:
+                    # Check if 'Column 42' exists before preprocessing
+                    had_column_42 = "Column 42" in record if isinstance(record, dict) else False
+
+                    processed_record = preprocess_record(
+                        record,
+                        list_fields,
+                        field_mappings if enable_schema_conversion else None,
+                        schema_data if enable_schema_conversion else None,
+                    )
+                    processed_records.append(processed_record)
+                    conversion_stats["converted_records"] += 1
+
+                    # Count removals
+                    if had_column_42:
+                        conversion_stats["column_42_removed"] += 1
+
+                except Exception as e:
+                    logger.error(f"Failed to preprocess record: {e}")
+                    # Add original record to maintain data integrity
+                    processed_records.append(record)
+                    conversion_stats["conversion_errors"] += 1
+
             processed_data = processed_records
+        else:
+            # Single record
+            try:
+                had_column_42 = "Column 42" in data if isinstance(data, dict) else False
+
+                processed_data = preprocess_record(
+                    data,
+                    list_fields,
+                    field_mappings if enable_schema_conversion else None,
+                    schema_data if enable_schema_conversion else None,
+                )
+                conversion_stats["converted_records"] = 1
+
+                if had_column_42:
+                    conversion_stats["column_42_removed"] = 1
+
+            except Exception as e:
+                logger.error(f"Failed to preprocess single record: {e}")
+                processed_data = data
+                conversion_stats["conversion_errors"] = 1
 
         # Save processed data
         with open(output_file, "w") as f:
@@ -460,16 +552,19 @@ def preprocess_all_facilities(
                     if "records" in file_content and isinstance(file_content["records"], list):
                         all_records.extend(file_content["records"])
                     elif "sheets" in file_content:
-                        # Handle multi-sheet structure similar to preprocess_facility_data
-                        # Ensure 'sheets' is a dictionary before iterating over it
+                        # Handle multi-sheet structure - only use first sheet for consistency
                         if isinstance(file_content["sheets"], dict):
-                            for sheet_name, sheet_data in file_content["sheets"].items():
-                                if isinstance(sheet_data, dict) and "records" in sheet_data:
-                                    all_records.extend(sheet_data["records"])
-                                else:
-                                    logger.warning(
-                                        f"Skipping sheet '{sheet_name}' in {input_file.name}: Expected dict with 'records' key, got {type(sheet_data)}"
-                                    )
+                            first_sheet_name = next(iter(file_content["sheets"]))
+                            first_sheet_data = file_content["sheets"][first_sheet_name]
+                            if isinstance(first_sheet_data, dict) and "records" in first_sheet_data:
+                                all_records.extend(first_sheet_data["records"])
+                                logger.info(
+                                    f"Using first sheet '{first_sheet_name}' from {input_file.name}"
+                                )
+                            else:
+                                logger.warning(
+                                    f"First sheet '{first_sheet_name}' in {input_file.name}: Expected dict with 'records' key, got {type(first_sheet_data)}"
+                                )
                         else:
                             logger.warning(
                                 f"Skipping sheets in {input_file.name}: Expected 'sheets' to be a dictionary, got {type(file_content['sheets'])}"

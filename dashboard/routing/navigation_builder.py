@@ -94,6 +94,11 @@ class NavigationBuilder:
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Data Quality", href="/data-quality"),
                     dbc.DropdownMenuItem("Workflow Analysis", href="/workflow"),
+                    dbc.DropdownMenuItem("Data Type Distribution", href="/data-types-distribution"),
+                    dbc.DropdownMenuItem(divider=True),
+                    dbc.DropdownMenuItem(
+                        "Solution Intelligence Case Study", href="/case-study-solution-sequence"
+                    ),
                 ]
             )
 
