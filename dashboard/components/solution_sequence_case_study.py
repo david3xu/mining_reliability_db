@@ -32,7 +32,7 @@ def create_solution_sequence_case_study_layout() -> html.Div:
             title="Case Study: Solution Sequence Intelligence",
             content_cards=[
                 create_case_study_header(case_study_data),
-                create_approach_comparison(),
+                create_approach_comparison(case_study_data),
                 create_solution_sequence_detail(case_study_data),
                 create_business_value_summary(),
             ],
@@ -96,16 +96,29 @@ def create_case_study_header(case_data: Dict[str, Any]) -> html.Div:
     )
 
 
-def create_approach_comparison() -> html.Div:
-    """Create traditional vs knowledge graph comparison"""
+def create_approach_comparison(case_data: Dict[str, Any]) -> html.Div:
+    """Create traditional vs knowledge graph comparison using actual root cause data"""
     colors = get_colors()
+
+    # Extract root cause tail extraction from the first sequence
+    problem_text = "problem"  # Default fallback
+    solution_sequences = case_data.get("solution_sequences", [])
+    if solution_sequences:
+        root_cause_tail = solution_sequences[0].get("root_cause_tail_extraction", "")
+        if root_cause_tail and root_cause_tail.strip():
+            problem_text = root_cause_tail.strip()
+        else:
+            # Fallback to regular root cause if tail extraction is not available
+            root_cause = solution_sequences[0].get("root_cause", "")
+            if root_cause and root_cause.strip():
+                problem_text = root_cause.strip()
 
     traditional_box = dbc.Card(
         [
             dbc.CardHeader(html.H4("Traditional Approach", style={"margin": "0"})),
             dbc.CardBody(
                 [
-                    html.P("Engineer faces corrosion cracking problem"),
+                    html.P(f"Engineer faces {problem_text}"),
                     html.Ul(
                         [
                             html.Li("❓ Which solution first?"),

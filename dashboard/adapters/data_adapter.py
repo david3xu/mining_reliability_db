@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from configs.environment import get_case_study_config
+from dashboard.adapters.config_adapter import get_config_adapter
 from dashboard.adapters.interfaces import (
     ComponentMetadata,
     FacilityData,
@@ -262,7 +262,8 @@ class PurifiedDataAdapter:
     def get_solution_sequence_case_study(self) -> Dict[str, Any]:
         """Get solution sequence case study data"""
         try:
-            case_study_config = get_case_study_config()
+            config_adapter = get_config_adapter()
+            case_study_config = config_adapter.get_case_study_config()
             study_params = case_study_config["case_study_definitions"][
                 "solution_sequence_analysis"
             ]["input_parameters"]
@@ -294,6 +295,7 @@ class PurifiedDataAdapter:
                         "facility": record["facility"],
                         "problem": record["problem_description"],
                         "root_cause": record["root_cause"],
+                        "root_cause_tail_extraction": record["root_cause_tail_extraction"],
                         "action_sequence": [],
                     }
 

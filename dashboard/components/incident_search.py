@@ -93,8 +93,8 @@ def create_incident_search_layout() -> html.Div:
 def create_search_results_table(results: list) -> html.Div:
     """Display full search results without truncation"""
     try:
+        from dashboard.adapters import handle_error_utility
         from dashboard.components.micro.table_base import create_data_table
-        from mine_core.shared.common import handle_error as handle_error_utility
 
         # Show FULL content, no truncation
         table_data = []
