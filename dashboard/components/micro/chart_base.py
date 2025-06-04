@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 from dash import dcc
 
 from dashboard.adapters import get_config_adapter
+from dashboard.utils.styling import get_colors
 
 
 def create_pie_chart(labels: list, values: list, title: str) -> dcc.Graph:

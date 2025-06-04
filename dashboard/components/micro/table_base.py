@@ -48,13 +48,15 @@ def create_data_table(
         data=data,
         columns=table_columns,
         style_cell={
-            "textAlign": "left",  # Left align for readability
-            "padding": "12px",
+            "textAlign": "left",
+            "padding": "15px",
             "fontFamily": "Arial, sans-serif",
             "fontSize": "14px",
-            "border": f"1px solid {config.get('border_color', '#CCCCCC')}",
-            "whiteSpace": "normal",  # Allow text wrapping
-            "height": "auto",  # Auto height for full content
+            "border": f"1px solid {config.get('border_color', '#555555')}",
+            "whiteSpace": "normal",
+            "height": "auto",
+            "backgroundColor": config.get("background_light"),
+            "color": config.get("text_primary"),
         },
         style_data={
             "backgroundColor": config.get("background_light"),
@@ -64,11 +66,24 @@ def create_data_table(
             "backgroundColor": config.get("primary_color"),
             "color": config.get("text_light"),
             "fontWeight": "bold",
+            "padding": "15px",
+            "border": f"1px solid {config.get('primary_color', '#64B5F6')}",
+        },
+        style_table={
+            "overflowX": "auto",
+            "border": f"1px solid {config.get('border_color', '#CCCCCC')}",
+            "borderRadius": "8px",
         },
         sort_action="native",
         page_size=10,
         markdown_options={"link_target": "_self"},
-        style_data_conditional=[{"if": {"column_id": link_column}, "textDecoration": "none"}]
+        style_data_conditional=[
+            {
+                "if": {"row_index": "odd"},
+                "backgroundColor": config.get("background_secondary"),
+            },
+            {"if": {"column_id": link_column}, "textDecoration": "none"}
+        ]
         if link_column
         else [],
     )

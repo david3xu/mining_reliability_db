@@ -134,6 +134,7 @@ def create_facility_chart() -> dcc.Graph:
         adapter = get_data_adapter()
         config_adapter = get_config_adapter()
         facility_data = adapter.get_facility_breakdown()
+        colors = get_colors()
         return create_pie_chart(facility_data.labels, facility_data.values, "Facility Distribution")
     except Exception as e:
         handle_error_utility(logger, e, "facility chart creation")
@@ -235,6 +236,7 @@ def create_historical_records_page() -> html.Div:
                             [
                                 html.H4("Historical Records Data", className="mb-3"),
                                 create_timeline_table(),
+                                html.Div(style={"height": "200px"})
                             ]
                         ),
                     ]
