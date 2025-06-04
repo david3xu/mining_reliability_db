@@ -11,3 +11,9 @@
 #timeline-table td a {
     text-decoration: none !important;
 }
+
+/* Custom styling for table rows on hover */
+.dash-table-container .dash-spreadsheet-table tbody tr:hover {
+    background-color: rgba(60,60,60,0.8) !important; /* This should ideally come from config.get("hover_color") */
+    border: 1px solid #64B5F6 !important; /* This should ideally come from config.get("primary_color") */
+}

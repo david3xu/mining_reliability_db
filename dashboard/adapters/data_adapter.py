@@ -60,7 +60,7 @@ class PurifiedDataAdapter:
                 data_fields=portfolio_data.get("data_fields", 0),
                 facilities=portfolio_data.get("facilities", 0),
                 years_coverage=portfolio_data.get("years_coverage", 0),
-                year_detail=portfolio_data.get("year_detail", "Unknown"),
+                year_detail=analysis_result.data.get("year_detail", "Unknown"),
                 metadata=ComponentMetadata(
                     source="core.intelligence_engine",
                     generated_at=analysis_result.generated_at,

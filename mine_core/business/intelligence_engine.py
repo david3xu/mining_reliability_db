@@ -50,34 +50,17 @@ class IntelligenceEngine:
             facility_result = self.query_manager.get_facility_metrics()
             facilities = facility_result.data
 
-            # Get action request counts
-            ar_count_result = self.query_manager.get_entity_count("ActionRequest")
-            total_records = ar_count_result
+            # Get total records from temporal analysis for consistency
+            temporal_analysis_result = self.analyze_temporal_timeline()
+            total_records = temporal_analysis_result.data.get("total_records", 0)
 
             # Analyze field coverage from schema
             field_analysis = self._analyze_field_coverage()
 
-            # Calculate temporal coverage
-            temporal_result = self.query_manager.get_temporal_analysis_data()
-
-            # Extract unique years for years_coverage calculation
-            valid_years = []
-            if temporal_result.success:
-                for item in temporal_result.data:
-                    year_str = item.get("year")
-                    if year_str:
-                        try:
-                            year = int(year_str)
-                            if 1900 <= year <= 2100:  # Reasonable year range
-                                valid_years.append(year)
-                        except (ValueError, TypeError):
-                            continue
-
-            years = sorted(list(set(valid_years)))
-            years_coverage = len(years)
-
-            # Generate year detail
-            year_detail = self._calculate_year_span(temporal_result.data)
+            # Calculate temporal coverage (already done in analyze_temporal_timeline, but keeping for direct access to years_coverage and year_detail)
+            # We'll just extract these from temporal_analysis_result
+            years_coverage = len(temporal_analysis_result.metadata.get("years", []))
+            year_detail = temporal_analysis_result.data.get("year_detail", "Unknown")
 
             portfolio_data = {
                 "total_records": total_records,
@@ -282,12 +265,16 @@ class IntelligenceEngine:
             # Build timeline structure
             timeline_data = self._build_timeline_matrix(facilities, temporal_result.data)
 
+            # Calculate year span string for display
+            year_span_str = self._calculate_year_span(temporal_result.data)
+            timeline_data["year_detail"] = year_span_str  # Add year_detail to data
+
             return IntelligenceResult(
                 analysis_type="temporal_timeline",
                 data=timeline_data,
                 metadata={
                     "facilities": len(facilities),
-                    "years": len(timeline_data.get("year_range", [])),
+                    "years": timeline_data.get("year_range", []),
                 },
                 quality_score=1.0 if timeline_data["total_records"] > 0 else 0.0,
                 generated_at=datetime.now().isoformat(),
@@ -628,6 +615,8 @@ class IntelligenceEngine:
         self, facilities: List[Dict], temporal_data: List[Dict]
     ) -> Dict[str, Any]:
         """Build timeline matrix from facility and temporal data"""
+        logger.info(f"_build_timeline_matrix: Received temporal_data: {temporal_data[:5]} (showing first 5 entries)")
+
         # Extract years with validation
         valid_years = []
         for item in temporal_data:
@@ -643,6 +632,7 @@ class IntelligenceEngine:
                     continue
 
         years = sorted(list(set(valid_years)))
+        logger.info(f"_build_timeline_matrix: Extracted and sorted years: {years}")
 
         if not years:
             # Return empty structure if no valid years found

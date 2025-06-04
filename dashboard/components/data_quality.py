@@ -71,12 +71,12 @@ def create_41_field_completion_analysis() -> html.Div:
                 [
                     html.H5(
                         f"100% Complete Fields ({len(complete_fields)} fields):",
-                        style={"color": colors.get("success_color"), "marginBottom": "10px"},
+                        style={"color": colors.get("success"), "marginBottom": "10px"},
                     ),
                     html.P(
                         ", ".join(complete_fields),
                         style={
-                            "backgroundColor": colors.get("success_color"),
+                            "backgroundColor": colors.get("success"),
                             "color": colors.get("text_light"),
                             "padding": "10px",
                             "borderRadius": "5px",
@@ -114,7 +114,7 @@ def create_raw_field_completion_chart(
     """Chart using exact raw field names from field_mappings.json"""
     colors = get_colors()
     if not incomplete_fields:
-        return html.P("All fields are 100% complete!", style={"color": colors.get("success_color")})
+        return html.P("All fields are 100% complete!", style={"color": colors.get("success")})
 
     raw_field_names = [field[0] for field in incomplete_fields]
     completion_rates = [field[1] for field in incomplete_fields]
@@ -123,11 +123,11 @@ def create_raw_field_completion_chart(
     colors_list = []
     for rate in completion_rates:
         if rate >= 80:
-            colors_list.append(colors.get("success_color"))  # Green
+            colors_list.append(colors.get("success"))  # Green
         elif rate >= 60:
-            colors_list.append(colors.get("warning_color"))  # Orange
+            colors_list.append(colors.get("warning"))  # Orange
         else:
-            colors_list.append(colors.get("error_color"))  # Red
+            colors_list.append(colors.get("error"))  # Red
 
     fig = go.Figure()
     fig.add_trace(
@@ -173,7 +173,7 @@ def create_action_request_facility_table() -> html.Div:
                     html.H4("ActionRequest Facility Statistics", className="mb-3"),
                     html.P(
                         "No ActionRequest facility data available",
-                        style={"color": colors.get("warning_color"), "fontStyle": "italic"},
+                        style={"color": colors.get("warning"), "fontStyle": "italic"},
                     ),
                 ]
             )
@@ -198,7 +198,7 @@ def create_action_request_facility_table() -> html.Div:
                     [
                         html.H6(
                             "Total Records",
-                            style={"color": colors.get("success_color"), "margin": "0"},
+                            style={"color": colors.get("success"), "margin": "0"},
                         ),
                         html.H4(
                             f"{summary_totals.get('total_records', 0):,}",
@@ -218,7 +218,7 @@ def create_action_request_facility_table() -> html.Div:
                     [
                         html.H6(
                             "Unique Actions",
-                            style={"color": colors.get("warning_color"), "margin": "0"},
+                            style={"color": colors.get("warning"), "margin": "0"},
                         ),
                         html.H4(
                             f"{summary_totals.get('total_unique_actions', 0):,}",
@@ -238,7 +238,7 @@ def create_action_request_facility_table() -> html.Div:
                     [
                         html.H6(
                             "Records/Action",
-                            style={"color": colors.get("info_color"), "margin": "0"},
+                            style={"color": colors.get("info"), "margin": "0"},
                         ),
                         html.H4(
                             f"{summary_totals.get('records_per_action', 0):.1f}",
@@ -258,7 +258,7 @@ def create_action_request_facility_table() -> html.Div:
                     [
                         html.H6(
                             "Max Records/Action",
-                            style={"color": colors.get("error_color"), "margin": "0"},
+                            style={"color": colors.get("error"), "margin": "0"},
                         ),
                         html.H4(
                             f"{summary_totals.get('max_records_per_action', 0):,}",
@@ -305,17 +305,17 @@ def create_action_request_facility_table() -> html.Div:
         conditional_formatting = [
             {
                 "if": {"column_id": "Records/Action", "filter_query": "{Records/Action} > 10"},
-                "backgroundColor": colors.get("error_color"),
+                "backgroundColor": colors.get("error"),
                 "color": colors.get("text_light"),
             },
             {
                 "if": {"column_id": "Records/Action", "filter_query": "{Records/Action} > 5"},
-                "backgroundColor": colors.get("warning_color"),
+                "backgroundColor": colors.get("warning"),
                 "color": colors.get("text_primary"),
             },
             {
                 "if": {"column_id": "Records/Action", "filter_query": "{Records/Action} <= 5"},
-                "backgroundColor": colors.get("success_color"),
+                "backgroundColor": colors.get("success"),
                 "color": colors.get("text_light"),
             },
         ]
