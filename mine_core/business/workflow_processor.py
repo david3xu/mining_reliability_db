@@ -380,7 +380,7 @@ class WorkflowProcessor:
             if entity == "ActionRequest":
                 # Use the same field-level completion calculation as _process_workflow_stages for consistency
                 ar_count = self.query_manager.get_entity_count("ActionRequest")
-                
+
                 if stage_config:
                     business_fields = stage_config.get("business_fields", [])
                     completion_rate = self._calculate_stage_field_completion(
