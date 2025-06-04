@@ -137,10 +137,14 @@ class WorkflowProcessor:
             # Get total ActionRequest count as the universal base for supporting entity completeness
             total_action_requests_for_support = self.query_manager.get_entity_count("ActionRequest")
             if total_action_requests_for_support == 0:
-                logger.warning("WorkflowProcessor: No ActionRequest records found for supporting entities completion. Defaulting to 0.")
+                logger.warning(
+                    "WorkflowProcessor: No ActionRequest records found for supporting entities completion. Defaulting to 0."
+                )
 
             # Process supporting entities, passing the total ActionRequest count
-            supporting_entities = self._process_supporting_entities(total_action_requests_for_support)
+            supporting_entities = self._process_supporting_entities(
+                total_action_requests_for_support
+            )
 
             # Generate completion summary
             completion_summary = self._generate_completion_summary(entity_completion_data)
@@ -191,9 +195,13 @@ class WorkflowProcessor:
             workflow_analysis = self.process_workflow_business_analysis()
 
             # Get total ActionRequest count as the universal base for supporting entity completeness
-            total_action_requests_for_visualization = self.query_manager.get_entity_count("ActionRequest")
+            total_action_requests_for_visualization = self.query_manager.get_entity_count(
+                "ActionRequest"
+            )
             if total_action_requests_for_visualization == 0:
-                logger.warning("WorkflowProcessor: No ActionRequest records found for supporting entities visualization. Defaulting to 0.")
+                logger.warning(
+                    "WorkflowProcessor: No ActionRequest records found for supporting entities visualization. Defaulting to 0."
+                )
 
             # Get entity classification for supporting entities
             entity_classification = get_entity_classification()
@@ -227,7 +235,9 @@ class WorkflowProcessor:
         entity_fields = entity_mappings.get(entity_name, {})
         return list(entity_fields.keys())
 
-    def calculate_comprehensive_field_completion(self, entity_name: str, total_action_requests: int) -> Dict[str, Any]:
+    def calculate_comprehensive_field_completion(
+        self, entity_name: str, total_action_requests: int
+    ) -> Dict[str, Any]:
         """Calculate completion rate for every field in entity"""
         try:
             all_fields = self.get_all_entity_fields(entity_name)
@@ -239,19 +249,26 @@ class WorkflowProcessor:
                     "entity_name": entity_name,
                     "completion_rate": 100.0 if ar_total_count > 0 else 0.0,
                     "field_count": len(all_fields),
-                    "field_details": [{
-                        "field_name": "Action Request Number",
-                        "valid_count": ar_total_count,
-                        "total_count": ar_total_count,
-                        "completion_rate": 100.0 if ar_total_count > 0 else 0.0,
-                    }],
+                    "field_details": [
+                        {
+                            "field_name": "Action Request Number",
+                            "valid_count": ar_total_count,
+                            "total_count": ar_total_count,
+                            "completion_rate": 100.0 if ar_total_count > 0 else 0.0,
+                        }
+                    ],
                     "total_records": ar_total_count,
                 }
 
             # For other entities, count how many instances are connected to an ActionRequest and have essential fields
             # The total_count for these entities will now be total_action_requests.
             if total_action_requests == 0 or not all_fields:
-                return {"entity_name": entity_name, "completion_rate": 0.0, "field_details": [], "total_records": total_action_requests}
+                return {
+                    "entity_name": entity_name,
+                    "completion_rate": 0.0,
+                    "field_details": [],
+                    "total_records": total_action_requests,
+                }
 
             field_details = []
             completion_rates = []
@@ -283,26 +300,33 @@ class WorkflowProcessor:
                     {
                         "field_name": field,
                         "valid_count": valid_count,
-                        "total_count": total_action_requests, # Base is total ActionRequests
+                        "total_count": total_action_requests,  # Base is total ActionRequests
                         "completion_rate": field_rate,
                     }
                 )
                 completion_rates.append(field_rate)
 
             # Calculate overall rate as average of field rates
-            overall_rate = sum(completion_rates) / len(completion_rates) if completion_rates else 0.0
+            overall_rate = (
+                sum(completion_rates) / len(completion_rates) if completion_rates else 0.0
+            )
 
             return {
                 "entity_name": entity_name,
                 "completion_rate": overall_rate,
                 "field_count": len(all_fields),
                 "field_details": field_details,
-                "total_records": total_action_requests, # Base is total ActionRequests
+                "total_records": total_action_requests,  # Base is total ActionRequests
             }
 
         except Exception as e:
             handle_error(logger, e, f"comprehensive completion for {entity_name}")
-            return {"entity_name": entity_name, "completion_rate": 0.0, "field_details": [], "total_records": 0}
+            return {
+                "entity_name": entity_name,
+                "completion_rate": 0.0,
+                "field_details": [],
+                "total_records": 0,
+            }
 
     def analyze_all_entity_completions(self) -> Dict[str, Any]:
         """Calculate comprehensive completion for all workflow entities and supporting entities based on raw field averages"""
@@ -323,21 +347,24 @@ class WorkflowProcessor:
         # Get all 41 raw field completion rates (already based on ActionRequest count)
         raw_field_completion_rates = self.calculate_raw_field_completion_rates()
         if not raw_field_completion_rates:
-            logger.warning("WorkflowProcessor: No raw field completion rates available. Cannot calculate entity completion rates.")
+            logger.warning(
+                "WorkflowProcessor: No raw field completion rates available. Cannot calculate entity completion rates."
+            )
             return {"workflow_entities": {}, "supporting_entities": {}}
 
         total_action_requests = self.query_manager.get_entity_count("ActionRequest")
         if total_action_requests == 0:
-            logger.warning("WorkflowProcessor: No ActionRequest records found. Cannot calculate entity completion rates based on total ActionRequests.")
+            logger.warning(
+                "WorkflowProcessor: No ActionRequest records found. Cannot calculate entity completion rates based on total ActionRequests."
+            )
             return {"workflow_entities": {}, "supporting_entities": {}}
-
 
         # Helper to get raw field names for a given entity
         def _get_raw_fields_for_entity(entity_name_to_map: str) -> List[str]:
             entity_raw_fields = []
             entity_mappings = self.mappings.get("entity_mappings", {}).get(entity_name_to_map, {})
             for internal_field, raw_field in entity_mappings.items():
-                if raw_field != "root_cause_tail_extraction": # Ensure derived field is skipped
+                if raw_field != "root_cause_tail_extraction":  # Ensure derived field is skipped
                     entity_raw_fields.append(raw_field)
             return entity_raw_fields
 
@@ -352,12 +379,12 @@ class WorkflowProcessor:
                     "entity_name": entity,
                     "completion_rate": completion_rate,
                     "field_count": total_fields,
-                    "total_records": ar_count, # Use actual AR count here
+                    "total_records": ar_count,  # Use actual AR count here
                 }
             else:
                 entity_raw_fields = _get_raw_fields_for_entity(entity)
                 relevant_field_rates = [
-                    raw_field_completion_rates.get(field, 0.0) # Get rate from 41-field analysis
+                    raw_field_completion_rates.get(field, 0.0)  # Get rate from 41-field analysis
                     for field in entity_raw_fields
                 ]
                 completion_rate = (
@@ -370,14 +397,14 @@ class WorkflowProcessor:
                     "entity_name": entity,
                     "completion_rate": round(completion_rate, 1),
                     "field_count": total_fields,
-                    "total_records": total_action_requests, # Base is always total ActionRequests
+                    "total_records": total_action_requests,  # Base is always total ActionRequests
                 }
 
         # Calculate completeness for supporting entities
         for entity in supporting_entities:
             entity_raw_fields = _get_raw_fields_for_entity(entity)
             relevant_field_rates = [
-                raw_field_completion_rates.get(field, 0.0) # Get rate from 41-field analysis
+                raw_field_completion_rates.get(field, 0.0)  # Get rate from 41-field analysis
                 for field in entity_raw_fields
             ]
             completion_rate = (
@@ -390,7 +417,7 @@ class WorkflowProcessor:
                 "entity_name": entity,
                 "completion_rate": round(completion_rate, 1),
                 "field_count": total_fields,
-                "total_records": total_action_requests, # Base is always total ActionRequests
+                "total_records": total_action_requests,  # Base is always total ActionRequests
             }
 
         return {
@@ -424,15 +451,21 @@ class WorkflowProcessor:
             # Get total ActionRequest count as the universal base for completeness
             total_action_requests = self.query_manager.get_entity_count("ActionRequest")
             if total_action_requests == 0:
-                logger.warning("WorkflowProcessor: No ActionRequest records found. Cannot calculate raw field completion rates.")
+                logger.warning(
+                    "WorkflowProcessor: No ActionRequest records found. Cannot calculate raw field completion rates."
+                )
                 return {}
 
-            logger.info(f"WorkflowProcessor: Total ActionRequest count (base for completeness): {total_action_requests}")
+            logger.info(
+                f"WorkflowProcessor: Total ActionRequest count (base for completeness): {total_action_requests}"
+            )
 
             # Process each entity's field mappings
             for entity_name, field_mapping in entity_mappings.items():
                 if entity_name == "Facility":
-                    logger.info("WorkflowProcessor: Skipping 'Facility' entity for raw field completion calculation.")
+                    logger.info(
+                        "WorkflowProcessor: Skipping 'Facility' entity for raw field completion calculation."
+                    )
                     continue
 
                 # Use total_action_requests as the base for all calculations
@@ -441,8 +474,10 @@ class WorkflowProcessor:
 
                 for internal_field, raw_field in field_mapping.items():
                     # Exclude 'root_cause_tail_extraction' which is a derived field and not a raw field for completeness analysis
-                    if internal_field == 'root_cause_tail_extraction':
-                        logger.info(f"WorkflowProcessor: Skipping derived field '{internal_field}' from raw field completion calculation.")
+                    if internal_field == "root_cause_tail_extraction":
+                        logger.info(
+                            f"WorkflowProcessor: Skipping derived field '{internal_field}' from raw field completion calculation."
+                        )
                         continue
                     query = f"""
                     MATCH (n:{entity_name})
@@ -693,7 +728,9 @@ class WorkflowProcessor:
         }
         return title_mapping.get(entity_name, entity_name)
 
-    def _get_entity_info_for_support(self, entity_name: str, total_action_requests: int) -> Dict[str, Any]:
+    def _get_entity_info_for_support(
+        self, entity_name: str, total_action_requests: int
+    ) -> Dict[str, Any]:
         """Retrieve pre-calculated entity information for supporting entities"""
         try:
             # Get comprehensive analysis which now calculates all entity completions
@@ -713,7 +750,7 @@ class WorkflowProcessor:
                     "entity_name": entity_name,
                     "field_count": field_count,
                     "completion_rate": 0.0,
-                    "entity_count": total_action_requests, # Base is total ActionRequests
+                    "entity_count": total_action_requests,  # Base is total ActionRequests
                     "card_height": 120,  # Standard supporting entity height
                 }
 
@@ -721,7 +758,13 @@ class WorkflowProcessor:
 
         except Exception as e:
             handle_error(logger, e, f"retrieving supporting entity info for {entity_name}")
-            return {"entity_name": entity_name, "field_count": 0, "completion_rate": 0.0, "entity_count": 0, "card_height": 120}
+            return {
+                "entity_name": entity_name,
+                "field_count": 0,
+                "completion_rate": 0.0,
+                "entity_count": 0,
+                "card_height": 120,
+            }
 
     def _stage_to_dict(self, stage: WorkflowStage) -> Dict[str, Any]:
         """Convert WorkflowStage to dictionary"""
