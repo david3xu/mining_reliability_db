@@ -2,6 +2,7 @@
 """
 Data Adapter - Core Data Pipeline Integration
 Unified data access layer with standardized interface.
+Architecture compliant: uses config_adapter instead of direct config imports.
 """
 
 import logging
