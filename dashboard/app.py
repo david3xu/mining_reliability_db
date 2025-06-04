@@ -218,7 +218,12 @@ class PurifiedDashboardApp:
                 from dashboard.components.incident_search import create_incident_search_layout
 
                 return create_incident_search_layout()
+            elif component_name == "solution_sequence_case_study_layout":
+                from dashboard.components.solution_sequence_case_study import (
+                    create_solution_sequence_case_study_layout,
+                )
 
+                return create_solution_sequence_case_study_layout()
             elif component_name == "facility_detail_layout":
                 facility_id = route_config.get("facility_id")
                 from dashboard.components.facility_detail import create_facility_detail_layout
@@ -229,7 +234,10 @@ class PurifiedDashboardApp:
                 return self._create_facilities_summary()
 
             else:
-                return self._create_not_found_page(route_config.get("page", "unknown"))
+                # Default to summary page if component is not recognized
+                from dashboard.components.summary import create_summary_layout
+
+                return create_summary_layout()
 
         except Exception as e:
             handle_error(logger, e, f"component loading for {component_name}")

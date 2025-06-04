@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from configs.environment import get_case_study_config
 from dashboard.adapters.interfaces import (
     ComponentMetadata,
     FacilityData,
@@ -248,16 +249,83 @@ class PurifiedDataAdapter:
             # Use schema-driven method
             search_result = query_manager.search_using_schema_configuration(search_text)
 
-            if not search_result.success:
-                logger.warning(f"Schema search failed: {search_result.metadata}")
+            if not search_result.success or not search_result.data:
                 return []
 
-            logger.info(f"Schema search found {search_result.count} results")
+            # Process and return data in a clean format
             return search_result.data
 
         except Exception as e:
-            handle_error(logger, e, f"schema-driven search adapter for '{search_text}'")
+            handle_error(logger, e, f"schema-driven search for '{search_text}'")
             return []
+
+    def get_solution_sequence_case_study(self) -> Dict[str, Any]:
+        """Get solution sequence case study data"""
+        try:
+            case_study_config = get_case_study_config()
+            study_params = case_study_config["case_study_definitions"][
+                "solution_sequence_analysis"
+            ]["input_parameters"]
+            action_request_number = study_params["action_request_number"]["default"]
+            facility_name = study_params["facility_name"]["default"]
+            logger.info(
+                f"Adapter: Fetching case study data for {action_request_number} in facility {facility_name}"
+            )
+
+            from mine_core.database.query_manager import get_query_manager
+
+            query_manager = get_query_manager()
+
+            case_study_result = query_manager.get_case_study_solution_sequence(
+                action_request_number, facility_name
+            )
+
+            if not case_study_result.success or not case_study_result.data:
+                return {"error": "Case study data not found"}
+
+            # Group the records by sequence_id (actionrequest_id) to create multiple solution sequences
+            sequences = {}
+            for record in case_study_result.data:
+                sequence_id = record["sequence_id"]
+                if sequence_id not in sequences:
+                    sequences[sequence_id] = {
+                        "action_request": record["action_number"],
+                        "action_title": record["action_title"],
+                        "facility": record["facility"],
+                        "problem": record["problem_description"],
+                        "root_cause": record["root_cause"],
+                        "action_sequence": [],
+                    }
+
+                # Add action plan if it exists
+                if record["action_plan_id"]:
+                    sequences[sequence_id]["action_sequence"].append(
+                        {
+                            "action_plan_id": record["action_plan_id"],
+                            "action_description": record["action_description"],
+                            "due_date": record["due_date"],
+                            "complete": record["complete"],
+                            "completion_date": record["completion_date"],
+                            "verification_status": record["verification_status"],
+                        }
+                    )
+
+            # Convert to list and add total counts
+            solution_sequences = []
+            for seq_id, seq_data in sequences.items():
+                seq_data["sequence_id"] = seq_id
+                seq_data["total_actions"] = len(seq_data["action_sequence"])
+                solution_sequences.append(seq_data)
+
+            return {
+                "solution_sequences": solution_sequences,
+                "total_sequences": len(solution_sequences),
+                "action_request_number": action_request_number,
+            }
+
+        except Exception as e:
+            handle_error(logger, e, f"solution sequence case study for {action_request_number}")
+            return {"error": str(e)}
 
     def get_action_request_facility_summary(self) -> Dict[str, Any]:
         """Pure data access for ActionRequest facility statistics summary"""

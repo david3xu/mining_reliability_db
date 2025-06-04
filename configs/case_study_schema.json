@@ -1,0 +1,40 @@
+{
+  "case_study_definitions": {
+    "solution_sequence_analysis": {
+      "input_parameters": {
+        "action_request_number": {
+          "type": "string",
+          "required": true,
+          "validation": "^[A-Z0-9-]+$",
+          "default": "2021-06400",
+          "description": "Primary identifier for incident analysis"
+        },
+        "facility_name": {
+          "type": "string",
+          "required": true,
+          "default": "mining_maintenance_nested",
+          "description": "Facility name to scope the action request number (ensures uniqueness)"
+        }
+      },
+      "entity_traversal": [
+        "ActionRequest",
+        "Problem",
+        "RootCause",
+        "ActionPlan"
+      ],
+      "output_structure": {
+        "incident_metadata": [
+          "action_number",
+          "facility",
+          "problem_description"
+        ],
+        "analysis_data": ["root_cause"],
+        "solution_sequence": [
+          "action_plans",
+          "effectiveness",
+          "implementation_dates"
+        ]
+      }
+    }
+  }
+}
