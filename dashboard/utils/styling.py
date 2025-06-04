@@ -21,6 +21,7 @@ def get_colors() -> Dict[str, str]:
         "primary_blue": primary_color,
         "light_blue": styling.get("light_blue", "#7BB3F0"),
         "dark_blue": styling.get("dark_blue", "#2E5C8A"),
+        "granular_completion_colors": styling.get("granular_completion_colors", []),
         "chart_colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
         "background_light": styling.get("background_light", "#FFFFFF"),
         "background_dark": styling.get("background_dark", "#1E1E1E"),
