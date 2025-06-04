@@ -43,6 +43,10 @@ class NavigationBuilder:
                     dbc.NavLink("Workflow Analysis", href="/workflow", className="nav-link"),
                     style={"display": "flex", "alignItems": "center"},
                 ),
+                dbc.NavItem(
+                    dbc.NavLink("Stakeholder Questions", href="/stakeholder-questions", className="nav-link"),
+                    style={"display": "flex", "alignItems": "center"},
+                ),
             ]
 
             # Analysis dropdown with facility data

@@ -195,6 +195,12 @@ class PurifiedDashboardApp:
 
                 return create_workflow_analysis_layout()
 
+            elif component_name == "stakeholder_questions_layout":
+                from dashboard.layouts.stakeholder_questions_layout import create_stakeholder_questions_layout
+
+                category_id = route_config.get("category_id")
+                return create_stakeholder_questions_layout(category_id)
+
             elif component_name == "historical_records_page":
                 from dashboard.components.portfolio_overview import create_historical_records_page
 
@@ -234,10 +240,10 @@ class PurifiedDashboardApp:
                 return self._create_facilities_summary()
 
             else:
-                # Default to summary page if component is not recognized
-                from dashboard.components.summary import create_summary_layout
+                # Default to portfolio overview if component is not recognized
+                from dashboard.components.portfolio_overview import create_complete_dashboard
 
-                return create_summary_layout()
+                return create_complete_dashboard()
 
         except Exception as e:
             handle_error(logger, e, f"component loading for {component_name}")

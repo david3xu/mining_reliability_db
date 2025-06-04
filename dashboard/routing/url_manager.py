@@ -30,6 +30,7 @@ class URLManager:
             "/",
             "/data-quality",
             "/workflow",
+            "/stakeholder-questions",
             "/summary",
             "/historical-records",
             "/facilities-distribution",
@@ -62,6 +63,17 @@ class URLManager:
 
         if pathname == "/workflow":
             return {"page": "workflow", "component": "workflow_analysis_layout"}
+
+        if pathname == "/stakeholder-questions":
+            return {"page": "stakeholder_questions", "component": "stakeholder_questions_layout"}
+
+        if pathname.startswith("/stakeholder-questions/"):
+            category_id = pathname.replace("/stakeholder-questions/", "")
+            return {
+                "page": "stakeholder_questions",
+                "component": "stakeholder_questions_layout",
+                "category_id": category_id
+            }
 
         if pathname == "/summary":
             return {"page": "summary", "component": "facilities_summary"}

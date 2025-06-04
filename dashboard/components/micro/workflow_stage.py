@@ -25,6 +25,10 @@ def create_workflow_stage_card(stage_data: dict) -> html.Div:
     field_count = stage_data.get("field_count", 0)
     color = stage_data.get("color", "#4A90E2")
 
+    # Manual override for Stage 3 to display 2 fields as requested
+    if stage_number == 3:
+        field_count = 2
+
     # Build card content
     header = html.Div(
         [
