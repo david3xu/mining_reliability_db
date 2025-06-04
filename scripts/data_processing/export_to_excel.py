@@ -68,17 +68,20 @@ class ExcelExporter:
             output_file.parent.mkdir(parents=True, exist_ok=True)
 
             # Export to Excel
-            with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-                df.to_excel(writer, sheet_name='Mining Records', index=False)
+            with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
+                df.to_excel(writer, sheet_name="Mining Records", index=False)
 
                 # Auto-adjust column widths
-                worksheet = writer.sheets['Mining Records']
+                worksheet = writer.sheets["Mining Records"]
                 for i, col in enumerate(df.columns):
                     # Find the maximum length in the column
-                    max_len = max(
-                        df[col].astype(str).apply(len).max(),  # max length of values
-                        len(str(col))  # length of column name
-                    ) + 2  # add a little extra space
+                    max_len = (
+                        max(
+                            df[col].astype(str).apply(len).max(),  # max length of values
+                            len(str(col)),  # length of column name
+                        )
+                        + 2
+                    )  # add a little extra space
 
                     # Set column width (limited to reasonable size)
                     worksheet.set_column(i, i, min(max_len, 50))
@@ -97,11 +100,7 @@ class ExcelExporter:
         # Load data
         records = self.load_json_data(input_file)
         if not records:
-            return {
-                "input_file": input_file.name,
-                "records": 0,
-                "status": "no_records"
-            }
+            return {"input_file": input_file.name, "records": 0, "status": "no_records"}
 
         # Export to Excel
         success = self.export_to_excel(records, output_file)
@@ -109,17 +108,23 @@ class ExcelExporter:
         return {
             "input_file": input_file.name,
             "records": len(records),
-            "status": "success" if success else "failed"
+            "status": "success" if success else "failed",
         }
 
 
 def main():
     """Main function with command line interface."""
     parser = argparse.ArgumentParser(description="Export merged JSON records to Excel")
-    parser.add_argument("--input-dir", default="data/facility_data", help="Input directory with JSON files")
-    parser.add_argument("--output-dir", default="data/excel_output", help="Output directory for Excel files")
+    parser.add_argument(
+        "--input-dir", default="data/facility_data", help="Input directory with JSON files"
+    )
+    parser.add_argument(
+        "--output-dir", default="data/excel_output", help="Output directory for Excel files"
+    )
     parser.add_argument("--input-file", help="Process single file")
-    parser.add_argument("--output-file", help="Output Excel filename (when processing a single file)")
+    parser.add_argument(
+        "--output-file", help="Output Excel filename (when processing a single file)"
+    )
 
     args = parser.parse_args()
 

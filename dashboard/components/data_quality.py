@@ -7,9 +7,9 @@ Quality assessment components with clean adapter integration.
 import logging
 from typing import Dict, List, Tuple
 
+import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 from dash import dash_table, dcc, html
-import dash_bootstrap_components as dbc
 
 from dashboard.adapters import get_data_adapter, get_workflow_adapter, handle_error_utility
 from dashboard.components.layout_template import create_standard_layout
@@ -56,9 +56,7 @@ def create_41_field_completion_analysis() -> html.Div:
         # Calculate average completeness for all 41 fields
         all_completion_rates = list(field_completion_data.values())
         average_completeness = (
-            sum(all_completion_rates) / len(all_completion_rates)
-            if all_completion_rates
-            else 0.0
+            sum(all_completion_rates) / len(all_completion_rates) if all_completion_rates else 0.0
         )
 
         # Separate 100% complete from incomplete fields
@@ -81,9 +79,11 @@ def create_41_field_completion_analysis() -> html.Div:
             shortened_name = _shorten_field_name(original_name)
             if shortened_name in shortened_name_counts:
                 shortened_name_counts[shortened_name] += 1
-                chart_display_names.append(f"{shortened_name} ({shortened_name_counts[shortened_name]})")
+                chart_display_names.append(
+                    f"{shortened_name} ({shortened_name_counts[shortened_name]})"
+                )
             else:
-                shortened_name_counts[shortened_name] = 0 # Initialize count
+                shortened_name_counts[shortened_name] = 0  # Initialize count
                 chart_display_names.append(shortened_name)
 
         # Create 100% complete fields display (reverted to original full-width style)
@@ -95,7 +95,9 @@ def create_41_field_completion_analysis() -> html.Div:
                         style={"color": colors.get("success"), "marginBottom": "10px"},
                     ),
                     html.P(
-                        ", ".join([_shorten_field_name(f) for f in complete_fields]),  # Shorten for display
+                        ", ".join(
+                            [_shorten_field_name(f) for f in complete_fields]
+                        ),  # Shorten for display
                         style={
                             "backgroundColor": colors.get("success"),
                             "color": colors.get("text_light"),
@@ -104,10 +106,12 @@ def create_41_field_completion_analysis() -> html.Div:
                         },
                     ),
                 ],
-                 className="mb-4 p-3 rounded", # Added some padding and rounded corners
-                 style={
-                     "backgroundColor": colors.get("success_darker"), # Using a darker green for contrast
-                 }
+                className="mb-4 p-3 rounded",  # Added some padding and rounded corners
+                style={
+                    "backgroundColor": colors.get(
+                        "success_darker"
+                    ),  # Using a darker green for contrast
+                },
             )
             if complete_fields
             else html.Div()
@@ -164,7 +168,7 @@ def create_41_field_completion_analysis() -> html.Div:
                     "margin": "5px",
                 },
             ),
-            width=6, # Adjusted width for two cards in a row
+            width=6,  # Adjusted width for two cards in a row
         )
 
         # Create incomplete fields chart
@@ -175,11 +179,11 @@ def create_41_field_completion_analysis() -> html.Div:
         return html.Div(
             [
                 html.H3("Field Completeness Analysis (41 Fields)", className="mb-4"),
-                complete_section, # Place the original 100% complete section here
+                complete_section,  # Place the original 100% complete section here
                 dbc.Row(
                     [
-                        average_completeness_card, # Smaller average completeness card
-                        total_fields_card, # Smaller total data fields card
+                        average_completeness_card,  # Smaller average completeness card
+                        total_fields_card,  # Smaller total data fields card
                     ],
                     justify="center",
                     className="mb-4",
@@ -213,18 +217,18 @@ def create_raw_field_completion_chart(
     granular_colors = colors.get("granular_completion_colors", [])
     if not granular_colors:
         logger.warning("No granular_completion_colors found in config. Falling back to Viridis.")
-        color_for_bars = completion_rates # Use rates for continuous Viridis if no granular colors
-        colorscale_type = 'Viridis'
+        color_for_bars = completion_rates  # Use rates for continuous Viridis if no granular colors
+        colorscale_type = "Viridis"
     else:
         # Map completion rates to the granular color palette
         color_for_bars = []
         for rate in completion_rates:
             # Calculate index: 0-4.9% -> index 0, 5-9.9% -> index 1, ..., 95-99.9% -> index 19, 100% -> index 20
-            color_index = int(rate / 5) # Divides by 5, truncates to get the 5% interval index
+            color_index = int(rate / 5)  # Divides by 5, truncates to get the 5% interval index
             # Ensure index does not go out of bounds (max index is len(granular_colors) - 1)
             color_index = min(color_index, len(granular_colors) - 1)
             color_for_bars.append(granular_colors[color_index])
-        colorscale_type = None # No continuous colorscale needed when using a list of colors
+        colorscale_type = None  # No continuous colorscale needed when using a list of colors
 
     fig = go.Figure()
     fig.add_trace(
@@ -233,11 +237,11 @@ def create_raw_field_completion_chart(
             x=completion_rates,
             orientation="h",
             marker=dict(
-                color=color_for_bars, # Use the determined granular colors
-                colorscale=colorscale_type, # Only set if falling back to continuous scale
-                cmin=0,                 # Minimum value for color mapping
-                cmax=100,               # Maximum value for color mapping
-                line=dict(color=colors.get("border_color"), width=1) # Keep border from config
+                color=color_for_bars,  # Use the determined granular colors
+                colorscale=colorscale_type,  # Only set if falling back to continuous scale
+                cmin=0,  # Minimum value for color mapping
+                cmax=100,  # Maximum value for color mapping
+                line=dict(color=colors.get("border_color"), width=1),  # Keep border from config
             ),
             text=[f"{rate:.1f}%" for rate in completion_rates],
             textposition="inside",
@@ -247,8 +251,8 @@ def create_raw_field_completion_chart(
     fig.update_layout(
         xaxis_title="Completion Rate (%)",
         xaxis=dict(
-            tickvals=[0, 20, 40, 60, 70, 80, 90, 100], # Add tick values for 70 and 90
-            gridcolor=colors.get("border_color"), # Use a color from config for gridlines
+            tickvals=[0, 20, 40, 60, 70, 80, 90, 100],  # Add tick values for 70 and 90
+            gridcolor=colors.get("border_color"),  # Use a color from config for gridlines
         ),
         height=max(400, len(raw_field_names) * 20),
         font={"family": "Arial", "size": 10},
@@ -263,7 +267,7 @@ def create_raw_field_completion_chart(
 def _shorten_field_name(field_name: str, max_length: int = 35) -> str:
     """Shorten field names for display if they exceed max_length."""
     if len(field_name) > max_length:
-        return field_name[:max_length - 3] + "..."
+        return field_name[: max_length - 3] + "..."
     return field_name
 
 
