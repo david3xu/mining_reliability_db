@@ -615,7 +615,9 @@ class IntelligenceEngine:
         self, facilities: List[Dict], temporal_data: List[Dict]
     ) -> Dict[str, Any]:
         """Build timeline matrix from facility and temporal data"""
-        logger.info(f"_build_timeline_matrix: Received temporal_data: {temporal_data[:5]} (showing first 5 entries)")
+        logger.info(
+            f"_build_timeline_matrix: Received temporal_data: {temporal_data[:5]} (showing first 5 entries)"
+        )
 
         # Extract years with validation
         valid_years = []

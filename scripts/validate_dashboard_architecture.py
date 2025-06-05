@@ -317,7 +317,8 @@ class DashboardValidator:
 
 def main():
     """Main validation function"""
-    project_root = "/home/291928k/uwa/alcoa/mining_reliability_db"
+    # Use relative path calculation instead of hardcoded path
+    project_root = Path(__file__).parent.parent
 
     validator = DashboardValidator(project_root)
     validation_results = validator.run_validation()

@@ -44,7 +44,9 @@ class NavigationBuilder:
                     style={"display": "flex", "alignItems": "center"},
                 ),
                 dbc.NavItem(
-                    dbc.NavLink("Stakeholder Questions", href="/stakeholder-questions", className="nav-link"),
+                    dbc.NavLink(
+                        "Stakeholder Questions", href="/stakeholder-questions", className="nav-link"
+                    ),
                     style={"display": "flex", "alignItems": "center"},
                 ),
             ]

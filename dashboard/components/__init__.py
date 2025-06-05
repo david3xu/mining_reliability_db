@@ -64,9 +64,9 @@ from dashboard.components.solution_sequence_case_study import (
 
 # Stakeholder Questions Components
 from dashboard.components.stakeholder_questions import (
-    create_stakeholder_questions_overview,
     create_question_category_card,
     create_question_detail_view,
+    create_stakeholder_questions_overview,
     get_question_category_metrics,
 )
 

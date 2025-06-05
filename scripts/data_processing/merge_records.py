@@ -18,6 +18,31 @@ logger = logging.getLogger(__name__)
 class SimpleMerger:
     """Simple record merger that groups by Action Request Number and merges differing values with '|'."""
 
+    def get_action_numbers_in_original_order(
+        self, records: List[Dict[str, Any]], grouped_records: Dict[str, List[Dict[str, Any]]]
+    ) -> List[str]:
+        """
+        Get Action Request Numbers in the order they first appear in the original dataset.
+        This preserves the original input order rather than sorting alphabetically.
+        """
+        action_field = self.find_action_request_field(records)
+        if not action_field:
+            return list(grouped_records.keys())
+
+        seen_action_numbers = set()
+        ordered_action_numbers = []
+
+        # Go through original records in order and track first occurrence of each Action Request Number
+        for record in records:
+            action_number = record.get(action_field)
+            if action_number:
+                action_key = str(action_number).strip()
+                if action_key not in seen_action_numbers and action_key in grouped_records:
+                    seen_action_numbers.add(action_key)
+                    ordered_action_numbers.append(action_key)
+
+        return ordered_action_numbers
+
     def merge_field_values(self, values: List[Any]) -> Any:
         """
         Core merge logic: identical values = keep one, different values = join with ' | '
@@ -211,10 +236,18 @@ class SimpleMerger:
                 "status": "grouping_failed",
             }
 
-        # Merge each group
+        # Merge each group - preserve original order from input dataset
         merged_records = []
         merge_count = 0
-        for action_number, record_group in grouped_records.items():
+        # Get Action Request Numbers in the order they first appeared in the original dataset
+        ordered_action_numbers = self.get_action_numbers_in_original_order(records, grouped_records)
+
+        logger.info(
+            f"Processing {len(ordered_action_numbers)} Action Request Numbers in original input order"
+        )
+
+        for action_number in ordered_action_numbers:
+            record_group = grouped_records[action_number]
             merged_record = self.merge_record_group(record_group)
             merged_records.append(merged_record)
             if len(record_group) > 1:
