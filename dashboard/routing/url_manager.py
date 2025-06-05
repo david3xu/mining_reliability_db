@@ -72,7 +72,7 @@ class URLManager:
             return {
                 "page": "stakeholder_questions",
                 "component": "stakeholder_questions_layout",
-                "category_id": category_id
+                "category_id": category_id,
             }
 
         if pathname == "/summary":

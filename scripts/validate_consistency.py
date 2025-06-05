@@ -113,10 +113,10 @@ class ConsistencyValidator:
                 ("get_metric_card_styling", "get_dashboard_metric_card_styling"),
             ]
 
-            for adapter_method, env_function in problematic_patterns:
-                if adapter_method in adapter_content and env_function not in env_content:
+            for adapter_method, expected_method in problematic_patterns:
+                if adapter_method in adapter_content and expected_method not in adapter_content:
                     naming_issues.append(
-                        f"Method naming mismatch: {adapter_method} vs {env_function}"
+                        f"Method naming mismatch: {adapter_method} vs {expected_method}"
                     )
 
         if naming_issues:
@@ -140,7 +140,7 @@ class ConsistencyValidator:
 
                 validator = ArchitectureValidator()
                 result = validator.validate_complete_architecture()
-                compliance_score = result.score
+                compliance_score = result.score * 100  # Convert from 0-1 scale to 0-100 scale
 
                 if compliance_score < 95.0:
                     self.errors.append(

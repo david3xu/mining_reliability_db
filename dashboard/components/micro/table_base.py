@@ -82,7 +82,7 @@ def create_data_table(
                 "if": {"row_index": "odd"},
                 "backgroundColor": config.get("background_secondary"),
             },
-            {"if": {"column_id": link_column}, "textDecoration": "none"}
+            {"if": {"column_id": link_column}, "textDecoration": "none"},
         ]
         if link_column
         else [],

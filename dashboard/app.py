@@ -196,7 +196,9 @@ class PurifiedDashboardApp:
                 return create_workflow_analysis_layout()
 
             elif component_name == "stakeholder_questions_layout":
-                from dashboard.layouts.stakeholder_questions_layout import create_stakeholder_questions_layout
+                from dashboard.layouts.stakeholder_questions_layout import (
+                    create_stakeholder_questions_layout,
+                )
 
                 category_id = route_config.get("category_id")
                 return create_stakeholder_questions_layout(category_id)

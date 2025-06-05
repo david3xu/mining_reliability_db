@@ -236,7 +236,7 @@ def create_historical_records_page() -> html.Div:
                             [
                                 html.H4("Historical Records Data", className="mb-3"),
                                 create_timeline_table(),
-                                html.Div(style={"height": "200px"})
+                                html.Div(style={"height": "200px"}),
                             ]
                         ),
                     ]

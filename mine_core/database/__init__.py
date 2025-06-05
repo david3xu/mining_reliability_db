@@ -4,10 +4,7 @@ Core Database Package
 Centralized data access and query management.
 """
 
-from mine_core.database.db import (
-    get_database,
-    close_database
-)
+from mine_core.database.db import close_database, get_database
 
 # Legacy compatibility
 from mine_core.database.queries import (  # Legacy function aliases
@@ -29,10 +26,7 @@ from mine_core.database.queries import (  # Legacy function aliases
     get_root_cause_frequency,
     get_root_cause_intelligence_summary,
 )
-from mine_core.database.query_manager import (
-    QueryManager,
-    get_query_manager,
-)
+from mine_core.database.query_manager import QueryManager, get_query_manager
 
 __all__ = [
     # Core Query Management

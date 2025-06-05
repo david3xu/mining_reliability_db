@@ -120,9 +120,13 @@ class ConfigurationManager:
                         if stage.get("entity_name") == "RootCause":
                             if "Root Cause (tail extraction)" in stage.get("business_fields", []):
                                 stage["business_fields"].remove("Root Cause (tail extraction)")
-                                logger.info("Excluded 'Root Cause (tail extraction)' from RootCause stage business fields.")
+                                logger.info(
+                                    "Excluded 'Root Cause (tail extraction)' from RootCause stage business fields."
+                                )
                                 # Print the field count for RootCause after exclusion
-                                print(f"DEBUG: RootCause Stage (Stage 3) field count after exclusion: {len(stage.get('business_fields', []))}")
+                                print(
+                                    f"DEBUG: RootCause Stage (Stage 3) field count after exclusion: {len(stage.get('business_fields', []))}"
+                                )
         return self._workflow_stages_cache
 
     def get_entity_classification(self) -> Dict[str, Any]:

@@ -375,7 +375,9 @@ class WorkflowProcessor:
         # Calculate completeness for workflow entities using the same logic as _process_workflow_stages
         for entity in entity_names:
             # Find the stage configuration for this entity
-            stage_config = next((stage for stage in stage_configs if stage.get("entity_name") == entity), None)
+            stage_config = next(
+                (stage for stage in stage_configs if stage.get("entity_name") == entity), None
+            )
 
             if entity == "ActionRequest":
                 # Use the same field-level completion calculation as _process_workflow_stages for consistency
@@ -391,8 +393,7 @@ class WorkflowProcessor:
                     # Fallback to raw field averaging if no stage config found
                     entity_raw_fields = _get_raw_fields_for_entity(entity)
                     relevant_field_rates = [
-                        raw_field_completion_rates.get(field, 0.0)
-                        for field in entity_raw_fields
+                        raw_field_completion_rates.get(field, 0.0) for field in entity_raw_fields
                     ]
                     completion_rate = (
                         sum(relevant_field_rates) / len(relevant_field_rates)
@@ -419,8 +420,7 @@ class WorkflowProcessor:
                     # Fallback to raw field averaging if no stage config found
                     entity_raw_fields = _get_raw_fields_for_entity(entity)
                     relevant_field_rates = [
-                        raw_field_completion_rates.get(field, 0.0)
-                        for field in entity_raw_fields
+                        raw_field_completion_rates.get(field, 0.0) for field in entity_raw_fields
                     ]
                     completion_rate = (
                         sum(relevant_field_rates) / len(relevant_field_rates)
@@ -939,7 +939,10 @@ class WorkflowProcessor:
             return 0.0
 
     def _calculate_stage_field_completion(
-        self, entity_name: str, business_fields: List[str], raw_field_completion_rates: Dict[str, float]
+        self,
+        entity_name: str,
+        business_fields: List[str],
+        raw_field_completion_rates: Dict[str, float],
     ) -> float:
         """Calculate stage completion by averaging completion rates of fields belonging to the stage"""
         try:
@@ -950,7 +953,9 @@ class WorkflowProcessor:
             entity_mappings = self.mappings.get("entity_mappings", {}).get(entity_name, {})
 
             # Create reverse mapping: raw field name -> internal field name
-            reverse_mapping = {raw_field: internal_field for internal_field, raw_field in entity_mappings.items()}
+            reverse_mapping = {
+                raw_field: internal_field for internal_field, raw_field in entity_mappings.items()
+            }
 
             # Find completion rates for stage fields
             stage_field_rates = []

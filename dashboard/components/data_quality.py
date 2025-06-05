@@ -127,7 +127,7 @@ def create_41_field_completion_analysis() -> html.Div:
                         style={
                             "color": colors.get("primary_color"),
                             "margin": "0",
-                            "fontSize": "16px", # Increased font size
+                            "fontSize": "16px",  # Increased font size
                         },
                     ),
                     html.H4(
@@ -135,7 +135,7 @@ def create_41_field_completion_analysis() -> html.Div:
                         style={
                             "color": colors.get("text_light"),
                             "margin": "5px 0",
-                            "fontSize": "24px", # Increased font size
+                            "fontSize": "24px",  # Increased font size
                         },
                     ),
                 ],
@@ -156,11 +156,19 @@ def create_41_field_completion_analysis() -> html.Div:
                 [
                     html.H6(
                         "Total Data Fields",
-                        style={"color": colors.get("primary_color"), "margin": "0", "fontSize": "16px"},
+                        style={
+                            "color": colors.get("primary_color"),
+                            "margin": "0",
+                            "fontSize": "16px",
+                        },
                     ),
                     html.H4(
                         f"{len(field_completion_data)}",
-                        style={"color": colors.get("text_light"), "margin": "5px 0", "fontSize": "24px"},
+                        style={
+                            "color": colors.get("text_light"),
+                            "margin": "5px 0",
+                            "fontSize": "24px",
+                        },
                     ),
                 ],
                 style={
@@ -184,13 +192,13 @@ def create_41_field_completion_analysis() -> html.Div:
                 justify="center",
                 className="g-0",  # Use g-0 to remove gutter between cols if desired
             ),
-            className="mb-4 p-3 rounded", # Add padding and rounded corners to the card
+            className="mb-4 p-3 rounded",  # Add padding and rounded corners to the card
             style={
                 "backgroundColor": colors.get("background_secondary"),
                 "border": f"1px solid {colors.get('border_color')}",
-                "width": "700px", # Set a fixed width for the combined card
-                "margin": "auto", # Center the combined card
-            }
+                "width": "700px",  # Set a fixed width for the combined card
+                "margin": "auto",  # Center the combined card
+            },
         )
 
         # Create incomplete fields chart
@@ -202,7 +210,7 @@ def create_41_field_completion_analysis() -> html.Div:
             [
                 html.H3("Field Completeness Analysis (41 Fields)", className="mb-4"),
                 complete_section,  # Place the original 100% complete section here
-                summary_cards_container, # Use the new combined card container
+                summary_cards_container,  # Use the new combined card container
                 html.H5(
                     f"Field Completion Rates (Excluding 100% Complete Fields)",
                     className="mt-4 mb-3",
@@ -291,7 +299,9 @@ def create_raw_field_completion_chart(
         # For now, we'll set the width of the graph itself.
     )
 
-    return dcc.Graph(figure=fig, style={'width': 'fit-content', 'margin': 'auto'}) # Center the graph
+    return dcc.Graph(
+        figure=fig, style={"width": "fit-content", "margin": "auto"}
+    )  # Center the graph
 
 
 def _shorten_field_name(field_name: str, max_length: int = 20) -> str:
