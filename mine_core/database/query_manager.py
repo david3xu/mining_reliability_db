@@ -6,6 +6,7 @@ Single authority for all Neo4j database interactions with schema-driven design.
 
 import logging
 import os # Added for file path operations
+import re
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -244,7 +245,10 @@ class QueryManager:
 
             query = f"""
             MATCH (n:{entity_type})-[:BELONGS_TO]->(f:Facility)
-            WHERE n.{date_field} IS NOT NULL AND f.facility_id IS NOT NULL AND NOT '_SchemaTemplate' IN labels(n)
+            WHERE n.{date_field} IS NOT NULL
+              AND n.{date_field} <> ""
+              AND f.facility_id IS NOT NULL
+              AND NOT '_SchemaTemplate' IN labels(n)
             WITH f.facility_id AS facility_id,
                  CASE
                      WHEN n.{date_field} =~ '^\\d{{4}}-\\d{{2}}-\\d{{2}}.*' THEN substring(n.{date_field}, 0, 4)

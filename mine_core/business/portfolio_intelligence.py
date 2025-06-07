@@ -202,8 +202,8 @@ class PortfolioIntelligence:
             return IntelligenceResult(
                 analysis_type="temporal_timeline",
                 data=timeline_data,
-                metadata={"years": list(timeline_data.get("years", {}).keys()), "total_records": timeline_data.get("total_incidents", 0)},
-                quality_score=1.0 if timeline_data.get("total_incidents", 0) > 0 else 0.0,
+                metadata={"years": timeline_data.get("year_range", []), "total_records": timeline_data.get("total_records", 0)},
+                quality_score=1.0 if timeline_data.get("total_records", 0) > 0 else 0.0,
                 generated_at=datetime.now().isoformat(),
             )
 
