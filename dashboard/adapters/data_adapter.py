@@ -597,7 +597,7 @@ class PurifiedDataAdapter:
             return {"incidents": [], "solutions": [], "facilities": []}
 
     def execute_essential_stakeholder_query(self, query_type: str, incident_keywords: List[str]) -> List[Dict[str, Any]]:
-        """Execute with fixed query manager"""
+        """Execute with fixed query manager and NoneType filtering"""
         try:
             query_manager = get_query_manager()
             config_adapter = get_config_adapter()
@@ -611,9 +611,24 @@ class PurifiedDataAdapter:
 
             # Use new method with syntax fixes
             result = query_manager.execute_stakeholder_essential_query(query_file_path, filter_clause)
-            return result.data if result.success else []
+
+            if result.success and result.data:
+                # Filter out None objects and ensure all records are dictionaries
+                filtered_data = []
+                for record in result.data:
+                    if record is not None and isinstance(record, dict):
+                        filtered_data.append(record)
+                    elif record is not None:
+                        logger.warning(f"Non-dict record encountered: {type(record)} - {record}")
+
+                logger.info(f"Query {query_type}: {len(filtered_data)} valid records after filtering")
+                return filtered_data
+            else:
+                logger.warning(f"Query {query_type}: No data or query failed")
+                return []
 
         except Exception as e:
+            logger.error(f"Error in essential stakeholder query: {query_type}: {e}")
             handle_error(logger, e, f"essential stakeholder query: {query_type}")
             return []
 

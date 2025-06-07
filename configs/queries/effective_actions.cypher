@@ -2,12 +2,13 @@
 // Smart pattern discovery - finds proven solutions with intelligence layers
 
 // Layer 1: Direct keyword matches (proven effective)
-MATCH (ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
+MATCH (ar:ActionRequest)-[:BELONGS_TO]->(facility:Facility)
+MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
 OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
 WHERE {filter_clause}
   AND COALESCE(v.is_action_plan_effective, "No") = "Yes"
 
-WITH ar, p, rc, ap, v,
+WITH ar, p, rc, ap, v, facility,
      // Calculate relevance score
      100 AS base_score,
      CASE
@@ -20,21 +21,22 @@ WITH ar, p, rc, ap, v,
          ELSE 5 END AS evidence_score
 
 // Layer 2: Equipment category similarity (same equipment types)
-OPTIONAL MATCH (ar)-[:BELONGS_TO]->(facility:Facility)<-[:BELONGS_TO]-(similar_ar:ActionRequest)
+OPTIONAL MATCH (ar)-[:BELONGS_TO]->(facility)<-[:BELONGS_TO]-(similar_ar:ActionRequest)
 WHERE ar.categories = similar_ar.categories
   AND similar_ar <> ar
 OPTIONAL MATCH (similar_ar)<-[:IDENTIFIED_IN]-(similar_p:Problem)<-[:ANALYZES]-(similar_rc:RootCause)<-[:RESOLVES]-(similar_ap:ActionPlan)
 OPTIONAL MATCH (similar_ap)<-[:VALIDATES]-(similar_v:Verification)
 WHERE COALESCE(similar_v.is_action_plan_effective, "No") = "Yes"
 
-WITH ar, p, rc, ap, v, base_score, rationale_score, evidence_score,
+WITH ar, p, rc, ap, v, facility, base_score, rationale_score, evidence_score,
      count(similar_ar) AS equipment_matches
 
 // Calculate final intelligence score
-WITH ar, p, rc, ap, v, rationale_score, evidence_score, equipment_matches,
+WITH ar, p, rc, ap, v, facility, rationale_score, evidence_score, equipment_matches,
      (100 + rationale_score + evidence_score + (equipment_matches * 5)) AS intelligence_score
 
 RETURN ar.action_request_number AS incident_id,
+       facility.facility_id AS facility,
        ap.action_plan AS effective_action,
        COALESCE(v.action_plan_eval_comment, 'Verified effective solution') AS why_effective,
        COALESCE(rc.objective_evidence, 'Technical validation available') AS supporting_evidence,

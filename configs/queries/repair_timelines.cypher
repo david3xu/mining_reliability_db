@@ -1,9 +1,12 @@
 // Calculate excavator motor repair timelines
-MATCH (ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
+MATCH (ar:ActionRequest)-[:BELONGS_TO]->(facility:Facility)
+MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)
 WHERE {filter_clause}
   AND ap.due_date IS NOT NULL
   AND ap.completion_date IS NOT NULL
-WITH ap.action_plan AS repair_type,
+WITH ar.action_request_number AS incident_id,
+     facility.facility_id AS facility,
+     ap.action_plan AS repair_type,
      duration.between(
        datetime(head(split(ap.due_date, ' | '))),
        datetime(head(split(ap.completion_date, ' | ')))
@@ -11,7 +14,9 @@ WITH ap.action_plan AS repair_type,
      toFloat(ar.requested_response_time) AS planned_timeline,
      ap.complete AS completion_status
 WHERE repair_duration >= 0 AND repair_duration <= 30
-RETURN repair_type,
+RETURN incident_id,
+       facility,
+       repair_type,
        avg(repair_duration) AS average_days,
        min(repair_duration) AS fastest_completion,
        max(repair_duration) AS longest_completion,
