@@ -491,56 +491,67 @@ class PurifiedDataAdapter:
             handle_error(logger, e, f"comprehensive graph search for '{search_term}'")
             return {"incidents": [], "solutions": [], "facilities": []}
 
-    def execute_essential_stakeholder_query(
-        self, query_type: str, incident_keywords: List[str]
-    ) -> List[Dict[str, Any]]:
-        """Execute essential stakeholder queries with keyword filtering"""
+    def execute_essential_stakeholder_query(self, query_type: str, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Execute with fixed query manager"""
         try:
             query_manager = get_query_manager()
             config_adapter = get_config_adapter()
-            essential_queries_config = config_adapter.get_stakeholder_queries_config().get(
-                "essential_queries", {}
-            )
-            keyword_processing_config = config_adapter.get_stakeholder_queries_config().get(
-                "keyword_processing", {}
-            )
-            keyword_filter_template = keyword_processing_config.get(
-                "keyword_filter_template", "toLower(p.what_happened) CONTAINS toLower('{keyword}')"
-            )
-            conjunction = keyword_processing_config.get("conjunction", " AND ")
+            essential_queries_config = config_adapter.get_stakeholder_queries_config().get("essential_queries", {})
 
-            # Build keyword filter
-            keyword_filters = []
-            if incident_keywords:
-                for keyword in incident_keywords:
-                    keyword_filters.append(keyword_filter_template.format(keyword=keyword))
-
-            filter_clause = conjunction.join(keyword_filters) if keyword_filters else "1=1"
+            # Build filter clause using flexible logic
+            filter_clause = self.build_flexible_keyword_filter(incident_keywords)
 
             query_config = essential_queries_config.get(query_type)
-            if not query_config:
-                logger.warning(f"Unknown essential query type: {query_type}")
-                return []
-
             query_file_path = query_config.get("query_file")
-            if not query_file_path:
-                logger.error(f"Query file path not found for query type: {query_type}")
-                return []
 
-            # Read the Cypher query from the file
-            # Assuming query files are small and can be read entirely
-            with open(query_file_path, "r") as f:
-                query = f.read()
-
-            # Replace the placeholder in the query
-            query = query.replace("{filter_clause}", filter_clause)
-
-            result = query_manager.execute_query(query)
+            # Use new method with syntax fixes
+            result = query_manager.execute_stakeholder_essential_query(query_file_path, filter_clause)
             return result.data if result.success else []
 
         except Exception as e:
             handle_error(logger, e, f"essential stakeholder query: {query_type}")
             return []
+
+    def build_flexible_keyword_filter(self, keywords: List[str]) -> str:
+        """Build flexible keyword filter with equipment-focused logic"""
+
+        # Equipment terms (high priority)
+        equipment_terms = ['excavator', 'motor', 'pump', 'conveyor', 'crusher']
+
+        # Failure modes (medium priority)
+        failure_terms = ['failed', 'leak', 'noise', 'vibration', 'wear']
+
+        # Component terms (lower priority)
+        component_terms = ['swing', 'rear', 'front', 'hydraulic']
+
+        equipment_filters = []
+        failure_filters = []
+        component_filters = []
+
+        for keyword in keywords:
+            keyword_lower = keyword.lower()
+
+            if keyword_lower in equipment_terms:
+                equipment_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+            elif keyword_lower in failure_terms:
+                failure_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+            elif keyword_lower in component_terms:
+                component_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+
+        # Build flexible logic: Equipment AND (Failure OR Component)
+        conditions = []
+
+        if equipment_filters:
+            conditions.append(f"({' OR '.join(equipment_filters)})")
+
+        if failure_filters and component_filters:
+            conditions.append(f"({' OR '.join(failure_filters + component_filters)})")
+        elif failure_filters:
+            conditions.append(f"({' OR '.join(failure_filters)})")
+        elif component_filters:
+            conditions.append(f"({' OR '.join(component_filters)})")
+
+        return ' AND '.join(conditions) if conditions else "1=1"
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""

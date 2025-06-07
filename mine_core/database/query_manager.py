@@ -5,6 +5,7 @@ Single authority for all Neo4j database interactions with schema-driven design.
 """
 
 import logging
+import os # Added for file path operations
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -560,6 +561,164 @@ class QueryManager:
                 f"schema-driven case study for {action_request_number} in facility {facility_name}",
             )
             return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def execute_stakeholder_essential_query(self, query_file_path: str, filter_clause: str) -> QueryResult:
+        """Execute stakeholder query with syntax fixes"""
+        try:
+            # Read query file
+            with open(query_file_path, 'r') as f:
+                query_template = f.read()
+
+            # Apply filter
+            query = query_template.replace("{filter_clause}", filter_clause)
+
+            # Fix Neo4j syntax
+            query = query.replace("SUBSTRING_BEFORE(", "head(split(")
+            query = query.replace("apoc.text.split(", "split(")
+
+            logger.info(f"Executing fixed stakeholder query: {query_file_path}")
+            return self.execute_query(query)
+
+        except Exception as e:
+            logger.error(f"Stakeholder query failed: {str(e)}")
+            return QueryResult(data=[], count=0, success=False, metadata={"error": str(e)})
+
+    def execute_stakeholder_query(self, query_template: str, filter_clause: str) -> QueryResult:
+        """Execute with detailed error diagnostics"""
+        try:
+            # Pre-execution validation
+            debug_info = self._validate_query_components(query_template, filter_clause)
+            logger.info(f"Query validation: {debug_info}")
+
+            # Process query with syntax fixes
+            formatted_query = query_template.replace("{filter_clause}", filter_clause)
+            original_query = formatted_query  # Preserve for debugging
+
+            formatted_query = self._fix_neo4j_syntax(formatted_query)
+
+            # Log query transformation if changes made
+            if formatted_query != original_query:
+                logger.info(f"Query syntax transformation applied")
+                logger.debug(f"Original: {original_query[:200]}...")
+                logger.debug(f"Fixed: {formatted_query[:200]}...")
+
+            return self.execute_query(formatted_query)
+
+        except Exception as e:
+            # Enhanced error context
+            error_context = {
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+                "query_template_start": query_template[:100],
+                "filter_clause": filter_clause,
+                "has_date_fields": "due_date" in query_template or "completion_date" in query_template,
+                "has_apoc_functions": "apoc." in query_template,
+                "has_substring_before": "SUBSTRING_BEFORE" in query_template
+            }
+
+            logger.error(f"Stakeholder query failed: {error_context}")
+            handle_error(logger, e, f"stakeholder query execution")
+
+            return QueryResult(
+                data=[],
+                count=0,
+                success=False,
+                metadata={"error": str(e), "debug_context": error_context}
+            )
+
+    def _validate_query_components(self, query_template: str, filter_clause: str) -> Dict[str, Any]:
+        """Validate query components before execution"""
+        validation = {
+            "template_length": len(query_template),
+            "filter_clause_length": len(filter_clause),
+            "contains_problematic_functions": [],
+            "date_field_references": [],
+            "neo4j_compatibility_issues": []
+        }
+
+        # Check for problematic functions
+        problematic_functions = ["SUBSTRING_BEFORE", "apoc.text.split"]
+        for func in problematic_functions:
+            if func in query_template:
+                validation["contains_problematic_functions"].append(func)
+
+        # Check for date field references
+        date_fields = ["due_date", "completion_date", "initiation_date", "verification_date"]
+        for field in date_fields:
+            if field in query_template:
+                validation["date_field_references"].append(field)
+
+        # Check for compatibility issues
+        if "duration.between" in query_template and "SUBSTRING_BEFORE" in query_template:
+            validation["neo4j_compatibility_issues"].append("datetime_parsing_with_substring_before")
+
+        return validation
+
+    def _fix_neo4j_syntax(self, query: str) -> str:
+        """Fix Neo4j syntax with detailed logging"""
+        fixes_applied = []
+
+        # Fix SUBSTRING_BEFORE
+        if "SUBSTRING_BEFORE" in query:
+            original_matches = re.findall(r"SUBSTRING_BEFORE\([^)]+\)", query)
+            pattern = r"SUBSTRING_BEFORE\(([^,]+),\s*\'([^\']+)\'\)"
+            replacement = r"head(split(\1, '\2'))"
+            query = re.sub(pattern, replacement, query)
+            fixes_applied.append(f"SUBSTRING_BEFORE -> head(split): {len(original_matches)} replacements")
+
+        # Fix apoc.text.split
+        if "apoc.text.split" in query:
+            apoc_count = query.count("apoc.text.split")
+            query = query.replace("apoc.text.split(", "split(")
+            fixes_applied.append(f"apoc.text.split -> split: {apoc_count} replacements")
+
+        if fixes_applied:
+            logger.info(f"Neo4j syntax fixes applied: {fixes_applied}")
+
+        return query
+
+    def validate_date_string(self, date_string: str) -> str:
+        """Extract first valid date from pipe-delimited string"""
+        if not date_string or date_string == "DATA_NOT_AVAILABLE":
+            return None
+
+        # Handle pipe-delimited dates
+        if " | " in date_string:
+            dates = date_string.split(" | ")
+            return dates[0].strip()
+
+        return date_string.strip()
+
+    def validate_date_format(self, date_string: str, field_name: str) -> Dict[str, Any]:
+        """Validate and diagnose date format issues"""
+        if not date_string: # Change this from if not date_string or date_string == "DATA_NOT_AVAILABLE":
+            return {"status": "empty", "field": field_name}
+
+        validation = {
+            "field": field_name,
+            "original_value": date_string,
+            "is_pipe_delimited": " | " in date_string,
+            "segment_count": len(date_string.split(" | ")) if " | " in date_string else 1,
+            "first_segment": date_string.split(" | ")[0] if " | " in date_string else date_string,
+            "status": "valid"
+        }
+
+        # Test datetime parsing
+        try:
+            from datetime import datetime
+            test_date = validation["first_segment"]
+            # Basic format validation
+            if "T" in test_date:
+                datetime.fromisoformat(test_date.replace("T", " ").split(".")[0])
+            else:
+                datetime.strptime(test_date, "%Y-%m-%d")
+            validation["parseable"] = True
+        except Exception as e:
+            validation["parseable"] = False
+            validation["parse_error"] = str(e)
+            validation["status"] = "parse_failed"
+
+        return validation
 
 
 # Singleton pattern
