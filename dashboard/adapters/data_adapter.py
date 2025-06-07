@@ -414,12 +414,117 @@ class PurifiedDataAdapter:
             handle_error(logger, e, "core workflow labels access")
             return []
 
-    def execute_comprehensive_graph_search(
-        self, search_term: str
-    ) -> Dict[str, List[Dict[str, Any]]]:
-        """Execute comprehensive graph search across all connected data"""
+    def execute_comprehensive_graph_search(self, search_term: str) -> Dict[str, List[Dict[str, Any]]]:
+        """Enhanced comprehensive graph search - return raw dimension-based data for comprehensive search layout"""
         try:
-            logger.info(f"Adapter: Executing comprehensive graph search for '{search_term}'")
+            # Call enhanced core intelligence
+            intelligence_result = self.intelligence_engine.execute_comprehensive_incident_search(search_term)
+
+            # Return raw dimension-based data directly for comprehensive search layout
+            search_data = intelligence_result.data if intelligence_result.data else {}
+
+            # Ensure all expected dimensions exist, even if empty
+            dimension_keys = [
+                "direct_matches", "equipment_patterns", "causal_chains",
+                "cross_facility_patterns", "temporal_patterns", "recurring_sequences",
+                "solution_effectiveness", "equipment_clusters"
+            ]
+
+            for key in dimension_keys:
+                if key not in search_data:
+                    search_data[key] = []
+
+            # Add search coverage metadata
+            search_data["search_coverage"] = len([k for k in dimension_keys if search_data.get(k)])
+
+            return search_data
+
+        except Exception as e:
+            handle_error(logger, e, f"comprehensive graph search for '{search_term}'")
+            # Return empty dimension structure
+            return {
+                "direct_matches": [],
+                "equipment_patterns": [],
+                "causal_chains": [],
+                "cross_facility_patterns": [],
+                "temporal_patterns": [],
+                "recurring_sequences": [],
+                "solution_effectiveness": [],
+                "equipment_clusters": [],
+                "search_coverage": 0
+            }
+
+    def get_consolidated_search_results(self, search_term: str) -> Dict[str, List[Dict[str, Any]]]:
+        """Get search results in consolidated incidents/solutions/facilities format"""
+        try:
+            # Call enhanced core intelligence
+            intelligence_result = self.intelligence_engine.execute_comprehensive_incident_search(search_term)
+
+            # Transform comprehensive results to consolidated format
+            incidents = self._consolidate_incident_results(intelligence_result.data)
+            solutions = self._consolidate_solution_results(intelligence_result.data)
+            facilities = self._consolidate_facility_results(intelligence_result.data)
+
+            return {
+                "incidents": incidents,
+                "solutions": solutions,
+                "facilities": facilities
+            }
+        except Exception as e:
+            handle_error(logger, e, f"consolidated search for '{search_term}'")
+            return {"incidents": [], "solutions": [], "facilities": []}
+
+    def _consolidate_incident_results(self, comprehensive_data: Dict) -> List[Dict]:
+        """Consolidate search dimensions into incidents format"""
+        incidents = []
+
+        # Merge results from all search dimensions
+        for dimension in ["direct_matches", "equipment_patterns", "causal_chains", "cross_facility_patterns", "temporal_patterns", "recurring_sequences", "solution_effectiveness", "equipment_failure_clusters"]:
+            dimension_results = comprehensive_data.get(dimension, [])
+            for result in dimension_results:
+                incidents.append({
+                    "incident_id": result.get("action_request_number", "N/A"),
+                    "facility": result.get("facility_name", "N/A"),
+                    "problem_description": result.get("what_happened", "N/A"),
+                    "root_cause": result.get("root_cause", "N/A"),
+                    "solution": result.get("action_plan", "N/A"),
+                    "effective": result.get("is_action_plan_effective", "Unknown")
+                })
+
+        return incidents[:50]  # Existing limit
+
+    def _consolidate_solution_results(self, comprehensive_data: Dict) -> List[Dict]:
+        """Consolidate search dimensions into solutions format"""
+        solutions = []
+        dimension_results = comprehensive_data.get("solution_effectiveness", [])
+        for result in dimension_results:
+            if result.get("is_action_plan_effective") == "Yes":
+                solutions.append({
+                    "solution_id": result.get("action_request_number", "N/A"),
+                    "action_plan": result.get("action_plan", "N/A"),
+                    "root_cause": result.get("root_cause", "N/A"),
+                    "effectiveness": result.get("is_action_plan_effective", "Unknown"),
+                    "comment": result.get("action_plan_eval_comment", "N/A")
+                })
+        return solutions[:50]
+
+    def _consolidate_facility_results(self, comprehensive_data: Dict) -> List[Dict]:
+        """Consolidate search dimensions into facilities format"""
+        facilities = []
+        dimension_results = comprehensive_data.get("cross_facility_patterns", [])
+        for result in dimension_results:
+            facilities.append({
+                "facility_1": result.get("facility_1", "N/A"),
+                "facility_2": result.get("facility_2", "N/A"),
+                "title": result.get("title", "N/A"),
+                "categories": result.get("categories", "N/A")
+            })
+        return facilities[:50]
+
+    def _execute_basic_graph_search(self, search_term: str) -> Dict[str, List[Dict[str, Any]]]:
+        """Fallback basic graph search method (original implementation)"""
+        try:
+            logger.info(f"Adapter: Executing fallback basic graph search for '{search_term}'")
 
             query_manager = get_query_manager()
             results = {"incidents": [], "solutions": [], "facilities": []}
@@ -488,7 +593,7 @@ class PurifiedDataAdapter:
             return results
 
         except Exception as e:
-            handle_error(logger, e, f"comprehensive graph search for '{search_term}'")
+            handle_error(logger, e, f"basic graph search for '{search_term}'")
             return {"incidents": [], "solutions": [], "facilities": []}
 
     def execute_essential_stakeholder_query(self, query_type: str, incident_keywords: List[str]) -> List[Dict[str, Any]]:

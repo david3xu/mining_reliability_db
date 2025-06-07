@@ -8,7 +8,7 @@ WITH ap.action_plan AS repair_type,
        datetime(head(split(ap.due_date, ' | '))),
        datetime(head(split(ap.completion_date, ' | ')))
      ).days AS repair_duration,
-     ar.requested_response_time AS planned_timeline,
+     toFloat(ar.requested_response_time) AS planned_timeline,
      ap.complete AS completion_status
 WHERE repair_duration >= 0 AND repair_duration <= 30
 RETURN repair_type,
