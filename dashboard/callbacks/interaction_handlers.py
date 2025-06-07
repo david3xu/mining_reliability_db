@@ -5,7 +5,7 @@ Clean interaction logic with adapter-driven URL generation.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from dash import Input, Output, State, callback, ctx, html
 from dash.exceptions import PreventUpdate
@@ -24,6 +24,7 @@ class InteractionHandlers:
         self.facility_adapter = get_facility_adapter()
         self.data_adapter = get_data_adapter()
         self.url_manager = get_url_manager()
+        self.last_results = None  # Store last query results for export
 
     def register_chart_interactions(self, app):
         """Register chart click callbacks"""
@@ -340,10 +341,10 @@ class InteractionHandlers:
         }
 
     def register_stakeholder_essentials_interactions(self, app):
-        """Register callbacks for essential stakeholder questions"""
+        """Register callbacks for essential stakeholder questions with JSON export"""
 
         @app.callback(
-            [Output("results-display", "children")],
+            [Output("results-display", "children"), Output("export-status", "children")],
             [Input("search-btn", "n_clicks"), Input("question-tabs", "active_tab")],
             State("incident-keywords", "value"),
             prevent_initial_call=True,
@@ -354,6 +355,7 @@ class InteractionHandlers:
             from dash import Input, Output, State, ctx, dcc, html
 
             from dashboard.components.stakeholder_essentials import (
+                create_effective_actions_table,
                 create_expertise_table,
                 create_solutions_table,
                 create_timeline_table,
@@ -364,43 +366,44 @@ class InteractionHandlers:
                 raise PreventUpdate
 
             if not keywords:
-                return [dbc.Alert("Please enter equipment and issue keywords", color="info")]
+                return [dbc.Alert("Please enter equipment and issue keywords", color="info")], ""
 
             try:
-                # Show search in progress
-                # This part will be handled by a separate output/status in the UI if needed
-
                 # Process keywords
                 keyword_list = [k.strip().lower() for k in keywords.split() if k.strip()]
 
                 data_adapter = self.data_adapter  # Use the adapter initialized in __init__
 
-                # Execute the appropriate query based on active tab
+                # Execute the appropriate query based on active tab and store results
                 display = html.Div()
                 if active_tab == "tab-1":
-                    # Can this be fixed?
-                    results = data_adapter.execute_essential_stakeholder_query(
-                        "can_this_be_fixed", keyword_list
-                    )
+                    query_type = "can_this_be_fixed"
+                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
+                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_solutions_table(results)
 
                 elif active_tab == "tab-2":
-                    # Who do I call?
-                    results = data_adapter.execute_essential_stakeholder_query(
-                        "who_do_i_call", keyword_list
-                    )
+                    query_type = "who_do_i_call"
+                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
+                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_expertise_table(results)
 
                 elif active_tab == "tab-3":
-                    # How long will this take?
-                    results = data_adapter.execute_essential_stakeholder_query(
-                        "how_long_will_this_take", keyword_list
-                    )
+                    query_type = "how_long_will_this_take"
+                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
+                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_timeline_table(results)
-                else:
-                    return [dbc.Alert("Unknown question tab", color="danger")]
 
-                return [display]
+                elif active_tab == "tab-4":
+                    query_type = "what_works_and_why"
+                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
+                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
+                    display = create_effective_actions_table(results)
+
+                else:
+                    return [dbc.Alert("Unknown question tab", color="danger")], ""
+
+                return [display], ""
 
             except Exception as e:
                 handle_error(logger, e, f"essential query for '{keywords}'")
@@ -412,8 +415,224 @@ class InteractionHandlers:
                     color="danger",
                 )
 
-                return [error_display]
+                return [error_display], ""
 
+        @app.callback(
+            [Output("results-display", "children", allow_duplicate=True),
+             Output("export-status", "children", allow_duplicate=True)],
+            Input("export-json-btn", "n_clicks"),
+            prevent_initial_call=True,
+        )
+        def export_json_results(n_clicks):
+            """Export last query results to JSON"""
+            import dash_bootstrap_components as dbc
+            from dash import html, no_update
+
+            from dashboard.adapters.data_adapter_json_export import get_json_export_adapter
+            from dashboard.components.stakeholder_essentials import (
+                create_effective_actions_table_with_export_info,
+                create_solutions_table_with_export_info,
+                create_expertise_table_with_export_info,
+                create_timeline_table_with_export_info
+            )
+            from mine_core.shared.common import handle_error
+
+            if not n_clicks:
+                raise PreventUpdate
+
+            if not hasattr(self, 'last_results') or not self.last_results:
+                return no_update, dbc.Alert("No results to export. Run a search first.", color="warning")
+
+            try:
+                query_type = self.last_results["type"]
+                results = self.last_results["data"]
+                keywords = self.last_results["keywords"]
+
+                # Get JSON export adapter and export
+                json_export_adapter = get_json_export_adapter()
+                _, export_path = json_export_adapter.execute_essential_stakeholder_query_with_export(
+                    query_type, keywords
+                )
+
+                # Update display with export info
+                if query_type == "can_this_be_fixed":
+                    display = create_solutions_table_with_export_info(results, export_path)
+                elif query_type == "who_do_i_call":
+                    display = create_expertise_table_with_export_info(results, export_path)
+                elif query_type == "how_long_will_this_take":
+                    display = create_timeline_table_with_export_info(results, export_path)
+                elif query_type == "what_works_and_why":
+                    display = create_effective_actions_table_with_export_info(results, export_path)
+                else:
+                    return no_update, dbc.Alert("Unknown query type", color="danger")
+
+                status = dbc.Alert([
+                    html.I(className="fas fa-check-circle me-2"),
+                    f"Results exported to: {export_path.split('/')[-1]}"
+                ], color="success", dismissable=True)
+
+                return display, status
+
+            except Exception as e:
+                handle_error(logger, e, "JSON export")
+                return no_update, dbc.Alert(f"Export failed: {str(e)}", color="danger")
+
+        @app.callback(
+            [Output("results-display", "children", allow_duplicate=True),
+             Output("export-status", "children", allow_duplicate=True)],
+            Input("export-all-btn", "n_clicks"),
+            State("incident-keywords", "value"),
+            prevent_initial_call=True,
+        )
+        def export_comprehensive_results(n_clicks, keywords):
+            """Export comprehensive analysis covering all 4 essential questions"""
+            import dash_bootstrap_components as dbc
+            from dash import html, no_update
+
+            from dashboard.adapters.data_adapter_json_export import get_json_export_adapter
+            from mine_core.shared.common import handle_error
+
+            if not n_clicks:
+                raise PreventUpdate
+
+            if not keywords:
+                return no_update, dbc.Alert("Please enter keywords first", color="warning")
+
+            try:
+                # Process keywords
+                keyword_list = [k.strip().lower() for k in keywords.split() if k.strip()]
+
+                # Get JSON export adapter and perform comprehensive export
+                json_export_adapter = get_json_export_adapter()
+                all_results, export_path = json_export_adapter.execute_comprehensive_stakeholder_export(keyword_list)
+
+                if not export_path:
+                    return no_update, dbc.Alert("Comprehensive export failed", color="danger")
+
+                # Create comprehensive results display
+                comprehensive_display = self._create_comprehensive_results_display(all_results, export_path)
+
+                status = dbc.Alert([
+                    html.I(className="fas fa-check-circle me-2"),
+                    f"Comprehensive analysis exported to: {export_path.split('/')[-1]}"
+                ], color="success", dismissable=True)
+
+                return comprehensive_display, status
+
+            except Exception as e:
+                handle_error(logger, e, "Comprehensive JSON export")
+                return no_update, dbc.Alert(f"Comprehensive export failed: {str(e)}", color="danger")
+
+    def _create_comprehensive_results_display(self, all_results: Dict[str, List[Dict]], export_path: str) -> html.Div:
+        """Create display for comprehensive results across all 4 questions"""
+        import dash_bootstrap_components as dbc
+        from dash import html
+
+        # Calculate summary statistics
+        total_results = sum(len(results) for results in all_results.values())
+
+        # Create summary cards
+        summary_cards = []
+        question_titles = {
+            "can_this_be_fixed": ("Can this be fixed?", "primary", "fas fa-tools"),
+            "who_do_i_call": ("Who do I call?", "info", "fas fa-users"),
+            "how_long_will_this_take": ("How long will this take?", "warning", "fas fa-clock"),
+            "what_works_and_why": ("What works & why?", "success", "fas fa-lightbulb")
+        }
+
+        for question_id, results in all_results.items():
+            if question_id in question_titles:
+                title, color, icon = question_titles[question_id]
+
+                summary_cards.append(
+                    dbc.Col([
+                        dbc.Card([
+                            dbc.CardBody([
+                                html.H6([
+                                    html.I(className=f"{icon} me-2"),
+                                    title
+                                ], className=f"text-{color} mb-2"),
+                                html.H4(str(len(results)), className=f"text-{color}"),
+                                html.P("relevant records", className="text-muted small")
+                            ])
+                        ], className=f"border-{color}")
+                    ], width=3)
+                )
+
+        # Export notification
+        export_notification = dbc.Alert([
+            html.I(className="fas fa-download me-2"),
+            f"Comprehensive analysis exported to: {export_path.split('/')[-1]}",
+            html.Br(),
+            html.Small(f"Total records found: {total_results} across all 4 questions", className="text-muted")
+        ], color="success", className="mb-4")
+
+        # Create detailed results sections
+        detailed_sections = []
+        for question_id, results in all_results.items():
+            if question_id in question_titles and results:
+                title, color, icon = question_titles[question_id]
+
+                # Create mini table for each question
+                table_rows = []
+                for result in results[:5]:  # Show top 5 results per question
+                    if question_id == "what_works_and_why":
+                        table_rows.append(
+                            html.Tr([
+                                html.Td(result.get("incident_id", "N/A")),
+                                html.Td(result.get("effective_action", "")[:50] + "..." if len(result.get("effective_action", "")) > 50 else result.get("effective_action", "")),
+                                html.Td(dbc.Badge(result.get("confidence_level", "Low"), color="success" if result.get("confidence_level") == "High" else "secondary"))
+                            ])
+                        )
+                    elif question_id == "who_do_i_call":
+                        table_rows.append(
+                            html.Tr([
+                                html.Td(result.get("initiating_department", "N/A")),
+                                html.Td(result.get("receiving_department", "N/A")),
+                                html.Td(f"{result.get('success_rate', 0)}%")
+                            ])
+                        )
+                    elif question_id == "how_long_will_this_take":
+                        table_rows.append(
+                            html.Tr([
+                                html.Td(result.get("repair_type", "N/A")),
+                                html.Td(f"{result.get('average_days', 0):.1f} days"),
+                                html.Td(result.get("repair_instances", 0))
+                            ])
+                        )
+                    elif question_id == "can_this_be_fixed":
+                        table_rows.append(
+                            html.Tr([
+                                html.Td(result.get("incident_id", "N/A")),
+                                html.Td(result.get("solution_method", "")[:40] + "..." if len(result.get("solution_method", "")) > 40 else result.get("solution_method", "")),
+                                html.Td(result.get("repair_days", "N/A"))
+                            ])
+                        )
+
+                if table_rows:
+                    detailed_sections.append(
+                        dbc.Card([
+                            dbc.CardHeader([
+                                html.I(className=f"{icon} me-2"),
+                                title,
+                                dbc.Badge(f"{len(results)} found", color=color, className="ms-2")
+                            ]),
+                            dbc.CardBody([
+                                dbc.Table([
+                                    html.Tbody(table_rows)
+                                ], striped=True, hover=True, size="sm"),
+                                html.P(f"Showing top 5 of {len(results)} results", className="text-muted small mt-2")
+                            ])
+                        ], className="mb-3")
+                    )
+
+        return html.Div([
+            export_notification,
+            html.H4("Comprehensive Stakeholder Analysis", className="mb-4"),
+            dbc.Row(summary_cards, className="mb-4"),
+            html.H5("Detailed Results by Question", className="mb-3"),
+            html.Div(detailed_sections)
+        ])
 
 # Singleton pattern
 _interaction_handlers = None

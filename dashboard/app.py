@@ -203,10 +203,10 @@ class PurifiedDashboardApp:
 
             elif component_name == "essential_questions_layout":
                 from dashboard.components.stakeholder_essentials import (
-                    create_essential_questions_layout,
+                    create_essential_questions_interface,
                 )
 
-                return create_essential_questions_layout()
+                return create_essential_questions_interface()
 
             elif component_name == "summary":
                 return self._create_facilities_summary()
