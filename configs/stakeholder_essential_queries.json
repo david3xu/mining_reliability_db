@@ -11,6 +11,10 @@
     "how_long_will_this_take": {
       "query_file": "configs/queries/repair_timelines.cypher",
       "description": "Timeline patterns for similar repairs"
+    },
+    "what_works_and_why": {
+      "query_file": "configs/queries/effective_actions.cypher",
+      "description": "Proven effective actions with rationale"
     }
   },
   "keyword_processing": {
