@@ -4,11 +4,126 @@
 
     "equipment_facility_network": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN f.facility_id, count(*) as incidents, collect(p.what_happened)[0..3] as sample_problems ORDER BY incidents DESC",
 
-    "solution_effectiveness_graph": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ap.action_plan) CONTAINS toLower($search_term) MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN ap.action_plan, v.is_action_plan_effective, rc.root_cause, p.what_happened, f.facility_id ORDER BY v.is_action_plan_effective DESC"
+    "solution_effectiveness_graph": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ap.action_plan) CONTAINS toLower($search_term) MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN ap.action_plan, v.is_action_plan_effective, rc.root_cause, p.what_happened, f.facility_id ORDER BY v.is_action_plan_effective DESC",
+
+    "direct_field_matches": {
+      "description": "Find exact matches in key fields with high precision",
+      "incident_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) WHERE toLower(p.what_happened) CONTAINS toLower($search_term) OR toLower(ar.categories) CONTAINS toLower($search_term) OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) RETURN ar, f, p, rc, ap, v ORDER BY ar.initiation_date DESC LIMIT 20",
+      "solution_query": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ap.action_plan) CONTAINS toLower($search_term) MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN ap, v, rc, p, ar, f ORDER BY v.is_action_plan_effective DESC LIMIT 15",
+      "facility_query": "MATCH (f:Facility)<-[:BELONGS_TO]-(ar:ActionRequest) WHERE toLower(f.facility_id) CONTAINS toLower($search_term) OR toLower(f.location) CONTAINS toLower($search_term) RETURN f, count(ar) as incident_count ORDER BY incident_count DESC LIMIT 10"
+    },
+
+    "equipment_patterns": {
+      "description": "Analyze equipment-specific failure patterns and asset vulnerability",
+      "incident_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) WHERE toLower(ar.categories) CONTAINS toLower($search_term) OR toLower(p.what_happened) CONTAINS toLower($search_term) OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause) WHERE toLower(rc.root_cause) CONTAINS 'equipment' OR toLower(rc.root_cause) CONTAINS 'mechanical' OR toLower(rc.root_cause) CONTAINS 'failure' OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) RETURN ar, f, p, rc, ap, v ORDER BY ar.initiation_date DESC LIMIT 25",
+      "pattern_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN ar.categories as equipment_type, f.facility_id, count(*) as failure_count, collect(distinct p.what_happened)[0..2] as common_issues ORDER BY failure_count DESC LIMIT 15",
+      "cluster_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause) RETURN f.facility_id, ar.categories, count(*) as incidents, collect(distinct rc.root_cause)[0..3] as common_causes ORDER BY incidents DESC LIMIT 20"
+    },
+
+    "causal_chains": {
+      "description": "Trace root cause analysis pathways and solution chains",
+      "chain_query": "MATCH path = (p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(p.what_happened) CONTAINS toLower($search_term) OR toLower(rc.root_cause) CONTAINS toLower($search_term) MATCH (p)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN p, rc, ap, v, ar, f, length(path) as chain_length ORDER BY v.is_action_plan_effective DESC, chain_length ASC LIMIT 20",
+      "cause_pattern_query": "MATCH (rc:RootCause) WHERE toLower(rc.root_cause) CONTAINS toLower($search_term) MATCH (rc)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) RETURN rc.root_cause, count(p) as problem_count, collect(distinct f.facility_id) as affected_facilities, avg(CASE WHEN v.is_action_plan_effective = 'Yes' THEN 1 ELSE 0 END) as success_rate ORDER BY problem_count DESC LIMIT 15"
+    },
+
+    "cross_facility_patterns": {
+      "description": "Identify knowledge sharing opportunities across facilities",
+      "cross_facility_query": "MATCH (ar1:ActionRequest)-[:BELONGS_TO]->(f1:Facility) MATCH (ar1)<-[:IDENTIFIED_IN]-(p1:Problem) WHERE toLower(p1.what_happened) CONTAINS toLower($search_term) MATCH (ar2:ActionRequest)-[:BELONGS_TO]->(f2:Facility) MATCH (ar2)<-[:IDENTIFIED_IN]-(p2:Problem) WHERE f1 <> f2 AND (toLower(p2.what_happened) CONTAINS toLower($search_term) OR toLower(ar2.categories) = toLower(ar1.categories)) OPTIONAL MATCH (p1)<-[:ANALYZES]-(rc1:RootCause)<-[:RESOLVES]-(ap1:ActionPlan)<-[:VALIDATES]-(v1:Verification) OPTIONAL MATCH (p2)<-[:ANALYZES]-(rc2:RootCause)<-[:RESOLVES]-(ap2:ActionPlan)<-[:VALIDATES]-(v2:Verification) RETURN f1.facility_id as facility1, f2.facility_id as facility2, ar1, ar2, p1, p2, ap1, ap2, v1, v2 ORDER BY ar1.initiation_date DESC LIMIT 25",
+      "facility_comparison_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN f.facility_id, count(*) as incident_count, collect(distinct ar.categories) as equipment_types, collect(p.what_happened)[0..2] as sample_issues ORDER BY incident_count DESC LIMIT 15"
+    },
+
+    "temporal_patterns": {
+      "description": "Analyze time-based trends and seasonal patterns",
+      "temporal_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN ar, f, p, ar.initiation_date, date(ar.initiation_date).year as year, date(ar.initiation_date).month as month, date(ar.initiation_date).dayOfWeek as day_of_week ORDER BY ar.initiation_date DESC LIMIT 30",
+      "trend_analysis_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) RETURN date(ar.initiation_date).year as year, date(ar.initiation_date).month as month, count(*) as incident_count, f.facility_id ORDER BY year DESC, month DESC LIMIT 24",
+      "seasonal_query": "MATCH (ar:ActionRequest) WHERE toLower(ar.categories) CONTAINS toLower($search_term) RETURN date(ar.initiation_date).month as month, count(*) as incidents ORDER BY month"
+    },
+
+    "recurring_sequences": {
+      "description": "Identify repeat incidents and cyclical patterns",
+      "recurring_query": "MATCH (ar1:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar1.categories) CONTAINS toLower($search_term) MATCH (ar1)<-[:IDENTIFIED_IN]-(p1:Problem) MATCH (ar2:ActionRequest)-[:BELONGS_TO]->(f) WHERE ar1 <> ar2 AND duration.between(date(ar1.initiation_date), date(ar2.initiation_date)).days > 0 AND duration.between(date(ar1.initiation_date), date(ar2.initiation_date)).days < 365 MATCH (ar2)<-[:IDENTIFIED_IN]-(p2:Problem) WHERE toLower(ar2.categories) = toLower(ar1.categories) OR (size(split(toLower(p1.what_happened), ' ')) > 2 AND any(word IN split(toLower(p1.what_happened), ' ') WHERE size(word) > 3 AND toLower(p2.what_happened) CONTAINS word)) OPTIONAL MATCH (p1)<-[:ANALYZES]-(rc1:RootCause)<-[:RESOLVES]-(ap1:ActionPlan)<-[:VALIDATES]-(v1:Verification) OPTIONAL MATCH (p2)<-[:ANALYZES]-(rc2:RootCause)<-[:RESOLVES]-(ap2:ActionPlan)<-[:VALIDATES]-(v2:Verification) RETURN ar1, ar2, p1, p2, f, duration.between(date(ar1.initiation_date), date(ar2.initiation_date)).days as days_between ORDER BY days_between ASC LIMIT 20",
+      "frequency_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) RETURN ar.categories, f.facility_id, count(*) as frequency ORDER BY frequency DESC LIMIT 15"
+    },
+
+    "solution_effectiveness": {
+      "description": "Find proven solutions with verification and success tracking",
+      "effective_solutions_query": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE v.is_action_plan_effective = 'Yes' AND (toLower(ap.action_plan) CONTAINS toLower($search_term)) MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN ap, v, rc, p, ar, f ORDER BY ar.initiation_date DESC LIMIT 20",
+      "solution_success_rate_query": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ap.action_plan) CONTAINS toLower($search_term) MATCH (ap)-[:RESOLVES]->(rc:RootCause) RETURN ap.action_plan, count(*) as total_applications, sum(CASE WHEN v.is_action_plan_effective = 'Yes' THEN 1 ELSE 0 END) as successful_applications, (sum(CASE WHEN v.is_action_plan_effective = 'Yes' THEN 1 ELSE 0 END) * 100.0 / count(*)) as success_rate ORDER BY success_rate DESC, total_applications DESC LIMIT 15",
+      "best_practices_query": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE v.is_action_plan_effective = 'Yes' MATCH (ap)-[:RESOLVES]->(rc:RootCause) WHERE toLower(rc.root_cause) CONTAINS toLower($search_term) RETURN ap.action_plan, rc.root_cause, count(*) as usage_count ORDER BY usage_count DESC LIMIT 10"
+    },
+
+    "equipment_failure_clusters": {
+      "description": "Analyze asset vulnerability and failure clustering patterns",
+      "cluster_analysis_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause) RETURN ar.categories as equipment_type, f.facility_id, collect(distinct rc.root_cause) as failure_modes, count(*) as failure_count ORDER BY failure_count DESC LIMIT 20",
+      "vulnerability_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN ar.categories, count(*) as total_incidents, collect(distinct f.facility_id) as affected_facilities, size(collect(distinct f.facility_id)) as facility_count ORDER BY total_incidents DESC LIMIT 15",
+      "maintenance_patterns_query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan) WHERE toLower(ap.action_plan) CONTAINS 'maintenance' OR toLower(ap.action_plan) CONTAINS 'inspect' OR toLower(ap.action_plan) CONTAINS 'service' RETURN ar.categories, ap.action_plan, count(*) as maintenance_frequency ORDER BY maintenance_frequency DESC LIMIT 15"
+    }
   },
+
+  "search_dimensions": {
+    "direct_field_matches": {
+      "weight": 1.0,
+      "description": "Exact keyword matches in problem descriptions, categories, and summaries",
+      "enabled": true
+    },
+    "equipment_patterns": {
+      "weight": 0.9,
+      "description": "Equipment-specific failure patterns and asset analysis",
+      "enabled": true
+    },
+    "causal_chains": {
+      "weight": 0.85,
+      "description": "Root cause analysis pathways and solution chains",
+      "enabled": true
+    },
+    "cross_facility_patterns": {
+      "weight": 0.8,
+      "description": "Knowledge sharing opportunities across facilities",
+      "enabled": true
+    },
+    "temporal_patterns": {
+      "weight": 0.75,
+      "description": "Time-based trends and seasonal analysis",
+      "enabled": true
+    },
+    "recurring_sequences": {
+      "weight": 0.7,
+      "description": "Repeat incidents and cyclical patterns",
+      "enabled": true
+    },
+    "solution_effectiveness": {
+      "weight": 0.95,
+      "description": "Proven solutions with verification tracking",
+      "enabled": true
+    },
+    "equipment_failure_clusters": {
+      "weight": 0.85,
+      "description": "Asset vulnerability and failure clustering",
+      "enabled": true
+    }
+  },
+
   "result_limits": {
     "max_incidents": 50,
     "max_solutions": 30,
-    "max_facilities": 10
+    "max_facilities": 10,
+    "per_dimension_limit": 25,
+    "max_cross_facility_comparisons": 15,
+    "max_temporal_analysis_months": 24
+  },
+
+  "performance_settings": {
+    "query_timeout_seconds": 30,
+    "max_parallel_queries": 4,
+    "enable_query_caching": true,
+    "cache_ttl_minutes": 15
+  },
+
+  "scoring_weights": {
+    "exact_match_bonus": 0.3,
+    "solution_effectiveness_bonus": 0.25,
+    "recent_incident_bonus": 0.2,
+    "cross_facility_bonus": 0.15,
+    "recurring_pattern_bonus": 0.1
   }
 }
