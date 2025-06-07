@@ -30,6 +30,7 @@ __all__ = [
     "get_entity_primary_key",
     "get_field_category_display_mapping",
     "get_entity_connections",
+    "get_graph_search_config",
     # Dashboard config
     "get_dashboard_config",
     "get_dashboard_server_config",
@@ -59,6 +60,8 @@ class ConfigurationManager:
         self._dashboard_charts_cache: Optional[Dict[str, Any]] = None
         self._field_category_display_cache: Optional[Dict[str, Any]] = None
         self._case_study_cache: Optional[Dict[str, Any]] = None
+        self._graph_search_cache: Optional[Dict[str, Any]] = None
+        self._stakeholder_queries_cache: Optional[Dict[str, Any]] = None
         self._lock = threading.Lock()
 
     def get_system_constants(self) -> Dict[str, Any]:
@@ -175,6 +178,24 @@ class ConfigurationManager:
                     self._case_study_cache = self._load_json_config("case_study_schema.json")
         return self._case_study_cache
 
+    def get_graph_search_config(self) -> Dict[str, Any]:
+        """Load graph search configuration with thread-safe caching"""
+        if self._graph_search_cache is None:
+            with self._lock:
+                if self._graph_search_cache is None:
+                    self._graph_search_cache = self._load_json_config("graph_search_config.json")
+        return self._graph_search_cache
+
+    def get_stakeholder_queries_config(self) -> Dict[str, Any]:
+        """Load stakeholder queries configuration with thread-safe caching"""
+        if self._stakeholder_queries_cache is None:
+            with self._lock:
+                if self._stakeholder_queries_cache is None:
+                    self._stakeholder_queries_cache = self._load_json_config(
+                        "stakeholder_essential_queries.json"
+                    )
+        return self._stakeholder_queries_cache
+
     def clear_cache(self):
         """Clear configuration cache (useful for testing)"""
         with self._lock:
@@ -190,6 +211,8 @@ class ConfigurationManager:
             self._dashboard_charts_cache = None
             self._field_category_display_cache = None
             self._case_study_cache = None
+            self._graph_search_cache = None
+            self._stakeholder_queries_cache = None
 
     def _load_json_config(self, filename: str) -> Dict[str, Any]:
         """Load JSON configuration file with error handling"""
@@ -203,6 +226,11 @@ class ConfigurationManager:
                 return self._get_default_styling_config()
             elif filename == "dashboard_charts.json":
                 return self._get_default_charts_config()
+            if filename == "graph_search_config.json":
+                logger.warning(
+                    f"graph_search_config.json not found at {config_path}. Returning empty config."
+                )
+                return {}
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
         try:
@@ -247,20 +275,6 @@ def get_system_constants() -> Dict[str, Any]:
     return _config_manager.get_system_constants()
 
 
-def _get_constant(path: str, default: Any = None) -> Any:
-    """Get a value from system constants using dot notation (e.g., 'database.default_uri')"""
-    constants = get_system_constants()
-    keys = path.split(".")
-    value = constants
-
-    try:
-        for key in keys:
-            value = value[key]
-        return value
-    except (KeyError, TypeError):
-        return default
-
-
 def get_env(key: str, default: str = None) -> str:
     """Load environment variable with default - primary access method"""
     return os.environ.get(key, default)
@@ -285,48 +299,36 @@ def validate_required_env(required_vars: List[str]) -> bool:
 def get_db_config() -> Dict[str, str]:
     """Get database configuration from environment"""
     return {
-        "uri": get_env("NEO4J_URI", _get_constant("database.default_uri", "bolt://localhost:7687")),
-        "user": get_env("NEO4J_USER", _get_constant("database.default_user", "neo4j")),
-        "password": get_env(
-            "NEO4J_PASSWORD", _get_constant("database.default_password", "password")
-        ),
+        "uri": get_env("NEO4J_URI", "bolt://localhost:7687"),
+        "user": get_env("NEO4J_USERNAME", "neo4j"),
+        "password": get_env_required("NEO4J_PASSWORD"),
+        "database": get_env("NEO4J_DATABASE", "neo4j"),
     }
 
 
 def get_data_dir() -> str:
     """Get data directory path"""
-    return get_env("DATA_DIR", _get_constant("database.default_data_dir", "data"))
+    return get_env("DATA_DIR", "data")
 
 
 def get_log_level() -> str:
     """Get logging level"""
-    return get_env("LOG_LEVEL", _get_constant("database.default_log_level", "INFO"))
+    return get_env("LOG_LEVEL", "INFO")
 
 
 def get_batch_size() -> int:
     """Get processing batch size"""
-    try:
-        return int(get_env("BATCH_SIZE", str(_get_constant("processing.batch_size", 1000))))
-    except ValueError:
-        return _get_constant("processing.batch_size", 1000)
+    return int(get_env("NEO4J_BATCH_SIZE", "1000"))
 
 
 def get_connection_timeout() -> int:
     """Get database connection timeout"""
-    try:
-        return int(
-            get_env("CONNECTION_TIMEOUT", str(_get_constant("processing.connection_timeout", 30)))
-        )
-    except ValueError:
-        return _get_constant("processing.connection_timeout", 30)
+    return int(get_env("NEO4J_CONNECTION_TIMEOUT", "10"))
 
 
 def get_max_retries() -> int:
     """Get maximum retry attempts"""
-    try:
-        return int(get_env("MAX_RETRIES", str(_get_constant("processing.max_retries", 3))))
-    except ValueError:
-        return _get_constant("processing.max_retries", 3)
+    return int(get_env("NEO4J_MAX_RETRIES", "3"))
 
 
 def get_root_cause_delimiters() -> List[str]:
@@ -386,8 +388,18 @@ def get_field_category_display_mapping() -> Dict[str, Any]:
 
 
 def get_case_study_config() -> Dict[str, Any]:
-    """Load case study configuration with optimized caching"""
+    """Get case study configuration from the configuration manager"""
     return _config_manager.get_case_study_config()
+
+
+def get_graph_search_config() -> Dict[str, Any]:
+    """Get graph search configuration from the configuration manager"""
+    return _config_manager.get_graph_search_config()
+
+
+def get_stakeholder_queries_config() -> Dict[str, Any]:
+    """Get stakeholder queries configuration from the configuration manager"""
+    return _config_manager.get_stakeholder_queries_config()
 
 
 def get_entity_names() -> List[str]:
@@ -486,5 +498,5 @@ def get_all_config() -> Dict[str, Any]:
 
 
 def get_config() -> Dict[str, Any]:
-    """Get all configuration settings - alias for get_all_config"""
+    """Get the entire configuration as a single dictionary"""
     return get_all_config()

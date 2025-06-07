@@ -339,6 +339,81 @@ class InteractionHandlers:
             },
         }
 
+    def register_stakeholder_essentials_interactions(self, app):
+        """Register callbacks for essential stakeholder questions"""
+
+        @app.callback(
+            [Output("results-display", "children")],
+            [Input("search-btn", "n_clicks"), Input("question-tabs", "active_tab")],
+            State("incident-keywords", "value"),
+            prevent_initial_call=True,
+        )
+        def execute_essential_query(n_clicks, active_tab, keywords):
+            """Execute essential stakeholder queries"""
+            import dash_bootstrap_components as dbc
+            from dash import Input, Output, State, ctx, dcc, html
+
+            from dashboard.components.stakeholder_essentials import (
+                create_expertise_table,
+                create_solutions_table,
+                create_timeline_table,
+            )
+            from mine_core.shared.common import handle_error
+
+            if not n_clicks and not active_tab:
+                raise PreventUpdate
+
+            if not keywords:
+                return [dbc.Alert("Please enter equipment and issue keywords", color="info")]
+
+            try:
+                # Show search in progress
+                # This part will be handled by a separate output/status in the UI if needed
+
+                # Process keywords
+                keyword_list = [k.strip().lower() for k in keywords.split() if k.strip()]
+
+                data_adapter = self.data_adapter  # Use the adapter initialized in __init__
+
+                # Execute the appropriate query based on active tab
+                display = html.Div()
+                if active_tab == "tab-1":
+                    # Can this be fixed?
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        "can_this_be_fixed", keyword_list
+                    )
+                    display = create_solutions_table(results)
+
+                elif active_tab == "tab-2":
+                    # Who do I call?
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        "who_do_i_call", keyword_list
+                    )
+                    display = create_expertise_table(results)
+
+                elif active_tab == "tab-3":
+                    # How long will this take?
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        "how_long_will_this_take", keyword_list
+                    )
+                    display = create_timeline_table(results)
+                else:
+                    return [dbc.Alert("Unknown question tab", color="danger")]
+
+                return [display]
+
+            except Exception as e:
+                handle_error(logger, e, f"essential query for '{keywords}'")
+                error_display = dbc.Alert(
+                    [
+                        html.I(className="fas fa-exclamation-triangle me-2"),
+                        f"Analysis failed: {str(e)}",
+                    ],
+                    color="danger",
+                )
+
+                return [error_display]
+
 
 # Singleton pattern
 _interaction_handlers = None

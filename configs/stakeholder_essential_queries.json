@@ -1,0 +1,27 @@
+{
+  "essential_queries": {
+    "can_this_be_fixed": {
+      "query_file": "configs/queries/proven_solutions.cypher",
+      "description": "Historical success precedents for similar problems"
+    },
+    "who_do_i_call": {
+      "query_file": "configs/queries/expert_departments.cypher",
+      "description": "Department expertise for contamination issues"
+    },
+    "how_long_will_this_take": {
+      "query_file": "configs/queries/repair_timelines.cypher",
+      "description": "Timeline patterns for similar repairs"
+    }
+  },
+  "keyword_processing": {
+    "default_keywords": ["excavator", "motor", "contamination"],
+    "keyword_filter_template": "toLower(p.what_happened) CONTAINS toLower('{keyword}')",
+    "conjunction": " AND "
+  },
+  "display_config": {
+    "max_results_per_query": 10,
+    "enable_search_highlighting": true,
+    "show_query_execution_time": true,
+    "enable_export": false
+  }
+}

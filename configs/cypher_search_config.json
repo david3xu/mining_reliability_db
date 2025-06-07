@@ -1,0 +1,180 @@
+{
+  "component_config": {
+    "title": "Cypher Search Interface",
+    "description": "Advanced graph query interface for power users",
+    "max_query_timeout": 30,
+    "max_result_limit": 1000,
+    "enable_query_caching": true,
+    "cache_duration_minutes": 15
+  },
+  "safety_framework": {
+    "allowed_keywords": [
+      "MATCH",
+      "RETURN",
+      "WHERE",
+      "WITH",
+      "ORDER BY",
+      "LIMIT",
+      "SKIP",
+      "DISTINCT",
+      "AS",
+      "AND",
+      "OR",
+      "NOT",
+      "IN",
+      "CONTAINS",
+      "STARTS WITH",
+      "ENDS WITH",
+      "COUNT",
+      "SUM",
+      "AVG",
+      "MIN",
+      "MAX",
+      "COLLECT",
+      "UNWIND",
+      "OPTIONAL MATCH",
+      "UNION",
+      "CASE",
+      "WHEN",
+      "THEN",
+      "ELSE",
+      "END"
+    ],
+    "forbidden_keywords": [
+      "CREATE",
+      "DELETE",
+      "REMOVE",
+      "SET",
+      "MERGE",
+      "DETACH",
+      "DROP",
+      "ALTER",
+      "INDEX",
+      "CONSTRAINT",
+      "PROCEDURE",
+      "FUNCTION",
+      "CALL",
+      "LOAD CSV",
+      "FOREACH",
+      "USING"
+    ],
+    "max_query_length": 2000,
+    "require_return_clause": true,
+    "require_limit_clause": true,
+    "default_limit": 100
+  },
+  "query_templates": {
+    "facility_patterns": {
+      "title": "Cross-Facility Pattern Analysis",
+      "description": "Find similar failure patterns across different facilities",
+      "template": "MATCH (p:Problem)-[r:ANALYZES]-(rc:RootCause)\nWHERE p.name CONTAINS $pattern\nRETURN p.name as problem, rc.root_cause as cause, count(*) as frequency\nORDER BY frequency DESC\nLIMIT $limit",
+      "parameters": [
+        {
+          "name": "pattern",
+          "type": "text",
+          "description": "Failure pattern to search for",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "description": "Maximum results to return",
+          "default": 50,
+          "max": 200
+        }
+      ]
+    },
+    "equipment_relationships": {
+      "title": "Equipment Relationship Mapping",
+      "description": "Explore relationships between equipment types and failure modes",
+      "template": "MATCH (p:Problem)\nWHERE p.name CONTAINS $equipment_type\nMATCH (p)-[r:ANALYZES]-(rc:RootCause)\nRETURN p.name as problem, rc.root_cause as root_cause, rc.objective_evidence as evidence\nORDER BY p.name\nLIMIT $limit",
+      "parameters": [
+        {
+          "name": "equipment_type",
+          "type": "text",
+          "description": "Equipment type (e.g., 'pump', 'conveyor', 'crusher')",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "description": "Maximum results to return",
+          "default": 50,
+          "max": 200
+        }
+      ]
+    },
+    "temporal_analysis": {
+      "title": "Time-Based Incident Analysis",
+      "description": "Analyze incidents and patterns over time periods",
+      "template": "MATCH (p:Problem)-[r:ANALYZES]-(rc:RootCause)\nWHERE p.problem_id CONTAINS $year\nRETURN substring(p.problem_id, -4) as year, p.name as problem, rc.root_cause as cause\nORDER BY year DESC, p.name\nLIMIT $limit",
+      "parameters": [
+        {
+          "name": "year",
+          "type": "text",
+          "description": "Year to filter by (e.g., '2023', '2024')",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "description": "Maximum results to return",
+          "default": 100,
+          "max": 300
+        }
+      ]
+    },
+    "root_cause_clustering": {
+      "title": "Root Cause Pattern Clustering",
+      "description": "Group similar root causes to identify systemic issues",
+      "template": "MATCH (rc:RootCause)\nWHERE rc.root_cause CONTAINS $keyword\nRETURN rc.root_cause as cause, rc.objective_evidence as evidence, count(*) as occurrence_count\nORDER BY occurrence_count DESC\nLIMIT $limit",
+      "parameters": [
+        {
+          "name": "keyword",
+          "type": "text",
+          "description": "Keyword in root cause description",
+          "required": true
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "description": "Maximum results to return",
+          "default": 30,
+          "max": 100
+        }
+      ]
+    }
+  },
+  "example_queries": {
+    "basic_exploration": {
+      "title": "Database Schema Exploration",
+      "query": "MATCH (n) RETURN DISTINCT labels(n) as node_types, count(n) as count ORDER BY count DESC LIMIT 10",
+      "description": "Explore the basic structure and node types in the database"
+    },
+    "relationship_overview": {
+      "title": "Relationship Types Overview",
+      "query": "MATCH ()-[r]->() RETURN DISTINCT type(r) as relationship_type, count(r) as count ORDER BY count DESC LIMIT 20",
+      "description": "See all relationship types and their frequencies"
+    },
+    "sample_problems": {
+      "title": "Sample Problem Analysis",
+      "query": "MATCH (p:Problem)-[:ANALYZES]-(rc:RootCause) RETURN p.name as problem, rc.root_cause as cause LIMIT 10",
+      "description": "View sample problems and their root causes"
+    }
+  },
+  "result_visualization": {
+    "table_config": {
+      "max_rows_display": 100,
+      "enable_sorting": true,
+      "enable_filtering": true,
+      "enable_export": true
+    },
+    "graph_config": {
+      "max_nodes_display": 50,
+      "enable_interactive": true,
+      "layout_algorithm": "force",
+      "node_size_property": "count",
+      "edge_width_property": "weight"
+    }
+  }
+}

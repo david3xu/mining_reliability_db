@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Data Adapter - Core Data Pipeline Integration
-Unified data access layer with standardized interface.
+Data Adapter - Core Data Pipeline Integration (Enhanced)
+Unified data access layer for comprehensive graph data extraction.
 Architecture compliant: uses config_adapter instead of direct config imports.
 """
 
 import logging
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -21,6 +20,7 @@ from dashboard.adapters.interfaces import (
 )
 from dashboard.adapters.workflow_adapter import get_workflow_adapter
 from mine_core.business.intelligence_engine import IntelligenceEngine, get_intelligence_engine
+from mine_core.database.query_manager import get_query_manager
 from mine_core.shared.common import handle_error
 
 __all__ = [
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 class PurifiedDataAdapter:
-    """Pure data access adapter - calls core business logic only"""
+    """Pure data access adapter - calls core business logic only (Enhanced for Graph Search)"""
 
     def __init__(self):
         """Initialize with core service connections"""
@@ -243,8 +243,6 @@ class PurifiedDataAdapter:
         try:
             logger.info(f"Adapter: Schema-driven search for '{search_text}'")
 
-            from mine_core.database.query_manager import get_query_manager
-
             query_manager = get_query_manager()
 
             # Use schema-driven method
@@ -273,8 +271,6 @@ class PurifiedDataAdapter:
             logger.info(
                 f"Adapter: Fetching case study data for {action_request_number} in facility {facility_name}"
             )
-
-            from mine_core.database.query_manager import get_query_manager
 
             query_manager = get_query_manager()
 
@@ -386,8 +382,6 @@ class PurifiedDataAdapter:
         try:
             logger.info("Adapter: Debugging search data structure")
 
-            from mine_core.database.query_manager import get_query_manager
-
             query_manager = get_query_manager()
 
             discovery_result = query_manager.discover_search_data_structure()
@@ -411,8 +405,6 @@ class PurifiedDataAdapter:
     def get_core_workflow_labels(self) -> List[str]:
         """Get core workflow entity labels only"""
         try:
-            from mine_core.database.query_manager import get_query_manager
-
             query_manager = get_query_manager()
 
             result = query_manager.get_core_workflow_labels()
@@ -420,6 +412,134 @@ class PurifiedDataAdapter:
 
         except Exception as e:
             handle_error(logger, e, "core workflow labels access")
+            return []
+
+    def execute_comprehensive_graph_search(
+        self, search_term: str
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        """Execute comprehensive graph search across all connected data"""
+        try:
+            logger.info(f"Adapter: Executing comprehensive graph search for '{search_term}'")
+
+            query_manager = get_query_manager()
+            results = {"incidents": [], "solutions": [], "facilities": []}
+
+            # Comprehensive incident search
+            incident_query = """
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            WHERE toLower(p.what_happened) CONTAINS toLower($search_term)
+            OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
+            RETURN ar.action_request_number AS incident_id,
+                   f.facility_id AS facility,
+                   p.what_happened AS problem_description,
+                   rc.root_cause AS root_cause,
+                   ap.action_plan AS solution,
+                   v.is_action_plan_effective AS effective
+            ORDER BY ar.initiation_date DESC
+            LIMIT 50
+            """
+
+            incident_result = query_manager.execute_query(
+                incident_query, params={"search_term": search_term}
+            )
+            if incident_result.success:
+                results["incidents"] = incident_result.data
+
+            # Solution effectiveness search
+            solution_query = """
+            MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
+            WHERE toLower(ap.action_plan) CONTAINS toLower($search_term)
+            MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            RETURN ap.action_plan AS solution,
+                   v.is_action_plan_effective AS effective,
+                   rc.root_cause AS root_cause,
+                   f.facility_id AS facility
+            ORDER BY v.is_action_plan_effective DESC
+            LIMIT 30
+            """
+
+            solution_result = query_manager.execute_query(
+                solution_query, params={"search_term": search_term}
+            )
+            if solution_result.success:
+                results["solutions"] = solution_result.data
+
+            # Facility network search
+            facility_query = """
+            MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+            WHERE toLower(ar.categories) CONTAINS toLower($search_term)
+               OR toLower(ar.title) CONTAINS toLower($search_term)
+            MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)
+            WITH f.facility_id AS facility_id,
+                 count(*) AS incident_count,
+                 collect(DISTINCT ar.categories) AS equipment_types
+            RETURN facility_id, incident_count, equipment_types
+            ORDER BY incident_count DESC
+            LIMIT 10
+            """
+
+            facility_result = query_manager.execute_query(
+                facility_query, params={"search_term": search_term}
+            )
+            if facility_result.success:
+                results["facilities"] = facility_result.data
+
+            return results
+
+        except Exception as e:
+            handle_error(logger, e, f"comprehensive graph search for '{search_term}'")
+            return {"incidents": [], "solutions": [], "facilities": []}
+
+    def execute_essential_stakeholder_query(
+        self, query_type: str, incident_keywords: List[str]
+    ) -> List[Dict[str, Any]]:
+        """Execute essential stakeholder queries with keyword filtering"""
+        try:
+            query_manager = get_query_manager()
+            config_adapter = get_config_adapter()
+            essential_queries_config = config_adapter.get_stakeholder_queries_config().get(
+                "essential_queries", {}
+            )
+            keyword_processing_config = config_adapter.get_stakeholder_queries_config().get(
+                "keyword_processing", {}
+            )
+            keyword_filter_template = keyword_processing_config.get(
+                "keyword_filter_template", "toLower(p.what_happened) CONTAINS toLower('{keyword}')"
+            )
+            conjunction = keyword_processing_config.get("conjunction", " AND ")
+
+            # Build keyword filter
+            keyword_filters = []
+            if incident_keywords:
+                for keyword in incident_keywords:
+                    keyword_filters.append(keyword_filter_template.format(keyword=keyword))
+
+            filter_clause = conjunction.join(keyword_filters) if keyword_filters else "1=1"
+
+            query_config = essential_queries_config.get(query_type)
+            if not query_config:
+                logger.warning(f"Unknown essential query type: {query_type}")
+                return []
+
+            query_file_path = query_config.get("query_file")
+            if not query_file_path:
+                logger.error(f"Query file path not found for query type: {query_type}")
+                return []
+
+            # Read the Cypher query from the file
+            # Assuming query files are small and can be read entirely
+            with open(query_file_path, "r") as f:
+                query = f.read()
+
+            # Replace the placeholder in the query
+            query = query.replace("{filter_clause}", filter_clause)
+
+            result = query_manager.execute_query(query)
+            return result.data if result.success else []
+
+        except Exception as e:
+            handle_error(logger, e, f"essential stakeholder query: {query_type}")
             return []
 
     def _get_timestamp(self) -> str:

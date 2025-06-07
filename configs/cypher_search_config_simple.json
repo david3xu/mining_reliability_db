@@ -1,0 +1,57 @@
+{
+  "component_config": {
+    "title": "Cypher Search Interface",
+    "description": "Advanced database query interface for power users",
+    "max_query_timeout": 30,
+    "max_results": 1000,
+    "enable_syntax_highlighting": true,
+    "enable_autocomplete": false
+  },
+  "safety_rules": {
+    "readonly_only": true,
+    "timeout_seconds": 30,
+    "max_results": 1000,
+    "forbidden_keywords": [
+      "CREATE",
+      "DELETE",
+      "SET",
+      "REMOVE",
+      "MERGE",
+      "DROP",
+      "ALTER",
+      "INSERT",
+      "UPDATE"
+    ],
+    "required_keywords": ["MATCH", "RETURN"]
+  },
+  "query_templates": {
+    "facility_overview": {
+      "name": "Facility Overview",
+      "description": "Get overview of all facilities and their basic information",
+      "template": "MATCH (f:Facility) RETURN f.facility_id, f.facility_name, f.location LIMIT 20",
+      "parameters": [],
+      "safety_level": "safe"
+    },
+    "recent_incidents": {
+      "name": "Recent Incidents",
+      "description": "Find recent action requests and their status",
+      "template": "MATCH (ar:ActionRequest) WHERE ar.date >= date('2023-01-01') RETURN ar.action_request_number, ar.title, ar.date ORDER BY ar.date DESC LIMIT 20",
+      "parameters": [],
+      "safety_level": "safe"
+    },
+    "equipment_analysis": {
+      "name": "Equipment Analysis",
+      "description": "Analyze equipment-related problems and solutions",
+      "template": "MATCH (ar:ActionRequest)<-[:IDENTIFIED_BY]-(p:Problem) WHERE toLower(p.description) CONTAINS 'equipment' RETURN ar.action_request_number, p.description LIMIT 15",
+      "parameters": [],
+      "safety_level": "safe"
+    },
+    "facility_connections": {
+      "name": "Facility Connections",
+      "description": "Show relationships between facilities and action requests",
+      "template": "MATCH (f:Facility)<-[:BELONGS_TO]-(ar:ActionRequest) RETURN f.facility_name, count(ar) as incident_count ORDER BY incident_count DESC LIMIT 10",
+      "parameters": [],
+      "safety_level": "safe"
+    }
+  }
+}

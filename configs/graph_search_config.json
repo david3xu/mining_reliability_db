@@ -1,0 +1,14 @@
+{
+  "search_queries": {
+    "comprehensive_incident_search": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) WHERE toLower(p.what_happened) CONTAINS toLower($search_term) OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) RETURN ar, f, p, rc, ap, v ORDER BY ar.initiation_date DESC",
+
+    "equipment_facility_network": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($search_term) MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem) RETURN f.facility_id, count(*) as incidents, collect(p.what_happened)[0..3] as sample_problems ORDER BY incidents DESC",
+
+    "solution_effectiveness_graph": "MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ap.action_plan) CONTAINS toLower($search_term) MATCH (ap)-[:RESOLVES]->(rc:RootCause)-[:ANALYZES]->(p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) RETURN ap.action_plan, v.is_action_plan_effective, rc.root_cause, p.what_happened, f.facility_id ORDER BY v.is_action_plan_effective DESC"
+  },
+  "result_limits": {
+    "max_incidents": 50,
+    "max_solutions": 30,
+    "max_facilities": 10
+  }
+}
