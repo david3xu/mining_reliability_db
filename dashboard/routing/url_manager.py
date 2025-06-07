@@ -30,13 +30,16 @@ class URLManager:
             "/",
             "/data-quality",
             "/workflow",
-            "/stakeholder-questions",
             "/summary",
             "/historical-records",
             "/facilities-distribution",
             "/data-types-distribution",
             "/search",
             "/case-study-solution-sequence",
+            "/stakeholder-validation",
+            "/cypher-search",
+            "/graph-search",
+            "/essentials",
         ]
 
         # Add dynamic facility routes
@@ -64,16 +67,11 @@ class URLManager:
         if pathname == "/workflow":
             return {"page": "workflow", "component": "workflow_analysis_layout"}
 
-        if pathname == "/stakeholder-questions":
-            return {"page": "stakeholder_questions", "component": "stakeholder_questions_layout"}
+        if pathname == "/cypher-search":
+            return {"page": "cypher_search", "component": "cypher_search_layout"}
 
-        if pathname.startswith("/stakeholder-questions/"):
-            category_id = pathname.replace("/stakeholder-questions/", "")
-            return {
-                "page": "stakeholder_questions",
-                "component": "stakeholder_questions_layout",
-                "category_id": category_id,
-            }
+        if pathname == "/essentials":
+            return {"page": "essentials", "component": "essential_questions_layout"}
 
         if pathname == "/summary":
             return {"page": "summary", "component": "facilities_summary"}
@@ -100,6 +98,9 @@ class URLManager:
                 "component": "facility_detail_layout",
                 "facility_id": facility_id,
             }
+
+        if pathname == "/graph-search":
+            return {"page": "graph_search", "component": "graph_search_layout"}
 
         return {"page": "not_found", "component": "error_page"}
 
@@ -136,6 +137,7 @@ class URLManager:
             "facilities_distribution",
             "data_types",
             "incident_search",
+            "graph_search",
         ]:
             breadcrumbs.append({"label": "Analysis", "url": pathname})
 
@@ -152,6 +154,9 @@ class URLManager:
             "/facilities-distribution": "Facilities Distribution",
             "/data-types-distribution": "Data Types Distribution",
             "/search": "Incident Search",
+            "/stakeholder-validation": "Stakeholder Validation",
+            "/cypher-search": "Cypher Search Interface",
+            "/graph-search": "Graph Search Analysis",
         }
 
         if pathname in title_mapping:

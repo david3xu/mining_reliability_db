@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Configuration Adapter - Pure Configuration Access Layer
+Configuration Adapter - Pure Configuration Access Layer (Enhanced)
 Central configuration adapter with caching and validation.
 """
 
+import json
 import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Pure configuration imports
@@ -23,9 +25,11 @@ from configs.environment import (
     get_entity_primary_key,
     get_field_analysis_config,
     get_field_category_display_mapping,
+    get_graph_search_config,
     get_mappings,
     get_max_retries,
     get_schema,
+    get_stakeholder_queries_config,
     get_system_constants,
     get_workflow_stages_config,
 )
@@ -53,6 +57,7 @@ __all__ = [
     "get_entity_names",
     "handle_error_utility",
     "get_dashboard_chart_config",
+    "get_stakeholder_queries_config",
 ]
 
 logger = logging.getLogger(__name__)
@@ -64,7 +69,7 @@ def handle_error_utility(logger: logging.Logger, error: Exception, context: str)
 
 
 class ConfigAdapter:
-    """Pure configuration access - no processing logic"""
+    """Pure configuration access - no processing logic (Enhanced for Graph Search)"""
 
     def __init__(self):
         """Initialize configuration adapter"""
@@ -218,10 +223,26 @@ class ConfigAdapter:
             handle_error_utility(logger, e, "entity connections configuration access")
             return {}
 
-    # Dashboard Configuration Access
+    # New Graph Search Configuration Access
+
+    def get_graph_search_config(self) -> Dict[str, Any]:
+        """Pure access to graph search configuration"""
+        try:
+            return get_graph_search_config()
+        except Exception as e:
+            handle_error_utility(logger, e, "graph search configuration access")
+            return {}
+
+    def get_stakeholder_queries_config(self) -> Dict[str, Any]:
+        """Pure access to stakeholder queries configuration"""
+        try:
+            return get_stakeholder_queries_config()
+        except Exception as e:
+            handle_error_utility(logger, e, "stakeholder queries configuration access")
+            return {}
 
     def get_dashboard_config(self) -> Dict[str, Any]:
-        """Pure access to dashboard configuration"""
+        """Pure access to main dashboard configuration"""
         try:
             return get_dashboard_config()
         except Exception as e:
@@ -234,11 +255,7 @@ class ConfigAdapter:
             return get_dashboard_chart_config()
         except Exception as e:
             handle_error_utility(logger, e, "dashboard chart configuration access")
-            return {
-                "font_family": "Arial, sans-serif",
-                "title_font_size": 18,
-                "default_height": 400,
-            }
+            return {}
 
     def get_styling_config(self) -> Dict[str, Any]:
         """Pure access to dashboard styling configuration"""
@@ -246,12 +263,7 @@ class ConfigAdapter:
             return get_dashboard_styling_config()
         except Exception as e:
             handle_error_utility(logger, e, "styling configuration access")
-            return {
-                "primary_color": "#4A90E2",
-                "chart_colors": ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"],
-                "background_light": "#FFFFFF",
-                "text_primary": "#333333",
-            }
+            return {}
 
     def get_server_config(self) -> Dict[str, Any]:
         """Pure access to server configuration"""
@@ -260,7 +272,7 @@ class ConfigAdapter:
             return dashboard_config.get("server", {})
         except Exception as e:
             handle_error_utility(logger, e, "server configuration access")
-            return {"default_host": "127.0.0.1", "default_port": 8050}
+            return {}
 
     def get_performance_config(self) -> Dict[str, Any]:
         """Pure access to performance configuration"""
@@ -269,51 +281,36 @@ class ConfigAdapter:
             return dashboard_config.get("performance", {})
         except Exception as e:
             handle_error_utility(logger, e, "performance configuration access")
-            return {"query_timeout_warning": 5.0, "cache_ttl_seconds": 300}
+            return {}
 
     def get_dashboard_metric_card_styling(self) -> Dict[str, Any]:
-        """Get metric card styling configuration for adapters"""
+        """Access styling for metric cards from dashboard config"""
         try:
-            styling = self.get_styling_config()
-            micro_styles = styling.get("micro_component_styles", {})
-            metric_card = micro_styles.get("metric_card", {})
-
-            return {
-                "primary_color": styling.get("primary_color", "#4A90E2"),
-                "text_light": styling.get("text_light", "#FFFFFF"),
-                "card_height": metric_card.get("default_dimensions", {})
-                .get("height", "120px")
-                .replace("px", ""),
-                "card_width": metric_card.get("default_dimensions", {})
-                .get("width", "220px")
-                .replace("px", ""),
-            }
+            dashboard_config = self.get_dashboard_config()
+            styling = dashboard_config.get("styling", {})
+            return styling.get("metric_cards", {})
         except Exception as e:
-            handle_error_utility(logger, e, "metric card styling configuration access")
+            handle_error_utility(logger, e, "metric card styling access")
             return {}
 
     def get_metric_card_styling(self) -> Dict[str, Any]:
-        """Alias for get_dashboard_metric_card_styling() for component compatibility"""
-        return self.get_dashboard_metric_card_styling()
-
-    def get_dashboard_chart_styling_template(self) -> Dict[str, Any]:
-        """Get dashboard chart styling template for adapters"""
+        """Pure access to metric card styling"""
         try:
             styling = self.get_styling_config()
-            charts = self.get_dashboard_chart_config()
+            return styling.get("metric_cards", {})
+        except Exception as e:
+            handle_error_utility(logger, e, "metric card styling access")
+            return {}
 
-            return {
-                "colors": styling.get("chart_colors", ["#4A90E2", "#F5A623", "#7ED321", "#B57EDC"]),
-                "font_family": charts.get("font_family", "Arial, sans-serif"),
-                "title_font_size": charts.get("title_font_size", 18),
-                "height": charts.get("default_height", 400),
-                "background": styling.get("background_light", "#FFFFFF"),
-            }
+    def get_dashboard_chart_styling_template(self) -> Dict[str, Any]:
+        """Access chart styling template from dashboard config"""
+        try:
+            dashboard_config = self.get_dashboard_config()
+            styling = dashboard_config.get("styling", {})
+            return styling.get("chart_template", {})
         except Exception as e:
             handle_error_utility(logger, e, "chart styling template access")
             return {}
-
-    # Field Analysis Configuration Access
 
     def get_field_analysis_config(self) -> Dict[str, Any]:
         """Pure access to field analysis configuration"""
@@ -324,7 +321,7 @@ class ConfigAdapter:
             return {}
 
     def get_field_category_display_mapping(self) -> Dict[str, Any]:
-        """Pure access to field category display mapping"""
+        """Pure access to field category display mapping configuration"""
         try:
             return get_field_category_display_mapping()
         except Exception as e:
@@ -332,41 +329,30 @@ class ConfigAdapter:
             return {}
 
     def get_completion_thresholds(self) -> Dict[str, int]:
-        """Pure access to completion thresholds"""
+        """Pure access to completion thresholds from system constants"""
         try:
-            field_config = self.get_field_analysis_config()
-            return field_config.get("completion_thresholds", {})
+            constants = get_system_constants()
+            return constants.get("completion_thresholds", {})
         except Exception as e:
             handle_error_utility(logger, e, "completion thresholds access")
-            return {"very_low": 20, "low": 40, "medium": 60, "good": 80, "high": 100}
-
-    def get_completion_colors(self) -> Dict[str, str]:
-        """Pure access to completion colors"""
-        try:
-            field_config = self.get_field_analysis_config()
-            return field_config.get("completion_colors", {})
-        except Exception as e:
-            handle_error_utility(logger, e, "completion colors access")
-            return {
-                "very_low": "#D32F2F",
-                "low": "#F57C00",
-                "medium": "#FFA000",
-                "good": "#7CB342",
-                "high": "#388E3C",
-            }
-
-    def get_chart_display_config(self) -> Dict[str, Any]:
-        """Get chart display configuration from field analysis"""
-        try:
-            field_config = self.get_field_analysis_config()
-            return field_config.get(
-                "chart_config", {"row_height": 25, "min_height": 400, "max_completion": 100}
-            )
-        except Exception as e:
-            handle_error_utility(logger, e, "chart display configuration access")
             return {}
 
-    # System Configuration Access
+    def get_completion_colors(self) -> Dict[str, str]:
+        """Pure access to completion colors from dashboard styling"""
+        try:
+            styling = self.get_styling_config()
+            return styling.get("completion_colors", {})
+        except Exception as e:
+            handle_error_utility(logger, e, "completion colors access")
+            return {}
+
+    def get_chart_display_config(self) -> Dict[str, Any]:
+        """Pure access to chart display configuration"""
+        try:
+            return get_dashboard_chart_config()
+        except Exception as e:
+            handle_error_utility(logger, e, "chart display config access")
+            return {}
 
     def get_system_constants(self) -> Dict[str, Any]:
         """Pure access to system constants configuration"""
@@ -381,80 +367,69 @@ class ConfigAdapter:
         try:
             return get_db_config()
         except Exception as e:
-            handle_error_utility(logger, e, "database configuration access")
+            handle_error_utility(logger, e, "database config access")
             return {}
 
     def get_processing_config(self) -> Dict[str, Any]:
         """Pure access to processing configuration"""
         try:
-            return {
-                "batch_size": get_batch_size(),
-                "connection_timeout": get_connection_timeout(),
-                "max_retries": get_max_retries(),
-            }
+            all_config = get_all_config()
+            return all_config.get("processing", {})
         except Exception as e:
-            handle_error_utility(logger, e, "processing configuration access")
+            handle_error_utility(logger, e, "processing config access")
             return {}
 
     def get_relationships_config(self) -> Dict[str, Any]:
-        """Pure access to relationships configuration based on schema"""
+        """Pure access to relationships configuration (from entity connections)"""
         try:
-            return {
-                "relationships": get_schema().get("relationships", []),
-                "entity_connections": self.get_entity_connections_config(),
-            }
+            return get_entity_connections()
         except Exception as e:
-            handle_error_utility(logger, e, "relationships configuration access")
+            handle_error_utility(logger, e, "relationships config access")
             return {}
 
     def get_complete_config(self) -> Dict[str, Any]:
-        """Comprehensive configuration summary for debugging"""
+        """Pure access to all configurations merged into a single dictionary"""
         try:
             return get_all_config()
         except Exception as e:
-            handle_error_utility(logger, e, "complete configuration access")
+            handle_error_utility(logger, e, "complete config access")
             return {}
 
     def validate_config_availability(self) -> Dict[str, bool]:
-        """Validate availability of core configuration files"""
-        availability = {
-            "schema_available": bool(self.get_schema_config()),
-            "mappings_available": bool(self.get_field_mappings_config()),
-            "dashboard_available": bool(self.get_dashboard_config()),
-            "workflow_stages_available": bool(self.get_workflow_stages_config()),
-            "styling_available": bool(self.get_styling_config()),
-            "charts_available": bool(self.get_dashboard_chart_config()),
-            "system_constants_available": bool(self.get_system_constants()),
-            "field_analysis_available": bool(self.get_field_analysis_config()),
-            "entity_classification_available": bool(self.get_entity_classification_config()),
-            "entity_connections_available": bool(self.get_entity_connections_config()),
+        """Check if all essential configurations are available"""
+        validation_results = {
+            "schema_available": self.get_schema_config() != {},
+            "field_mappings_available": self.get_field_mappings_config() != {},
+            "dashboard_config_available": self.get_dashboard_config() != {},
+            "workflow_stages_available": self.get_workflow_stages_config() != {},
+            "entity_classification_available": self.get_entity_classification_config() != {},
+            "entity_connections_available": self.get_entity_connections_config() != {},
+            "field_analysis_available": self.get_field_analysis_config() != {},
+            "dashboard_styling_available": self.get_styling_config() != {},
+            "dashboard_charts_available": self.get_dashboard_chart_config() != {},
+            "system_constants_available": self.get_system_constants() != {},
+            "case_study_available": self.get_case_study_config() != {},
+            "graph_search_available": self.get_graph_search_config() != {},
         }
-        if not all(availability.values()):
-            handle_error_utility(
-                logger, ValueError("Some configs not available"), "config availability validation"
-            )
-        return availability
+        return validation_results
 
-    # Convenience methods for workflow_adapter compatibility
+    # Direct access to environment config functions for purity
+
     def get_mappings(self) -> Dict[str, Any]:
-        """Get full mappings configuration (convenience method)"""
-        return self.get_field_mappings_config()
+        """Direct access to field mappings"""
+        return get_mappings()
 
     def get_schema(self) -> Dict[str, Any]:
-        """Get schema configuration (convenience method)"""
-        return self.get_schema_config()
+        """Direct access to model schema"""
+        return get_schema()
 
     def get_entity_classification(self) -> Dict[str, Any]:
-        """Get entity classification configuration (convenience method for workflow analysis)"""
-        return self.get_entity_classification_config()
+        """Direct access to entity classification"""
+        return get_entity_classification()
 
     def get_case_study_config(self) -> Dict[str, Any]:
-        """Pure access to case study configuration"""
-        try:
-            return get_case_study_config()
-        except Exception as e:
-            handle_error_utility(logger, e, "case study configuration access")
-            return {}
+        """Direct access to case study schema"""
+        return get_case_study_config()
 
 
 # Singleton pattern

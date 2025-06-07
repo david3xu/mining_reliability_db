@@ -62,14 +62,6 @@ from dashboard.components.solution_sequence_case_study import (
     create_solution_sequence_case_study_layout,
 )
 
-# Stakeholder Questions Components
-from dashboard.components.stakeholder_questions import (
-    create_question_category_card,
-    create_question_detail_view,
-    create_stakeholder_questions_overview,
-    get_question_category_metrics,
-)
-
 # Navigation Components
 from dashboard.components.tab_navigation import (
     create_breadcrumb_navigation,
@@ -84,6 +76,15 @@ from dashboard.components.workflow_analysis import (
     create_workflow_analysis_layout,
     create_workflow_metrics,
 )
+
+# Stakeholder Questions Components (Consolidated into Enhanced Investigation)
+# from dashboard.components.stakeholder_questions import (
+#     create_question_category_card,
+#     create_question_detail_view,
+#     create_stakeholder_questions_overview,
+#     get_question_category_metrics,
+# )
+
 
 __all__ = [
     # Atomized Portfolio Components
@@ -137,9 +138,9 @@ __all__ = [
     "create_workflow_stage_card",
     "create_facility_summary_card",
     "create_solution_sequence_case_study_layout",
-    # Stakeholder Questions Components
-    "create_stakeholder_questions_overview",
-    "create_question_category_card",
-    "create_question_detail_view",
-    "get_question_category_metrics",
+    # Stakeholder Questions Components (Consolidated into Enhanced Investigation)
+    # "create_stakeholder_questions_overview",
+    # "create_question_category_card",
+    # "create_question_detail_view",
+    # "get_question_category_metrics",
 ]

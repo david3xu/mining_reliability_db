@@ -158,8 +158,14 @@ class PurifiedDashboardApp:
             interaction_handlers.register_table_interactions(self.app)
             interaction_handlers.register_navigation_interactions(self.app)
             interaction_handlers.register_search_interactions(self.app)
+            interaction_handlers.register_stakeholder_essentials_interactions(self.app)
 
             logger.info("✅ All callbacks registered through interaction handlers")
+
+            # Import enhanced investigation component to register callbacks
+            import dashboard.components.graph_search
+
+            logger.info("✅ Enhanced investigation callbacks imported")
 
             # Also ensure incident search component callbacks are imported
             # import dashboard.components.incident_search # Removed redundant import
@@ -195,13 +201,15 @@ class PurifiedDashboardApp:
 
                 return create_workflow_analysis_layout()
 
-            elif component_name == "stakeholder_questions_layout":
-                from dashboard.layouts.stakeholder_questions_layout import (
-                    create_stakeholder_questions_layout,
+            elif component_name == "essential_questions_layout":
+                from dashboard.components.stakeholder_essentials import (
+                    create_essential_questions_layout,
                 )
 
-                category_id = route_config.get("category_id")
-                return create_stakeholder_questions_layout(category_id)
+                return create_essential_questions_layout()
+
+            elif component_name == "summary":
+                return self._create_facilities_summary()
 
             elif component_name == "historical_records_page":
                 from dashboard.components.portfolio_overview import create_historical_records_page
@@ -226,30 +234,41 @@ class PurifiedDashboardApp:
                 from dashboard.components.incident_search import create_incident_search_layout
 
                 return create_incident_search_layout()
+
             elif component_name == "solution_sequence_case_study_layout":
                 from dashboard.components.solution_sequence_case_study import (
                     create_solution_sequence_case_study_layout,
                 )
 
                 return create_solution_sequence_case_study_layout()
+
             elif component_name == "facility_detail_layout":
-                facility_id = route_config.get("facility_id")
                 from dashboard.components.facility_detail import create_facility_detail_layout
 
-                return create_facility_detail_layout(facility_id)
+                return create_facility_detail_layout(route_config.get("facility_id"))
 
-            elif component_name == "facilities_summary":
-                return self._create_facilities_summary()
+            elif component_name == "cypher_search_layout":
+                from dashboard.components.cypher_search import create_cypher_search_layout
 
-            else:
-                # Default to portfolio overview if component is not recognized
-                from dashboard.components.portfolio_overview import create_complete_dashboard
+                return create_cypher_search_layout()
 
-                return create_complete_dashboard()
+            elif component_name == "graph_search_layout":
+                from dashboard.components.graph_search import create_graph_search_layout
+
+                return create_graph_search_layout()
+
+            elif component_name == "stakeholder_essentials":
+                from dashboard.components.stakeholder_essentials import (
+                    create_essential_questions_interface,
+                )
+
+                return create_essential_questions_interface()
+
+            return self._create_not_found_page(component_name)
 
         except Exception as e:
-            handle_error(logger, e, f"component loading for {component_name}")
-            return self._create_error_page(f"Component {component_name} failed to load")
+            handle_error(logger, e, f"loading component {component_name}")
+            return self._create_error_page(str(e))
 
     def _create_not_found_page(self, pathname):
         """Create 404 page"""

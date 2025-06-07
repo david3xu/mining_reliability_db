@@ -43,6 +43,99 @@ class IntelligenceEngine:
         self.schema = get_schema()
         self.mappings = get_mappings()
 
+    def execute_cypher_query(
+        self, query_template: str, parameters: Dict[str, Any] = None
+    ) -> IntelligenceResult:
+        """Execute schema-driven cypher query with template substitution"""
+        try:
+            logger.info(f"Intelligence Engine: Executing cypher query template")
+
+            # Get schema information for template substitution
+            entity_names = get_entity_names()
+            entity_connections = get_entity_connections()
+
+            # Template substitution - replace schema placeholders
+            formatted_query = query_template
+
+            # Replace entity names
+            for entity_type, entity_name in entity_names.items():
+                formatted_query = formatted_query.replace(
+                    f"{{{entity_type.lower()}_entity}}", entity_name
+                )
+
+            # Replace relationship connections
+            for connection_key, connection_name in entity_connections.items():
+                formatted_query = formatted_query.replace(
+                    f"{{{connection_key.lower()}}}", connection_name
+                )
+
+            # Replace field mappings (basic primary keys)
+            for entity_type in entity_names.keys():
+                primary_key = get_entity_primary_key(entity_type)
+                if primary_key:
+                    formatted_query = formatted_query.replace(
+                        f"{{{entity_type.lower()}_primary_key}}", primary_key
+                    )
+
+            # Execute the formatted query
+            result = self.query_manager.execute_query(formatted_query, **(parameters or {}))
+
+            if not result.success:
+                return IntelligenceResult(
+                    analysis_type="cypher_query_execution",
+                    data=[],
+                    metadata={
+                        "error": "Query execution failed",
+                        "template_used": query_template[:100],
+                    },
+                    quality_score=0.0,
+                    generated_at=datetime.now().isoformat(),
+                )
+
+            return IntelligenceResult(
+                analysis_type="cypher_query_execution",
+                data=result.data,
+                metadata={
+                    "query_executed": formatted_query[:200] + "...",
+                    "parameters_used": list((parameters or {}).keys()),
+                    "records_returned": len(result.data) if result.data else 0,
+                },
+                quality_score=1.0 if result.data else 0.5,
+                generated_at=datetime.now().isoformat(),
+            )
+
+        except Exception as e:
+            handle_error(logger, e, f"cypher query execution: {query_template[:50]}...")
+            return IntelligenceResult(
+                analysis_type="cypher_query_execution",
+                data=[],
+                metadata={"error": str(e), "template_used": query_template[:100]},
+                quality_score=0.0,
+                generated_at=datetime.now().isoformat(),
+            )
+
+    def execute_raw_cypher_query(self, query: str) -> Optional[List[Dict[str, Any]]]:
+        """Execute a raw Cypher query with safety checks"""
+        try:
+            logger.info(f"Intelligence Engine: Executing raw Cypher query")
+            logger.debug(f"Query: {query}")
+
+            # Execute query through query manager
+            results = self.query_manager.execute_query(query)
+
+            if results is not None:
+                logger.info(
+                    f"Intelligence Engine: Raw query returned {len(results) if hasattr(results, '__len__') else 'unknown'} results"
+                )
+                return results
+            else:
+                logger.warning("Intelligence Engine: Raw query returned no results")
+                return []
+
+        except Exception as e:
+            handle_error(logger, e, f"raw cypher query execution")
+            return None
+
     def analyze_portfolio_metrics(self) -> IntelligenceResult:
         """Analyze portfolio-level metrics and coverage"""
         try:

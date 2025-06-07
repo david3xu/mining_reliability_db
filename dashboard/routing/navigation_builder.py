@@ -43,9 +43,20 @@ class NavigationBuilder:
                     dbc.NavLink("Workflow Analysis", href="/workflow", className="nav-link"),
                     style={"display": "flex", "alignItems": "center"},
                 ),
+                # Primary stakeholder investigation tool
                 dbc.NavItem(
                     dbc.NavLink(
-                        "Stakeholder Questions", href="/stakeholder-questions", className="nav-link"
+                        "Graph Search",
+                        href="/graph-search",
+                        className="nav-link",
+                        style={
+                            "background": "linear-gradient(45deg, #6C63FF, #FF6B9D)",
+                            "border": "none",
+                            "borderRadius": "8px",
+                            "padding": "8px 16px",
+                            "color": "white",
+                            "fontWeight": "bold",
+                        },
                     ),
                     style={"display": "flex", "alignItems": "center"},
                 ),
@@ -97,10 +108,16 @@ class NavigationBuilder:
                         "Data Types Distribution", href="/data-types-distribution"
                     ),
                     dbc.DropdownMenuItem("Incident Search", href="/search"),
+                    # NEW: Graph Search
                     dbc.DropdownMenuItem(divider=True),
-                    dbc.DropdownMenuItem("Data Quality", href="/data-quality"),
-                    dbc.DropdownMenuItem("Workflow Analysis", href="/workflow"),
-                    dbc.DropdownMenuItem("Data Type Distribution", href="/data-types-distribution"),
+                    dbc.DropdownMenuItem("Graph Search", href="/graph-search"),
+                    dbc.DropdownMenuItem("Essential Questions", href="/essentials"),
+                    # Advanced tools for power users
+                    dbc.DropdownMenuItem("⚙️ Advanced Tools", header=True),
+                    dbc.DropdownMenuItem(
+                        "Stakeholder Validation (QA)", href="/stakeholder-validation"
+                    ),
+                    dbc.DropdownMenuItem("Cypher Search (Direct)", href="/cypher-search"),
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem(
                         "Solution Intelligence Case Study", href="/case-study-solution-sequence"
@@ -196,6 +213,7 @@ class NavigationBuilder:
             "/facilities-distribution": "Facilities Distribution",
             "/data-types-distribution": "Data Types Distribution",
             "/search": "Incident Search",
+            "/graph-search": "Graph Search",
         }
 
         if pathname in title_mapping:

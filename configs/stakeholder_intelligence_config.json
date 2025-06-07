@@ -1,0 +1,416 @@
+{
+  "component_config": {
+    "title": "Stakeholder Intelligence Engine",
+    "description": "Role-aware incident investigation through historical pattern analysis and business intelligence",
+    "max_investigation_timeout": 45,
+    "enable_keyword_extraction": true,
+    "enable_escalation_logic": true,
+    "enable_business_context": true
+  },
+  "stakeholder_routing": {
+    "operator": {
+      "investigation_depth": "immediate_actions",
+      "query_templates": ["exact_pattern_matching", "immediate_solutions"],
+      "result_focus": ["quick_fixes", "temporary_workarounds"],
+      "max_results": 5,
+      "timeout_seconds": 15,
+      "escalation_levels": ["level_1_exact_matching"],
+      "response_format": "concise_actions"
+    },
+    "maintenance_tech": {
+      "investigation_depth": "detailed_analysis",
+      "query_templates": [
+        "solution_effectiveness_analysis",
+        "equipment_specific"
+      ],
+      "result_focus": ["proven_solutions", "maintenance_procedures"],
+      "max_results": 10,
+      "timeout_seconds": 30,
+      "escalation_levels": [
+        "level_1_exact_matching",
+        "level_2_equipment_analysis"
+      ],
+      "response_format": "technical_detail"
+    },
+    "engineer": {
+      "investigation_depth": "root_cause_analysis",
+      "query_templates": [
+        "comprehensive_pattern_search",
+        "failure_mode_analysis"
+      ],
+      "result_focus": [
+        "root_causes",
+        "design_modifications",
+        "preventive_measures"
+      ],
+      "max_results": 20,
+      "timeout_seconds": 45,
+      "escalation_levels": [
+        "level_1_exact_matching",
+        "level_2_equipment_analysis",
+        "level_3_expert_routing",
+        "level_4_pattern_investigation"
+      ],
+      "response_format": "comprehensive_analysis"
+    },
+    "manager": {
+      "investigation_depth": "business_impact",
+      "query_templates": ["cost_impact_analysis", "facility_comparison"],
+      "result_focus": [
+        "cost_implications",
+        "resource_allocation",
+        "strategic_recommendations"
+      ],
+      "max_results": 8,
+      "timeout_seconds": 25,
+      "escalation_levels": [
+        "level_2_equipment_analysis",
+        "level_3_expert_routing"
+      ],
+      "response_format": "business_summary"
+    }
+  },
+  "investigation_parameters": {
+    "exact_threshold": 3,
+    "pattern_threshold": 5,
+    "success_rate_threshold": 70,
+    "minimum_expertise_cases": 5,
+    "fallback_enabled": true
+  },
+  "keyword_extraction": {
+    "equipment_terms": [
+      "conveyor",
+      "crusher",
+      "pump",
+      "motor",
+      "gearbox",
+      "bearing",
+      "belt",
+      "pulley",
+      "drive",
+      "valve",
+      "pipe",
+      "tank",
+      "vessel",
+      "turbine",
+      "compressor",
+      "separator",
+      "classifier",
+      "screen"
+    ],
+    "failure_modes": [
+      "vibration",
+      "leak",
+      "noise",
+      "overheating",
+      "wear",
+      "crack",
+      "blockage",
+      "jam",
+      "slip",
+      "misalignment",
+      "corrosion",
+      "erosion",
+      "fatigue",
+      "seizure",
+      "cavitation",
+      "surge",
+      "instability"
+    ],
+    "severity_indicators": [
+      "emergency",
+      "critical",
+      "urgent",
+      "immediate",
+      "severe",
+      "catastrophic",
+      "failure",
+      "breakdown",
+      "stopped",
+      "shutdown"
+    ],
+    "operational_contexts": [
+      "startup",
+      "shutdown",
+      "peak",
+      "low",
+      "variable",
+      "intermittent",
+      "continuous",
+      "cyclic",
+      "seasonal",
+      "weather",
+      "maintenance"
+    ]
+  },
+  "investigation_levels": {
+    "level_1_exact_matching": {
+      "title": "Exact Pattern Recognition",
+      "description": "Find identical historical incidents with verified outcomes",
+      "precision": "high",
+      "query_template": "exact_pattern_matching",
+      "success_criteria": "exact_matches >= investigation_parameters.exact_threshold"
+    },
+    "level_2_equipment_analysis": {
+      "title": "Equipment-Specific Investigation",
+      "description": "Analyze solutions by equipment type and failure mode",
+      "precision": "medium",
+      "query_template": "solution_effectiveness_analysis",
+      "trigger_condition": "keywords.equipment OR keywords.failure_modes",
+      "success_criteria": "solution_success_rate >= investigation_parameters.success_rate_threshold"
+    },
+    "level_3_expert_routing": {
+      "title": "Expert Facility Identification",
+      "description": "Identify facilities with proven expertise for consultation",
+      "precision": "medium",
+      "query_template": "expert_facility_identification",
+      "trigger_condition": "exact_matches >= investigation_parameters.exact_threshold",
+      "success_criteria": "expert_facilities.length > 0"
+    },
+    "level_4_pattern_investigation": {
+      "title": "Comprehensive Pattern Analysis",
+      "description": "Broad historical pattern search for comprehensive intelligence",
+      "precision": "high_recall",
+      "query_template": "comprehensive_pattern_search",
+      "trigger_condition": "investigation_parameters.fallback_enabled AND previous_levels_insufficient"
+    }
+  },
+  "query_templates": {
+    "exact_pattern_matching": {
+      "title": "Exact Historical Precedent Search",
+      "template": "MATCH (ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan) OPTIONAL MATCH (ap)-[:VALIDATES]->(v:Verification) WHERE toLower(p.what_happened) CONTAINS toLower($incident_description) RETURN p.what_happened as historical_incident, ar.facility_id as facility, ap.action_plan as solution, ap.recommended_action as specific_actions, v.is_action_plan_effective as verified_effective, p.problem_id as case_reference ORDER BY v.is_action_plan_effective DESC, ar.facility_id LIMIT $limit",
+      "parameters": [
+        { "name": "incident_description", "type": "text", "required": true },
+        { "name": "limit", "type": "number", "default": 10, "max": 20 }
+      ]
+    },
+    "solution_effectiveness_analysis": {
+      "title": "Equipment-Specific Solution Analysis",
+      "template": "MATCH (p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)<-[:BELONGS_TO]-(f:Facility) OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause) OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan) OPTIONAL MATCH (ap)-[:VALIDATES]->(v:Verification) WHERE (any(keyword IN $equipment_keywords WHERE toLower(p.what_happened) CONTAINS toLower(keyword)) OR any(keyword IN $failure_keywords WHERE toLower(p.what_happened) CONTAINS toLower(keyword))) WITH ap.action_plan as solution_approach, count(*) as total_attempts, sum(CASE WHEN v.is_action_plan_effective = true THEN 1 ELSE 0 END) as successful_cases, collect(DISTINCT f.facility_id) as facilities_used WHERE total_attempts >= 2 WITH solution_approach, total_attempts, successful_cases, facilities_used, round((toFloat(successful_cases) / total_attempts) * 100, 1) as success_rate RETURN solution_approach, success_rate, total_attempts, successful_cases, facilities_used ORDER BY success_rate DESC, total_attempts DESC LIMIT $limit",
+      "parameters": [
+        { "name": "equipment_keywords", "type": "array", "required": true },
+        { "name": "failure_keywords", "type": "array", "required": true },
+        { "name": "limit", "type": "number", "default": 15, "max": 25 }
+      ]
+    },
+    "expert_facility_identification": {
+      "title": "Expert Facility Consultation Routing",
+      "template": "MATCH (p:Problem)-[:IDENTIFIED_IN]->(ar:ActionRequest)<-[:BELONGS_TO]-(f:Facility) OPTIONAL MATCH (p)<-[:ANALYZES]-(rc:RootCause) OPTIONAL MATCH (rc)<-[:RESOLVES]-(ap:ActionPlan) OPTIONAL MATCH (ap)-[:VALIDATES]->(v:Verification) WHERE any(keyword IN $equipment_keywords WHERE toLower(p.what_happened) CONTAINS toLower(keyword)) AND v.is_action_plan_effective = true WITH f.facility_id as facility, count(*) as successful_solutions, count(DISTINCT p.problem_id) as total_problems_handled, collect(DISTINCT ap.action_plan)[0..3] as sample_successful_solutions WHERE successful_solutions >= $minimum_expertise WITH facility, successful_solutions, total_problems_handled, sample_successful_solutions, round((toFloat(successful_solutions) / total_problems_handled) * 100, 1) as expertise_rate RETURN facility as expert_facility, expertise_rate, successful_solutions, total_problems_handled, sample_successful_solutions ORDER BY expertise_rate DESC, successful_solutions DESC LIMIT $limit",
+      "parameters": [
+        { "name": "equipment_keywords", "type": "array", "required": true },
+        {
+          "name": "minimum_expertise",
+          "type": "number",
+          "default": 5,
+          "max": 20
+        },
+        { "name": "limit", "type": "number", "default": 8, "max": 15 }
+      ]
+    },
+    "comprehensive_pattern_search": {
+      "title": "Comprehensive Historical Pattern Investigation",
+      "template": "MATCH (ar:ActionRequest)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan) OPTIONAL MATCH (ap)-[:VALIDATES]->(v:Verification) WHERE any(word IN split(toLower($incident_description), ' ') WHERE toLower(p.what_happened) CONTAINS word OR toLower(rc.root_cause) CONTAINS word OR toLower(ap.action_plan) CONTAINS word) WITH ar, p, ap, v, [word IN split(toLower($incident_description), ' ') WHERE toLower(p.what_happened) CONTAINS word OR toLower(rc.root_cause) CONTAINS word OR toLower(ap.action_plan) CONTAINS word] as matched_keywords RETURN p.what_happened as related_incident, ar.facility_id as facility, ap.action_plan as solution_approach, ap.recommended_action as specific_actions, v.is_action_plan_effective as was_effective, matched_keywords as keyword_matches, size(matched_keywords) as relevance_score ORDER BY relevance_score DESC, v.is_action_plan_effective DESC LIMIT $limit",
+      "parameters": [
+        { "name": "incident_description", "type": "text", "required": true },
+        { "name": "all_keywords", "type": "array", "required": true },
+        { "name": "limit", "type": "number", "default": 20, "max": 50 }
+      ]
+    }
+  },
+  "response_templates": {
+    "exact_precedent_found": {
+      "title": "Historical Precedent Identified",
+      "template": "**PRECEDENT FOUND:** Similar incident at {facility}\n\n**Historical Case:** {historical_incident}\n\n**Proven Solution:** {solution}\n\n**Verification Status:** {effectiveness_status}\n\n**Reference:** {case_reference}"
+    },
+    "solution_effectiveness": {
+      "title": "Equipment-Specific Solution Analysis",
+      "template": "**SOLUTION ANALYSIS:** {solution_approach}\n\n**Success Rate:** {success_rate}% ({successful_cases}/{total_attempts} cases)\n\n**Used by Facilities:** {facilities_used}\n\n**Recommendation Level:** {recommendation_level}"
+    },
+    "expert_consultation": {
+      "title": "Expert Facility Consultation",
+      "template": "**EXPERT FACILITY:** {expert_facility}\n\n**Expertise Rate:** {expertise_rate}% success rate\n\n**Experience:** {successful_solutions} successful solutions\n\n**Sample Solutions:** {sample_solutions}"
+    },
+    "pattern_analysis": {
+      "title": "Historical Pattern Intelligence",
+      "template": "**RELATED PATTERNS:** {matched_keywords}\n\n**Similar Incident:** {related_incident}\n\n**Applied Solution:** {solution_approach}\n\n**Effectiveness:** {effectiveness_status}\n\n**Relevance Score:** {relevance_score}/10"
+    },
+    "incident_precedent_template": "Record {incident_id}: {problem_description}",
+    "root_cause_template": "Root Cause: {root_cause_analysis}",
+    "solution_template": "Solution: {solution_implemented}",
+    "outcome_template": "Outcome: {effectiveness_status}",
+    "facility_template": "Facility: {facility_location}"
+  },
+  "business_context_integration": {
+    "cost_analysis": {
+      "downtime_cost_per_hour": 50000,
+      "maintenance_cost_multipliers": {
+        "emergency": 3.0,
+        "scheduled": 1.0,
+        "preventive": 0.7
+      },
+      "equipment_replacement_costs": {
+        "pump": 25000,
+        "motor": 15000,
+        "conveyor": 100000,
+        "crusher": 500000
+      }
+    },
+    "risk_assessment": {
+      "safety_risk_factors": ["pressure", "height", "electrical", "chemical"],
+      "operational_impact_levels": [
+        "minimal",
+        "moderate",
+        "significant",
+        "critical"
+      ],
+      "environmental_considerations": ["dust", "noise", "emissions", "waste"]
+    }
+  },
+  "validation_questions": [
+    "Is this the type of operational intelligence you need?",
+    "Does this approach help with maintenance decision-making?",
+    "What additional insights would be valuable?",
+    "Should we expand this capability to other equipment types?"
+  ],
+  "demo_scenarios": {
+    "conveyor_water_ingress": {
+      "title": "Conveyor Water Ingress Analysis",
+      "description": "Demonstrate pattern analysis for water ingress issues in conveyor systems",
+      "engineer_question": "What solutions have worked for water ingress in conveyors?",
+      "expected_impact": "Faster problem resolution and reduced downtime",
+      "default_equipment_type": "conveyor",
+      "default_failure_mode": "water ingress",
+      "default_action_request": "2021-02113"
+    },
+    "pump_bearing_failure": {
+      "title": "Pump Bearing Failure Pattern",
+      "description": "Analyze historical bearing failure patterns and successful interventions",
+      "engineer_question": "Which facilities have expertise in pump bearing maintenance?",
+      "expected_impact": "Improved maintenance planning and knowledge sharing",
+      "default_equipment_type": "pump",
+      "default_failure_mode": "bearing failure",
+      "default_action_request": null
+    },
+    "motor_vibration_analysis": {
+      "title": "Motor Vibration Analysis",
+      "description": "Identify vibration-related failure patterns and preventive measures",
+      "engineer_question": "What causes motor vibration and how is it effectively resolved?",
+      "expected_impact": "Proactive maintenance and equipment longevity",
+      "default_equipment_type": "motor",
+      "default_failure_mode": "vibration",
+      "default_action_request": null
+    }
+  },
+  "question_categories": [
+    {
+      "category_id": "tech_impact",
+      "category_name": "Technology Impact Assessment",
+      "questions": [
+        {
+          "question_id": "TI001",
+          "question_text": "Has there been any technological impact on equipment components or systems over the past 10 years?"
+        },
+        {
+          "question_id": "TI002",
+          "question_text": "Since WA Mining is a new site, should we expect its equipment to show different patterns compared to other sites?"
+        }
+      ]
+    },
+    {
+      "category_id": "operational_trends",
+      "category_name": "Operational Trends Analysis",
+      "questions": [
+        {
+          "question_id": "OT001",
+          "question_text": "WGP and Kwinana have shown a decrease in the number of records over time. What does this indicate?"
+        },
+        {
+          "question_id": "OT002",
+          "question_text": "In 2023, there is about 50% increase of records, why?"
+        }
+      ]
+    },
+    {
+      "category_id": "data_quality",
+      "category_name": "Data Representativeness and Quality",
+      "questions": [
+        {
+          "question_id": "DQ001",
+          "question_text": "Does this sample data accurately reflect the real data distribution across all sites, or was it randomly selected?"
+        },
+        {
+          "question_id": "DQ002",
+          "question_text": "Are records completed all at once, or does their completion depend on different stages of the operational workflow?"
+        }
+      ]
+    },
+    {
+      "category_id": "workflow_understanding",
+      "category_name": "Workflow Understanding",
+      "questions": [
+        {
+          "question_id": "WU001",
+          "question_text": "What is the exact order of stage field values and the overall workflow progression?"
+        },
+        {
+          "question_id": "WU002",
+          "question_text": "Why doesn't the stage field change even when there are multiple records for the same action request number?"
+        },
+        {
+          "question_id": "WU003",
+          "question_text": "Are some fields only completed because they aren't required until later stages of the workflow?"
+        },
+        {
+          "question_id": "WU004",
+          "question_text": "Which fields are optional and which ones are mandatory to fill in?"
+        }
+      ]
+    },
+    {
+      "category_id": "record_structure",
+      "category_name": "Record Structure",
+      "questions": [
+        {
+          "question_id": "RS001",
+          "question_text": "Why do some action requests have multiple records while others have single records?"
+        },
+        {
+          "question_id": "RS002",
+          "question_text": "What are the different patterns between single-record and multiple-record action requests?"
+        }
+      ]
+    },
+    {
+      "category_id": "category_classification",
+      "category_name": "Category Classification",
+      "questions": [
+        {
+          "question_id": "CC001",
+          "question_text": "What are the documented definitions for each category value in the 'categories' field?"
+        },
+        {
+          "question_id": "CC002",
+          "question_text": "How do we define and identify recurring problems? With over 30% occurrence rate, are these incidents truly repeating?"
+        }
+      ]
+    },
+    {
+      "category_id": "field_relationships",
+      "category_name": "Field Relationships",
+      "questions": [
+        {
+          "question_id": "FR001",
+          "question_text": "What is the relationship between the completion field and stage field? How do they interact in the workflow?"
+        },
+        {
+          "question_id": "FR002",
+          "question_text": "Why does the action types field show only unique values? Is this a limitation of the sample data?"
+        },
+        {
+          "question_id": "FR003",
+          "question_text": "Why are WA Mining's initiating and receiving departments concentrated in one area compared to other facilities?"
+        }
+      ]
+    }
+  ]
+}
