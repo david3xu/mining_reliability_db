@@ -254,26 +254,21 @@ def create_effective_actions_table(results: List[Dict[str, Any]]) -> html.Div:
         table_rows.append(
             html.Tr([
                 html.Td(result.get("incident_id", "N/A")),
+                html.Td(result.get("facility", "N/A")),
                 html.Td(
-                    html.Div(result.get("effective_action", "")[:80] + "..."
-                            if len(result.get("effective_action", "")) > 80
+                    html.Div(result.get("effective_action", "")[:60] + "..."
+                            if len(result.get("effective_action", "")) > 60
                             else result.get("effective_action", "")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
                 html.Td(
-                    html.Div(result.get("why_effective", "No explanation provided")[:60] + "..."
-                            if len(result.get("why_effective", "")) > 60
+                    html.Div(result.get("why_effective", "No explanation provided")[:50] + "..."
+                            if len(result.get("why_effective", "")) > 50
                             else result.get("why_effective", "No explanation provided")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
                 html.Td(str(result.get("usage_frequency", 0))),
                 html.Td([confidence_badge, html.Br(), evidence_badge]),
-                html.Td(
-                    html.Small(result.get("supporting_evidence", "")[:40] + "..."
-                              if len(result.get("supporting_evidence", "")) > 40
-                              else result.get("supporting_evidence", ""),
-                              className="text-muted")
-                )
             ])
         )
 
@@ -282,12 +277,12 @@ def create_effective_actions_table(results: List[Dict[str, Any]]) -> html.Div:
         dbc.Table([
             html.Thead([
                 html.Tr([
-                    html.Th("Incident ID"),
+                    html.Th("Action Request"),
+                    html.Th("Facility"),
                     html.Th("Effective Action"),
                     html.Th("Why It Works"),
                     html.Th("Usage Count"),
-                    html.Th("Confidence"),
-                    html.Th("Evidence")
+                    html.Th("Confidence")
                 ])
             ]),
             html.Tbody(table_rows),
@@ -333,15 +328,16 @@ def create_effective_actions_table_with_export_info(results: List[Dict[str, Any]
         table_rows.append(
             html.Tr([
                 html.Td(result.get("incident_id", "N/A")),
+                html.Td(result.get("facility", "N/A")),
                 html.Td(
-                    html.Div(result.get("effective_action", "")[:80] + "..."
-                            if len(result.get("effective_action", "")) > 80
+                    html.Div(result.get("effective_action", "")[:60] + "..."
+                            if len(result.get("effective_action", "")) > 60
                             else result.get("effective_action", "")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
                 html.Td(
-                    html.Div(result.get("why_effective", "No explanation provided")[:60] + "..."
-                            if len(result.get("why_effective", "")) > 60
+                    html.Div(result.get("why_effective", "No explanation provided")[:50] + "..."
+                            if len(result.get("why_effective", "")) > 50
                             else result.get("why_effective", "No explanation provided")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
@@ -356,7 +352,8 @@ def create_effective_actions_table_with_export_info(results: List[Dict[str, Any]
         dbc.Table([
             html.Thead([
                 html.Tr([
-                    html.Th("Incident ID"),
+                    html.Th("Action Request"),
+                    html.Th("Facility"),
                     html.Th("Effective Action"),
                     html.Th("Why It Works"),
                     html.Th("Usage Count"),
@@ -396,14 +393,19 @@ def create_solutions_table_with_export_info(results: List[Dict[str, Any]], expor
         table_rows.append(
             html.Tr([
                 html.Td(result.get("incident_id", "N/A")),
+                html.Td(result.get("facility", "N/A")),
                 html.Td(
-                    html.Div(result.get("solution_method", "")[:60] + "..."
-                            if len(result.get("solution_method", "")) > 60
-                            else result.get("solution_method", "")),
+                    html.Div(result.get("problem_description", "")[:50] + "..."
+                            if len(result.get("problem_description", "")) > 50
+                            else result.get("problem_description", "")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
-                html.Td(result.get("repair_days", "N/A")),
-                html.Td(result.get("facility", "N/A")),
+                html.Td(
+                    html.Div(result.get("proven_solution", "")[:50] + "..."
+                            if len(result.get("proven_solution", "")) > 50
+                            else result.get("proven_solution", "")),
+                    style={"whiteSpace": "normal", "wordBreak": "break-word"},
+                ),
                 html.Td(confidence_badge),
             ])
         )
@@ -414,10 +416,10 @@ def create_solutions_table_with_export_info(results: List[Dict[str, Any]], expor
         dbc.Table([
             html.Thead([
                 html.Tr([
-                    html.Th("Incident ID"),
-                    html.Th("Solution Method"),
-                    html.Th("Repair Days"),
+                    html.Th("Action Request"),
                     html.Th("Facility"),
+                    html.Th("Problem Description"),
+                    html.Th("Proven Solution"),
                     html.Th("Confidence"),
                 ])
             ]),
@@ -504,8 +506,12 @@ def create_timeline_table_with_export_info(results: List[Dict[str, Any]], export
 
         table_rows.append(
             html.Tr([
+                html.Td(result.get("incident_id", "N/A")),
+                html.Td(result.get("facility", "N/A")),
                 html.Td(
-                    html.Div(result.get("repair_type", "N/A")),
+                    html.Div(result.get("repair_type", "N/A")[:40] + "..."
+                            if len(result.get("repair_type", "")) > 40
+                            else result.get("repair_type", "N/A")),
                     style={"whiteSpace": "normal", "wordBreak": "break-word"},
                 ),
                 html.Td(html.Span(f"{avg_days:.1f} days", className=f"badge bg-{badge_color}")),
@@ -522,6 +528,8 @@ def create_timeline_table_with_export_info(results: List[Dict[str, Any]], export
         dbc.Table([
             html.Thead([
                 html.Tr([
+                    html.Th("Action Request"),
+                    html.Th("Facility"),
                     html.Th("Repair Type"),
                     html.Th("Avg Duration"),
                     html.Th("Fastest"),

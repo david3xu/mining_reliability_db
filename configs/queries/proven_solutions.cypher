@@ -4,6 +4,7 @@ MATCH (ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES
 OPTIONAL MATCH (ap)<-[:VALIDATES]-(v:Verification)
 WHERE {filter_clause}
 RETURN ar.action_request_number AS incident_id,
+       f.facility_id AS facility,
        p.what_happened AS problem_description,
        rc.root_cause AS contamination_cause,
        ap.action_plan AS proven_solution,
