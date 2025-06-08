@@ -377,25 +377,25 @@ class InteractionHandlers:
                 # Execute the appropriate query based on active tab and store results
                 display = html.Div()
                 if active_tab == "tab-1":
-                    query_type = "can_this_be_fixed"
+                    query_type = "what_could_be_causing_this"
                     results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
                     self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_solutions_table(results)
 
                 elif active_tab == "tab-2":
-                    query_type = "who_do_i_call"
+                    query_type = "who_has_diagnostic_experience"
                     results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
                     self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_expertise_table(results)
 
                 elif active_tab == "tab-3":
-                    query_type = "how_long_will_this_take"
+                    query_type = "what_should_i_check_first"
                     results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
                     self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_timeline_table(results)
 
                 elif active_tab == "tab-4":
-                    query_type = "what_works_and_why"
+                    query_type = "what_investigation_steps_worked"
                     results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
                     self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
                     display = create_effective_actions_table(results)
@@ -534,10 +534,10 @@ class InteractionHandlers:
         # Create summary cards
         summary_cards = []
         question_titles = {
-            "can_this_be_fixed": ("Can this be fixed?", "primary", "fas fa-tools"),
-            "who_do_i_call": ("Who do I call?", "info", "fas fa-users"),
-            "how_long_will_this_take": ("How long will this take?", "warning", "fas fa-clock"),
-            "what_works_and_why": ("What works & why?", "success", "fas fa-lightbulb")
+            "what_could_be_causing_this": ("What could be causing this?", "primary", "fas fa-search-plus"),
+            "who_has_diagnostic_experience": ("Who has diagnostic experience?", "info", "fas fa-user-md"),
+            "what_should_i_check_first": ("What should I check first?", "warning", "fas fa-list-ol"),
+            "what_investigation_steps_worked": ("What investigation steps worked?", "success", "fas fa-check-circle")
         }
 
         for question_id, results in all_results.items():
@@ -576,36 +576,36 @@ class InteractionHandlers:
                 # Create mini table for each question
                 table_rows = []
                 for result in results[:5]:  # Show top 5 results per question
-                    if question_id == "what_works_and_why":
+                    if question_id == "what_investigation_steps_worked":
                         table_rows.append(
                             html.Tr([
                                 html.Td(result.get("incident_id", "N/A")),
-                                html.Td(result.get("effective_action", "")[:50] + "..." if len(result.get("effective_action", "")) > 50 else result.get("effective_action", "")),
-                                html.Td(dbc.Badge(result.get("confidence_level", "Low"), color="success" if result.get("confidence_level") == "High" else "secondary"))
+                                html.Td(result.get("approach_description", "")[:50] + "..." if len(result.get("approach_description", "")) > 50 else result.get("approach_description", "")),
+                                html.Td(dbc.Badge(f"{result.get('success_rate', 0)}%", color="success" if result.get("success_rate", 0) > 70 else "secondary"))
                             ])
                         )
-                    elif question_id == "who_do_i_call":
+                    elif question_id == "who_has_diagnostic_experience":
                         table_rows.append(
                             html.Tr([
-                                html.Td(result.get("initiating_department", "N/A")),
-                                html.Td(result.get("receiving_department", "N/A")),
-                                html.Td(f"{result.get('success_rate', 0)}%")
+                                html.Td(result.get("expert_department", "N/A")),
+                                html.Td(result.get("facility_name", "N/A")),
+                                html.Td(f"{result.get('diagnostic_success_rate', 0)}%")
                             ])
                         )
-                    elif question_id == "how_long_will_this_take":
+                    elif question_id == "what_should_i_check_first":
                         table_rows.append(
                             html.Tr([
-                                html.Td(result.get("repair_type", "N/A")),
-                                html.Td(f"{result.get('average_days', 0):.1f} days"),
-                                html.Td(result.get("repair_instances", 0))
+                                html.Td(result.get("step_description", "N/A")),
+                                html.Td(result.get("priority_level", "N/A")),
+                                html.Td(result.get("instances", 0))
                             ])
                         )
-                    elif question_id == "can_this_be_fixed":
+                    elif question_id == "what_could_be_causing_this":
                         table_rows.append(
                             html.Tr([
                                 html.Td(result.get("incident_id", "N/A")),
-                                html.Td(result.get("solution_method", "")[:40] + "..." if len(result.get("solution_method", "")) > 40 else result.get("solution_method", "")),
-                                html.Td(result.get("repair_days", "N/A"))
+                                html.Td(result.get("root_cause_analysis", "")[:40] + "..." if len(result.get("root_cause_analysis", "")) > 40 else result.get("root_cause_analysis", "")),
+                                html.Td(f"{result.get('similarity_score', 0):.1f}")
                             ])
                         )
 

@@ -596,6 +596,253 @@ class PurifiedDataAdapter:
             handle_error(logger, e, f"basic graph search for '{search_term}'")
             return {"incidents": [], "solutions": [], "facilities": []}
 
+    # Symptom-based filtering and diagnostic methods for incident root cause investigation
+
+    def classify_incident_symptoms(self, incident_description: str) -> Dict[str, Any]:
+        """Classify incident symptoms using symptom classification config"""
+        try:
+            config_adapter = get_config_adapter()
+            symptom_config = config_adapter.get_symptom_classification_config()
+
+            # Extract keyword categories
+            keyword_categories = symptom_config.get("keyword_categories", {})
+            equipment_terms = keyword_categories.get("equipment_terms", {}).get("terms", [])
+            symptom_terms = keyword_categories.get("symptom_terms", {}).get("terms", [])
+            component_terms = keyword_categories.get("component_terms", {}).get("terms", [])
+            severity_indicators = keyword_categories.get("severity_indicators", {}).get("terms", [])
+
+            description_lower = incident_description.lower()
+
+            classification = {
+                "equipment_matches": [],
+                "symptom_matches": [],
+                "component_matches": [],
+                "severity_matches": [],
+                "classification_score": 0
+            }
+
+            # Find keyword matches
+            for term in equipment_terms:
+                if term.lower() in description_lower:
+                    classification["equipment_matches"].append(term)
+                    classification["classification_score"] += 3
+
+            for term in symptom_terms:
+                if term.lower() in description_lower:
+                    classification["symptom_matches"].append(term)
+                    classification["classification_score"] += 2
+
+            for term in component_terms:
+                if term.lower() in description_lower:
+                    classification["component_matches"].append(term)
+                    classification["classification_score"] += 1
+
+            for term in severity_indicators:
+                if term.lower() in description_lower:
+                    classification["severity_matches"].append(term)
+                    classification["classification_score"] += 2
+
+            return classification
+
+        except Exception as e:
+            handle_error(logger, e, f"symptom classification for '{incident_description}'")
+            return {
+                "equipment_matches": [],
+                "symptom_matches": [],
+                "component_matches": [],
+                "severity_matches": [],
+                "classification_score": 0
+            }
+
+    def build_symptom_based_filter(self, incident_keywords: List[str]) -> str:
+        """Build symptom-based filter clause using classification logic"""
+        try:
+            config_adapter = get_config_adapter()
+            symptom_config = config_adapter.get_symptom_classification_config()
+
+            # Get filter logic configuration
+            filter_logic = symptom_config.get("filter_logic", {})
+            primary_pattern = filter_logic.get("primary_pattern", "(equipment OR component) AND symptom")
+            conjunction_op = filter_logic.get("conjunction_operator", "AND")
+            disjunction_op = filter_logic.get("disjunction_operator", "OR")
+
+            # Extract keyword categories for classification
+            keyword_categories = symptom_config.get("keyword_categories", {})
+            equipment_terms = set(term.lower() for term in keyword_categories.get("equipment_terms", {}).get("terms", []))
+            symptom_terms = set(term.lower() for term in keyword_categories.get("symptom_terms", {}).get("terms", []))
+            component_terms = set(term.lower() for term in keyword_categories.get("component_terms", {}).get("terms", []))
+
+            # Classify the input keywords
+            equipment_filters = []
+            symptom_filters = []
+            component_filters = []
+
+            for keyword in incident_keywords:
+                keyword_lower = keyword.lower()
+
+                if keyword_lower in equipment_terms:
+                    equipment_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+                    equipment_filters.append(f"toLower(ar.categories) CONTAINS toLower('{keyword}')")
+                elif keyword_lower in symptom_terms:
+                    symptom_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+                elif keyword_lower in component_terms:
+                    component_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+                    component_filters.append(f"toLower(ar.categories) CONTAINS toLower('{keyword}')")
+                else:
+                    # Fallback: treat as general search term
+                    symptom_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+
+            # Build filter according to primary pattern
+            conditions = []
+
+            if "equipment" in primary_pattern.lower() and equipment_filters:
+                conditions.append(f"({' OR '.join(equipment_filters)})")
+
+            if "component" in primary_pattern.lower() and component_filters:
+                conditions.append(f"({' OR '.join(component_filters)})")
+
+            if "symptom" in primary_pattern.lower() and symptom_filters:
+                conditions.append(f"({' OR '.join(symptom_filters)})")
+
+            # Combine conditions based on pattern
+            if "AND" in primary_pattern and len(conditions) > 1:
+                return f" {conjunction_op} ".join(conditions)
+            elif conditions:
+                return f" {disjunction_op} ".join(conditions)
+            else:
+                # Fallback to general keyword search
+                all_filters = []
+                for keyword in incident_keywords:
+                    all_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+                return f" {disjunction_op} ".join(all_filters) if all_filters else "1=1"
+
+        except Exception as e:
+            handle_error(logger, e, f"symptom-based filter building")
+            # Fallback to existing flexible keyword filter
+            return self.build_flexible_keyword_filter(incident_keywords)
+
+    def execute_diagnostic_query(self, query_type: str, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Execute diagnostic queries for root cause investigation"""
+        try:
+            query_manager = get_query_manager()
+            config_adapter = get_config_adapter()
+
+            # Get stakeholder queries config for diagnostic query mappings
+            stakeholder_config = config_adapter.get_stakeholder_queries_config()
+            essential_queries = stakeholder_config.get("essential_queries", {})
+
+            # Check if this is a diagnostic query type
+            diagnostic_query_types = [
+                "what_could_be_causing_this",
+                "what_investigation_steps_worked",
+                "who_has_diagnostic_experience",
+                "what_should_i_check_first"
+            ]
+
+            if query_type not in diagnostic_query_types:
+                logger.warning(f"Query type '{query_type}' is not a diagnostic query")
+                return []
+
+            # Get query configuration
+            query_config = essential_queries.get(query_type)
+            if not query_config:
+                logger.error(f"No configuration found for query type: {query_type}")
+                return []
+
+            query_file_path = query_config.get("query_file")
+            if not query_file_path:
+                logger.error(f"No query file specified for query type: {query_type}")
+                return []
+
+            # Build symptom-based filter clause
+            filter_clause = self.build_symptom_based_filter(incident_keywords)
+
+            # Execute the diagnostic query
+            result = query_manager.execute_stakeholder_essential_query(query_file_path, filter_clause)
+
+            if result.success and result.data:
+                # Filter out None objects and ensure all records are dictionaries
+                filtered_data = []
+                for record in result.data:
+                    if record is not None and isinstance(record, dict):
+                        filtered_data.append(record)
+                    elif record is not None:
+                        logger.warning(f"Non-dict record encountered in diagnostic query: {type(record)} - {record}")
+
+                logger.info(f"Diagnostic query {query_type}: {len(filtered_data)} valid records")
+                return filtered_data
+            else:
+                logger.warning(f"Diagnostic query {query_type}: No data or query failed")
+                return []
+
+        except Exception as e:
+            logger.error(f"Error executing diagnostic query {query_type}: {e}")
+            handle_error(logger, e, f"diagnostic query: {query_type}")
+            return []
+
+    def get_potential_root_causes(self, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Get potential root causes based on similar symptom patterns"""
+        return self.execute_diagnostic_query("what_could_be_causing_this", incident_keywords)
+
+    def get_investigation_approaches(self, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Get investigation approaches that worked for similar symptoms"""
+        return self.execute_diagnostic_query("what_investigation_steps_worked", incident_keywords)
+
+    def get_diagnostic_experts(self, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Get departments with diagnostic experience for similar symptoms"""
+        return self.execute_diagnostic_query("who_has_diagnostic_experience", incident_keywords)
+
+    def get_prioritized_investigation_steps(self, incident_keywords: List[str]) -> List[Dict[str, Any]]:
+        """Get prioritized investigation steps based on success patterns"""
+        return self.execute_diagnostic_query("what_should_i_check_first", incident_keywords)
+
+    def execute_comprehensive_incident_investigation(self, incident_description: str, incident_keywords: List[str]) -> Dict[str, Any]:
+        """Execute comprehensive incident investigation using all diagnostic queries"""
+        try:
+            logger.info(f"Starting comprehensive incident investigation for: {incident_keywords}")
+
+            # First, classify the incident symptoms
+            symptom_classification = self.classify_incident_symptoms(incident_description)
+
+            # Execute all diagnostic queries
+            investigation_results = {
+                "symptom_classification": symptom_classification,
+                "potential_root_causes": self.get_potential_root_causes(incident_keywords),
+                "investigation_approaches": self.get_investigation_approaches(incident_keywords),
+                "diagnostic_experts": self.get_diagnostic_experts(incident_keywords),
+                "prioritized_steps": self.get_prioritized_investigation_steps(incident_keywords),
+                "investigation_summary": {
+                    "keywords_analyzed": incident_keywords,
+                    "classification_score": symptom_classification.get("classification_score", 0),
+                    "total_root_causes_found": 0,
+                    "total_approaches_found": 0,
+                    "total_experts_found": 0,
+                    "total_steps_found": 0
+                }
+            }
+
+            # Update summary counts
+            investigation_results["investigation_summary"]["total_root_causes_found"] = len(investigation_results["potential_root_causes"])
+            investigation_results["investigation_summary"]["total_approaches_found"] = len(investigation_results["investigation_approaches"])
+            investigation_results["investigation_summary"]["total_experts_found"] = len(investigation_results["diagnostic_experts"])
+            investigation_results["investigation_summary"]["total_steps_found"] = len(investigation_results["prioritized_steps"])
+
+            logger.info(f"Investigation completed: {investigation_results['investigation_summary']}")
+            return investigation_results
+
+        except Exception as e:
+            handle_error(logger, e, f"comprehensive incident investigation")
+            return {
+                "symptom_classification": {"equipment_matches": [], "symptom_matches": [], "component_matches": [], "severity_matches": [], "classification_score": 0},
+                "potential_root_causes": [],
+                "investigation_approaches": [],
+                "diagnostic_experts": [],
+                "prioritized_steps": [],
+                "investigation_summary": {"error": str(e)}
+            }
+
+    # End of symptom-based filtering and diagnostic methods
+
     def execute_essential_stakeholder_query(self, query_type: str, incident_keywords: List[str]) -> List[Dict[str, Any]]:
         """Execute with fixed query manager and NoneType filtering"""
         try:
@@ -633,7 +880,7 @@ class PurifiedDataAdapter:
             return []
 
     def build_flexible_keyword_filter(self, keywords: List[str]) -> str:
-        """Build flexible keyword filter with equipment-focused logic"""
+        """Build flexible keyword filter with equipment-focused logic and fallback for all keywords"""
 
         # Equipment terms (high priority)
         equipment_terms = ['excavator', 'motor', 'pump', 'conveyor', 'crusher']
@@ -647,6 +894,7 @@ class PurifiedDataAdapter:
         equipment_filters = []
         failure_filters = []
         component_filters = []
+        general_filters = []  # For keywords not in predefined lists
 
         for keyword in keywords:
             keyword_lower = keyword.lower()
@@ -657,21 +905,31 @@ class PurifiedDataAdapter:
                 failure_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
             elif keyword_lower in component_terms:
                 component_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
+            else:
+                # CRITICAL FIX: Include ALL keywords, not just predefined ones
+                general_filters.append(f"toLower(p.what_happened) CONTAINS toLower('{keyword}')")
 
-        # Build flexible logic: Equipment AND (Failure OR Component)
+        # Build flexible logic: Equipment AND (Failure OR Component OR General)
         conditions = []
 
         if equipment_filters:
             conditions.append(f"({' OR '.join(equipment_filters)})")
 
-        if failure_filters and component_filters:
-            conditions.append(f"({' OR '.join(failure_filters + component_filters)})")
-        elif failure_filters:
-            conditions.append(f"({' OR '.join(failure_filters)})")
-        elif component_filters:
-            conditions.append(f"({' OR '.join(component_filters)})")
+        # Combine all other filters
+        other_filters = failure_filters + component_filters + general_filters
+        if other_filters:
+            conditions.append(f"({' OR '.join(other_filters)})")
 
-        return ' AND '.join(conditions) if conditions else "1=1"
+        # If we have specific equipment and other terms, combine with AND
+        # Otherwise, use OR to be more inclusive
+        if len(conditions) > 1:
+            return ' AND '.join(conditions)
+        elif conditions:
+            return conditions[0]
+        else:
+            # Final fallback: search all keywords with OR
+            all_filters = [f"toLower(p.what_happened) CONTAINS toLower('{keyword}')" for keyword in keywords]
+            return ' OR '.join(all_filters) if all_filters else "1=1"
 
     def _get_timestamp(self) -> str:
         """Generate current timestamp for metadata"""

@@ -63,10 +63,10 @@ class JSONExportAdapter:
         try:
             all_results = {}
             query_types = [
-                "can_this_be_fixed",
-                "who_do_i_call",
-                "how_long_will_this_take",
-                "what_works_and_why"
+                "what_could_be_causing_this",
+                "who_has_diagnostic_experience",
+                "what_should_i_check_first",
+                "what_investigation_steps_worked"
             ]
 
             # Execute all 4 essential queries
@@ -162,36 +162,36 @@ class JSONExportAdapter:
                 "filter_logic": "flexible_equipment_focused",
                 "max_results_per_question": 10,
                 "questions_included": [
-                    "can_this_be_fixed",
-                    "who_do_i_call",
-                    "how_long_will_this_take",
-                    "what_works_and_why"
+                    "what_could_be_causing_this",
+                    "who_has_diagnostic_experience",
+                    "what_should_i_check_first",
+                    "what_investigation_steps_worked"
                 ]
             },
             "analysis_results": {
-                "can_this_be_fixed": {
-                    "question": "Can this be fixed? Historical solution precedents",
-                    "description": "Analysis of past successful repairs and solution methods",
-                    "result_count": len(all_results.get("can_this_be_fixed", [])),
-                    "results": all_results.get("can_this_be_fixed", [])
+                "what_could_be_causing_this": {
+                    "question": "What could be causing this? Potential root causes",
+                    "description": "Analysis of similar past incidents and potential root causes",
+                    "result_count": len(all_results.get("what_could_be_causing_this", [])),
+                    "results": all_results.get("what_could_be_causing_this", [])
                 },
-                "who_do_i_call": {
-                    "question": "Who do I call? Department expertise mapping",
-                    "description": "Identification of expert departments and responsible teams",
-                    "result_count": len(all_results.get("who_do_i_call", [])),
-                    "results": all_results.get("who_do_i_call", [])
+                "who_has_diagnostic_experience": {
+                    "question": "Who has diagnostic experience? Expert departments",
+                    "description": "Identification of departments with diagnostic expertise",
+                    "result_count": len(all_results.get("who_has_diagnostic_experience", [])),
+                    "results": all_results.get("who_has_diagnostic_experience", [])
                 },
-                "how_long_will_this_take": {
-                    "question": "How long will this take? Timeline analysis",
-                    "description": "Historical repair duration patterns and time estimates",
-                    "result_count": len(all_results.get("how_long_will_this_take", [])),
-                    "results": all_results.get("how_long_will_this_take", [])
+                "what_should_i_check_first": {
+                    "question": "What should I check first? Priority investigation steps",
+                    "description": "Prioritized investigation steps based on historical success",
+                    "result_count": len(all_results.get("what_should_i_check_first", [])),
+                    "results": all_results.get("what_should_i_check_first", [])
                 },
-                "what_works_and_why": {
-                    "question": "What works and why? Proven effective actions",
-                    "description": "Evidence-based effective actions with success rationale",
-                    "result_count": len(all_results.get("what_works_and_why", [])),
-                    "results": all_results.get("what_works_and_why", [])
+                "what_investigation_steps_worked": {
+                    "question": "What investigation steps worked? Proven diagnostic approaches",
+                    "description": "Investigation methods that led to successful diagnosis",
+                    "result_count": len(all_results.get("what_investigation_steps_worked", [])),
+                    "results": all_results.get("what_investigation_steps_worked", [])
                 }
             },
             "summary": {
@@ -215,10 +215,10 @@ class JSONExportAdapter:
     def _get_query_description(self, query_type: str) -> str:
         """Get human-readable query description"""
         descriptions = {
-            "can_this_be_fixed": "Historical solution precedents analysis",
-            "who_do_i_call": "Department expertise and responsibility mapping",
-            "how_long_will_this_take": "Timeline analysis for similar repairs",
-            "what_works_and_why": "Proven effective actions with rationale"
+            "what_could_be_causing_this": "Potential root causes from similar symptom patterns",
+            "who_has_diagnostic_experience": "Departments experienced with similar symptom investigation",
+            "what_should_i_check_first": "Prioritized investigation steps based on success patterns",
+            "what_investigation_steps_worked": "Investigation methods that led to successful diagnosis"
         }
         return descriptions.get(query_type, "Unknown query type")
 
@@ -270,7 +270,7 @@ class JSONExportAdapter:
             insights.append("No relevant data found for search keywords")
             return insights
 
-        if query_type == "what_works_and_why":
+        if query_type == "what_investigation_steps_worked":
             # Analyze effective actions
             high_freq_actions = [r for r in results if r.get("usage_frequency", 0) >= 3]
             if high_freq_actions:
@@ -280,21 +280,20 @@ class JSONExportAdapter:
             if strong_evidence:
                 insights.append(f"{len(strong_evidence)} actions have strong supporting evidence")
 
-        elif query_type == "who_do_i_call":
+        elif query_type == "who_has_diagnostic_experience":
             # Analyze department expertise
             if results:
-                success_rates = [r.get("success_rate", 0) for r in results if isinstance(r.get("success_rate"), (int, float))]
+                success_rates = [r.get("diagnostic_success_rate", 0) for r in results if isinstance(r.get("diagnostic_success_rate"), (int, float))]
                 if success_rates:
                     avg_success_rate = sum(success_rates) / len(success_rates)
-                    insights.append(f"Average department success rate: {avg_success_rate:.1f}%")
+                    insights.append(f"Average department diagnostic success rate: {avg_success_rate:.1f}%")
 
-        elif query_type == "how_long_will_this_take":
-            # Analyze timeline patterns
+        elif query_type == "what_should_i_check_first":
+            # Analyze prioritized investigation steps
             if results:
-                durations = [r.get("average_days", 0) for r in results if isinstance(r.get("average_days"), (int, float))]
-                if durations:
-                    avg_duration = sum(durations) / len(durations)
-                    insights.append(f"Average repair duration: {avg_duration:.1f} days")
+                high_priority_steps = [r for r in results if r.get("priority_level") == "High"]
+                if high_priority_steps:
+                    insights.append(f"{len(high_priority_steps)} high-priority investigation steps identified")
 
         insights.append(f"Found {len(results)} relevant records")
         return insights
@@ -310,25 +309,24 @@ class JSONExportAdapter:
         # Per-question insights
         for question, results in all_results.items():
             if results:
-                if question == "what_works_and_why":
+                if question == "what_investigation_steps_worked":
                     high_freq_actions = [r for r in results if r.get("usage_frequency", 0) >= 3]
                     if high_freq_actions:
-                        insights.append(f"Effective Actions: {len(high_freq_actions)} proven solutions with multiple uses")
+                        insights.append(f"Investigation Steps: {len(high_freq_actions)} proven approaches with multiple uses")
 
-                elif question == "who_do_i_call":
-                    success_rates = [r.get("success_rate", 0) for r in results if isinstance(r.get("success_rate"), (int, float))]
+                elif question == "who_has_diagnostic_experience":
+                    success_rates = [r.get("diagnostic_success_rate", 0) for r in results if isinstance(r.get("diagnostic_success_rate"), (int, float))]
                     if success_rates:
                         avg_success_rate = sum(success_rates) / len(success_rates)
-                        insights.append(f"Expert Departments: Average success rate {avg_success_rate:.1f}%")
+                        insights.append(f"Expert Departments: Average diagnostic success rate {avg_success_rate:.1f}%")
 
-                elif question == "how_long_will_this_take":
-                    durations = [r.get("average_days", 0) for r in results if isinstance(r.get("average_days"), (int, float))]
-                    if durations:
-                        avg_duration = sum(durations) / len(durations)
-                        insights.append(f"Timeline Analysis: Average repair duration {avg_duration:.1f} days")
+                elif question == "what_should_i_check_first":
+                    high_priority_steps = [r for r in results if r.get("priority_level") == "High"]
+                    if high_priority_steps:
+                        insights.append(f"Priority Steps: {len(high_priority_steps)} high-priority investigation steps")
 
-                elif question == "can_this_be_fixed":
-                    insights.append(f"Solution Precedents: {len(results)} historical repair cases found")
+                elif question == "what_could_be_causing_this":
+                    insights.append(f"Root Cause Analysis: {len(results)} similar incidents with potential causes found")
 
         # Keywords analysis
         if keywords:

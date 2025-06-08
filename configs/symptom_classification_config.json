@@ -1,0 +1,106 @@
+{
+  "symptom_classification": {
+    "version": "1.0.0",
+    "last_updated": "2025-06-08",
+    "description": "Symptom keyword classification for root cause investigation"
+  },
+  "keyword_categories": {
+    "equipment_terms": {
+      "priority": "high",
+      "description": "Equipment types and machinery",
+      "terms": [
+        "motor",
+        "pump",
+        "excavator",
+        "conveyor",
+        "crusher",
+        "bearing",
+        "engine",
+        "transmission",
+        "hydraulic",
+        "compressor",
+        "turbine",
+        "generator",
+        "transformer",
+        "valve",
+        "cylinder",
+        "gearbox"
+      ]
+    },
+    "symptom_terms": {
+      "priority": "critical",
+      "description": "Failure symptoms and observable issues",
+      "terms": [
+        "failed",
+        "failure",
+        "leak",
+        "noise",
+        "vibration",
+        "wear",
+        "contamination",
+        "particles",
+        "overheating",
+        "seized",
+        "broken",
+        "cracked",
+        "corroded",
+        "blocked",
+        "jammed",
+        "smoking",
+        "sparking"
+      ]
+    },
+    "component_terms": {
+      "priority": "medium",
+      "description": "Component locations and parts",
+      "terms": [
+        "swing",
+        "rear",
+        "front",
+        "hydraulic",
+        "seal",
+        "gasket",
+        "bearing",
+        "shaft",
+        "housing",
+        "bracket",
+        "coupling",
+        "filter",
+        "hose",
+        "pipe",
+        "fitting",
+        "cable",
+        "wire",
+        "sensor"
+      ]
+    },
+    "severity_indicators": {
+      "priority": "medium",
+      "description": "Urgency and impact terms",
+      "terms": [
+        "emergency",
+        "critical",
+        "urgent",
+        "shutdown",
+        "stopped",
+        "downtime",
+        "safety",
+        "fire",
+        "explosion",
+        "injury"
+      ]
+    }
+  },
+  "filter_logic": {
+    "primary_pattern": "(equipment OR component) AND symptom",
+    "fallback_pattern": "general_keyword_search",
+    "conjunction_operator": "AND",
+    "disjunction_operator": "OR"
+  },
+  "configuration_rules": {
+    "minimum_keyword_length": 3,
+    "case_insensitive": true,
+    "partial_matching": false,
+    "stemming_enabled": false
+  }
+}
