@@ -159,6 +159,7 @@ class PurifiedDashboardApp:
             interaction_handlers.register_navigation_interactions(self.app)
             interaction_handlers.register_search_interactions(self.app)
             interaction_handlers.register_stakeholder_essentials_interactions(self.app)
+            interaction_handlers.register_stakeholder_journey_callbacks(self.app)
 
             logger.info("✅ All callbacks registered through interaction handlers")
 
@@ -259,10 +260,10 @@ class PurifiedDashboardApp:
 
             elif component_name == "stakeholder_essentials":
                 from dashboard.components.stakeholder_essentials import (
-                    create_essential_questions_interface,
+                    create_complete_stakeholder_journey,
                 )
 
-                return create_essential_questions_interface()
+                return create_complete_stakeholder_journey()
 
             return self._create_not_found_page(component_name)
 

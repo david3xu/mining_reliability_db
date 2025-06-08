@@ -5,6 +5,7 @@ Unified data access layer for comprehensive graph data extraction.
 Architecture compliant: uses config_adapter instead of direct config imports.
 """
 
+import json
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -985,20 +986,221 @@ class PurifiedDataAdapter:
             ),
         )
 
+    def execute_complete_stakeholder_journey(self, user_input: str) -> Dict[str, Any]:
+        """Execute complete stakeholder journey with single input returning five outputs"""
+        try:
+            logger.info(f"Adapter: Executing complete stakeholder journey for input: {user_input}")
 
-# Singleton pattern
-_data_adapter: Optional[PurifiedDataAdapter] = None
+            # Extract keywords from user input
+            keywords = self._extract_keywords_from_input(user_input)
+
+            # Build filter clause for queries
+            filter_clause = self._build_filter_clause(keywords)
+
+            # Execute all five journey queries
+            journey_results = {}
+
+            # 1. Why did this happen?
+            why_results = self._execute_journey_query("why_did_this_happen", filter_clause)
+            journey_results["why_did_this_happen"] = {
+                "title": "Why did this happen?",
+                "results": why_results,
+                "count": len(why_results) if why_results else 0
+            }
+
+            # 2. How do I figure out what's wrong?
+            investigation_results = self._execute_journey_query("how_do_i_figure_out_whats_wrong", filter_clause)
+            journey_results["how_do_i_figure_out_whats_wrong"] = {
+                "title": "How do I figure out what's wrong?",
+                "results": investigation_results,
+                "count": len(investigation_results) if investigation_results else 0
+            }
+
+            # 3. Who can help me?
+            experts_results = self._execute_journey_query("who_can_help_me", filter_clause)
+            journey_results["who_can_help_me"] = {
+                "title": "Who can help me?",
+                "results": experts_results,
+                "count": len(experts_results) if experts_results else 0
+            }
+
+            # 4. What should I check first?
+            checklist_results = self._execute_journey_query("what_should_i_check_first", filter_clause)
+            journey_results["what_should_i_check_first"] = {
+                "title": "What should I check first?",
+                "results": checklist_results,
+                "count": len(checklist_results) if checklist_results else 0
+            }
+
+            # 5. How do I fix it?
+            solutions_results = self._execute_journey_query("how_do_i_fix_it", filter_clause)
+            journey_results["how_do_i_fix_it"] = {
+                "title": "How do I fix it?",
+                "results": solutions_results,
+                "count": len(solutions_results) if solutions_results else 0
+            }
+
+            # Add summary metadata
+            total_results = sum(section["count"] for section in journey_results.values())
+            journey_results["metadata"] = {
+                "user_input": user_input,
+                "keywords_used": keywords,
+                "total_results": total_results,
+                "generated_at": self._get_timestamp(),
+                "success": True
+            }
+
+            logger.info(f"Stakeholder journey completed with {total_results} total results")
+            return journey_results
+
+        except Exception as e:
+            handle_error(logger, e, "complete stakeholder journey execution")
+            return {
+                "metadata": {
+                    "user_input": user_input,
+                    "error": str(e),
+                    "generated_at": self._get_timestamp(),
+                    "success": False
+                }
+            }
+
+    def _extract_keywords_from_input(self, user_input: str) -> List[str]:
+        """Extract relevant keywords from user input using symptom classification config"""
+        try:
+            config_adapter = get_config_adapter()
+            symptom_config = config_adapter.get_symptom_classification_config()
+
+            keywords = []
+            input_lower = user_input.lower()
+
+            # Extract equipment terms
+            for equipment in symptom_config.get("equipment_terms", []):
+                if equipment.lower() in input_lower:
+                    keywords.append(equipment)
+
+            # Extract symptom terms
+            for symptom in symptom_config.get("symptom_terms", []):
+                if symptom.lower() in input_lower:
+                    keywords.append(symptom)
+
+            # Extract component terms
+            for component in symptom_config.get("component_terms", []):
+                if component.lower() in input_lower:
+                    keywords.append(component)
+
+            # Extract operational context
+            for context in symptom_config.get("operational_context", []):
+                if context.lower() in input_lower:
+                    keywords.append(context)
+
+            # If no specific terms found, use the entire input as keywords
+            if not keywords:
+                keywords = [word.strip() for word in user_input.split() if len(word.strip()) > 2]
+
+            return list(set(keywords))  # Remove duplicates
+
+        except Exception as e:
+            logger.warning(f"Error extracting keywords: {e}")
+            return [word.strip() for word in user_input.split() if len(word.strip()) > 2]
+
+    def _build_filter_clause(self, keywords: List[str]) -> str:
+        """Build Neo4j filter clause from keywords"""
+        if not keywords:
+            return "true"  # No filtering if no keywords
+
+        # Build CONTAINS clauses for different fields
+        conditions = []
+
+        for keyword in keywords:
+            keyword_conditions = [
+                f"toLower(p.what_happened) CONTAINS toLower('{keyword}')",
+                f"toLower(rc.root_cause) CONTAINS toLower('{keyword}')",
+                f"toLower(f.facility_id) CONTAINS toLower('{keyword}')",
+                f"toLower(ar.operating_centre) CONTAINS toLower('{keyword}')"
+            ]
+            conditions.append(f"({' OR '.join(keyword_conditions)})")
+
+        return " AND ".join(conditions)
+
+    def _execute_journey_query(self, query_name: str, filter_clause: str) -> List[Dict[str, Any]]:
+        """Execute a single journey query with filter clause substitution"""
+        try:
+            query_manager = get_query_manager()
+
+            # Load configuration to get query file path
+            config_path = "/home/291928k/uwa/alcoa/mining_reliability_db/configs/stakeholder_essential_queries.json"
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+
+            # Get query file path from configuration
+            if query_name in config.get("complete_stakeholder_journey", {}):
+                query_file_path = config["complete_stakeholder_journey"][query_name]["query_file"]
+            elif query_name in config.get("essential_queries", {}):
+                query_file_path = config["essential_queries"][query_name]["query_file"]
+            else:
+                logger.error(f"Query {query_name} not found in configuration")
+                return []
+
+            # Execute the query with correct parameters
+            result = query_manager.execute_stakeholder_essential_query(
+                query_file_path,
+                filter_clause
+            )
+
+            if result and result.success and result.data:
+                return result.data
+            else:
+                logger.warning(f"Query {query_name} returned no results or failed")
+                return []
+
+        except Exception as e:
+            logger.error(f"Error executing journey query {query_name}: {e}")
+            return []
+
+    def execute_stakeholder_essential_query(self, query_type: str, user_input: str = "") -> Dict[str, Any]:
+        """Execute individual stakeholder essential query with optional user input filtering"""
+        try:
+            logger.info(f"Adapter: Executing stakeholder essential query: {query_type}")
+
+            if user_input:
+                keywords = self._extract_keywords_from_input(user_input)
+                filter_clause = self._build_filter_clause(keywords)
+            else:
+                filter_clause = "true"  # No filtering
+
+            results = self._execute_journey_query(query_type, filter_clause)
+
+            return {
+                "query_type": query_type,
+                "user_input": user_input,
+                "results": results,
+                "count": len(results) if results else 0,
+                "generated_at": self._get_timestamp(),
+                "success": True
+            }
+
+        except Exception as e:
+            handle_error(logger, e, f"stakeholder essential query {query_type}")
+            return {
+                "query_type": query_type,
+                "user_input": user_input,
+                "error": str(e),
+                "generated_at": self._get_timestamp(),
+                "success": False
+            }
 
 
-def get_data_adapter() -> PurifiedDataAdapter:
-    """Get singleton data adapter instance"""
-    global _data_adapter
-    if _data_adapter is None:
-        _data_adapter = PurifiedDataAdapter()
-    return _data_adapter
+# Singleton pattern implementation
+_data_adapter_instance = None
 
+def get_data_adapter():
+    """Get the singleton instance of PurifiedDataAdapter."""
+    global _data_adapter_instance
+    if _data_adapter_instance is None:
+        _data_adapter_instance = PurifiedDataAdapter()
+    return _data_adapter_instance
 
 def reset_adapter():
-    """Reset data adapter for testing or re-initialization"""
-    global _data_adapter
-    _data_adapter = None
+    """Reset the singleton instance (mainly for testing)."""
+    global _data_adapter_instance
+    _data_adapter_instance = None
