@@ -39,10 +39,10 @@ def create_essential_questions_interface():
                     ),
                     dbc.Tabs(
                         [
-                            dbc.Tab(label="Can this be fixed?", tab_id="tab-1"),
-                            dbc.Tab(label="Who do I call?", tab_id="tab-2"),
-                            dbc.Tab(label="How long will this take?", tab_id="tab-3"),
-                            dbc.Tab(label="What works & why?", tab_id="tab-4"),
+                            dbc.Tab(label="What could be causing this?", tab_id="tab-1"),
+                            dbc.Tab(label="Who has diagnostic experience?", tab_id="tab-2"),
+                            dbc.Tab(label="What should I check first?", tab_id="tab-3"),
+                            dbc.Tab(label="What investigation steps worked?", tab_id="tab-4"),
                         ],
                         id="question-tabs",
                     ),

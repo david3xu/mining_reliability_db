@@ -241,6 +241,47 @@ class ConfigAdapter:
             handle_error_utility(logger, e, "stakeholder queries configuration access")
             return {}
 
+    def get_symptom_classification_config(self) -> Dict[str, Any]:
+        """Load symptom classification configuration"""
+        try:
+            config_dir = Path(__file__).parent.parent.parent / "configs"
+            config_path = config_dir / "symptom_classification_config.json"
+
+            if not config_path.exists():
+                logger.warning(f"Symptom classification config not found: {config_path}")
+                return self._get_default_symptom_config()
+
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+
+            logger.info("✅ Symptom classification config loaded successfully")
+            return config
+
+        except Exception as e:
+            handle_error_utility(logger, e, "loading symptom classification config")
+            return self._get_default_symptom_config()
+
+    def _get_default_symptom_config(self) -> Dict[str, Any]:
+        """Fallback default symptom classification configuration"""
+        return {
+            "keyword_categories": {
+                "equipment_terms": {
+                    "terms": ["motor", "pump", "excavator", "bearing", "engine"]
+                },
+                "symptom_terms": {
+                    "terms": ["failed", "leak", "noise", "vibration", "contamination"]
+                },
+                "component_terms": {
+                    "terms": ["swing", "rear", "front", "hydraulic", "seal"]
+                }
+            },
+            "filter_logic": {
+                "primary_pattern": "(equipment OR component) AND symptom",
+                "conjunction_operator": "AND",
+                "disjunction_operator": "OR"
+            }
+        }
+
     def get_dashboard_config(self) -> Dict[str, Any]:
         """Pure access to main dashboard configuration"""
         try:

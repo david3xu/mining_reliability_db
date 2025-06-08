@@ -1,31 +1,31 @@
 {
   "essential_queries": {
-    "can_this_be_fixed": {
-      "query_file": "configs/queries/proven_solutions.cypher",
-      "description": "Historical success precedents for similar problems"
+    "what_could_be_causing_this": {
+      "query_file": "configs/queries/potential_root_causes.cypher",
+      "description": "Potential root causes from similar symptom patterns"
     },
-    "who_do_i_call": {
-      "query_file": "configs/queries/expert_departments.cypher",
-      "description": "Department expertise for contamination issues"
+    "what_investigation_steps_worked": {
+      "query_file": "configs/queries/investigation_approaches.cypher",
+      "description": "Investigation methods that led to successful diagnosis"
     },
-    "how_long_will_this_take": {
-      "query_file": "configs/queries/repair_timelines.cypher",
-      "description": "Timeline patterns for similar repairs"
+    "who_has_diagnostic_experience": {
+      "query_file": "configs/queries/diagnostic_experts.cypher",
+      "description": "Departments experienced with similar symptom investigation"
     },
-    "what_works_and_why": {
-      "query_file": "configs/queries/effective_actions.cypher",
-      "description": "Proven effective actions with rationale"
+    "what_should_i_check_first": {
+      "query_file": "configs/queries/prioritized_investigation_steps.cypher",
+      "description": "Prioritized investigation steps based on success patterns"
     }
   },
   "keyword_processing": {
-    "default_keywords": ["excavator", "motor", "contamination"],
-    "keyword_filter_template": "toLower(p.what_happened) CONTAINS toLower('{keyword}')",
+    "default_keywords": ["motor", "failed", "contamination", "particles"],
+    "symptom_filter_template": "toLower(p.what_happened) CONTAINS toLower('{keyword}')",
     "conjunction": " AND "
   },
   "display_config": {
-    "max_results_per_query": 10,
-    "enable_search_highlighting": true,
-    "show_query_execution_time": true,
+    "max_results_per_query": 8,
+    "enable_symptom_highlighting": true,
+    "show_diagnostic_success_rates": true,
     "enable_export": false
   }
 }
