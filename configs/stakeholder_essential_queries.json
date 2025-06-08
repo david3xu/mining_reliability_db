@@ -1,4 +1,31 @@
 {
+  "complete_stakeholder_journey": {
+    "why_did_this_happen": {
+      "query_file": "configs/queries/why_did_this_happen.cypher",
+      "description": "Root causes from similar historical incidents",
+      "priority": 1
+    },
+    "how_do_i_figure_out_whats_wrong": {
+      "query_file": "configs/queries/how_do_i_figure_out_whats_wrong.cypher",
+      "description": "Investigation approaches that led to successful diagnosis",
+      "priority": 2
+    },
+    "who_can_help_me": {
+      "query_file": "configs/queries/who_can_help_me.cypher",
+      "description": "Expert departments with proven success for similar issues",
+      "priority": 3
+    },
+    "what_should_i_check_first": {
+      "query_file": "configs/queries/what_should_i_check_first.cypher",
+      "description": "Prioritized investigation steps based on success patterns",
+      "priority": 4
+    },
+    "how_do_i_fix_it": {
+      "query_file": "configs/queries/how_do_i_fix_it.cypher",
+      "description": "Proven action plans that successfully resolved similar symptoms",
+      "priority": 5
+    }
+  },
   "essential_queries": {
     "what_could_be_causing_this": {
       "query_file": "configs/queries/potential_root_causes.cypher",
@@ -15,7 +42,16 @@
     "what_should_i_check_first": {
       "query_file": "configs/queries/prioritized_investigation_steps.cypher",
       "description": "Prioritized investigation steps based on success patterns"
+    },
+    "how_do_i_fix_this": {
+      "query_file": "configs/queries/proven_solutions.cypher",
+      "description": "Proven effective solutions with verification and success rates"
     }
+  },
+  "workflow_config": {
+    "single_input_multiple_outputs": true,
+    "auto_execute_all_queries": true,
+    "display_comprehensive_results": true
   },
   "keyword_processing": {
     "default_keywords": ["motor", "failed", "contamination", "particles"],
@@ -23,9 +59,10 @@
     "conjunction": " AND "
   },
   "display_config": {
-    "max_results_per_query": 8,
+    "max_results_per_query": 6,
     "enable_symptom_highlighting": true,
-    "show_diagnostic_success_rates": true,
-    "enable_export": false
+    "show_success_rates": true,
+    "enable_export": false,
+    "comprehensive_dashboard": true
   }
 }

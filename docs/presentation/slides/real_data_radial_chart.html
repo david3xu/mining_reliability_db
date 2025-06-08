@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importance-Based Stakeholder Intelligence</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a; /* Dark professional background */
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Add presentation-style decorative elements */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        body::before {
+            top: 20px;
+            left: 20px;
+            background: radial-gradient(circle, #64B5F6 2px, transparent 2px);
+            background-size: 20px 20px;
+        }
+
+        body::after {
+            bottom: 20px;
+            right: 20px;
+            background: radial-gradient(circle, #22c55e 2px, transparent 2px);
+            background-size: 25px 25px;
+        }
+
+        .container {
+            width: 1000px;
+            height: 1000px;
+            margin: 0 auto;
+            position: relative;
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 5;
+        }
+
+        .center {
+            position: absolute;
+            top: 400px;
+            left: 400px;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .spoke {
+            position: absolute;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(148, 163, 184, 0.8), rgba(148, 163, 184, 0.3));
+            transform-origin: left center;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .spoke::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid rgba(148, 163, 184, 0.8);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        .spoke-label {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 12px;
+            font-weight: bold;
+            color: #f1f5f9;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            border: 3px solid;
+            transition: all 0.3s ease;
+        }
+
+        .spoke-label:hover {
+            transform: scale(1.05);
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .spoke-label strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Size and positioning based on importance ranking */
+
+        /* Rank 1: IMPACT - Largest, Closest */
+        .rank1 {
+            width: 180px;
+            padding: 20px;
+            font-size: 1em;
+        }
+        .rank1 strong { font-size: 1.6em; }
+        /* Positioning handled by JS */
+
+        /* Rank 2: RESOURCES - 2nd Largest, 2nd Closest */
+        .rank2 {
+            width: 160px;
+            padding: 18px;
+            font-size: 0.95em;
+        }
+        .rank2 strong { font-size: 1.5em; }
+        /* Positioning handled by JS */
+
+        /* Rank 3: ACTIONS - 3rd Largest, 3rd Closest */
+        .rank3 {
+            width: 150px;
+            padding: 16px;
+            font-size: 0.9em;
+        }
+        .rank3 strong { font-size: 1.4em; }
+        /* Positioning handled by JS */
+
+        /* Rank 4: EQUIPMENT - 4th Largest, 4th Closest */
+        .rank4 {
+            width: 140px;
+            padding: 14px;
+            font-size: 0.85em;
+        }
+        .rank4 strong { font-size: 1.3em; }
+        /* Positioning handled by JS */
+
+        /* Rank 5: EVIDENCE - 5th Largest, 5th Closest */
+        .rank5 {
+            width: 130px;
+            padding: 12px;
+            font-size: 0.8em;
+        }
+        .rank5 strong { font-size: 1.2em; }
+        /* Positioning handled by JS */
+
+        /* Rank 6: CAUSES - Smallest, Furthest */
+        .rank6 {
+            width: 140px;
+            padding: 10px;
+            font-size: 0.7em;
+        }
+        .rank6 strong { font-size: 1.1em; }
+        /* Positioning handled by JS */
+
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #f1f5f9;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            position: relative;
+            z-index: 10;
+        }
+
+        .title h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .title p {
+            font-size: 1.2em;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        /* Add colored separator line like the slide */
+        .title::after {
+            content: '';
+            display: block;
+            width: 60%;
+            height: 4px;
+            margin: 20px auto;
+            background: linear-gradient(90deg, #dc2626, #f59e0b, #22c55e, #2563eb, #8b5cf6);
+            border-radius: 2px;
+        }
+
+        .case-info {
+            text-align: center;
+            margin-top: 20px;
+            color: #cbd5e1;
+            font-size: 0.9em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .highlight {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .rank-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .professional-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.9em;
+            position: relative;
+            z-index: 10;
+        }
+
+        .professional-footer .team-name {
+            color: #64B5F6;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        <h1>🎯 Importance-Based Stakeholder Intelligence</h1>
+        <p>Card size and distance reflect crisis response priority</p>
+    </div>
+
+    <div class="container">
+        <!-- Center Hub -->
+        <div class="center">
+            WHAT<br>HAPPENED?<br><br>
+            <small>Action Request: 2023-00548<br>Motor Failed - BOTH Units<br>3.5 Days Down<br>System Contamination</small>
+        </div>
+
+        <!-- Spokes - length based on importance (shorter = more important) -->
+        <div class="spoke spoke1"></div>
+        <div class="spoke spoke2"></div>
+        <div class="spoke spoke3"></div>
+        <div class="spoke spoke4"></div>
+        <div class="spoke spoke5"></div>
+        <div class="spoke spoke6"></div>
+
+        <!-- Cards sized and positioned by importance -->
+        <div class="spoke-label label1 rank1">
+            <div class="rank-indicator">1</div>
+            <strong>Impact</strong><br>
+            3.5 Days Downtime<br>
+            30 Day Response<br>
+            Category: Production<br>
+            Amount of Loss: null
+        </div>
+
+        <div class="spoke-label label2 rank2">
+            <div class="rank-indicator">2</div>
+            <strong>Resources</strong><br>
+            HUN Mobile Plant<br>
+            Hitachi Support<br>
+            Expert: Tynan Wells
+        </div>
+
+        <div class="spoke-label label3 rank3">
+            <div class="rank-indicator">3</div>
+            <strong>Actions</strong><br>
+            Follow up with Hitachi<br>
+            Remove rear slew motor<br>
+            Create 1000hrs contamination check<br>
+            Develop flushing procedure
+        </div>
+
+        <div class="spoke-label label4 rank4">
+            <div class="rank-indicator">4</div>
+            <strong>Equipment</strong><br>
+            excavatr-1020<br>
+            WA-Mining<br>
+            Operating Centre: HUN Mobile Plant
+        </div>
+
+        <div class="spoke-label label5 rank5">
+            <div class="rank-indicator">5</div>
+            <strong>Evidence</strong><br>
+            Effective: <span class="highlight">YES</span><br>
+            Stage: Closed<br>
+            Recurring: No<br>
+            Obj. Evidence: Oil leaking
+        </div>
+
+        <div class="spoke-label label6 rank6">
+            <div class="rank-indicator">6</div>
+            <strong>Causes</strong><br>
+            Counter slewing caused forces on swing motor shaft which also may have contributed to the excessive shaft movement
+        </div>
+    </div>
+
+    <div class="case-info">
+        <p><strong>Visual Logic:</strong> Larger cards + shorter lines = higher crisis priority</p>
+        <p><strong>Ranking:</strong> 1=Impact, 2=Resources, 3=Actions, 4=Equipment, 5=Evidence, 6=Causes</p>
+        <p><strong>Usage:</strong> Start with largest cards (Impact, Resources) for immediate crisis response</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delay to ensure all CSS is applied and elements are rendered for accurate offsetWidth/offsetHeight
+            setTimeout(positionElements, 100);
+
+            window.addEventListener('resize', positionElements);
+
+            function positionElements() {
+                const container = document.querySelector('.container');
+                const center = document.querySelector('.center');
+                const spokes = document.querySelectorAll('.spoke');
+                const labels = document.querySelectorAll('.spoke-label');
+
+                if (!container || !center || spokes.length === 0 || labels.length === 0) {
+                    console.warn("One or more elements not found. Cannot position.");
+                    return;
+                }
+
+                const containerRect = container.getBoundingClientRect();
+                const centerX = containerRect.width / 2;
+                const centerY = containerRect.height / 2;
+
+                // Data for each stakeholder card
+                const stakeholderData = [
+                    {
+                        rank: 1,
+                        title: 'Impact',
+                        content: '3.5 Days Downtime<br>30 Day Response<br>Category: Production<br>Amount of Loss: null',
+                        color: '#dc2626',
+                        spokeLength: 120, // Shorter length for higher importance
+                        labelMargin: 20, // Margin between spoke end and label start
+                        initialAngle: 10 // Custom angle for placement
+                    },
+                    {
+                        rank: 2,
+                        title: 'Resources',
+                        content: 'HUN Mobile Plant<br>Hitachi Support<br>Expert: Tynan Wells',
+                        color: '#2563eb',
+                        spokeLength: 140,
+                        labelMargin: 25,
+                        initialAngle: 70
+                    },
+                    {
+                        rank: 3,
+                        title: 'Actions',
+                        content: 'Follow up with Hitachi<br>Remove rear slew motor<br>Create 1000hrs contamination check<br>Develop flushing procedure',
+                        color: '#22c55e',
+                        spokeLength: 160,
+                        labelMargin: 30,
+                        initialAngle: 130
+                    },
+                    {
+                        rank: 4,
+                        title: 'Equipment',
+                        content: 'excavatr-1020<br>WA-Mining<br>Operating Centre: HUN Mobile Plant',
+                        color: '#f59e0b',
+                        spokeLength: 180,
+                        labelMargin: 35,
+                        initialAngle: 190
+                    },
+                    {
+                        rank: 5,
+                        title: 'Evidence',
+                        content: 'Effective: <span class="highlight">YES</span><br>Stage: Closed<br>Recurring: No<br>Obj. Evidence: Oil leaking',
+                        color: '#8b5cf6',
+                        spokeLength: 200,
+                        labelMargin: 40,
+                        initialAngle: 275,
+                        yOffset: 60
+                    },
+                    {
+                        rank: 6,
+                        title: 'Causes',
+                        content: 'Counter slewing caused forces on swing motor shaft which also may have contributed to the excessive shaft movement',
+                        color: '#6b7280',
+                        spokeLength: 220, // Longer length for lower importance
+                        labelMargin: 45,
+                        initialAngle: 335,
+                        yOffset: 30
+                    }
+                ];
+
+                const numSpokes = stakeholderData.length;
+                const angleIncrement = 360 / numSpokes;
+
+                // Adjust center hub position first, as spoke and label positioning depends on it
+                const centerWidth = center.offsetWidth;
+                const centerHeight = center.offsetHeight;
+                center.style.left = `${centerX - (centerWidth / 2)}px`;
+                center.style.top = `${centerY - (centerHeight / 2)}px`;
+
+                stakeholderData.forEach((data, index) => {
+                    const spoke = spokes[index];
+                    const label = labels[index];
+
+                    const angle = data.initialAngle; // Use custom initial angle
+                    const angleRad = angle * (Math.PI / 180); // Angle in radians
+
+                    // Position spokes
+                    spoke.style.left = `${centerX}px`;
+                    spoke.style.top = `${centerY}px`;
+                    spoke.style.width = `${data.spokeLength}px`;
+                    spoke.style.transform = `rotate(${angle}deg)`;
+
+                    // Set content and border color for label before positioning to get accurate offsetWidth/offsetHeight
+                    label.querySelector('strong').innerHTML = data.title;
+                    label.innerHTML = `<div class="rank-indicator">${data.rank}</div><strong>${data.title}</strong><br>${data.content}`;
+                    label.style.borderColor = data.color;
+
+                    // Get label dimensions *after* setting content
+                    const labelWidth = label.offsetWidth;
+                    const labelHeight = label.offsetHeight;
+
+                    // Calculate effective distance for the label's center from the container's center
+                    // This considers spoke length, a margin, and half of the label's width/height to center it properly
+                    const effectiveDistance = data.spokeLength + data.labelMargin + Math.hypot(labelWidth / 2, labelHeight / 2);
+
+                    const labelX = centerX + (effectiveDistance * Math.cos(angleRad));
+                    let labelY = centerY + (effectiveDistance * Math.sin(angleRad));
+
+                    // Apply vertical offset if defined
+                    if (data.yOffset) {
+                        labelY += data.yOffset;
+                    }
+
+                    // Adjust label position to center it
+                    label.style.left = `${labelX - (labelWidth / 2)}px`;
+                    label.style.top = `${labelY - (labelHeight / 2)}px`;
+
+                    // Recalculate spoke length to meet the new label position
+                    const newSpokeLength = Math.hypot(labelX - centerX, labelY - centerY) - (Math.hypot(labelWidth / 2, labelHeight / 2) + data.labelMargin);
+                    spoke.style.width = `${newSpokeLength}px`;
+                });
+            }
+        });
+    </script>
+    <div class="professional-footer">
+        <div class="team-name">Equipment Intelligence System</div>
+        <div>Crisis Response Analysis</div>
+    </div>
+</body>
+</html>

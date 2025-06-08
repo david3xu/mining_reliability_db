@@ -7,6 +7,7 @@ Clean interaction logic with adapter-driven URL generation.
 import logging
 from typing import Any, Dict, List, Optional
 
+import dash_bootstrap_components as dbc
 from dash import Input, Output, State, callback, ctx, html
 from dash.exceptions import PreventUpdate
 
@@ -25,6 +26,7 @@ class InteractionHandlers:
         self.data_adapter = get_data_adapter()
         self.url_manager = get_url_manager()
         self.last_results = None  # Store last query results for export
+        self.last_journey_results = None  # Store last journey results for export
 
     def register_chart_interactions(self, app):
         """Register chart click callbacks"""
@@ -633,6 +635,94 @@ class InteractionHandlers:
             html.H5("Detailed Results by Question", className="mb-3"),
             html.Div(detailed_sections)
         ])
+
+    def register_stakeholder_journey_callbacks(self, app):
+        """Register complete stakeholder journey callbacks"""
+
+        @app.callback(
+            [Output("journey-status", "children"),
+             Output("journey-results-container", "children"),
+             Output("journey-export-btn", "disabled")],
+            Input("journey-search-btn", "n_clicks"),
+            State("stakeholder-journey-input", "value"),
+            prevent_initial_call=True
+        )
+        def execute_complete_stakeholder_journey(n_clicks, user_input):
+            """Execute complete stakeholder journey with single input"""
+            try:
+                if not n_clicks or not user_input or not user_input.strip():
+                    raise PreventUpdate
+
+                logger.info(f"Starting complete stakeholder journey for: {user_input}")
+
+                # Show loading status
+                loading_status = dbc.Alert([
+                    dbc.Spinner(size="sm", spinner_class_name="me-2"),
+                    f"Executing complete journey for: '{user_input}'..."
+                ], color="info", className="mb-0")
+
+                # Execute journey through data adapter
+                journey_results = self.data_adapter.execute_complete_stakeholder_journey(user_input)
+
+                # Store results for export
+                self.last_journey_results = journey_results
+
+                if journey_results.get("metadata", {}).get("success"):
+                    # Success status
+                    total_results = journey_results.get("metadata", {}).get("total_results", 0)
+                    success_status = dbc.Alert([
+                        html.I(className="fas fa-check-circle me-2"),
+                        f"Journey completed successfully! Found {total_results} total results across all questions."
+                    ], color="success", className="mb-0")
+
+                    # Create results display using the component function
+                    from dashboard.components.stakeholder_essentials import create_journey_results_display
+                    results_display = create_journey_results_display(journey_results)
+
+                    return success_status, results_display, False  # Enable export button
+                else:
+                    # Error status
+                    error_msg = journey_results.get("metadata", {}).get("error", "Unknown error")
+                    error_status = dbc.Alert([
+                        html.I(className="fas fa-exclamation-triangle me-2"),
+                        f"Journey failed: {error_msg}"
+                    ], color="danger", className="mb-0")
+
+                    return error_status, html.Div(), True  # Keep export disabled
+
+            except Exception as e:
+                handle_error(logger, e, "complete stakeholder journey callback")
+                error_status = dbc.Alert([
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    f"Error executing journey: {str(e)}"
+                ], color="danger", className="mb-0")
+
+                return error_status, html.Div(), True
+
+        @app.callback(
+            Output("journey-export-btn", "href"),
+            Input("journey-export-btn", "n_clicks"),
+            prevent_initial_call=True
+        )
+        def export_journey_results(n_clicks):
+            """Export complete journey results as JSON"""
+            try:
+                if not n_clicks or not hasattr(self, 'last_journey_results'):
+                    raise PreventUpdate
+
+                import json
+                from urllib.parse import quote
+
+                # Convert results to JSON
+                json_data = json.dumps(self.last_journey_results, indent=2, default=str)
+                json_string = quote(json_data)
+
+                # Create download URL
+                return f"data:application/json;charset=utf-8,{json_string}"
+
+            except Exception as e:
+                handle_error(logger, e, "journey results export")
+                raise PreventUpdate
 
 # Singleton pattern
 _interaction_handlers = None
