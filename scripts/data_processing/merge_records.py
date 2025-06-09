@@ -77,16 +77,18 @@ class SimpleMerger:
         if len(records) == 1:
             return records[0]
 
-        # Get all field names across all records
-        all_fields = set()
-        for record in records:
-            all_fields.update(record.keys())
+        # Preserve order from first record
+        field_order = list(records[0].keys())
+        for record in records[1:]:
+            for field in record.keys():
+                if field not in field_order:
+                    field_order.append(field)
 
-        # Merge each field
+        # Merge in correct order
         merged_record = {}
-        for field_name in all_fields:
-            field_values = [record.get(field_name) for record in records]
-            merged_record[field_name] = self.merge_field_values(field_values)
+        for field_name in field_order:
+            values = [record.get(field_name) for record in records]
+            merged_record[field_name] = self.merge_field_values(values)
 
         return merged_record
 
@@ -214,59 +216,73 @@ class SimpleMerger:
         """Process a single facility file: load, merge, save."""
         logger.info(f"Processing {input_file.name}")
 
-        # Load data
-        records, structure_info = self.load_json_data(input_file)
-        if not records:
+        try:
+            # Load data
+            records, structure_info = self.load_json_data(input_file)
+            if not records:
+                logger.warning(f"No records in {input_file.name}")
+                return {
+                    "input_file": input_file.name,
+                    "input_records": 0,
+                    "output_records": 0,
+                    "merge_groups": 0,
+                    "status": "empty",
+                }
+
+            # Group by Action Request Number
+            grouped_records = self.group_records_by_action_number(records)
+            if not grouped_records:
+                logger.warning(f"Grouping failed for {input_file.name}")
+                return {
+                    "input_file": input_file.name,
+                    "input_records": len(records),
+                    "output_records": 0,
+                    "merge_groups": 0,
+                    "status": "grouping_failed",
+                }
+
+            # Merge each group - preserve original order from input dataset
+            merged_records = []
+            merge_count = 0
+            # Get Action Request Numbers in the order they first appeared in the original dataset
+            ordered_action_numbers = self.get_action_numbers_in_original_order(records, grouped_records)
+
+            logger.info(
+                f"Processing {len(ordered_action_numbers)} Action Request Numbers in original input order"
+            )
+
+            for action_number in ordered_action_numbers:
+                record_group = grouped_records[action_number]
+                merged_record = self.merge_record_group(record_group)
+                merged_records.append(merged_record)
+                if len(record_group) > 1:
+                    merge_count += 1
+                    logger.info(
+                        f"Merged {len(record_group)} records for Action Request: {action_number}"
+                    )
+
+            # Save merged data
+            self.save_json_data(merged_records, structure_info, output_file)
+
+            return {
+                "input_file": input_file.name,
+                "input_records": len(records),
+                "output_records": len(merged_records),
+                "merge_groups": merge_count,
+                "unique_actions": len(grouped_records),
+                "status": "success",
+            }
+
+        except Exception as e:
+            logger.error(f"Processing failed for {input_file.name}: {e}")
             return {
                 "input_file": input_file.name,
                 "input_records": 0,
                 "output_records": 0,
                 "merge_groups": 0,
-                "status": "no_records",
+                "status": "failed",
+                "error": str(e),
             }
-
-        # Group by Action Request Number
-        grouped_records = self.group_records_by_action_number(records)
-        if not grouped_records:
-            return {
-                "input_file": input_file.name,
-                "input_records": len(records),
-                "output_records": 0,
-                "merge_groups": 0,
-                "status": "grouping_failed",
-            }
-
-        # Merge each group - preserve original order from input dataset
-        merged_records = []
-        merge_count = 0
-        # Get Action Request Numbers in the order they first appeared in the original dataset
-        ordered_action_numbers = self.get_action_numbers_in_original_order(records, grouped_records)
-
-        logger.info(
-            f"Processing {len(ordered_action_numbers)} Action Request Numbers in original input order"
-        )
-
-        for action_number in ordered_action_numbers:
-            record_group = grouped_records[action_number]
-            merged_record = self.merge_record_group(record_group)
-            merged_records.append(merged_record)
-            if len(record_group) > 1:
-                merge_count += 1
-                logger.info(
-                    f"Merged {len(record_group)} records for Action Request: {action_number}"
-                )
-
-        # Save merged data
-        self.save_json_data(merged_records, structure_info, output_file)
-
-        return {
-            "input_file": input_file.name,
-            "input_records": len(records),
-            "output_records": len(merged_records),
-            "merge_groups": merge_count,
-            "unique_actions": len(grouped_records),
-            "status": "success",
-        }
 
 
 def main():

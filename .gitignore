@@ -58,15 +58,26 @@ logs/
 htmlcov/
 .coverage.*
 
-# Data Files
-data/raw/
-data/processed/
-data/exports/
+# Data Files - ignore all content but keep directories with .keep files
+data/excel_output/*
+!data/excel_output/.keep
+data/facility_data/*
+!data/facility_data/.keep
+data/inter_data/*
+!data/inter_data/.keep
+data/raw_data/*
+!data/raw_data/.keep
+data/search_results/*
+!data/search_results/.keep
+data/stakeholder_results/*
+!data/stakeholder_results/.keep
+data/test_output/*
+!data/test_output/.keep
+
+# Additional data file patterns
 *.csv
 *.xlsx
 *.json.backup
-data/inter_data/mining_maintenance_nested.json
-data/inter_data/fab16f86-faa9-44d9-b9d7-cfbbb47061da.json
 
 # OS
 .DS_Store
