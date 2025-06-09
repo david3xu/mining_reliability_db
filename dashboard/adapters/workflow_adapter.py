@@ -217,13 +217,13 @@ class WorkflowAdapter:
             return {"workflow_completions": {}, "supporting_completions": {}}
 
     def get_completion_color(self, completion_rate: float) -> str:
-        """Assign color based on completion percentage"""
+        """Assign blue-variant color based on completion percentage"""
         if completion_rate >= 80.0:
-            return "#7ED321"  # Green - Excellent
+            return "#1565C0"  # Dark blue - Excellent
         elif completion_rate >= 60.0:
-            return "#F5A623"  # Orange - Good
+            return "#2196F3"  # Medium blue - Good
         else:
-            return "#D32F2F"  # Red - Needs Attention
+            return "#64B5F6"  # Light blue - Needs Attention
 
     def get_enriched_workflow_stages_comprehensive(self) -> List[Dict[str, Any]]:
         """Enhanced stages with comprehensive field completion"""
