@@ -24,7 +24,7 @@ from dashboard.adapters.workflow_adapter import get_workflow_adapter
 from mine_core.business.intelligence_engine import IntelligenceEngine, get_intelligence_engine
 from mine_core.database.query_manager import get_query_manager
 from mine_core.shared.common import handle_error
-from dashboard.utils.data_transformers import BASE_DIR
+from mine_core.utils.constants import BASE_DIR
 
 __all__ = [
     "PurifiedDataAdapter",
