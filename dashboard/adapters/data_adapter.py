@@ -9,8 +9,9 @@ import json
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import os
 
-from dashboard.adapters.config_adapter import get_config_adapter
+from dashboard.adapters.config_adapter import get_config_adapter, handle_error_utility
 from dashboard.adapters.interfaces import (
     ComponentMetadata,
     FacilityData,
@@ -23,6 +24,7 @@ from dashboard.adapters.workflow_adapter import get_workflow_adapter
 from mine_core.business.intelligence_engine import IntelligenceEngine, get_intelligence_engine
 from mine_core.database.query_manager import get_query_manager
 from mine_core.shared.common import handle_error
+from dashboard.utils.data_transformers import BASE_DIR
 
 __all__ = [
     "PurifiedDataAdapter",
@@ -1128,7 +1130,7 @@ class PurifiedDataAdapter:
             query_manager = get_query_manager()
 
             # Load configuration to get query file path
-            config_path = "/home/291928k/uwa/alcoa/mining_reliability_db/configs/stakeholder_essential_queries.json"
+            config_path = os.path.join(BASE_DIR, "configs", "stakeholder_essential_queries.json")
             with open(config_path, 'r') as f:
                 config = json.load(f)
 
