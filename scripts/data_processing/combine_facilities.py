@@ -10,6 +10,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List
 
+import pandas as pd
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -57,7 +59,43 @@ class FacilityCombiner:
             logger.error(f"Failed to load {facility_file.name}: {e}")
             return []
 
-    def combine_all_facilities(self, input_dir: Path, output_file: Path) -> Dict[str, Any]:
+    def save_to_excel(self, records: List[Dict[str, Any]], output_file: Path, facility_stats: List[Dict[str, Any]]) -> None:
+        """Save combined records to Excel format with multiple sheets."""
+        try:
+            # Create Excel writer object
+            with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
+
+                # Main records sheet
+                if records:
+                    df_records = pd.DataFrame(records)
+                    df_records.to_excel(writer, sheet_name='All_Records', index=False)
+                    logger.info(f"Saved {len(records)} records to 'All_Records' sheet")
+
+                # Facility summary sheet
+                if facility_stats:
+                    df_summary = pd.DataFrame(facility_stats)
+                    df_summary.to_excel(writer, sheet_name='Facility_Summary', index=False)
+                    logger.info(f"Saved facility summary with {len(facility_stats)} facilities")
+
+                # Create separate sheets for each facility
+                for facility_info in facility_stats:
+                    facility_name = facility_info['facility']
+                    facility_records = [r for r in records if r.get('_facility_name') == facility_name]
+
+                    if facility_records:
+                        # Clean up sheet name (Excel has restrictions)
+                        sheet_name = facility_name.replace('.', '_').replace('-', '_')[:31]  # Excel sheet name limit
+                        df_facility = pd.DataFrame(facility_records)
+                        df_facility.to_excel(writer, sheet_name=sheet_name, index=False)
+                        logger.info(f"Saved {len(facility_records)} records to '{sheet_name}' sheet")
+
+            logger.info(f"Excel file saved to {output_file}")
+
+        except Exception as e:
+            logger.error(f"Failed to save Excel file: {e}")
+            raise
+
+    def combine_all_facilities(self, input_dir: Path, output_json: Path, output_excel: Path = None) -> Dict[str, Any]:
         """Combine all facility files into single dataset."""
 
         # Find all JSON files
@@ -92,17 +130,22 @@ class FacilityCombiner:
                 "total_facilities": len(facility_stats),
                 "total_records": len(all_records),
                 "facility_breakdown": facility_stats,
-                "combined_timestamp": "2025-06-09T00:00:00"
+                "combined_timestamp": "2025-06-16T00:00:00"
             }
         }
 
-        # Save combined dataset
-        output_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_file, "w", encoding="utf-8") as f:
+        # Save combined dataset as JSON
+        output_json.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_json, "w", encoding="utf-8") as f:
             json.dump(combined_data, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Combined {len(all_records)} records from {len(facility_stats)} facilities")
-        logger.info(f"Output saved to {output_file}")
+        logger.info(f"JSON output saved to {output_json}")
+
+        # Save as Excel if requested
+        if output_excel:
+            output_excel.parent.mkdir(parents=True, exist_ok=True)
+            self.save_to_excel(all_records, output_excel, facility_stats)
 
         return {
             "status": "success",
@@ -116,27 +159,36 @@ def main():
     """Main execution function."""
     parser = argparse.ArgumentParser(description="Combine facility records into unified dataset")
     parser.add_argument("--input-dir", default="data/facility_data", help="Input directory with facility files")
-    parser.add_argument("--output-file", default="data/combined/all_facilities.json", help="Output combined file")
+    parser.add_argument("--output-json", default="data/combined/all_facilities.json", help="Output JSON file")
+    parser.add_argument("--output-excel", default="data/excel_output/all_facilities.xlsx", help="Output Excel file")
+    parser.add_argument("--json-only", action="store_true", help="Only generate JSON output (skip Excel)")
 
     args = parser.parse_args()
 
     # Setup paths
     project_root = Path(__file__).parent.parent.parent
     input_dir = project_root / args.input_dir
-    output_file = project_root / args.output_file
+    output_json = project_root / args.output_json
+    output_excel = None if args.json_only else project_root / args.output_excel
 
     # Combine facilities
     combiner = FacilityCombiner()
-    result = combiner.combine_all_facilities(input_dir, output_file)
+    result = combiner.combine_all_facilities(input_dir, output_json, output_excel)
 
     # Print summary
     if result["status"] == "success":
-        print("Combination Summary:")
+        print("=" * 60)
+        print("FACILITY COMBINATION SUMMARY")
+        print("=" * 60)
         print(f"Facilities processed: {result['facilities_processed']}")
         print(f"Total records combined: {result['combined_records']}")
+        print(f"JSON output: {output_json}")
+        if output_excel:
+            print(f"Excel output: {output_excel}")
         print("\nFacility breakdown:")
         for facility_info in result["facility_breakdown"]:
             print(f"  {facility_info['facility']}: {facility_info['records']} records")
+        print("=" * 60)
         return 0
     else:
         print(f"Combination failed: {result['status']}")
