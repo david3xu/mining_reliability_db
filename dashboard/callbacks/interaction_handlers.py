@@ -700,29 +700,49 @@ class InteractionHandlers:
                 return error_status, html.Div(), True
 
         @app.callback(
-            Output("journey-export-btn", "href"),
+            [Output("journey-status", "children", allow_duplicate=True),
+             Output("journey-export-btn", "disabled", allow_duplicate=True)],
             Input("journey-export-btn", "n_clicks"),
             prevent_initial_call=True
         )
         def export_journey_results(n_clicks):
-            """Export complete journey results as JSON"""
+            """Export complete journey results as JSON file"""
             try:
                 if not n_clicks or not hasattr(self, 'last_journey_results'):
                     raise PreventUpdate
 
                 import json
-                from urllib.parse import quote
+                import os
+                from datetime import datetime
 
-                # Convert results to JSON
-                json_data = json.dumps(self.last_journey_results, indent=2, default=str)
-                json_string = quote(json_data)
+                # Create export directory if it doesn't exist
+                export_dir = "data/stakeholder_results"
+                os.makedirs(export_dir, exist_ok=True)
 
-                # Create download URL
-                return f"data:application/json;charset=utf-8,{json_string}"
+                # Generate filename with timestamp
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"stakeholder_journey_{timestamp}.json"
+                filepath = os.path.join(export_dir, filename)
+
+                # Write results to file
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    json.dump(self.last_journey_results, f, indent=2, default=str)
+
+                # Show success message
+                success_status = dbc.Alert([
+                    html.I(className="fas fa-check-circle me-2"),
+                    f"Journey results exported to: {filepath}"
+                ], color="success", dismissable=True)
+
+                return success_status, False
 
             except Exception as e:
                 handle_error(logger, e, "journey results export")
-                raise PreventUpdate
+                error_status = dbc.Alert([
+                    html.I(className="fas fa-exclamation-triangle me-2"),
+                    f"Export failed: {str(e)}"
+                ], color="danger", dismissable=True)
+                return error_status, False
 
 # Singleton pattern
 _interaction_handlers = None

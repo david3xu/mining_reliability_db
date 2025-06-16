@@ -371,7 +371,7 @@ class PurifiedDashboardApp:
             print("   🏭 Facility Analysis (dynamic)")
             print("=" * 60)
 
-            self.app.run_server(**server_config)
+            self.app.run(**server_config)
 
         except Exception as e:
             handle_error(logger, e, "server startup")
