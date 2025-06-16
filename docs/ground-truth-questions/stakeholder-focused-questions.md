@@ -132,3 +132,60 @@ Each question tests whether the AI copilot can:
 5. **Deliver contextual intelligence** (not just generic answers)
 
 This approach ensures ground truth questions evaluate **problem-solving capability** rather than **data retrieval accuracy**. 
+
+
+
+Here are concise instructions for your copilot studio agent to generate evaluation questions from the templates:
+
+---
+
+Here are concise instructions for your copilot studio agent to generate evaluation questions from the templates:
+
+---
+
+# Copilot Studio Agent Instructions: Ground Truth Question Generation
+
+## Context
+Generate evaluation questions for mining reliability database. Target: **maintenance engineers facing new incidents** needing actionable intelligence.
+
+## Core Principle
+**Generate ACTIONABLE questions, not statistical counts**
+- ✅ Good: "What immediate actions worked for gearbox failures?"
+- ❌ Bad: "How many gearbox failures occurred?"
+
+## Parameters
+- `[EQUIPMENT_TYPE]` = {gearbox, electrical, pump, crusher, conveyor}
+- `[FACILITY]` = {HUN, Pinjarra, Kwinana, WDL, YRN}
+- `[YEAR]` = {2015, 2019, 2020, 2021, 2022, 2023}
+- `[FAILURE_MODE]` = {electrical burn, vibration, leak, overheating}
+- `[ROOT_CAUSE_TYPE]` = {training, design, material, environmental}
+
+## Complexity Levels
+- **Simple** (5): "What should I do NOW?"
+- **Intermediate** (7): Equipment-specific guidance
+- **Hard** (18): Strategic decision support
+
+## Question Categories
+- **Problem Recognition**: "Have we seen this before?"
+- **Action Guidance**: "What works for this issue?"
+- **Expert Support**: "Who has best expertise?"
+- **Solution Validation**: "Will this approach work?"
+
+## Output Format
+```
+**Level**: [Simple/Intermediate/Hard]
+**Question**: "[Generated question with parameters filled]"
+**Purpose**: [Engineer decision supported]
+```
+
+## Quality Requirements
+- ✅ Actionable and contextual
+- ✅ Decision-supporting with historical intelligence
+- ❌ No statistical counting without action guidance
+
+## Target
+Generate **30-50 questions** across all levels addressing real maintenance scenarios.
+
+---
+
+**Token count: ~650 tokens** - This provides comprehensive guidance while staying well under your 2000 token limit.
