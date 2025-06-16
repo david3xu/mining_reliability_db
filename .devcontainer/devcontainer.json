@@ -55,7 +55,7 @@
             "onAutoForward": "ignore"
         }
     },
-    "postCreateCommand": "pip install -e .[dev,analysis] && docker-compose up -d neo4j",
+    "postCreateCommand": "pip install -e .[dev] && docker-compose up -d neo4j",
     "remoteUser": "vscode",
     "hostRequirements": {
         "memory": "8gb"
