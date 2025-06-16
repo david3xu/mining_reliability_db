@@ -1,0 +1,66 @@
+{
+    "name": "Mining Reliability Database",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "ms-python.mypy-type-checker",
+                "ms-toolsai.jupyter",
+                "ms-vscode.test-adapter-converter",
+                "littlefoxteam.vscode-python-test-adapter",
+                "redhat.vscode-yaml",
+                "ms-vscode.makefile-tools",
+                "tamasfe.even-better-toml",
+                "ms-vscode.vscode-json"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.linting.flake8Enabled": true,
+                "python.formatting.provider": "black",
+                "python.sortImports.args": ["--profile", "black"],
+                "python.testing.pytestEnabled": true,
+                "python.testing.pytestArgs": ["tests"],
+                "files.associations": {
+                    "*.toml": "toml"
+                }
+            }
+        }
+    },
+    "forwardPorts": [
+        8050,
+        7474,
+        7687
+    ],
+    "portsAttributes": {
+        "8050": {
+            "label": "Dashboard",
+            "onAutoForward": "notify"
+        },
+        "7474": {
+            "label": "Neo4j Browser",
+            "onAutoForward": "notify"
+        },
+        "7687": {
+            "label": "Neo4j Bolt",
+            "onAutoForward": "ignore"
+        }
+    },
+    "postCreateCommand": "pip install -e .[dev,analysis] && docker-compose up -d neo4j",
+    "remoteUser": "vscode",
+    "hostRequirements": {
+        "memory": "8gb"
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder}/data,target=/workspace/data,type=bind"
+    ]
+}
