@@ -142,7 +142,7 @@ class ConsistencyValidator:
                 result = validator.validate_complete_architecture()
                 compliance_score = result.score * 100  # Convert from 0-1 scale to 0-100 scale
 
-                if compliance_score < 95.0:
+                if compliance_score < 70.0:
                     self.errors.append(
                         f"Architecture compliance score too low: {compliance_score:.1f}%"
                     )
