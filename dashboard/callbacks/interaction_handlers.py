@@ -380,26 +380,50 @@ class InteractionHandlers:
                 display = html.Div()
                 if active_tab == "tab-1":
                     query_type = "what_could_be_causing_this"
-                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
-                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        query_type, keyword_list
+                    )
+                    self.last_results = {
+                        "type": query_type,
+                        "data": results,
+                        "keywords": keyword_list,
+                    }
                     display = create_solutions_table(results)
 
                 elif active_tab == "tab-2":
                     query_type = "who_has_diagnostic_experience"
-                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
-                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        query_type, keyword_list
+                    )
+                    self.last_results = {
+                        "type": query_type,
+                        "data": results,
+                        "keywords": keyword_list,
+                    }
                     display = create_expertise_table(results)
 
                 elif active_tab == "tab-3":
                     query_type = "what_should_i_check_first"
-                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
-                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        query_type, keyword_list
+                    )
+                    self.last_results = {
+                        "type": query_type,
+                        "data": results,
+                        "keywords": keyword_list,
+                    }
                     display = create_timeline_table(results)
 
                 elif active_tab == "tab-4":
                     query_type = "what_investigation_steps_worked"
-                    results = data_adapter.execute_essential_stakeholder_query(query_type, keyword_list)
-                    self.last_results = {"type": query_type, "data": results, "keywords": keyword_list}
+                    results = data_adapter.execute_essential_stakeholder_query(
+                        query_type, keyword_list
+                    )
+                    self.last_results = {
+                        "type": query_type,
+                        "data": results,
+                        "keywords": keyword_list,
+                    }
                     display = create_effective_actions_table(results)
 
                 else:
@@ -420,8 +444,10 @@ class InteractionHandlers:
                 return [error_display], ""
 
         @app.callback(
-            [Output("results-display", "children", allow_duplicate=True),
-             Output("export-status", "children", allow_duplicate=True)],
+            [
+                Output("results-display", "children", allow_duplicate=True),
+                Output("export-status", "children", allow_duplicate=True),
+            ],
             Input("export-json-btn", "n_clicks"),
             prevent_initial_call=True,
         )
@@ -433,17 +459,19 @@ class InteractionHandlers:
             from dashboard.adapters.data_adapter_json_export import get_json_export_adapter
             from dashboard.components.stakeholder_essentials import (
                 create_effective_actions_table_with_export_info,
-                create_solutions_table_with_export_info,
                 create_expertise_table_with_export_info,
-                create_timeline_table_with_export_info
+                create_solutions_table_with_export_info,
+                create_timeline_table_with_export_info,
             )
             from mine_core.shared.common import handle_error
 
             if not n_clicks:
                 raise PreventUpdate
 
-            if not hasattr(self, 'last_results') or not self.last_results:
-                return no_update, dbc.Alert("No results to export. Run a search first.", color="warning")
+            if not hasattr(self, "last_results") or not self.last_results:
+                return no_update, dbc.Alert(
+                    "No results to export. Run a search first.", color="warning"
+                )
 
             try:
                 query_type = self.last_results["type"]
@@ -452,7 +480,10 @@ class InteractionHandlers:
 
                 # Get JSON export adapter and export
                 json_export_adapter = get_json_export_adapter()
-                _, export_path = json_export_adapter.execute_essential_stakeholder_query_with_export(
+                (
+                    _,
+                    export_path,
+                ) = json_export_adapter.execute_essential_stakeholder_query_with_export(
                     query_type, keywords
                 )
 
@@ -468,10 +499,14 @@ class InteractionHandlers:
                 else:
                     return no_update, dbc.Alert("Unknown query type", color="danger")
 
-                status = dbc.Alert([
-                    html.I(className="fas fa-check-circle me-2"),
-                    f"Results exported to: {export_path.split('/')[-1]}"
-                ], color="success", dismissable=True)
+                status = dbc.Alert(
+                    [
+                        html.I(className="fas fa-check-circle me-2"),
+                        f"Results exported to: {export_path.split('/')[-1]}",
+                    ],
+                    color="success",
+                    dismissable=True,
+                )
 
                 return display, status
 
@@ -480,8 +515,10 @@ class InteractionHandlers:
                 return no_update, dbc.Alert(f"Export failed: {str(e)}", color="danger")
 
         @app.callback(
-            [Output("results-display", "children", allow_duplicate=True),
-             Output("export-status", "children", allow_duplicate=True)],
+            [
+                Output("results-display", "children", allow_duplicate=True),
+                Output("export-status", "children", allow_duplicate=True),
+            ],
             Input("export-all-btn", "n_clicks"),
             State("incident-keywords", "value"),
             prevent_initial_call=True,
@@ -506,26 +543,39 @@ class InteractionHandlers:
 
                 # Get JSON export adapter and perform comprehensive export
                 json_export_adapter = get_json_export_adapter()
-                all_results, export_path = json_export_adapter.execute_comprehensive_stakeholder_export(keyword_list)
+                (
+                    all_results,
+                    export_path,
+                ) = json_export_adapter.execute_comprehensive_stakeholder_export(keyword_list)
 
                 if not export_path:
                     return no_update, dbc.Alert("Comprehensive export failed", color="danger")
 
                 # Create comprehensive results display
-                comprehensive_display = self._create_comprehensive_results_display(all_results, export_path)
+                comprehensive_display = self._create_comprehensive_results_display(
+                    all_results, export_path
+                )
 
-                status = dbc.Alert([
-                    html.I(className="fas fa-check-circle me-2"),
-                    f"Comprehensive analysis exported to: {export_path.split('/')[-1]}"
-                ], color="success", dismissable=True)
+                status = dbc.Alert(
+                    [
+                        html.I(className="fas fa-check-circle me-2"),
+                        f"Comprehensive analysis exported to: {export_path.split('/')[-1]}",
+                    ],
+                    color="success",
+                    dismissable=True,
+                )
 
                 return comprehensive_display, status
 
             except Exception as e:
                 handle_error(logger, e, "Comprehensive JSON export")
-                return no_update, dbc.Alert(f"Comprehensive export failed: {str(e)}", color="danger")
+                return no_update, dbc.Alert(
+                    f"Comprehensive export failed: {str(e)}", color="danger"
+                )
 
-    def _create_comprehensive_results_display(self, all_results: Dict[str, List[Dict]], export_path: str) -> html.Div:
+    def _create_comprehensive_results_display(
+        self, all_results: Dict[str, List[Dict]], export_path: str
+    ) -> html.Div:
         """Create display for comprehensive results across all 4 questions"""
         import dash_bootstrap_components as dbc
         from dash import html
@@ -536,10 +586,26 @@ class InteractionHandlers:
         # Create summary cards
         summary_cards = []
         question_titles = {
-            "what_could_be_causing_this": ("What could be causing this?", "primary", "fas fa-search-plus"),
-            "who_has_diagnostic_experience": ("Who has diagnostic experience?", "info", "fas fa-user-md"),
-            "what_should_i_check_first": ("What should I check first?", "warning", "fas fa-list-ol"),
-            "what_investigation_steps_worked": ("What investigation steps worked?", "success", "fas fa-check-circle")
+            "what_could_be_causing_this": (
+                "What could be causing this?",
+                "primary",
+                "fas fa-search-plus",
+            ),
+            "who_has_diagnostic_experience": (
+                "Who has diagnostic experience?",
+                "info",
+                "fas fa-user-md",
+            ),
+            "what_should_i_check_first": (
+                "What should I check first?",
+                "warning",
+                "fas fa-list-ol",
+            ),
+            "what_investigation_steps_worked": (
+                "What investigation steps worked?",
+                "success",
+                "fas fa-check-circle",
+            ),
         }
 
         for question_id, results in all_results.items():
@@ -547,27 +613,44 @@ class InteractionHandlers:
                 title, color, icon = question_titles[question_id]
 
                 summary_cards.append(
-                    dbc.Col([
-                        dbc.Card([
-                            dbc.CardBody([
-                                html.H6([
-                                    html.I(className=f"{icon} me-2"),
-                                    title
-                                ], className=f"text-{color} mb-2"),
-                                html.H4(str(len(results)), className=f"text-{color}"),
-                                html.P("relevant records", className="text-muted small")
-                            ])
-                        ], className=f"border-{color}")
-                    ], width=3)
+                    dbc.Col(
+                        [
+                            dbc.Card(
+                                [
+                                    dbc.CardBody(
+                                        [
+                                            html.H6(
+                                                [html.I(className=f"{icon} me-2"), title],
+                                                className=f"text-{color} mb-2",
+                                            ),
+                                            html.H4(str(len(results)), className=f"text-{color}"),
+                                            html.P(
+                                                "relevant records", className="text-muted small"
+                                            ),
+                                        ]
+                                    )
+                                ],
+                                className=f"border-{color}",
+                            )
+                        ],
+                        width=3,
+                    )
                 )
 
         # Export notification
-        export_notification = dbc.Alert([
-            html.I(className="fas fa-download me-2"),
-            f"Comprehensive analysis exported to: {export_path.split('/')[-1]}",
-            html.Br(),
-            html.Small(f"Total records found: {total_results} across all 4 questions", className="text-muted")
-        ], color="success", className="mb-4")
+        export_notification = dbc.Alert(
+            [
+                html.I(className="fas fa-download me-2"),
+                f"Comprehensive analysis exported to: {export_path.split('/')[-1]}",
+                html.Br(),
+                html.Small(
+                    f"Total records found: {total_results} across all 4 questions",
+                    className="text-muted",
+                ),
+            ],
+            color="success",
+            className="mb-4",
+        )
 
         # Create detailed results sections
         detailed_sections = []
@@ -580,72 +663,114 @@ class InteractionHandlers:
                 for result in results[:5]:  # Show top 5 results per question
                     if question_id == "what_investigation_steps_worked":
                         table_rows.append(
-                            html.Tr([
-                                html.Td(result.get("incident_id", "N/A")),
-                                html.Td(result.get("approach_description", "")[:50] + "..." if len(result.get("approach_description", "")) > 50 else result.get("approach_description", "")),
-                                html.Td(dbc.Badge(f"{result.get('success_rate', 0)}%", color="success" if result.get("success_rate", 0) > 70 else "secondary"))
-                            ])
+                            html.Tr(
+                                [
+                                    html.Td(result.get("incident_id", "N/A")),
+                                    html.Td(
+                                        result.get("approach_description", "")[:50] + "..."
+                                        if len(result.get("approach_description", "")) > 50
+                                        else result.get("approach_description", "")
+                                    ),
+                                    html.Td(
+                                        dbc.Badge(
+                                            f"{result.get('success_rate', 0)}%",
+                                            color="success"
+                                            if result.get("success_rate", 0) > 70
+                                            else "secondary",
+                                        )
+                                    ),
+                                ]
+                            )
                         )
                     elif question_id == "who_has_diagnostic_experience":
                         table_rows.append(
-                            html.Tr([
-                                html.Td(result.get("expert_department", "N/A")),
-                                html.Td(result.get("facility_name", "N/A")),
-                                html.Td(f"{result.get('diagnostic_success_rate', 0)}%")
-                            ])
+                            html.Tr(
+                                [
+                                    html.Td(result.get("expert_department", "N/A")),
+                                    html.Td(result.get("facility_name", "N/A")),
+                                    html.Td(f"{result.get('diagnostic_success_rate', 0)}%"),
+                                ]
+                            )
                         )
                     elif question_id == "what_should_i_check_first":
                         table_rows.append(
-                            html.Tr([
-                                html.Td(result.get("step_description", "N/A")),
-                                html.Td(result.get("priority_level", "N/A")),
-                                html.Td(result.get("instances", 0))
-                            ])
+                            html.Tr(
+                                [
+                                    html.Td(result.get("step_description", "N/A")),
+                                    html.Td(result.get("priority_level", "N/A")),
+                                    html.Td(result.get("instances", 0)),
+                                ]
+                            )
                         )
                     elif question_id == "what_could_be_causing_this":
                         table_rows.append(
-                            html.Tr([
-                                html.Td(result.get("incident_id", "N/A")),
-                                html.Td(result.get("root_cause_analysis", "")[:40] + "..." if len(result.get("root_cause_analysis", "")) > 40 else result.get("root_cause_analysis", "")),
-                                html.Td(f"{result.get('similarity_score', 0):.1f}")
-                            ])
+                            html.Tr(
+                                [
+                                    html.Td(result.get("incident_id", "N/A")),
+                                    html.Td(
+                                        result.get("root_cause_analysis", "")[:40] + "..."
+                                        if len(result.get("root_cause_analysis", "")) > 40
+                                        else result.get("root_cause_analysis", "")
+                                    ),
+                                    html.Td(f"{result.get('similarity_score', 0):.1f}"),
+                                ]
+                            )
                         )
 
                 if table_rows:
                     detailed_sections.append(
-                        dbc.Card([
-                            dbc.CardHeader([
-                                html.I(className=f"{icon} me-2"),
-                                title,
-                                dbc.Badge(f"{len(results)} found", color=color, className="ms-2")
-                            ]),
-                            dbc.CardBody([
-                                dbc.Table([
-                                    html.Tbody(table_rows)
-                                ], striped=True, hover=True, size="sm"),
-                                html.P(f"Showing top 5 of {len(results)} results", className="text-muted small mt-2")
-                            ])
-                        ], className="mb-3")
+                        dbc.Card(
+                            [
+                                dbc.CardHeader(
+                                    [
+                                        html.I(className=f"{icon} me-2"),
+                                        title,
+                                        dbc.Badge(
+                                            f"{len(results)} found", color=color, className="ms-2"
+                                        ),
+                                    ]
+                                ),
+                                dbc.CardBody(
+                                    [
+                                        dbc.Table(
+                                            [html.Tbody(table_rows)],
+                                            striped=True,
+                                            hover=True,
+                                            size="sm",
+                                        ),
+                                        html.P(
+                                            f"Showing top 5 of {len(results)} results",
+                                            className="text-muted small mt-2",
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            className="mb-3",
+                        )
                     )
 
-        return html.Div([
-            export_notification,
-            html.H4("Comprehensive Stakeholder Analysis", className="mb-4"),
-            dbc.Row(summary_cards, className="mb-4"),
-            html.H5("Detailed Results by Question", className="mb-3"),
-            html.Div(detailed_sections)
-        ])
+        return html.Div(
+            [
+                export_notification,
+                html.H4("Comprehensive Stakeholder Analysis", className="mb-4"),
+                dbc.Row(summary_cards, className="mb-4"),
+                html.H5("Detailed Results by Question", className="mb-3"),
+                html.Div(detailed_sections),
+            ]
+        )
 
     def register_stakeholder_journey_callbacks(self, app):
         """Register complete stakeholder journey callbacks"""
 
         @app.callback(
-            [Output("journey-status", "children"),
-             Output("journey-results-container", "children"),
-             Output("journey-export-btn", "disabled")],
+            [
+                Output("journey-status", "children"),
+                Output("journey-results-container", "children"),
+                Output("journey-export-btn", "disabled"),
+            ],
             Input("journey-search-btn", "n_clicks"),
             State("stakeholder-journey-input", "value"),
-            prevent_initial_call=True
+            prevent_initial_call=True,
         )
         def execute_complete_stakeholder_journey(n_clicks, user_input):
             """Execute complete stakeholder journey with single input"""
@@ -656,10 +781,14 @@ class InteractionHandlers:
                 logger.info(f"Starting complete stakeholder journey for: {user_input}")
 
                 # Show loading status
-                loading_status = dbc.Alert([
-                    dbc.Spinner(size="sm", spinner_class_name="me-2"),
-                    f"Executing complete journey for: '{user_input}'..."
-                ], color="info", className="mb-0")
+                loading_status = dbc.Alert(
+                    [
+                        dbc.Spinner(size="sm", spinner_class_name="me-2"),
+                        f"Executing complete journey for: '{user_input}'...",
+                    ],
+                    color="info",
+                    className="mb-0",
+                )
 
                 # Execute journey through data adapter
                 journey_results = self.data_adapter.execute_complete_stakeholder_journey(user_input)
@@ -670,45 +799,62 @@ class InteractionHandlers:
                 if journey_results.get("metadata", {}).get("success"):
                     # Success status
                     total_results = journey_results.get("metadata", {}).get("total_results", 0)
-                    success_status = dbc.Alert([
-                        html.I(className="fas fa-check-circle me-2"),
-                        f"Journey completed successfully! Found {total_results} total results across all questions."
-                    ], color="success", className="mb-0")
+                    success_status = dbc.Alert(
+                        [
+                            html.I(className="fas fa-check-circle me-2"),
+                            f"Journey completed successfully! Found {total_results} total results across all questions.",
+                        ],
+                        color="success",
+                        className="mb-0",
+                    )
 
                     # Create results display using the component function
-                    from dashboard.components.stakeholder_essentials import create_journey_results_display
+                    from dashboard.components.stakeholder_essentials import (
+                        create_journey_results_display,
+                    )
+
                     results_display = create_journey_results_display(journey_results)
 
                     return success_status, results_display, False  # Enable export button
                 else:
                     # Error status
                     error_msg = journey_results.get("metadata", {}).get("error", "Unknown error")
-                    error_status = dbc.Alert([
-                        html.I(className="fas fa-exclamation-triangle me-2"),
-                        f"Journey failed: {error_msg}"
-                    ], color="danger", className="mb-0")
+                    error_status = dbc.Alert(
+                        [
+                            html.I(className="fas fa-exclamation-triangle me-2"),
+                            f"Journey failed: {error_msg}",
+                        ],
+                        color="danger",
+                        className="mb-0",
+                    )
 
                     return error_status, html.Div(), True  # Keep export disabled
 
             except Exception as e:
                 handle_error(logger, e, "complete stakeholder journey callback")
-                error_status = dbc.Alert([
-                    html.I(className="fas fa-exclamation-triangle me-2"),
-                    f"Error executing journey: {str(e)}"
-                ], color="danger", className="mb-0")
+                error_status = dbc.Alert(
+                    [
+                        html.I(className="fas fa-exclamation-triangle me-2"),
+                        f"Error executing journey: {str(e)}",
+                    ],
+                    color="danger",
+                    className="mb-0",
+                )
 
                 return error_status, html.Div(), True
 
         @app.callback(
-            [Output("journey-status", "children", allow_duplicate=True),
-             Output("journey-export-btn", "disabled", allow_duplicate=True)],
+            [
+                Output("journey-status", "children", allow_duplicate=True),
+                Output("journey-export-btn", "disabled", allow_duplicate=True),
+            ],
             Input("journey-export-btn", "n_clicks"),
-            prevent_initial_call=True
+            prevent_initial_call=True,
         )
         def export_journey_results(n_clicks):
             """Export complete journey results as JSON file"""
             try:
-                if not n_clicks or not hasattr(self, 'last_journey_results'):
+                if not n_clicks or not hasattr(self, "last_journey_results"):
                     raise PreventUpdate
 
                 import json
@@ -725,24 +871,33 @@ class InteractionHandlers:
                 filepath = os.path.join(export_dir, filename)
 
                 # Write results to file
-                with open(filepath, 'w', encoding='utf-8') as f:
+                with open(filepath, "w", encoding="utf-8") as f:
                     json.dump(self.last_journey_results, f, indent=2, default=str)
 
                 # Show success message
-                success_status = dbc.Alert([
-                    html.I(className="fas fa-check-circle me-2"),
-                    f"Journey results exported to: {filepath}"
-                ], color="success", dismissable=True)
+                success_status = dbc.Alert(
+                    [
+                        html.I(className="fas fa-check-circle me-2"),
+                        f"Journey results exported to: {filepath}",
+                    ],
+                    color="success",
+                    dismissable=True,
+                )
 
                 return success_status, False
 
             except Exception as e:
                 handle_error(logger, e, "journey results export")
-                error_status = dbc.Alert([
-                    html.I(className="fas fa-exclamation-triangle me-2"),
-                    f"Export failed: {str(e)}"
-                ], color="danger", dismissable=True)
+                error_status = dbc.Alert(
+                    [
+                        html.I(className="fas fa-exclamation-triangle me-2"),
+                        f"Export failed: {str(e)}",
+                    ],
+                    color="danger",
+                    dismissable=True,
+                )
                 return error_status, False
+
 
 # Singleton pattern
 _interaction_handlers = None
