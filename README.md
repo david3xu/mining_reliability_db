@@ -18,12 +18,20 @@ git clone <repository>
 cd mining-reliability-dashboard
 pip install -r requirements.txt
 
-
-git commit --no-verify -m "cypher search works - investigating architecture compliance"
-
 # Configure environment
 cp .env.example .env
 # Edit .env with your database credentials
+
+# Start Neo4j database (choose one option)
+docker-compose up -d neo4j    # Option 1: Docker Compose
+# OR
+make docker-neo4j             # Option 2: Direct Docker
+
+# Setup database schema
+make schema
+
+# Import sample data (optional)
+make import-sample
 
 # Run dashboard
 python dashboard/app.py
@@ -31,12 +39,27 @@ python dashboard/app.py
 
 **Access:** http://localhost:8050
 
-## Development
+## Development Setup
+
+**Complete development setup:**
+
+```bash
+make dev-setup    # Complete environment setup
+make quick-start  # Quick start with sample data
+```
+
+**Available commands:**
+
+```bash
+make help  # Show all available commands
+```
 
 **Architecture Validation:**
 
 ```bash
-python dashboard/validation/architecture_validator.py --report
+make validate-architecture  # Validate architecture compliance
+make validate-config       # Validate configuration setup
+make validate-data         # Run data integrity validation
 ```
 
 **Performance Analysis:**
@@ -51,6 +74,52 @@ python dashboard/validation/performance_profiler.py --report
 python dashboard/validation/integration_tester.py --report
 ```
 
+## Database Management
+
+**Docker Setup Options:**
+
+**Option 1: Docker Compose (Recommended):**
+```bash
+docker ps
+docker-compose up -d neo4j     # Start Neo4j service
+docker-compose down            # Stop all services
+docker-compose logs neo4j      # View Neo4j logs
+docker-compose stop neo4j      # Stop Neo4j only
+```
+
+**Option 2: Direct Docker Commands:**
+```bash
+make docker-neo4j   # Start new Neo4j container
+make docker-start   # Start existing container
+make docker-stop    # Stop container
+make docker-logs    # View logs
+make docker-clean   # Remove container (deletes data)
+```
+
+**Current Status Check:**
+```bash
+docker ps           # Check running containers
+make validate-db    # Test database connection
+```
+
+**Schema Management:**
+
+```bash
+make schema         # Create database schema
+make schema-reset   # Complete schema reset
+make reset          # Reset data only
+make reset-all      # Reset everything
+```
+
+**Data Import:**
+
+```bash
+make import         # Import all facility data
+make import-sample  # Import sample data for testing
+make import-large   # Optimized for large datasets
+make import-debug   # Import with debug logging
+```
+
 ## Structure
 
 ```
@@ -58,6 +127,7 @@ mine_core/          # Core business logic
 dashboard/adapters/ # Pure data access layer
 dashboard/components/ # UI rendering layer
 configs/           # Configuration files
+scripts/           # Database and utility scripts
 ```
 
 ## Compliance
@@ -85,14 +155,47 @@ configs/           # Configuration files
 
 All system behavior controlled through JSON configuration files in `configs/` directory. No hardcoded values in operational code.
 
-## Production
+**Key configuration files:**
+- `model_schema.json` - Entity relationships and UI generation
+- `field_mappings.json` - Data processing logic
+- `dashboard_config.json` - UI settings and styling
+
+## Testing
 
 ```bash
-# Docker deployment
-docker-compose up -d
+make test           # Run complete test suite
+make test-coverage  # Run tests with coverage report
+make lint           # Run code quality checks
+make type-check     # Run type checking
+```
 
-# Manual deployment
+## Production
+
+**Docker deployment:**
+
+```bash
+docker-compose up -d
+```
+
+**Manual deployment:**
+
+```bash
 gunicorn dashboard.app:server --bind 0.0.0.0:8050
 ```
 
 **Monitoring:** Performance and compliance validation tools included for production monitoring.
+
+## Troubleshooting
+
+**Common issues:**
+
+- **Port conflicts:** Use `docker ps` to check existing containers
+- **Database connection:** Run `make validate-db` to test connection
+- **Performance issues:** Run `make validate-architecture --report`
+
+**Getting help:**
+
+```bash
+make info           # Show system information
+make help          # Show all available commands
+```

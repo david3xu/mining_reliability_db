@@ -1,0 +1,249 @@
+{
+  "question_generation_framework": {
+    "metadata": {
+      "version": "1.0.0",
+      "approach": "dimensional_modeling",
+      "total_questions": 30,
+      "evaluation_framework": "copilot_studio_ground_truth"
+    },
+    
+    "complexity_distribution": {
+      "simple": {
+        "count": 5,
+        "percentage": 16.7,
+        "pattern": "single_dimension_count",
+        "cypher_complexity": "basic_match_count"
+      },
+      "intermediate": {
+        "count": 7,
+        "percentage": 23.3,
+        "pattern": "multi_dimension_aggregation",
+        "cypher_complexity": "grouping_with_ordering"
+      },
+      "hard": {
+        "count": 18,
+        "percentage": 60.0,
+        "pattern": "workflow_analysis_calculation",
+        "cypher_complexity": "multi_entity_traversal_analytics"
+      }
+    },
+
+    "primary_dimensions": {
+      "equipment_topic": {
+        "source_field": "ActionRequest.categories",
+        "secondary_source": "Asset.asset_numbers",
+        "sample_values": [
+          "gearbox", "electrical", "pump", "conveyor", 
+          "motor", "bearing", "valve", "sensor"
+        ],
+        "filter_pattern": "toLower(ar.categories) CONTAINS toLower($equipment_type)",
+        "dimension_priority": "high"
+      },
+      
+      "facility": {
+        "source_field": "Facility.facility_name",
+        "sample_values": [
+          "Pinjarra", "Kwinana", "Worsley", "Huntly"
+        ],
+        "filter_pattern": "f.facility_name = $facility_name",
+        "dimension_priority": "high"
+      },
+      
+      "temporal": {
+        "source_field": "ActionRequest.initiation_date",
+        "extraction": "year(ar.initiation_date)",
+        "sample_values": [2015, 2016, 2017, 2018, 2019, 2020],
+        "filter_pattern": "year(ar.initiation_date) = $year",
+        "dimension_priority": "medium"
+      },
+      
+      "workflow_stage": {
+        "entity_progression": [
+          "ActionRequest", "Problem", "RootCause", "ActionPlan", "Verification"
+        ],
+        "completion_indicators": {
+          "problem_identified": "EXISTS((ar)<-[:IDENTIFIED_IN]-(p:Problem))",
+          "root_cause_analyzed": "EXISTS((ar)<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause))",
+          "action_planned": "EXISTS(path_to_action_plan)",
+          "verification_completed": "EXISTS(path_to_verification)"
+        },
+        "dimension_priority": "medium"
+      },
+      
+      "outcome_effectiveness": {
+        "source_field": "Verification.is_action_plan_effective",
+        "boolean_values": [true, false],
+        "filter_pattern": "v.is_action_plan_effective = $effectiveness",
+        "calculation_field": "success_rate_calculation",
+        "dimension_priority": "high"
+      }
+    },
+
+    "question_templates": {
+      "simple_count_questions": [
+        {
+          "template": "How many {equipment_type} incidents do we have in {facility}?",
+          "cypher_pattern": "basic_equipment_facility_count",
+          "expected_answer_type": "integer",
+          "validation_query": "count_validation"
+        },
+        {
+          "template": "How many root cause analyses were completed in {year}?",
+          "cypher_pattern": "yearly_rootcause_count",
+          "expected_answer_type": "integer",
+          "validation_query": "temporal_count_validation"
+        },
+        {
+          "template": "How many {equipment_type} incidents occurred in {year}?",
+          "cypher_pattern": "equipment_temporal_count",
+          "expected_answer_type": "integer",
+          "validation_query": "equipment_year_validation"
+        }
+      ],
+      
+      "intermediate_aggregation_questions": [
+        {
+          "template": "What are the top 3 facilities for {equipment_type} issues in {year}?",
+          "cypher_pattern": "facility_ranking_by_equipment_year",
+          "expected_answer_type": "ranked_list",
+          "validation_query": "facility_ranking_validation"
+        },
+        {
+          "template": "How many {equipment_type} root causes were identified per facility?",
+          "cypher_pattern": "equipment_rootcause_facility_distribution",
+          "expected_answer_type": "facility_count_pairs",
+          "validation_query": "distribution_validation"
+        },
+        {
+          "template": "What's the monthly distribution of {equipment_type} incidents in {facility}?",
+          "cypher_pattern": "temporal_distribution_analysis",
+          "expected_answer_type": "time_series",
+          "validation_query": "temporal_distribution_validation"
+        }
+      ],
+      
+      "hard_analytical_questions": [
+        {
+          "template": "What's the success rate for resolving {equipment_type} issues in {facility} during {year}?",
+          "cypher_pattern": "equipment_facility_year_success_rate",
+          "expected_answer_type": "percentage",
+          "validation_query": "success_rate_calculation_validation"
+        },
+        {
+          "template": "Which facility has the most effective root cause analysis for {equipment_type}?",
+          "cypher_pattern": "facility_effectiveness_comparison",
+          "expected_answer_type": "facility_with_metrics",
+          "validation_query": "effectiveness_ranking_validation"
+        },
+        {
+          "template": "What are the common root cause patterns for {equipment_type} across multiple facilities?",
+          "cypher_pattern": "cross_facility_pattern_analysis",
+          "expected_answer_type": "pattern_frequency_list",
+          "validation_query": "pattern_analysis_validation"
+        },
+        {
+          "template": "How does the resolution time for {equipment_type} issues compare between {facility1} and {facility2}?",
+          "cypher_pattern": "comparative_resolution_analysis",
+          "expected_answer_type": "comparative_metrics",
+          "validation_query": "resolution_time_comparison_validation"
+        }
+      ]
+    },
+
+    "cypher_query_patterns": {
+      "basic_equipment_facility_count": {
+        "query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility {facility_name: $facility}) WHERE toLower(ar.categories) CONTAINS toLower($equipment_type) RETURN count(*) as incident_count",
+        "parameters": ["facility", "equipment_type"],
+        "complexity": "simple"
+      },
+      
+      "facility_ranking_by_equipment_year": {
+        "query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE toLower(ar.categories) CONTAINS toLower($equipment_type) AND year(ar.initiation_date) = $year WITH f.facility_name as facility, count(*) as incidents RETURN facility, incidents ORDER BY incidents DESC LIMIT 3",
+        "parameters": ["equipment_type", "year"],
+        "complexity": "intermediate"
+      },
+      
+      "equipment_facility_year_success_rate": {
+        "query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility {facility_name: $facility})<-[:IDENTIFIED_IN]-(p:Problem)<-[:ANALYZES]-(rc:RootCause)<-[:RESOLVES]-(ap:ActionPlan)<-[:VALIDATES]-(v:Verification) WHERE toLower(ar.categories) CONTAINS toLower($equipment_type) AND year(ar.initiation_date) = $year WITH count(*) as total_plans, count(CASE WHEN v.is_action_plan_effective = true THEN 1 END) as effective_plans RETURN round((effective_plans * 100.0 / total_plans), 1) as success_rate",
+        "parameters": ["facility", "equipment_type", "year"],
+        "complexity": "hard"
+      }
+    },
+
+    "data_discovery_queries": {
+      "extract_equipment_types": {
+        "query": "MATCH (ar:ActionRequest) WHERE ar.categories IS NOT NULL RETURN DISTINCT ar.categories as equipment_types ORDER BY equipment_types",
+        "purpose": "Get actual equipment categories from data"
+      },
+      
+      "extract_facilities": {
+        "query": "MATCH (f:Facility) RETURN DISTINCT f.facility_name as facilities ORDER BY facilities",
+        "purpose": "Get actual facility names from data"
+      },
+      
+      "extract_year_range": {
+        "query": "MATCH (ar:ActionRequest) WHERE ar.initiation_date IS NOT NULL RETURN min(year(ar.initiation_date)) as earliest_year, max(year(ar.initiation_date)) as latest_year",
+        "purpose": "Get temporal range with data"
+      },
+      
+      "validate_data_volumes": {
+        "query": "MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility) WHERE ar.categories IS NOT NULL WITH f.facility_name as facility, ar.categories as equipment, year(ar.initiation_date) as year, count(*) as volume WHERE volume >= 5 RETURN facility, equipment, year, volume ORDER BY volume DESC",
+        "purpose": "Find dimension combinations with sufficient data for meaningful questions"
+      }
+    },
+
+    "question_generation_process": {
+      "step_1_data_discovery": {
+        "description": "Execute data discovery queries to get actual dimensional values",
+        "queries": ["extract_equipment_types", "extract_facilities", "extract_year_range", "validate_data_volumes"]
+      },
+      
+      "step_2_dimension_matrix": {
+        "description": "Create cross-product of dimensions with sufficient data volume",
+        "minimum_data_threshold": 5,
+        "dimension_combinations": [
+          ["equipment_type", "facility"],
+          ["equipment_type", "year"],
+          ["facility", "year"],
+          ["equipment_type", "facility", "year"]
+        ]
+      },
+      
+      "step_3_question_distribution": {
+        "description": "Distribute questions across complexity levels and dimensional combinations",
+        "distribution_strategy": "balanced_coverage",
+        "ensure_representation": "all_primary_dimensions"
+      },
+      
+      "step_4_ground_truth_execution": {
+        "description": "Execute validation queries to generate expected answers",
+        "store_results": "ground_truth_answers.json",
+        "include_metadata": ["execution_timestamp", "data_volume", "query_parameters"]
+      }
+    },
+
+    "evaluation_framework_integration": {
+      "copilot_studio_format": {
+        "question_structure": {
+          "question_id": "unique_identifier",
+          "question_text": "natural_language_question",
+          "complexity_level": "simple|intermediate|hard",
+          "dimensions_used": ["list_of_dimensions"],
+          "expected_answer": "ground_truth_result",
+          "validation_query": "cypher_query_for_verification",
+          "metadata": {
+            "equipment_type": "value_if_applicable",
+            "facility": "value_if_applicable", 
+            "year": "value_if_applicable"
+          }
+        }
+      },
+      
+      "success_metrics": {
+        "exact_match_rate": "percentage_of_exact_answer_matches",
+        "semantic_similarity": "embedding_based_answer_similarity",
+        "query_accuracy": "correct_cypher_query_generation_rate"
+      }
+    }
+  }
+} 
