@@ -95,7 +95,133 @@ class FacilityCombiner:
             logger.error(f"Failed to save Excel file: {e}")
             raise
 
-    def combine_all_facilities(self, input_dir: Path, output_json: Path, output_excel: Path = None) -> Dict[str, Any]:
+    def save_to_markdown(self, records: List[Dict[str, Any]], output_file: Path, facility_stats: List[Dict[str, Any]]) -> None:
+        """Save records to separate Markdown files by facility - pure JSON data conversion."""
+        try:
+            # Create markdown folder structure
+            markdown_dir = output_file.parent / "markdown_facilities"
+            markdown_dir.mkdir(exist_ok=True)
+
+            # Create combined file
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write("# Mining Reliability Database - All Facilities\n\n")
+                f.write(f"**Total Records:** {len(records)}\n")
+                f.write(f"**Total Facilities:** {len(facility_stats)}\n\n")
+                f.write("## Facility Files\n\n")
+                for facility_info in facility_stats:
+                    facility_name = facility_info['facility']
+                    record_count = facility_info['records']
+                    f.write(f"- [{facility_name}.md]({markdown_dir.name}/{facility_name}.md) - {record_count} records\n")
+                f.write("\n")
+
+            # Create separate markdown files for each facility
+            for facility_info in facility_stats:
+                facility_name = facility_info['facility']
+                facility_records = [r for r in records if r.get('_facility_name') == facility_name]
+
+                if facility_records:
+                    facility_file = markdown_dir / f"{facility_name}.md"
+
+                    with open(facility_file, 'w', encoding='utf-8') as f:
+                        # Facility header
+                        f.write(f"# {facility_name}\n\n")
+                        f.write(f"**Total Records:** {len(facility_records)}\n\n")
+
+                        # Convert each record to markdown
+                        for i, record in enumerate(facility_records, 1):
+                            # Use Action Request Number as header if available, otherwise use record number
+                            record_id = record.get('Action Request Number:', f'Record {i}')
+                            f.write(f"## {record_id}\n\n")
+
+                            # Write all fields from the record (except facility name since it's in the file header)
+                            for field_name, field_value in record.items():
+                                if field_name == '_facility_name':
+                                    continue  # Skip since it's already in the header
+
+                                if field_value is not None and str(field_value).strip():
+                                    # Clean field name for display
+                                    display_name = field_name.replace('_', ' ').title()
+                                    if display_name.endswith(':'):
+                                        display_name = display_name[:-1]
+
+                                    # Format the value
+                                    if isinstance(field_value, str) and len(field_value) > 100:
+                                        # For long text, use block format
+                                        f.write(f"**{display_name}:**\n\n{field_value}\n\n")
+                                    else:
+                                        # For short text, use inline format
+                                        f.write(f"**{display_name}:** {field_value}\n\n")
+
+                            # Add separator between records
+                            f.write("---\n\n")
+
+                    logger.info(f"Created {facility_file} with {len(facility_records)} records")
+
+            logger.info(f"Markdown files created in {markdown_dir}")
+            logger.info(f"Index file saved to {output_file}")
+
+        except Exception as e:
+            logger.error(f"Failed to save Markdown files: {e}")
+            raise
+
+    def save_facility_markdowns(self, records: List[Dict[str, Any]], output_dir: Path, facility_stats: List[Dict[str, Any]]) -> None:
+        """Save separate markdown files for each facility."""
+        try:
+            # Create the output directory
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create separate file for each facility
+            for facility_info in facility_stats:
+                facility_name = facility_info['facility']
+                facility_records = [r for r in records if r.get('_facility_name') == facility_name]
+
+                if facility_records:
+                    # Clean filename
+                    safe_filename = facility_name.replace('.', '_').replace('-', '_') + '.md'
+                    facility_file = output_dir / safe_filename
+
+                    with open(facility_file, 'w', encoding='utf-8') as f:
+                        # Facility header
+                        f.write(f"# {facility_name}\n\n")
+                        f.write(f"**Total Records:** {len(facility_records)}\n\n")
+
+                        # Convert each record to markdown
+                        for i, record in enumerate(facility_records, 1):
+                            # Use Action Request Number as header if available, otherwise use record number
+                            record_id = record.get('Action Request Number:', f'Record {i}')
+                            f.write(f"## {record_id}\n\n")
+
+                            # Write all fields from the record (except facility name since it's in the file header)
+                            for field_name, field_value in record.items():
+                                if field_name == '_facility_name':
+                                    continue  # Skip since it's already in the header
+
+                                if field_value is not None and str(field_value).strip():
+                                    # Clean field name for display
+                                    display_name = field_name.replace('_', ' ').title()
+                                    if display_name.endswith(':'):
+                                        display_name = display_name[:-1]
+
+                                    # Format the value
+                                    if isinstance(field_value, str) and len(field_value) > 100:
+                                        # For long text, use block format
+                                        f.write(f"**{display_name}:**\n\n{field_value}\n\n")
+                                    else:
+                                        # For short text, use inline format
+                                        f.write(f"**{display_name}:** {field_value}\n\n")
+
+                            # Add separator between records
+                            f.write("---\n\n")
+
+                    logger.info(f"Created facility markdown: {facility_file}")
+
+            logger.info(f"All facility markdown files saved to {output_dir}")
+
+        except Exception as e:
+            logger.error(f"Failed to save facility markdown files: {e}")
+            raise
+
+    def combine_all_facilities(self, input_dir: Path, output_json: Path, output_excel: Path = None, output_markdown: Path = None, facility_markdown_dir: Path = None) -> Dict[str, Any]:
         """Combine all facility files into single dataset."""
 
         # Find all JSON files
@@ -130,7 +256,7 @@ class FacilityCombiner:
                 "total_facilities": len(facility_stats),
                 "total_records": len(all_records),
                 "facility_breakdown": facility_stats,
-                "combined_timestamp": "2025-06-16T00:00:00"
+                "combined_timestamp": "2025-06-17T00:00:00"
             }
         }
 
@@ -147,6 +273,15 @@ class FacilityCombiner:
             output_excel.parent.mkdir(parents=True, exist_ok=True)
             self.save_to_excel(all_records, output_excel, facility_stats)
 
+        # Save as Markdown if requested
+        if output_markdown:
+            output_markdown.parent.mkdir(parents=True, exist_ok=True)
+            self.save_to_markdown(all_records, output_markdown, facility_stats)
+
+        # Save separate facility markdown files if requested
+        if facility_markdown_dir:
+            self.save_facility_markdowns(all_records, facility_markdown_dir, facility_stats)
+
         return {
             "status": "success",
             "combined_records": len(all_records),
@@ -161,7 +296,12 @@ def main():
     parser.add_argument("--input-dir", default="data/facility_data", help="Input directory with facility files")
     parser.add_argument("--output-json", default="data/combined/all_facilities.json", help="Output JSON file")
     parser.add_argument("--output-excel", default="data/excel_output/all_facilities.xlsx", help="Output Excel file")
-    parser.add_argument("--json-only", action="store_true", help="Only generate JSON output (skip Excel)")
+    parser.add_argument("--output-markdown", default="data/excel_output/all_facilities_report.md", help="Output Markdown report")
+    parser.add_argument("--facility-markdown-dir", default="data/facility_markdown", help="Directory for separate facility markdown files")
+    parser.add_argument("--json-only", action="store_true", help="Only generate JSON output (skip Excel and Markdown)")
+    parser.add_argument("--skip-excel", action="store_true", help="Skip Excel generation")
+    parser.add_argument("--skip-markdown", action="store_true", help="Skip Markdown generation")
+    parser.add_argument("--skip-facility-markdown", action="store_true", help="Skip separate facility markdown files")
 
     args = parser.parse_args()
 
@@ -169,11 +309,23 @@ def main():
     project_root = Path(__file__).parent.parent.parent
     input_dir = project_root / args.input_dir
     output_json = project_root / args.output_json
-    output_excel = None if args.json_only else project_root / args.output_excel
+
+    # Determine output formats
+    output_excel = None
+    output_markdown = None
+    facility_markdown_dir = None
+
+    if not args.json_only:
+        if not args.skip_excel:
+            output_excel = project_root / args.output_excel
+        if not args.skip_markdown:
+            output_markdown = project_root / args.output_markdown
+        if not args.skip_facility_markdown:
+            facility_markdown_dir = project_root / args.facility_markdown_dir
 
     # Combine facilities
     combiner = FacilityCombiner()
-    result = combiner.combine_all_facilities(input_dir, output_json, output_excel)
+    result = combiner.combine_all_facilities(input_dir, output_json, output_excel, output_markdown, facility_markdown_dir)
 
     # Print summary
     if result["status"] == "success":
@@ -185,6 +337,10 @@ def main():
         print(f"JSON output: {output_json}")
         if output_excel:
             print(f"Excel output: {output_excel}")
+        if output_markdown:
+            print(f"Markdown report: {output_markdown}")
+        if facility_markdown_dir:
+            print(f"Facility markdown directory: {facility_markdown_dir}")
         print("\nFacility breakdown:")
         for facility_info in result["facility_breakdown"]:
             print(f"  {facility_info['facility']}: {facility_info['records']} records")

@@ -63,6 +63,8 @@ data/excel_output/*
 !data/excel_output/.keep
 data/facility_data/*
 !data/facility_data/.keep
+data/facility_markdown/*
+!data/facility_markdown/.keep
 data/inter_data/*
 !data/inter_data/.keep
 data/raw_data/*
@@ -73,6 +75,8 @@ data/stakeholder_results/*
 !data/stakeholder_results/.keep
 data/test_output/*
 !data/test_output/.keep
+data/combined/*
+!data/combined/.keep
 
 # Additional data file patterns
 *.csv
