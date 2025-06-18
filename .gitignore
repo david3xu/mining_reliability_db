@@ -78,6 +78,9 @@ data/test_output/*
 data/combined/*
 !data/combined/.keep
 
+# Split facility records output (generated files)
+data/facility_data/split_records/
+
 # Additional data file patterns
 *.csv
 *.xlsx
