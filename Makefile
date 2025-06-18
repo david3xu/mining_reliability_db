@@ -59,27 +59,25 @@ install-full: ## Install all development and analysis dependencies
 	pip install -e ".[dev]"
 	pip install -r requirements-dev.txt
 
-# Docker Neo4j Management - Updated patterns
-docker-neo4j: ## Start Neo4j container with standard configuration
-	docker run -d --name neo4j \
-		-p 7474:7474 -p 7687:7687 \
-		-e NEO4J_AUTH=neo4j/password \
-		neo4j:latest
+# Docker Neo4j Management - Updated to use docker-compose
+docker-neo4j: ## Start Neo4j using docker-compose
+	docker compose up -d neo4j
 	@echo "Neo4j started. Browser: http://localhost:7474"
-	@echo "Configure connection in .env file"
+	@echo "Credentials: neo4j/mining123"
 
 docker-start: ## Start existing Neo4j container
-	docker start neo4j
+	docker compose start neo4j
 
 docker-stop: ## Stop Neo4j container
-	docker stop neo4j
+	docker compose stop neo4j
 
-docker-clean: ## Remove Neo4j container (deletes data)
-	docker stop neo4j || true
-	docker rm neo4j || true
+docker-clean: ## Remove Neo4j container and data volume
+	docker compose down
+	docker volume rm mining_reliability_db_neo4j_data || true
+	@echo "Neo4j container and data volume removed"
 
 docker-logs: ## View Neo4j container logs
-	docker logs neo4j
+	docker compose logs neo4j
 
 # Development workflow shortcuts - Updated for unified architecture
 dev-setup: setup install-dev docker-neo4j ## Complete development environment setup
