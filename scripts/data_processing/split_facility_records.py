@@ -57,40 +57,48 @@ def load_records_from_file(file_path: Path) -> List[Dict[str, Any]]:
         return []
 
 
-def create_safe_filename(record: Dict[str, Any], index: int) -> str:
+def create_safe_filename(record: Dict[str, Any], index: int, source_filename: str = "") -> str:
     """
-    Create a safe filename for the record JSON file.
+    Create a safe filename for the record JSON file using action request number + facility name.
 
     Args:
         record: The record dictionary
         index: Index of the record in the original file
+        source_filename: Name of the source file (used as fallback for facility name)
 
     Returns:
-        Safe filename string
+        Safe filename string in format: ActionRequestNumber_FacilityName.json
     """
-    # Try to use meaningful identifiers from the record
-    potential_ids = [
-        record.get("Action Request Number:", ""),
-        record.get("Title", ""),
-        record.get("Asset Number(s)", ""),
-        record.get("_facility_name", "")
-    ]
+    # Get action request number
+    action_request = record.get("Action Request Number:", "")
+    if not action_request:
+        action_request = record.get("Action Request Number", "")
 
-    # Find the first non-empty identifier
-    record_id = None
-    for id_val in potential_ids:
-        if id_val and str(id_val).strip():
-            record_id = str(id_val).strip()
-            break
+    # Get facility name
+    facility_name = record.get("_facility_name", "")
+    if not facility_name and source_filename:
+        # Use source filename without extension as facility name
+        facility_name = Path(source_filename).stem
 
-    if record_id:
-        # Clean the ID to make it filesystem-safe
-        safe_id = "".join(c for c in record_id if c.isalnum() or c in ('-', '_', ' ')).strip()
-        safe_id = safe_id.replace(' ', '_')[:50]  # Limit length
-        filename = f"{index:04d}_{safe_id}.json"
+    # Clean values to make them filesystem-safe
+    if action_request:
+        safe_action = "".join(c for c in str(action_request).strip() if c.isalnum() or c in ('-', '_')).strip()
     else:
-        # Fallback to just the index
-        filename = f"{index:04d}_record.json"
+        safe_action = f"Record{index:04d}"
+
+    if facility_name:
+        safe_facility = "".join(c for c in str(facility_name).strip() if c.isalnum() or c in ('-', '_')).strip()
+    else:
+        safe_facility = "UnknownFacility"
+
+    # Create filename: ActionRequestNumber_FacilityName.json
+    filename = f"{safe_action}_{safe_facility}.json"
+
+    # Ensure filename is not too long (max 255 characters for most filesystems)
+    if len(filename) > 200:
+        safe_action = safe_action[:100]
+        safe_facility = safe_facility[:90]
+        filename = f"{safe_action}_{safe_facility}.json"
 
     return filename
 
@@ -124,8 +132,8 @@ def split_facility_file(input_file: Path, output_base_dir: Path) -> int:
     processed_count = 0
     for index, record in enumerate(records):
         try:
-            # Create filename
-            filename = create_safe_filename(record, index)
+            # Create filename using action request number + facility name
+            filename = create_safe_filename(record, index, input_file.name)
             output_file = output_dir / filename
 
             # Add metadata to the record
