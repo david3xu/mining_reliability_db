@@ -9,6 +9,8 @@ plotly==5.17.0
 pandas>=2.1.3
 numpy>=1.26.0
 xlsxwriter==3.1.2  # For Excel export functionality
+python-docx==1.1.0  # For DOCX document generation
+openpyxl==3.1.2  # For Excel file creation and manipulation
 
 # Database Connectivity
 neo4j==5.13.0
