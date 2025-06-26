@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 # import os
 
 # Strategic import: Use adapter instead of direct mine_core access
-from dashboard.adapters import get_data_adapter, get_workflow_adapter
+from dashboard.adapters import get_data_adapter
 from dashboard.adapters.config_adapter import handle_error_utility
 from dashboard.utils.styling import get_chart_layout_template, get_colors, get_fonts
 from mine_core.utils.constants import BASE_DIR

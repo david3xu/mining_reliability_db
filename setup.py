@@ -1,62 +1,45 @@
-#!/usr/bin/env python3
-"""
-Mining Reliability Dashboard - Package Configuration
-Professional analytics platform with clean architecture.
-"""
-
-from setuptools import find_packages, setup
-
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
-with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+from setuptools import setup, find_packages
 
 setup(
-    name="mining-reliability-dashboard",
-    version="2.0.0",
-    author="Mining Analytics Team",
-    description="Professional analytics platform for operational intelligence",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
+    name="mining-reliability-search",
+    version="1.0.0",
+    description="Advanced search algorithms for mining reliability data using Neo4j graph database",
+    long_description="Sophisticated search algorithms and pattern discovery tools specifically designed for mining reliability data analysis. Features include graph-based search, Cypher query interface with safety validation, cross-facility pattern discovery, and stakeholder-focused query templates.",
     packages=find_packages(),
+    install_requires=[
+        "neo4j>=5.0.0",
+        "dash>=2.15.0",
+        "dash-bootstrap-components>=1.5.0",
+        "plotly>=5.17.0",
+        "pandas>=2.0.0",
+        "python-dotenv>=1.0.0",
+        "pydantic>=2.0.0",
+        "numpy>=1.24.0",
+        "scipy>=1.10.0",
+        "scikit-learn>=1.3.0",
+        "structlog>=23.1.0",
+    ],
+    python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Manufacturing",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Engineers",
+        "Intended Audience :: Developers",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Database :: Database Engines/Servers",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Programming Language :: Python :: 3.12",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
-    python_requires=">=3.9",
-    install_requires=requirements,
-    extras_require={
-        "dev": [
-            "pytest>=7.4.3",
-            "pytest-cov>=4.1.0",
-            "black>=23.9.1",
-            "flake8>=6.1.0",
-            "mypy>=1.7.1",
-        ],
-        "production": [
-            "gunicorn>=21.2.0",
-            "redis>=5.0.1",
-        ],
-    },
-    entry_points={
-        "console_scripts": [
-            "mining-dashboard=dashboard.app:main",
-            "validate-architecture=dashboard.validation.architecture_validator:main",
-            "profile-performance=dashboard.validation.performance_profiler:main",
-            "test-integration=dashboard.validation.integration_tester:main",
-        ],
-    },
-    include_package_data=True,
-    package_data={
-        "configs": ["*.json"],
-        "dashboard": ["static/*", "assets/*"],
+    keywords="mining reliability search algorithms neo4j graph database pattern discovery",
+    author="Mining Reliability Team",
+    project_urls={
+        "Documentation": "https://github.com/your-org/mining-reliability-search/docs",
+        "Source": "https://github.com/your-org/mining-reliability-search",
+        "Tracker": "https://github.com/your-org/mining-reliability-search/issues",
     },
 )

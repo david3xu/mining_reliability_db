@@ -1,7 +1,0 @@
-{
-  "descriptive_fields": "Text/String (Unstructured)",
-  "temporal_fields": "Date (Temporal)",
-  "categorical_fields": "Categorical (Discrete)",
-  "boolean_fields": "Boolean (Binary)",
-  "quantitative_fields": "Numeric (Quantitative)"
-}

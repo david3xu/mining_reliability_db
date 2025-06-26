@@ -1,201 +1,238 @@
-# Mining Reliability Dashboard
+# Mining Reliability Search Algorithms
 
-Professional analytics platform for operational intelligence with clean Core → Adapter → Component architecture.
+Advanced search algorithms and pattern discovery tools specifically designed for mining reliability data analysis using Neo4j graph database.
 
-## Architecture
+## 🚀 Overview
 
-**Core Layer:** Business intelligence and data processing
-**Adapter Layer:** Pure data access without business logic
-**Component Layer:** UI rendering with single responsibilities
+This repository contains sophisticated search algorithms that enable engineers and analysts to quickly discover patterns, solutions, and insights across mining facility data. Built on Neo4j graph database technology, it provides both user-friendly interfaces and powerful programmatic access to complex mining reliability data.
 
-## Quick Start
+## ✨ Key Features
 
-**Requirements:** Python 3.9+, Neo4j 5.0+
+### 🔍 Multi-Dimensional Graph Search
+- **Comprehensive Pattern Matching**: Search across incidents, equipment, solutions, and facilities simultaneously
+- **Cross-Facility Intelligence**: Discover knowledge sharing opportunities between different facilities
+- **Equipment Failure Analysis**: Specialized algorithms for equipment-specific failure patterns
+- **Temporal Pattern Discovery**: Time-based trend analysis and seasonal pattern detection
+
+### 🛡️ Safe Cypher Query Interface
+- **Query Validation Framework**: Built-in safety checks prevent dangerous operations
+- **Template-Based System**: Pre-built queries for common use cases
+- **Advanced Result Visualization**: Interactive charts and graphs for query results
+- **Export Capabilities**: CSV, JSON, and visualization exports
+
+### 📊 Pattern Discovery Engine
+- **Root Cause Analysis**: Automated discovery of recurring root causes
+- **Solution Effectiveness Ranking**: Evidence-based solution success analysis
+- **Stakeholder Knowledge Mapping**: Connect experts with relevant experience
+- **Workflow Analysis**: Process efficiency and bottleneck identification
+
+### 🎯 Stakeholder-Focused Queries
+Pre-built queries optimized for different roles:
+- **Engineers**: "What should I check first?", "Who can help me?"
+- **Managers**: "What are the most effective solutions?", "Where are the patterns?"
+- **Analysts**: "Why did this happen?", "How do I prevent recurrence?"
+
+## 🏗️ Architecture
+
+```
+mining-reliability-search/
+├── dashboard/
+│   ├── components/
+│   │   ├── graph_search.py      # Multi-dimensional graph search interface
+│   │   └── cypher_search.py     # Advanced Cypher query interface
+│   └── adapters/                # Data connectivity layer
+├── mine_core/
+│   ├── analytics/
+│   │   ├── pattern_discovery.py # Core pattern analysis algorithms
+│   │   └── workflow_analyzer.py # Workflow pattern analysis
+│   └── database/                # Neo4j connectivity and query management
+├── configs/
+│   ├── graph_search_config.json # Search algorithm configurations
+│   ├── cypher_search_config.json # Query safety and templates
+│   └── queries/                 # Pre-built Cypher query library
+└── utils/                       # Utilities and helpers
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Neo4j Database 5.0+
+- Access to mining reliability data in Neo4j
+
+### Installation
 
 ```bash
-# Clone and setup
-git clone <repository>
-cd mining-reliability-dashboard
+# Clone the repository
+git clone https://github.com/your-org/mining-reliability-search.git
+cd mining-reliability-search
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Configure environment
+# Set up environment variables
 cp .env.example .env
-# Edit .env with your database credentials
-
-# Start Neo4j database (choose one option)
-docker-compose up -d neo4j    # Option 1: Docker Compose
-# OR
-make docker-neo4j             # Option 2: Direct Docker
-
-# Setup database schema
-make schema
-
-# Import sample data (optional)
-make import-sample
-
-# Run dashboard
-python dashboard/app.py
+# Edit .env with your Neo4j connection details:
+# NEO4J_URI=bolt://localhost:7687
+# NEO4J_USER=neo4j
+# NEO4J_PASSWORD=your_password
 ```
 
-**Access:** http://localhost:8050
-
-## Development Setup
-
-**Complete development setup:**
+### Running the Search Interface
 
 ```bash
-make dev-setup    # Complete environment setup
-make quick-start  # Quick start with sample data
+# Start the search dashboard
+python -m dashboard.app
+
+# Open your browser to: http://localhost:8050
 ```
 
-**Available commands:**
+### Programmatic Usage
+
+```python
+from mine_core.analytics.pattern_discovery import PatternDiscovery
+from mine_core.database.query_manager import QueryManager
+
+# Initialize search components
+pattern_discovery = PatternDiscovery()
+query_manager = QueryManager()
+
+# Search for equipment failures
+results = pattern_discovery.analyze_equipment_patterns("excavator motor")
+
+# Execute custom search
+query_results = query_manager.search_comprehensive("contamination incidents")
+```
+
+## 📋 Core Components
+
+### Graph Search Engine (`dashboard/components/graph_search.py`)
+- **Multi-dimensional search**: Incidents, equipment, solutions, facilities
+- **Intelligent result ranking**: Relevance-based result ordering
+- **Export capabilities**: Multiple output formats
+- **Real-time suggestions**: Auto-complete and search hints
+
+### Cypher Query Interface (`dashboard/components/cypher_search.py`)
+- **Safety validation**: Query sanitization and limits
+- **Template library**: Common query patterns
+- **Result visualization**: Charts, tables, and graphs
+- **Query history**: Track and reuse previous searches
+
+### Pattern Discovery (`mine_core/analytics/pattern_discovery.py`)
+- **Cross-facility analysis**: Compare patterns across locations
+- **Equipment failure clustering**: Group similar failure modes
+- **Solution effectiveness scoring**: Rank solutions by success rate
+- **Trend detection**: Identify emerging patterns over time
+
+### Query Templates (`configs/queries/`)
+Stakeholder-focused pre-built queries:
+- `who_can_help_me.cypher` - Find relevant experts
+- `what_should_i_check_first.cypher` - Priority investigation steps
+- `proven_solutions.cypher` - Validated solution approaches
+- `why_did_this_happen.cypher` - Root cause analysis
+
+## 🔧 Configuration
+
+### Search Behavior (`configs/graph_search_config.json`)
+```json
+{
+  "search_queries": {
+    "comprehensive_incident_search": "...",
+    "equipment_facility_network": "...",
+    "solution_effectiveness_graph": "..."
+  },
+  "result_limits": {
+    "default_limit": 20,
+    "max_limit": 100
+  }
+}
+```
+
+### Safety Framework (`configs/cypher_search_config.json`)
+```json
+{
+  "safety": {
+    "allowed_keywords": ["MATCH", "RETURN", "WHERE", "ORDER BY"],
+    "forbidden_keywords": ["DELETE", "DROP", "CREATE"],
+    "max_query_length": 2000,
+    "require_limit_clause": true
+  }
+}
+```
+
+## 📊 Use Cases
+
+### Equipment Failure Analysis
+Search for patterns in equipment failures across facilities:
+```cypher
+MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+WHERE ar.categories CONTAINS 'excavator'
+RETURN f.facility_id, count(*) as incidents
+ORDER BY incidents DESC
+```
+
+### Solution Effectiveness Tracking
+Find the most effective solutions for specific problems:
+```cypher
+MATCH (ap:ActionPlan)<-[:VALIDATES]-(v:Verification)
+WHERE v.is_action_plan_effective = 'Yes'
+RETURN ap.action_plan, count(*) as success_count
+ORDER BY success_count DESC
+```
+
+### Expert Knowledge Discovery
+Identify who has experience with specific issues:
+```cypher
+MATCH (ar:ActionRequest)-[:BELONGS_TO]->(f:Facility)
+WHERE ar.categories CONTAINS $equipment_type
+RETURN f.facility_id, collect(ar.responsible_department) as departments
+```
+
+## 🧪 Testing
 
 ```bash
-make help  # Show all available commands
+# Run search algorithm tests
+python -m pytest tests/unit/analytics/
+python -m pytest tests/unit/database/
+
+# Test search interfaces
+python scripts/test_comprehensive_graph_search.py
+
+# Performance testing
+python -m pytest tests/performance/ -v
 ```
 
-**Architecture Validation:**
+## 📚 Documentation
 
-```bash
-make validate-architecture  # Validate architecture compliance
-make validate-config       # Validate configuration setup
-make validate-data         # Run data integrity validation
-```
+- **[Neo4j Command Line Guide](docs/NEO4J_COMMAND_LINE_GUIDE.md)** - Database interaction guide
+- **[Graph Analysis Benefits](docs/neo4j-graph-analysis/)** - Why graph databases for mining data
+- **[Ground Truth Questions](docs/ground-truth-questions/)** - Validation question library
+- **[Search Algorithm Details](docs/SEARCH_BRANCH_CLEANUP_PLAN.md)** - Technical implementation details
 
-**Performance Analysis:**
+## 🤝 Contributing
 
-```bash
-python dashboard/validation/performance_profiler.py --report
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-search`)
+3. Commit your changes (`git commit -m 'Add amazing search feature'`)
+4. Push to the branch (`git push origin feature/amazing-search`)
+5. Open a Pull Request
 
-**Integration Testing:**
+## 📄 License
 
-```bash
-python dashboard/validation/integration_tester.py --report
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Database Management
+## 🆘 Support
 
-**Docker Setup Options:**
+- **Documentation**: Check the `docs/` directory
+- **Issues**: Report bugs and request features via GitHub Issues
+- **Questions**: Use GitHub Discussions for general questions
 
-**Option 1: Docker Compose (Recommended):**
-```bash
-docker ps
-docker-compose up -d neo4j     # Start Neo4j service
-docker-compose down            # Stop all services
-docker-compose logs neo4j      # View Neo4j logs
-docker-compose stop neo4j      # Stop Neo4j only
-```
+## 🔗 Related Projects
 
-**Option 2: Direct Docker Commands:**
-```bash
-make docker-neo4j   # Start new Neo4j container
-make docker-start   # Start existing container
-make docker-stop    # Stop container
-make docker-logs    # View logs
-make docker-clean   # Remove container (deletes data)
-```
+- **Neo4j**: Graph database platform
+- **Dash**: Python web application framework
+- **Plotly**: Interactive visualization library
 
-**Current Status Check:**
-```bash
-docker ps           # Check running containers
-make validate-db    # Test database connection
-```
+---
 
-**Schema Management:**
-
-```bash
-make schema         # Create database schema
-make schema-reset   # Complete schema reset
-make reset          # Reset data only
-make reset-all      # Reset everything
-```
-
-**Data Import:**
-
-```bash
-make import         # Import all facility data
-make import-sample  # Import sample data for testing
-make import-large   # Optimized for large datasets
-make import-debug   # Import with debug logging
-```
-
-## Structure
-
-```
-mine_core/          # Core business logic
-dashboard/adapters/ # Pure data access layer
-dashboard/components/ # UI rendering layer
-configs/           # Configuration files
-scripts/           # Database and utility scripts
-```
-
-## Compliance
-
-- **MDC Architecture:** 100% compliant
-- **Function Size:** Core ≤50, Adapter ≤20, Component ≤30 lines
-- **Dependencies:** Core → Adapter → Component flow enforced
-- **Configuration:** Schema-driven, zero hardcoding
-
-## Performance
-
-- **Response Time:** Sub-second for all operations
-- **Architecture:** Clean separation eliminates redundancy
-- **Monitoring:** Built-in performance profiling
-
-## Features
-
-- Portfolio analytics across operational facilities
-- Workflow intelligence with stage analysis
-- Data quality assessment and gap identification
-- Facility-specific performance analysis
-- Interactive navigation with real-time validation
-
-## Configuration
-
-All system behavior controlled through JSON configuration files in `configs/` directory. No hardcoded values in operational code.
-
-**Key configuration files:**
-- `model_schema.json` - Entity relationships and UI generation
-- `field_mappings.json` - Data processing logic
-- `dashboard_config.json` - UI settings and styling
-
-## Testing
-
-```bash
-make test           # Run complete test suite
-make test-coverage  # Run tests with coverage report
-make lint           # Run code quality checks
-make type-check     # Run type checking
-```
-
-## Production
-
-**Docker deployment:**
-
-```bash
-docker-compose up -d
-```
-
-**Manual deployment:**
-
-```bash
-gunicorn dashboard.app:server --bind 0.0.0.0:8050
-```
-
-**Monitoring:** Performance and compliance validation tools included for production monitoring.
-
-## Troubleshooting
-
-**Common issues:**
-
-- **Port conflicts:** Use `docker ps` to check existing containers
-- **Database connection:** Run `make validate-db` to test connection
-- **Performance issues:** Run `make validate-architecture --report`
-
-**Getting help:**
-
-```bash
-make info           # Show system information
-make help          # Show all available commands
-```
+**Built with ❤️ for mining reliability engineers**
