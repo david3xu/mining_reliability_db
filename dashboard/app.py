@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Purified Dashboard Application - Pure Bootstrap Architecture
-Clean application entry point with routing delegation and adapter validation.
+Search-Only Dashboard Application - Minimal Search Interface
+Clean application entry point focused on search algorithms only.
 """
 
 import logging
@@ -16,412 +16,80 @@ sys.path.insert(0, str(project_root))
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, callback, dcc, html
-from dash.exceptions import PreventUpdate
 
-# Adapter validation
+# Search components and adapters
 from dashboard.adapters import get_config_adapter, get_data_adapter
-from dashboard.routing.navigation_builder import get_navigation_builder
-
-# Pure routing and navigation
-from dashboard.routing.url_manager import get_url_manager
-from dashboard.utils.styling import get_dashboard_styles
-from mine_core.shared.common import handle_error, setup_project_environment
-
-logger = None
-
-
-class PurifiedDashboardApp:
-    """Clean application bootstrap with routing delegation"""
-
-    def __init__(self, debug=None, port=None, host=None):
-        self.debug = debug if debug is not None else False
-        self.port = port or 8050
-        self.host = host or "127.0.0.1"
-
-        self._setup_logging()
-        self._validate_adapters()
-        self._initialize_app()
-        self._setup_routing()
-
-    def _setup_logging(self):
-        """Initialize logging through project infrastructure"""
-        global logger
-        try:
-            logger = setup_project_environment("purified_dashboard")
-            logger.info("Purified dashboard initialization started")
-        except Exception as e:
-            logging.basicConfig(level=logging.INFO)
-            logger = logging.getLogger(__name__)
-            logger.warning(f"Project environment setup failed: {e}")
-
-    def _validate_adapters(self):
-        """Validate adapter layer availability"""
-        try:
-            data_adapter = get_data_adapter()
-            config_adapter = get_config_adapter()
-
-            validation = data_adapter.get_data_quality_validation()
-            if validation.overall_status:
-                logger.info("✅ Adapter layer validated")
-            else:
-                logger.warning("⚠️ Adapter validation issues detected")
-
-            # Call the debug method
-            debug_info = data_adapter.debug_search_data_structure()
-            print("Debug Search Data Structure:", debug_info)
-
-        except Exception as e:
-            handle_error(logger, e, "adapter validation")
-
-    def _initialize_app(self):
-        """Initialize Dash application with clean architecture"""
-        try:
-            # Use centralized styling utility
-            styling = get_dashboard_styles()
-
-            self.app = dash.Dash(
-                __name__,
-                external_stylesheets=[
-                    dbc.themes.BOOTSTRAP,
-                    {
-                        "href": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
-                        "rel": "stylesheet",
-                    },
-                    "/dashboard/assets/custom_styles.css",
-                ],
-                suppress_callback_exceptions=True,
-                title="Mining Reliability Database",
-                meta_tags=[
-                    {"name": "viewport", "content": "width=device-width, initial-scale=1.0"},
-                    {"name": "description", "content": "Professional Mining Reliability Analysis"},
-                ],
-            )
-
-            self.app.layout = self._create_layout()
-            logger.info("Purified application initialized")
-
-        except Exception as e:
-            handle_error(logger, e, "application initialization")
-            raise
-
-    def _create_layout(self):
-        """Create application layout with navigation delegation"""
-        navigation_builder = get_navigation_builder()
-        # Use centralized styling utility for main layout background
-        styling = get_dashboard_styles()
-
-        return html.Div(
-            [
-                dcc.Location(id="url", refresh=False),
-                navigation_builder.build_main_navigation(),
-                html.Div(
-                    id="page-content",
-                    className="container-fluid p-4",
-                    style=styling["main_container"],
-                ),
-            ]
-        )
+from dashboard.components import create_graph_search_layout, create_cypher_search_layout, create_standard_layout
+from mine_core.shared.common import setup_project_environment
 
-    def _setup_routing(self):
-        """Setup routing through URL manager and register all callbacks"""
-        # Import all components with callbacks to ensure they're registered
-        self._register_all_callbacks()
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-        url_manager = get_url_manager()
 
-        @self.app.callback(
-            Output("page-content", "children"), Input("url", "pathname"), prevent_initial_call=False
-        )
-        def route_page(pathname):
-            """Route pages through URL manager"""
-            try:
-                if not url_manager.validate_route(pathname):
-                    return self._create_not_found_page(pathname)
+def create_search_app():
+    """Create a minimal search-only dashboard application."""
 
-                route_config = url_manager.resolve_route(pathname)
-                return self._load_page_component(route_config)
+    # Setup environment
+    setup_project_environment()
 
-            except Exception as e:
-                handle_error(logger, e, f"routing for {pathname}")
-                return self._create_error_page(str(e))
+    # Initialize Dash app
+    app = dash.Dash(
+        __name__,
+        external_stylesheets=[dbc.themes.BOOTSTRAP],
+        suppress_callback_exceptions=True
+    )
 
-    def _register_all_callbacks(self):
-        """Register all application callbacks through interaction handlers"""
-        try:
-            # Register interaction handlers
-            from dashboard.callbacks.interaction_handlers import get_interaction_handlers
+    # Simple layout with tabs for the two search interfaces
+    app.layout = html.Div([
+        dbc.Container([
+            html.H1("Mining Reliability Search", className="text-center mb-4"),
 
-            interaction_handlers = get_interaction_handlers()
+            dbc.Tabs([
+                dbc.Tab(label="Graph Search", tab_id="graph-search"),
+                dbc.Tab(label="Cypher Search", tab_id="cypher-search"),
+            ], id="search-tabs", active_tab="graph-search"),
 
-            # Register all callback types
-            interaction_handlers.register_chart_interactions(self.app)
-            interaction_handlers.register_table_interactions(self.app)
-            interaction_handlers.register_navigation_interactions(self.app)
-            interaction_handlers.register_search_interactions(self.app)
-            interaction_handlers.register_stakeholder_essentials_interactions(self.app)
-            interaction_handlers.register_stakeholder_journey_callbacks(self.app)
+            html.Div(id="tab-content", className="mt-3")
+        ], fluid=True)
+    ])
 
-            logger.info("✅ All callbacks registered through interaction handlers")
+    # Callback to switch between search interfaces
+    @app.callback(
+        Output("tab-content", "children"),
+        Input("search-tabs", "active_tab")
+    )
+    def render_tab_content(active_tab):
+        if active_tab == "graph-search":
+            return create_graph_search_layout()
+        elif active_tab == "cypher-search":
+            return create_cypher_search_layout()
+        return html.Div("Select a search tab")
 
-            # Import enhanced investigation component to register callbacks
-            import dashboard.components.graph_search
+    return app
 
-            logger.info("✅ Enhanced investigation callbacks imported")
 
-            # Also ensure incident search component callbacks are imported
-            # import dashboard.components.incident_search # Removed redundant import
+# For compatibility with existing code
+def create_app():
+    """Create the search application."""
+    return create_search_app()
 
-            logger.info("✅ Search component callbacks imported")
 
-        except Exception as e:
-            handle_error(logger, e, "callback registration")
-            logger.warning("⚠️ Some callbacks may not be registered properly")
-            # import dashboard.components.other_component_with_callbacks
+class SearchDashboardApp:
+    """Minimal search dashboard application wrapper."""
 
-        except Exception as e:
-            handle_error(logger, e, "callback registration")
-            logger.warning("⚠️ Some callbacks may not be registered")
+    def __init__(self):
+        self.app = create_search_app()
 
-    def _load_page_component(self, route_config: dict):
-        """Load page component based on route configuration"""
-        component_name = route_config.get("component")
+    def run(self, host="0.0.0.0", port=8050, debug=False):
+        """Run the search dashboard."""
+        self.app.run_server(host=host, port=port, debug=debug)
 
-        try:
-            if component_name == "portfolio_overview":
-                from dashboard.components.portfolio_overview import create_complete_dashboard
 
-                return create_complete_dashboard()
-
-            elif component_name == "data_quality_layout":
-                from dashboard.components.data_quality import create_data_quality_layout
-
-                return create_data_quality_layout()
-
-            elif component_name == "workflow_analysis_layout":
-                from dashboard.components.workflow_analysis import create_workflow_analysis_layout
-
-                return create_workflow_analysis_layout()
-
-            elif component_name == "essential_questions_layout":
-                from dashboard.components.stakeholder_essentials import (
-                    create_essential_questions_interface,
-                )
-
-                return create_essential_questions_interface()
-
-            elif component_name == "summary":
-                return self._create_facilities_summary()
-
-            elif component_name == "historical_records_page":
-                from dashboard.components.portfolio_overview import create_historical_records_page
-
-                return create_historical_records_page()
-
-            elif component_name == "facilities_distribution_page":
-                from dashboard.components.portfolio_overview import (
-                    create_facilities_distribution_page,
-                )
-
-                return create_facilities_distribution_page()
-
-            elif component_name == "data_types_distribution_page":
-                from dashboard.components.portfolio_overview import (
-                    create_data_types_distribution_page,
-                )
-
-                return create_data_types_distribution_page()
-
-            elif component_name == "incident_search_layout":
-                from dashboard.components.incident_search import create_incident_search_layout
-
-                return create_incident_search_layout()
-
-            elif component_name == "solution_sequence_case_study_layout":
-                from dashboard.components.solution_sequence_case_study import (
-                    create_solution_sequence_case_study_layout,
-                )
-
-                return create_solution_sequence_case_study_layout()
-
-            elif component_name == "facility_detail_layout":
-                from dashboard.components.facility_detail import create_facility_detail_layout
-
-                return create_facility_detail_layout(route_config.get("facility_id"))
-
-            elif component_name == "cypher_search_layout":
-                from dashboard.components.cypher_search import create_cypher_search_layout
-
-                return create_cypher_search_layout()
-
-            elif component_name == "graph_search_layout":
-                from dashboard.components.graph_search import create_graph_search_layout
-
-                return create_graph_search_layout()
-
-            elif component_name == "stakeholder_essentials":
-                from dashboard.components.stakeholder_essentials import (
-                    create_complete_stakeholder_journey,
-                )
-
-                return create_complete_stakeholder_journey()
-
-            return self._create_not_found_page(component_name)
-
-        except Exception as e:
-            handle_error(logger, e, f"loading component {component_name}")
-            return self._create_error_page(str(e))
-
-    def _create_not_found_page(self, pathname):
-        """Create 404 page"""
-        return dbc.Container(
-            [
-                dbc.Alert(
-                    [
-                        html.H4("Page Not Found"),
-                        html.P(f"Route '{pathname}' does not exist"),
-                        dbc.Button("Return to Portfolio", href="/", color="primary"),
-                    ],
-                    color="warning",
-                )
-            ]
-        )
-
-    def _create_error_page(self, error_message):
-        """Create error page"""
-        return dbc.Container(
-            [
-                dbc.Alert(
-                    [
-                        html.H4("Application Error"),
-                        html.P(error_message),
-                        dbc.Button("Return to Portfolio", href="/", color="secondary"),
-                    ],
-                    color="danger",
-                )
-            ]
-        )
-
-    def _create_facilities_summary(self):
-        """Create facilities summary page"""
-        try:
-            data_adapter = get_data_adapter()
-            portfolio_data = data_adapter.get_portfolio_metrics()
-            facility_data = data_adapter.get_facility_breakdown()
-
-            return html.Div(
-                [
-                    html.H2("Four Facilities Summary", className="text-primary mb-4"),
-                    html.P(
-                        f"Analysis across {facility_data.total_records:,} records from {len(facility_data.labels)} facilities"
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                [
-                                    dbc.Card(
-                                        [
-                                            dbc.CardBody(
-                                                [
-                                                    html.H4(label, className="card-title"),
-                                                    html.H2(f"{value:,}", className="text-success"),
-                                                    html.P(
-                                                        f"{percentage:.1f}% of total",
-                                                        className="text-muted",
-                                                    ),
-                                                ]
-                                            )
-                                        ]
-                                    )
-                                ],
-                                md=3,
-                            )
-                            for label, value, percentage in zip(
-                                facility_data.labels,
-                                facility_data.values,
-                                facility_data.percentages,
-                            )
-                        ]
-                    ),
-                ]
-            )
-
-        except Exception as e:
-            handle_error(logger, e, "facilities summary creation")
-            return self._create_error_page("Facilities summary unavailable")
-
-    def run_server(self, **kwargs):
-        """Run dashboard server with status reporting"""
-        try:
-            server_config = {"host": self.host, "port": self.port, "debug": self.debug}
-            server_config.update(kwargs)
-
-            print("\n" + "=" * 60)
-            print("🚀 PURIFIED MINING RELIABILITY DASHBOARD")
-            print("=" * 60)
-            print(f"📊 URL: http://{self.host}:{self.port}")
-            print(f"🏗️ Architecture: Core → Adapter → Component")
-            print(f"🔧 Debug Mode: {self.debug}")
-            print("=" * 60)
-            print("🧭 Navigation:")
-            print("   📋 Portfolio Overview (/)")
-            print("   🔍 Data Quality (/data-quality)")
-            print("   🔄 Workflow Analysis (/workflow)")
-            print("   🔎 Incident Search (/search)")
-            print("   📊 Summary (/summary)")
-            print("   🏭 Facility Analysis (dynamic)")
-            print("=" * 60)
-
-            self.app.run(**server_config)
-
-        except Exception as e:
-            handle_error(logger, e, "server startup")
-            raise
-
-
-def create_app(debug=None, port=None, host=None):
-    """Application factory"""
-    try:
-        return PurifiedDashboardApp(debug=debug, port=port, host=host)
-    except Exception as e:
-        if logger:
-            handle_error(logger, e, "application creation")
-        raise
-
-
-def main():
-    """CLI entry point"""
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Purified Mining Reliability Dashboard")
-    parser.add_argument("--port", type=int, help="Server port")
-    parser.add_argument("--host", type=str, help="Server host")
-    parser.add_argument("--debug", action="store_true", help="Debug mode")
-
-    args = parser.parse_args()
-
-    try:
-        app = create_app(debug=args.debug, port=args.port, host=args.host)
-        app.run_server()
-        return 0
-
-    except KeyboardInterrupt:
-        print("\n🛑 Dashboard stopped")
-        return 0
-    except Exception as e:
-        print(f"Error: {e}")
-        return 1
+# For compatibility
+PurifiedDashboardApp = SearchDashboardApp
 
 
 if __name__ == "__main__":
-    exit(main())
-
-# Production WSGI
-try:
-    production_app = create_app()
-    app = production_app.app
-    server = app.server
-except Exception as e:
-    print(f"Production app creation failed: {e}")
-    app = dash.Dash(__name__)
-    app.layout = html.Div("Production initialization failed")
-    server = app.server
+    app = create_app()
+    app.run(host="0.0.0.0", port=8050, debug=True)

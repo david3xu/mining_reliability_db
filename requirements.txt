@@ -1,36 +1,23 @@
-# Mining Reliability Dashboard - Core Dependencies
+# Core Dependencies for Mining Reliability Search Algorithms
+# Graph Database and Connectivity
+neo4j>=5.0.0
 
-# Dashboard Framework
-dash==2.14.1
-dash-bootstrap-components==1.5.0
-plotly==5.17.0
+# Dashboard and Web Interface
+dash>=2.15.0
+dash-bootstrap-components>=1.5.0
 
-# Data Processing
-pandas>=2.1.3
-numpy>=1.26.0
-xlsxwriter==3.1.2  # For Excel export functionality
-python-docx==1.1.0  # For DOCX document generation
-openpyxl==3.1.2  # For Excel file creation and manipulation
+# Data Visualization and Analysis
+plotly>=5.17.0
+pandas>=2.0.0
 
-# Database Connectivity
-neo4j==5.13.0
+# Configuration and Environment
+python-dotenv>=1.0.0
+pydantic>=2.0.0
 
-# Configuration Management
-python-dotenv==1.0.0
-pydantic==2.5.0
+# Optional: Enhanced Analytics
+numpy>=1.24.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
 
-# Logging and Monitoring
-structlog==23.2.0
-
-# Development Tools
-black==23.9.1
-flake8==6.1.0
-pytest==7.4.3
-pytest-cov==4.1.0
-
-# Type Checking
-mypy==1.7.1
-
-# Package Management
-setuptools==68.2.2
-wheel==0.41.3
+# Logging and Utilities
+structlog>=23.1.0

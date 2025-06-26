@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Mining Reliability Dashboard - Main Package
-Professional analytics platform with Core → Adapter → Component architecture.
+Mining Reliability Search Dashboard - Main Package
+Search-focused analytics platform with minimal architecture.
 """
 
 __version__ = "2.0.0"
 __author__ = "Mining Analytics Team"
-__description__ = "Professional operational intelligence dashboard"
+__description__ = "Search-focused operational intelligence dashboard"
 
 # Main application entry point
-from dashboard.app import PurifiedDashboardApp, create_app
+from dashboard.app import SearchDashboardApp, create_app
 
-__all__ = ["PurifiedDashboardApp", "create_app", "__version__"]
+__all__ = ["SearchDashboardApp", "create_app", "__version__"]

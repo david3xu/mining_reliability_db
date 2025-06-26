@@ -16,7 +16,7 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 
 from dashboard.adapters.config_adapter import ConfigAdapter
 from dashboard.adapters.data_adapter import DataAdapter
-from dashboard.utils.layout_helpers import create_standard_layout
+from dashboard.components.layout_template import create_standard_layout
 
 logger = logging.getLogger(__name__)
 
